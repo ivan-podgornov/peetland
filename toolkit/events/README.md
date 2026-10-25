@@ -1,4 +1,4 @@
-# @brain/events
+# @peetland/events
 
 Инструменты для работы с событиями и отменой асинхронных операций. API повторяет браузерный,
 поэтому если вы работали с `EventTarget` и `AbortController`, всё будет знакомо.
@@ -16,7 +16,7 @@
 больше не нужна:
 
 ```ts
-import { AbortController, EventTarget } from '@brain/events';
+import { AbortController, EventTarget } from '@peetland/events';
 
 type Events = {
   npcDied: number;

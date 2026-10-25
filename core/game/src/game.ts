@@ -1,4 +1,4 @@
-import type { IGeometry } from '@brain/geometry';
+import type { IGeometry } from '@peetland/geometry';
 
 import type { IActorFactory } from './actor';
 import type { IObjectFactory } from './object';

@@ -7,7 +7,7 @@
 ## Быстрый старт
 
 ```ts
-import { AbortController } from '@brain/events';
+import { AbortController } from '@peetland/events';
 
 const controller = new AbortController();
 

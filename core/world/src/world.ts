@@ -1,5 +1,5 @@
-import type { IGame } from '@brain/game';
-import type { Vector3 } from '@brain/geometry';
+import type { IGame } from '@peetland/game';
+import type { Vector3 } from '@peetland/geometry';
 
 export type WorldDeps = {
   game: IGame;

@@ -7,18 +7,18 @@
     "target": "esnext",
     "verbatimModuleSyntax": false,
     "paths": {
-      "@brain/game": ["../../core/game/src/index.ts"],
-      "@brain/world": ["../../core/world/src/index.ts"],
-      "@brain/gta-sa": ["../gta-sa/src/index.ts"],
-      "@brain/moonloader": ["../moonloader/src/index.ts"],
+      "@peetland/game": ["../../core/game/src/index.ts"],
+      "@peetland/world": ["../../core/world/src/index.ts"],
+      "@peetland/gta-sa": ["../gta-sa/src/index.ts"],
+      "@peetland/moonloader": ["../moonloader/src/index.ts"],
       "vkeys": ["../moonloader/src/vkeys.ts"],
-      "@brain/events": ["../../toolkit/events/src/index.ts"],
-      "@brain/geometry": ["../../toolkit/geometry/src/index.ts"],
-      "@brain/htn": ["../../toolkit/htn/src/index.ts"]
+      "@peetland/events": ["../../toolkit/events/src/index.ts"],
+      "@peetland/geometry": ["../../toolkit/geometry/src/index.ts"],
+      "@peetland/htn": ["../../toolkit/htn/src/index.ts"]
     }
   },
   "tstl": {
-    "luaBundle": "./dist/brain.lua",
+    "luaBundle": "./dist/peetland.lua",
     "luaBundleEntry": "./src/main.ts",
     "luaTarget": "JIT",
     "noImplicitSelf": true,

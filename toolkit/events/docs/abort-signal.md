@@ -8,7 +8,7 @@
 Операция получает сигнал и реагирует на отмену:
 
 ```ts
-import { AbortController, AbortSignal } from '@brain/events';
+import { AbortController, AbortSignal } from '@peetland/events';
 
 function doWork(signal: AbortSignal) {
   if (signal.aborted) {

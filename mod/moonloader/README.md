@@ -26,7 +26,7 @@
 ## Установка
 
 ```bash
-npm install @brain/moonloader
+npm install @peetland/moonloader
 ```
 
 ## Использование
@@ -39,7 +39,7 @@ import {
   getCharHeading,
   print,
   PLAYER_PED,
-} from '@brain/moonloader';
+} from '@peetland/moonloader';
 import * as vkeys from 'vkeys';
 
 function main() {

@@ -9,7 +9,7 @@
 Сначала опишите события: ключ - название события, значение - тип данных, которые с ним передаются.
 
 ```ts
-import { EventTarget } from '@brain/events';
+import { EventTarget } from '@peetland/events';
 
 type Events = {
   npcDied: [id: number];

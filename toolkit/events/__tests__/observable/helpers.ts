@@ -20,6 +20,11 @@ export function getDefaultSubscribeOptions(): SubscribeOptions {
   return {};
 }
 
+/** Ждёт, пока выполнятся все микрозадачи, запланированные к этому моменту */
+export function flushPromises(): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve));
+}
+
 export function createControlledObservable(
   options: ObservableOptions = getDefaultObservableOptions()
 ) {

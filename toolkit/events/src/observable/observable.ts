@@ -2,9 +2,10 @@ import { MulticastObserver } from '../multicast-observer';
 import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
+import { ObservableFactory } from './factory';
 import type { ErrorHandler, Executor, ObservableOptions, SubscribeOptions } from './types';
 
-export class Observable<T> {
+export class Observable<T> extends ObservableFactory {
   private readonly executor: Executor<T>;
   private readonly onError: ErrorHandler;
   private multicast: MulticastObserver<T> | null;
@@ -15,6 +16,7 @@ export class Observable<T> {
    * Функция принимает подписчика и может сгенерировать новые значения в этом подписчике.
    */
   constructor(executor: Executor<T>, options: ObservableOptions = {}) {
+    super();
     this.executor = executor;
     this.onError = options.onError ?? (() => {});
     this.multicast = null;

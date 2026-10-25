@@ -3,7 +3,15 @@ import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
 import { ObservableFactory } from './factory';
-import type { ErrorHandler, Executor, ObservableOptions, SubscribeOptions } from './types';
+import { SwitchMapObserver } from './switch-map-observer';
+import type {
+  ErrorHandler,
+  Executor,
+  Mapper,
+  ObservableInput,
+  ObservableOptions,
+  SubscribeOptions,
+} from './types';
 
 export class Observable<T> extends ObservableFactory {
   private readonly executor: Executor<T>;
@@ -44,6 +52,28 @@ export class Observable<T> extends ObservableFactory {
         subscriber.error(error);
       }
     }
+  }
+
+  /**
+   * Возвращает Observable, который превращает каждое значение этого Observable во внутренний
+   * Observable с помощью mapper и выдаёт значения только последнего из них. Когда приходит новое
+   * значение, подписка на предыдущий внутренний Observable отменяется. Результат завершается,
+   * когда завершились и этот Observable, и последний внутренний.
+   */
+  switchMap<R>(
+    mapper: Mapper<T, ObservableInput<R>>,
+    options: ObservableOptions = {}
+  ): Observable<R> {
+    return new Observable<R>((subscriber) => {
+      // Наблюдатель создаётся на каждую подписку, потому что хранит её состояние
+      const observer = new SwitchMapObserver({
+        subscriber,
+        mapper,
+        toObservable: (input) => Observable.from(input, options),
+      });
+
+      this.subscribe(observer, { signal: subscriber.signal });
+    }, options);
   }
 
   /**

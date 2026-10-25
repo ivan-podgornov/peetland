@@ -1,3 +1,10 @@
 export { Observable } from './observable';
 
-export type { ErrorHandler, Executor, ObservableOptions, SubscribeOptions } from './types';
+export type {
+  ErrorHandler,
+  Executor,
+  Mapper,
+  ObservableInput,
+  ObservableOptions,
+  SubscribeOptions,
+} from './types';

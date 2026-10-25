@@ -3,7 +3,7 @@
 // Observable.from в this лежит сам класс Observable.
 
 import type { Observable } from './observable';
-import type { Executor, ObservableOptions } from './types';
+import type { Executor, ObservableInput, ObservableOptions } from './types';
 
 type ObservableConstructor = new <T>(
   executor: Executor<T>,
@@ -20,7 +20,7 @@ export class ObservableFactory {
    */
   static from<T>(
     this: ObservableConstructor,
-    value: Observable<T> | ReadonlyArray<T> | Promise<T>,
+    value: ObservableInput<T>,
     options: ObservableOptions = {}
   ): Observable<T> {
     if (value instanceof this) {

@@ -3,10 +3,12 @@ import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
 import { ObservableFactory } from './factory';
+import { InspectObserver } from './inspect-observer';
 import { SwitchMapObserver } from './switch-map-observer';
 import type {
   ErrorHandler,
   Executor,
+  Inspector,
   Mapper,
   ObservableInput,
   ObservableOptions,
@@ -73,6 +75,23 @@ export class Observable<T> extends ObservableFactory {
       });
 
       this.subscribe(observer, { signal: subscriber.signal });
+    }, options);
+  }
+
+  /**
+   * Возвращает Observable, который выдаёт те же события, что и этот, и попутно вызывает колбэки
+   * inspector: при подписке, на каждое значение, при завершении и при отписке наблюдателя.
+   * Исключение в колбэке inspector, кроме abort, завершает поток с этим исключением.
+   */
+  inspect(inspector: Inspector<T> = {}, options: ObservableOptions = {}): Observable<T> {
+    return new Observable<T>((subscriber) => {
+      const observer = new InspectObserver({
+        subscriber,
+        inspector,
+        onError: options.onError ?? (() => {}),
+      });
+
+      observer.observe(this);
     }, options);
   }
 

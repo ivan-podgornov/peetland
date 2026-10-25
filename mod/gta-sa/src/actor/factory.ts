@@ -1,5 +1,5 @@
-import type { CreateActorOptions, IActorFactory } from '@brain/game';
-import type { IGeometry } from '@brain/geometry';
+import type { CreateActorOptions, IActorFactory } from '@peetland/game';
+import type { IGeometry } from '@peetland/geometry';
 
 import type { IGtaObjectFactory } from '../object';
 

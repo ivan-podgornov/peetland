@@ -1,5 +1,5 @@
-import { lua_thread, wait } from '@brain/moonloader';
-import type { LuaThread } from '@brain/moonloader';
+import { lua_thread, wait } from '@peetland/moonloader';
+import type { LuaThread } from '@peetland/moonloader';
 
 type AnyFunction = (...args: never[]) => unknown;
 

@@ -1,10 +1,10 @@
-# @brain/geometry
+# @peetland/geometry
 
 Набор базовых геометрических операций над точками на плоскости и в пространстве: расстояние между
 точками, попадание в радиус и пошаговое перемещение к цели.
 
 ```ts
-import { Geometry } from '@brain/geometry';
+import { Geometry } from '@peetland/geometry';
 
 const geometry = new Geometry();
 
@@ -16,7 +16,7 @@ geometry.getDistance3d({ x: 0, y: 0, z: 0 }, { x: 2, y: 3, z: 6 }); // 7
 Точки описываются простыми объектами:
 
 ```ts
-import type { Vector2, Vector3 } from '@brain/geometry';
+import type { Vector2, Vector3 } from '@peetland/geometry';
 
 const onMap: Vector2 = { x: 10, y: 20 };
 const inWorld: Vector3 = { x: 10, y: 20, z: 5 };
@@ -90,7 +90,7 @@ function update(deltaSeconds: number) {
 внутри. Так в тестах её можно подменить, а при необходимости — заменить реализацию целиком:
 
 ```ts
-import type { IGeometry, Vector3 } from '@brain/geometry';
+import type { IGeometry, Vector3 } from '@peetland/geometry';
 
 class Guard {
   constructor(

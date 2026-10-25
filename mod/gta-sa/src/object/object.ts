@@ -1,6 +1,6 @@
-import type { CreateObjectOptions, IObject } from '@brain/game';
-import type { Vector3 } from '@brain/geometry';
-import type { ObjectHandle } from '@brain/moonloader';
+import type { CreateObjectOptions, IObject } from '@peetland/game';
+import type { Vector3 } from '@peetland/geometry';
+import type { ObjectHandle } from '@peetland/moonloader';
 
 import {
   createObjectNoOffset,
@@ -14,7 +14,7 @@ import {
   setObjectCoordinates,
   setObjectCollision,
   setObjectVisible,
-} from '@brain/moonloader';
+} from '@peetland/moonloader';
 
 export interface IGtaObject extends IObject {
   readonly handle: ObjectHandle;

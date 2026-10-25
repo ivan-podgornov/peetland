@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -15,7 +14,7 @@ describe('Observable', () => {
         const mapper = vi.fn(() => createControlledObservable().observable);
 
         source.observable
-          .switchMap(mapper, getDefaultObservableOptions())
+          .switchMap(mapper)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('value');
 
@@ -27,7 +26,7 @@ describe('Observable', () => {
         const mapper = vi.fn(() => createControlledObservable().observable);
 
         source.observable
-          .switchMap(mapper, getDefaultObservableOptions())
+          .switchMap(mapper)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('first value');
         source.subscriber.next('second value');
@@ -41,7 +40,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(vi.fn().mockThrow(error), getDefaultObservableOptions())
+          .switchMap(vi.fn().mockThrow(error))
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
 
@@ -52,7 +51,7 @@ describe('Observable', () => {
         const source = createControlledObservable();
 
         source.observable
-          .switchMap(vi.fn().mockThrow(new Error('mapper error')), getDefaultObservableOptions())
+          .switchMap(vi.fn().mockThrow(new Error('mapper error')))
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('value');
 
@@ -63,9 +62,7 @@ describe('Observable', () => {
         const source = createControlledObservable();
         const observer = createMockedObserver();
 
-        source.observable
-          .switchMap(() => [1, 2], getDefaultObservableOptions())
-          .subscribe(observer, getDefaultSubscribeOptions());
+        source.observable.switchMap(() => [1, 2]).subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
 
         expect(observer.next).toHaveBeenNthCalledWith(1, 1);
@@ -78,7 +75,7 @@ describe('Observable', () => {
 
         source.observable
           // Типы такие значения запрещают, но проверяется поведение в рантайме
-          .switchMap(() => 42 as never, getDefaultObservableOptions())
+          .switchMap(() => 42 as never)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
 

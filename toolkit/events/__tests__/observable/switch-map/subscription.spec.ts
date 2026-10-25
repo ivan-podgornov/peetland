@@ -5,7 +5,6 @@ import { AbortController } from '../../../src/abort-controller';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -17,10 +16,7 @@ describe('Observable', () => {
       it('Не подписывается на исходный observable, пока на результат никто не подписан', () => {
         const source = createControlledObservable();
 
-        source.observable.switchMap(
-          () => createControlledObservable().observable,
-          getDefaultObservableOptions()
-        );
+        source.observable.switchMap(() => createControlledObservable().observable);
 
         expect(source.executor).not.toHaveBeenCalled();
       });
@@ -30,7 +26,7 @@ describe('Observable', () => {
         const source = createControlledObservable();
 
         source.observable
-          .switchMap(() => createControlledObservable().observable, getDefaultObservableOptions())
+          .switchMap(() => createControlledObservable().observable)
           .subscribe(createMockedObserver(), {
             ...getDefaultSubscribeOptions(),
             signal: controller.signal,
@@ -46,7 +42,7 @@ describe('Observable', () => {
         const inner = createControlledObservable();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(createMockedObserver(), {
             ...getDefaultSubscribeOptions(),
             signal: controller.signal,

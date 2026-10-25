@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -15,7 +14,7 @@ describe('Observable', () => {
         const inspector = { complete: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.complete();
 
@@ -27,7 +26,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .inspect({ complete: vi.fn() }, getDefaultObservableOptions())
+          .inspect({ complete: vi.fn() })
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.complete();
 
@@ -39,9 +38,7 @@ describe('Observable', () => {
         const inspector = { complete: vi.fn() };
         const observer = createMockedObserver();
 
-        source.observable
-          .inspect(inspector, getDefaultObservableOptions())
-          .subscribe(observer, getDefaultSubscribeOptions());
+        source.observable.inspect(inspector).subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.complete();
 
         expect(inspector.complete).toHaveBeenCalledBefore(observer.complete);
@@ -52,7 +49,7 @@ describe('Observable', () => {
         const inspector = { abort: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.complete();
 
@@ -66,7 +63,7 @@ describe('Observable', () => {
           const observer = createMockedObserver();
 
           source.observable
-            .inspect({ complete: vi.fn().mockThrow(error) }, getDefaultObservableOptions())
+            .inspect({ complete: vi.fn().mockThrow(error) })
             .subscribe(observer, getDefaultSubscribeOptions());
           source.subscriber.complete();
 
@@ -78,10 +75,7 @@ describe('Observable', () => {
           const observer = createMockedObserver();
 
           source.observable
-            .inspect(
-              { complete: vi.fn().mockThrow(new Error('inspector error')) },
-              getDefaultObservableOptions()
-            )
+            .inspect({ complete: vi.fn().mockThrow(new Error('inspector error')) })
             .subscribe(observer, getDefaultSubscribeOptions());
           source.subscriber.complete();
 

@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -18,7 +17,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
         inner.subscriber.complete();
@@ -31,7 +30,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => createControlledObservable().observable, getDefaultObservableOptions())
+          .switchMap(() => createControlledObservable().observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.complete();
 
@@ -44,7 +43,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
         inner.subscriber.complete();
@@ -60,7 +59,7 @@ describe('Observable', () => {
           const observer = createMockedObserver();
 
           source.observable
-            .switchMap(() => inner.observable, getDefaultObservableOptions())
+            .switchMap(() => inner.observable)
             .subscribe(observer, getDefaultSubscribeOptions());
           source.subscriber.next('value');
           source.subscriber.complete();
@@ -74,7 +73,7 @@ describe('Observable', () => {
           const observer = createMockedObserver();
 
           source.observable
-            .switchMap(() => inner.observable, getDefaultObservableOptions())
+            .switchMap(() => inner.observable)
             .subscribe(observer, getDefaultSubscribeOptions());
           source.subscriber.next('value');
           source.subscriber.complete();
@@ -89,7 +88,7 @@ describe('Observable', () => {
           const observer = createMockedObserver();
 
           source.observable
-            .switchMap(() => inner.observable, getDefaultObservableOptions())
+            .switchMap(() => inner.observable)
             .subscribe(observer, getDefaultSubscribeOptions());
           source.subscriber.next('value');
           source.subscriber.complete();

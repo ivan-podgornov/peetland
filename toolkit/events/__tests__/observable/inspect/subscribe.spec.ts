@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -14,7 +13,7 @@ describe('Observable', () => {
         const source = createControlledObservable();
         const inspector = { subscribe: vi.fn() };
 
-        source.observable.inspect(inspector, getDefaultObservableOptions());
+        source.observable.inspect(inspector);
 
         expect(inspector.subscribe).not.toHaveBeenCalled();
       });
@@ -24,7 +23,7 @@ describe('Observable', () => {
         const inspector = { subscribe: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
 
         expect(inspector.subscribe).toHaveBeenCalledExactlyOnceWith();
@@ -35,7 +34,7 @@ describe('Observable', () => {
         const inspector = { subscribe: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
 
         expect(inspector.subscribe).toHaveBeenCalledBefore(source.executor);
@@ -47,7 +46,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .inspect({ subscribe: vi.fn().mockThrow(error) }, getDefaultObservableOptions())
+          .inspect({ subscribe: vi.fn().mockThrow(error) })
           .subscribe(observer, getDefaultSubscribeOptions());
 
         expect(observer.error).toHaveBeenCalledExactlyOnceWith(error);
@@ -57,10 +56,7 @@ describe('Observable', () => {
         const source = createControlledObservable();
 
         source.observable
-          .inspect(
-            { subscribe: vi.fn().mockThrow(new Error('inspector error')) },
-            getDefaultObservableOptions()
-          )
+          .inspect({ subscribe: vi.fn().mockThrow(new Error('inspector error')) })
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
 
         expect(source.executor).not.toHaveBeenCalled();

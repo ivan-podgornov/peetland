@@ -17,12 +17,10 @@ describe('Observable', () => {
         const source = createControlledObservable();
         const inspector = { abort: vi.fn() };
 
-        source.observable
-          .inspect(inspector, getDefaultObservableOptions())
-          .subscribe(createMockedObserver(), {
-            ...getDefaultSubscribeOptions(),
-            signal: controller.signal,
-          });
+        source.observable.inspect(inspector).subscribe(createMockedObserver(), {
+          ...getDefaultSubscribeOptions(),
+          signal: controller.signal,
+        });
         controller.abort('reason');
 
         expect(inspector.abort).toHaveBeenCalledExactlyOnceWith('reason');
@@ -32,28 +30,23 @@ describe('Observable', () => {
         const controller = new AbortController();
         const source = createControlledObservable();
 
-        source.observable
-          .inspect({ abort: vi.fn() }, getDefaultObservableOptions())
-          .subscribe(createMockedObserver(), {
-            ...getDefaultSubscribeOptions(),
-            signal: controller.signal,
-          });
+        source.observable.inspect({ abort: vi.fn() }).subscribe(createMockedObserver(), {
+          ...getDefaultSubscribeOptions(),
+          signal: controller.signal,
+        });
         controller.abort();
 
         expect(source.subscriber.active).toBe(false);
       });
 
-      it('Если inspector.abort выбросил исключение, вызывает onError, переданный во втором параметре inspect', () => {
+      it('Если inspector.abort выбросил исключение, вызывает onError, переданный в конструктор исходного observable', () => {
         const error = new Error('inspector error');
         const onError = vi.fn();
         const controller = new AbortController();
-        const source = createControlledObservable();
+        const source = createControlledObservable({ ...getDefaultObservableOptions(), onError });
 
         source.observable
-          .inspect(
-            { abort: vi.fn().mockThrow(error) },
-            { ...getDefaultObservableOptions(), onError }
-          )
+          .inspect({ abort: vi.fn().mockThrow(error) })
           .subscribe(createMockedObserver(), {
             ...getDefaultSubscribeOptions(),
             signal: controller.signal,

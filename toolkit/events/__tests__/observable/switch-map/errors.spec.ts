@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -18,7 +17,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => createControlledObservable().observable, getDefaultObservableOptions())
+          .switchMap(() => createControlledObservable().observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.error(error);
 
@@ -30,7 +29,7 @@ describe('Observable', () => {
         const inner = createControlledObservable();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('value');
         source.subscriber.error(new Error('source error'));
@@ -45,7 +44,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
         inner.subscriber.error(error);
@@ -58,7 +57,7 @@ describe('Observable', () => {
         const inner = createControlledObservable();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('value');
         inner.subscriber.error(new Error('inner error'));

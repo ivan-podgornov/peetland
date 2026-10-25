@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -16,7 +15,7 @@ describe('Observable', () => {
         const inspector = { error: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.error(error);
 
@@ -29,7 +28,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .inspect({ error: vi.fn() }, getDefaultObservableOptions())
+          .inspect({ error: vi.fn() })
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.error(error);
 
@@ -41,9 +40,7 @@ describe('Observable', () => {
         const inspector = { error: vi.fn() };
         const observer = createMockedObserver();
 
-        source.observable
-          .inspect(inspector, getDefaultObservableOptions())
-          .subscribe(observer, getDefaultSubscribeOptions());
+        source.observable.inspect(inspector).subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.error(new Error('source error'));
 
         expect(inspector.error).toHaveBeenCalledBefore(observer.error);
@@ -54,7 +51,7 @@ describe('Observable', () => {
         const inspector = { abort: vi.fn() };
 
         source.observable
-          .inspect(inspector, getDefaultObservableOptions())
+          .inspect(inspector)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.error(new Error('source error'));
 
@@ -67,7 +64,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .inspect({ error: vi.fn().mockThrow(inspectorError) }, getDefaultObservableOptions())
+          .inspect({ error: vi.fn().mockThrow(inspectorError) })
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.error(new Error('source error'));
 

@@ -17,6 +17,8 @@ import type {
 
 export class Observable<T> extends ObservableFactory {
   private readonly executor: Executor<T>;
+  /** Опции этого Observable. Их же получают Observable, которые создаются его операторами */
+  private readonly options: ObservableOptions;
   private readonly onError: ErrorHandler;
   private multicast: MulticastObserver<T> | null;
   private subscriber: ISubscriber<T> | null;
@@ -28,6 +30,7 @@ export class Observable<T> extends ObservableFactory {
   constructor(executor: Executor<T>, options: ObservableOptions = {}) {
     super();
     this.executor = executor;
+    this.options = options;
     this.onError = options.onError ?? (() => {});
     this.multicast = null;
     this.subscriber = null;
@@ -62,20 +65,17 @@ export class Observable<T> extends ObservableFactory {
    * значение, подписка на предыдущий внутренний Observable отменяется. Результат завершается,
    * когда завершились и этот Observable, и последний внутренний.
    */
-  switchMap<R>(
-    mapper: Mapper<T, ObservableInput<R>>,
-    options: ObservableOptions = {}
-  ): Observable<R> {
+  switchMap<R>(mapper: Mapper<T, ObservableInput<R>>): Observable<R> {
     return new Observable<R>((subscriber) => {
       // Наблюдатель создаётся на каждую подписку, потому что хранит её состояние
       const observer = new SwitchMapObserver({
         subscriber,
         mapper,
-        toObservable: (input) => Observable.from(input, options),
+        toObservable: (input) => Observable.from(input, this.options),
       });
 
       this.subscribe(observer, { signal: subscriber.signal });
-    }, options);
+    }, this.options);
   }
 
   /**
@@ -83,16 +83,12 @@ export class Observable<T> extends ObservableFactory {
    * inspector: при подписке, на каждое значение, при завершении и при отписке наблюдателя.
    * Исключение в колбэке inspector, кроме abort, завершает поток с этим исключением.
    */
-  inspect(inspector: Inspector<T> = {}, options: ObservableOptions = {}): Observable<T> {
+  inspect(inspector: Inspector<T> = {}): Observable<T> {
     return new Observable<T>((subscriber) => {
-      const observer = new InspectObserver({
-        subscriber,
-        inspector,
-        onError: options.onError ?? (() => {}),
-      });
+      const observer = new InspectObserver({ subscriber, inspector, onError: this.onError });
 
       observer.observe(this);
-    }, options);
+    }, this.options);
   }
 
   /**

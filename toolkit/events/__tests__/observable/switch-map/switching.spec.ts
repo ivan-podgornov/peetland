@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createControlledObservable,
   createMockedObserver,
-  getDefaultObservableOptions,
   getDefaultSubscribeOptions,
 } from '../helpers';
 
@@ -17,7 +16,7 @@ describe('Observable', () => {
         const inner = createControlledObservable();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('value');
 
@@ -30,7 +29,7 @@ describe('Observable', () => {
         const observer = createMockedObserver();
 
         source.observable
-          .switchMap(() => inner.observable, getDefaultObservableOptions())
+          .switchMap(() => inner.observable)
           .subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('value');
         inner.subscriber.next('inner value');
@@ -47,7 +46,7 @@ describe('Observable', () => {
           .mockReturnValueOnce(createControlledObservable().observable);
 
         source.observable
-          .switchMap(mapper, getDefaultObservableOptions())
+          .switchMap(mapper)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('first value');
         source.subscriber.next('second value');
@@ -68,7 +67,7 @@ describe('Observable', () => {
           });
 
         source.observable
-          .switchMap(mapper, getDefaultObservableOptions())
+          .switchMap(mapper)
           .subscribe(createMockedObserver(), getDefaultSubscribeOptions());
         source.subscriber.next('first value');
         source.subscriber.next('second value');
@@ -85,9 +84,7 @@ describe('Observable', () => {
           .mockReturnValueOnce(createControlledObservable().observable)
           .mockReturnValueOnce(second.observable);
 
-        source.observable
-          .switchMap(mapper, getDefaultObservableOptions())
-          .subscribe(observer, getDefaultSubscribeOptions());
+        source.observable.switchMap(mapper).subscribe(observer, getDefaultSubscribeOptions());
         source.subscriber.next('first value');
         source.subscriber.next('second value');
         second.subscriber.next('second inner value');

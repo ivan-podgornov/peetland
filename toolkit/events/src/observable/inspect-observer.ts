@@ -1,0 +1,94 @@
+import type { AbortListener } from '../abort-signal';
+import type { IObserverObject, ISubscriber } from '../subscriber';
+
+import type { Observable } from './observable';
+import type { ErrorHandler, Inspector, InspectorObject } from './types';
+
+export type InspectObserverOptions<T> = {
+  /** Подписчик результата inspect, которому передаются события исходного Observable */
+  subscriber: ISubscriber<T>;
+  inspector: Inspector<T>;
+  /** Получает исключения из inspector.abort: к этому моменту передать их в поток уже нельзя */
+  onError: ErrorHandler;
+};
+
+/**
+ * Наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
+ * инспектора и передаёт события подписчику без изменений. Исключение в колбэке инспектора
+ * завершает поток с этим исключением.
+ */
+export class InspectObserver<T> implements IObserverObject<T> {
+  private readonly subscriber: ISubscriber<T>;
+  private readonly inspector: InspectorObject<T>;
+  private readonly onError: ErrorHandler;
+  private readonly abortListener: AbortListener;
+
+  constructor(options: InspectObserverOptions<T>) {
+    this.subscriber = options.subscriber;
+    this.inspector =
+      typeof options.inspector === 'function' ? { next: options.inspector } : options.inspector;
+    this.onError = options.onError;
+    this.abortListener = () => this.callAbort();
+  }
+
+  /** Вызывает inspector.subscribe и, если он не выбросил исключение, подписывается на source */
+  observe(source: Observable<T>): void {
+    try {
+      this.inspector.subscribe?.();
+    } catch (error) {
+      this.subscriber.error(error);
+      return;
+    }
+
+    this.subscriber.signal.addEventListener('abort', this.abortListener);
+    source.subscribe(this, { signal: this.subscriber.signal });
+  }
+
+  next(value: T): void {
+    try {
+      this.inspector.next?.(value);
+    } catch (error) {
+      this.finish(() => this.subscriber.error(error));
+      return;
+    }
+
+    this.subscriber.next(value);
+  }
+
+  error(error?: unknown): void {
+    this.finish(() => {
+      this.inspector.error?.(error);
+      this.subscriber.error(error);
+    });
+  }
+
+  complete(): void {
+    this.finish(() => {
+      this.inspector.complete?.();
+      this.subscriber.complete();
+    });
+  }
+
+  /**
+   * Завершает поток, не вызывая inspector.abort. Подписчик при завершении тоже переводит свой
+   * сигнал в состояние aborted, поэтому слушатель отписки нужно снять заранее. Если finishing
+   * выбросил исключение, поток завершается с ним
+   */
+  private finish(finishing: () => void): void {
+    this.subscriber.signal.removeEventListener('abort', this.abortListener);
+
+    try {
+      finishing();
+    } catch (error) {
+      this.subscriber.error(error);
+    }
+  }
+
+  private callAbort(): void {
+    try {
+      this.inspector.abort?.(this.subscriber.signal.reason);
+    } catch (error) {
+      this.onError(error);
+    }
+  }
+}

@@ -10,7 +10,7 @@ const intervals = new Map<number, LuaThread<unknown[]>>();
 
 function setTimeout(
   callback: AnyFunction,
-  timeout: number,
+  timeout: number = 0,
   ...args: Parameters<AnyFunction>
 ): number {
   const id = timeoutId++;
@@ -38,7 +38,7 @@ function clearTimeout(timeoutId: number) {
 
 function setInterval(
   callback: AnyFunction,
-  timeout: number,
+  timeout: number = 0,
   ...args: Parameters<AnyFunction>
 ): number {
   const id = intervalId++;

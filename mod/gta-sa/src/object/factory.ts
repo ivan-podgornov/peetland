@@ -1,4 +1,4 @@
-import type { CreateObjectOptions, IObjectFactory } from '@brain/game';
+import type { CreateObjectOptions, IObjectFactory } from '@peetland/game';
 
 import { GtaObject } from './object';
 import type { IGtaObject } from './object';

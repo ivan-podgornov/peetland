@@ -1,8 +1,8 @@
-import { Observable } from '@brain/events';
-import type { ISubscriber } from '@brain/events';
-import type { CreateActorOptions, IActor } from '@brain/game';
-import type { IGeometry, Vector3 } from '@brain/geometry';
-import type { PedHandle } from '@brain/moonloader';
+import { Observable } from '@peetland/events';
+import type { ISubscriber } from '@peetland/events';
+import type { CreateActorOptions, IActor } from '@peetland/game';
+import type { IGeometry, Vector3 } from '@peetland/geometry';
+import type { PedHandle } from '@peetland/moonloader';
 
 import {
   clearCharTasksImmediately,
@@ -16,7 +16,7 @@ import {
   requestModel,
   setCharCoordinates,
   taskGoToObject,
-} from '@brain/moonloader';
+} from '@peetland/moonloader';
 
 import type { IGtaObjectFactory } from '../object';
 

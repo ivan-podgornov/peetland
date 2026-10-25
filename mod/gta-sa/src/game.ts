@@ -1,6 +1,6 @@
-import type { IGame } from '@brain/game';
-import { Geometry } from '@brain/geometry';
-import type { IGeometry } from '@brain/geometry';
+import type { IGame } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
+import type { IGeometry } from '@peetland/geometry';
 
 import { GtaActorFactory } from './actor';
 import type { IGtaActorFactory } from './actor';

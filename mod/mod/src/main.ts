@@ -1,8 +1,8 @@
 import './patch-global';
 
-import { GtaGame } from '@brain/gta-sa';
-import { getCharCoordinates, print, wait, wasKeyPressed, PLAYER_PED } from '@brain/moonloader';
-import { World } from '@brain/world';
+import { GtaGame } from '@peetland/gta-sa';
+import { getCharCoordinates, print, wait, wasKeyPressed, PLAYER_PED } from '@peetland/moonloader';
+import { World } from '@peetland/world';
 
 import { VK_G, VK_H } from 'vkeys';
 

@@ -1,5 +1,5 @@
-import type { Observable } from '@brain/events';
-import type { Vector3 } from '@brain/geometry';
+import type { Observable } from '@peetland/events';
+import type { Vector3 } from '@peetland/geometry';
 
 export interface IActor {
   /** Возвращает позицию персонажа в игре */

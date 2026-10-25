@@ -1,4 +1,4 @@
-import type { Vector3 } from '@brain/geometry';
+import type { Vector3 } from '@peetland/geometry';
 
 export interface IObject {
   /** Замораживает объект на текущей позиции */

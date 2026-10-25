@@ -49,3 +49,150 @@
    остальные данные, например, такие как жажда, бодрость могут быть указаны в константе.
 7. В одном файле должна проверяться только одна фича. Если проверок сильно много, файл разделяется
    на подфайлы в которых проверяются подфичи или разбивается на проверки при определённых событиях.
+
+## Проверка в игре
+
+Мод проверяется на компьютере с GTA San Andreas и MoonLoader. Собирать проект на нём не нужно:
+сборки публикуются в [релизы](https://github.com/ivan-podgornov/peetland/releases) репозитория,
+а скрипт-загрузчик скачивает их прямо в игре.
+
+### Сборки
+
+- **Стабильная.** Каждый пуш в `main` публикует релиз `build-<номер>` и помечает его как
+  последний. Ссылка на него не меняется:
+  `https://github.com/ivan-podgornov/peetland/releases/latest/download/peetland.lua`.
+- **Пре-релиз.** Сборка из пулл реквеста публикуется как пре-релиз `pr-<номер пулл реквеста>`:
+  `https://github.com/ivan-podgornov/peetland/releases/download/pr-<номер>/peetland.lua`. На стабильную
+  ссылку пре-релизы не влияют.
+
+### Как опубликовать пре-релиз
+
+1. Открыть пулл реквест или запушить в него новые коммиты.
+2. Дождаться, пока пройдут проверки (типы, линтер, форматирование, тесты) и сборка.
+3. Во вкладке пулл реквеста нажать **Review deployments**, выбрать окружение `preview`
+   и подтвердить. Пре-релиз `pr-<номер>` будет создан или перезаписан текущей сборкой.
+
+Новый пуш отменяет предыдущий запуск, в том числе ожидающий подтверждения. При закрытии или
+мерже пулл реквеста пре-релиз и его тег удаляются автоматически.
+
+### Загрузчик
+
+Скрипт ниже нужно один раз сохранить как `moonloader/peetland-loader.lua` на компьютере, где
+проверяется мод. По нажатию **Ctrl + T** он скачивает сборку, выгружает запущенную версию мода
+и запускает новую. Если скачать сборку не удалось, старая версия продолжает работать. При старте
+игры загрузчик сам запускает сборку, скачанную в прошлый раз.
+
+Какую сборку загружать, определяет переменная `PR` в начале скрипта:
+
+- `nil` — последний стабильный релиз;
+- номер пулл реквеста, например `14`, — пре-релиз этого пулл реквеста.
+
+Сборка сохраняется в `moonloader/peetland/peetland.lua`. В корне `moonloader` не должно быть своего
+`peetland.lua`, иначе запустятся два экземпляра мода. Ошибки загрузки пишутся в `moonloader.log`.
+
+```lua
+script_name('peetland-loader')
+script_author('ivan-podgornov')
+
+local vkeys = require('vkeys')
+local dlstatus = require('moonloader').download_status
+
+-- Номер пулл реквеста, сборку которого нужно загружать. nil — последний стабильный релиз
+local PR = nil
+
+local RELEASES = 'https://github.com/ivan-podgornov/peetland/releases'
+local URL = PR and (RELEASES .. '/download/pr-' .. PR .. '/peetland.lua')
+  or (RELEASES .. '/latest/download/peetland.lua')
+-- Подпапка, а не корень moonloader: иначе peetland.lua будет сам запускаться при старте игры
+local DIR = getWorkingDirectory() .. '\\peetland'
+local TARGET = DIR .. '\\peetland.lua'
+local TEMP = DIR .. '\\peetland.download.lua'
+local TIMEOUT_SECONDS = 30
+
+-- Запущенный экземпляр peetland
+local peetland = nil
+
+local function notify(text)
+  print(text)
+  printStringNow(text, 3000)
+end
+
+local function download()
+  os.remove(TEMP)
+
+  local finished = false
+  -- Параметр ломает кэш Windows: без него можно получить старую сборку
+  downloadUrlToFile(URL .. '?t=' .. os.time(), TEMP, function(_, status)
+    if status == dlstatus.STATUS_ENDDOWNLOADDATA then
+      finished = true
+    end
+  end)
+
+  local startedAt = localClock()
+  while not finished do
+    if localClock() - startedAt > TIMEOUT_SECONDS then
+      return false, 'timeout'
+    end
+    wait(0)
+  end
+
+  -- Компилируем без запуска: так отсекаем недокачанный файл или html-страницу с ошибкой
+  local chunk, err = loadfile(TEMP)
+  if not chunk then
+    return false, err
+  end
+
+  return true
+end
+
+local function unloadpeetland()
+  if peetland then
+    pcall(function()
+      peetland:unload()
+    end)
+    peetland = nil
+    wait(0)
+  end
+end
+
+local function reload()
+  notify('peetland: downloading...')
+
+  local ok, err = download()
+  if not ok then
+    notify('peetland: download failed')
+    print(err)
+    return
+  end
+
+  -- Старая версия выгружается только после успешной загрузки новой
+  unloadpeetland()
+  os.remove(TARGET)
+  os.rename(TEMP, TARGET)
+
+  peetland = script.load(TARGET)
+  if peetland then
+    notify('peetland: loaded')
+  else
+    notify('peetland: failed to start')
+  end
+end
+
+function main()
+  if not doesDirectoryExist(DIR) then
+    createDirectory(DIR)
+  end
+
+  if doesFileExist(TARGET) then
+    peetland = script.load(TARGET)
+  end
+
+  while true do
+    wait(0)
+
+    if isKeyDown(vkeys.VK_CONTROL) and wasKeyPressed(vkeys.VK_T) then
+      reload()
+    end
+  end
+end
+```

@@ -1,4 +1,4 @@
-import type { ISubscriber, Observable } from '@peetland/events';
+import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
 export interface IActor {
@@ -52,21 +52,8 @@ export interface IActorCommand {
   cancel(reason: unknown): void;
 }
 
-/** То, как актор устроен на самом деле. Actor делегирует ему свои методы */
-export interface IActorState {
-  /** Возвращает позицию персонажа */
-  getPosition(): Vector3;
-
-  /** Устанавливает позицию персонажа */
-  setPosition(position: Vector3): void;
-
-  /** Создаёт команду, которая ведёт персонажа к точке и сообщает о ходе движения в subscriber */
-  createGoToCoordsCommand(
-    actor: IActor,
-    subscriber: ISubscriber<Vector3>,
-    options: GoToCoordsOptions
-  ): IActorCommand;
-
-  /** Удаляет персонажа */
-  despawn(): void;
+/** То, как актор устроен на самом деле. Actor делегирует ему все свои методы */
+export interface IActorState extends IActor {
+  /** Команда, которую актор выполняет сейчас */
+  readonly currentCommand: IActorCommand | null;
 }

@@ -1,7 +1,8 @@
+import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 
-import type { GoToCoordsOptions, IActor, IActorCommand, IActorState } from '../actor';
+import type { IActorCommand, IActorState } from '../actor';
 
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 
@@ -18,10 +19,16 @@ export type VirtualSpawnedActorStateDeps = {
 export class VirtualSpawnedActorState implements IActorState {
   private readonly geometry: IGeometry;
   private position: Vector3;
+  private command: IActorCommand | null;
 
   constructor(options: VirtualSpawnedActorStateOptions, deps: VirtualSpawnedActorStateDeps) {
     this.geometry = deps.geometry;
     this.position = { ...options.position };
+    this.command = null;
+  }
+
+  get currentCommand(): IActorCommand | null {
+    return this.command;
   }
 
   getPosition(): Vector3 {
@@ -32,15 +39,29 @@ export class VirtualSpawnedActorState implements IActorState {
     this.position = { ...position };
   }
 
-  createGoToCoordsCommand(
-    actor: IActor,
-    subscriber: ISubscriber<Vector3>,
-    options: GoToCoordsOptions
-  ): IActorCommand {
-    return new VirtualGoToCoordsCommand(actor, subscriber, options, { geometry: this.geometry });
+  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
+    return new Observable((subscriber: ISubscriber<Vector3>) => {
+      const command = new VirtualGoToCoordsCommand(
+        this,
+        subscriber,
+        { coords, completeRadius },
+        { geometry: this.geometry }
+      );
+
+      this.command?.cancel(new Error('Актор получил другую команду'));
+      this.command = command;
+
+      subscriber.addTeardown(() => {
+        if (this.command === command) {
+          this.command = null;
+        }
+      });
+
+      command.start();
+    });
   }
 
   despawn(): void {
-    return;
+    this.command?.cancel(new Error('Актор деспавнен'));
   }
 }

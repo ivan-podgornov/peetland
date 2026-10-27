@@ -2,6 +2,8 @@ import type { IActorState } from '../types';
 
 /** Состояние деспавненного актора: любой его метод выбрасывает ошибку */
 export class DespawnedActorState implements IActorState {
+  readonly currentCommand = null;
+
   getPosition(): never {
     throw this.createError();
   }
@@ -10,7 +12,7 @@ export class DespawnedActorState implements IActorState {
     throw this.createError();
   }
 
-  createGoToCoordsCommand(): never {
+  goToCoords(): never {
     throw this.createError();
   }
 

@@ -41,14 +41,11 @@ describe('VirtualActor', () => {
       expect(next).toHaveBeenCalledExactlyOnceWith({ x: 0, y: 0, z: 0 });
     });
 
-    it('Если актор деспавнен, при подписке завершается ошибкой', () => {
+    it('Если актор деспавнен, выбрасывает ошибку', () => {
       const actor = createActor();
-      const error = vi.fn();
       actor.despawn();
 
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
-
-      expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      expect(() => actor.goToCoords({ x: 10, y: 0, z: 0 }, 1)).toThrow(Error);
     });
   });
 });

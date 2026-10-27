@@ -1,5 +1,6 @@
+import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActor, IActorCommand, IActorState } from '@peetland/game';
+import type { IActorCommand, IActorState } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import {
@@ -23,11 +24,17 @@ export class GtaSpawnedActorState implements IActorState {
   private readonly handle: PedHandle;
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
+  private command: IActorCommand | null;
 
   constructor(handle: PedHandle, deps: GtaSpawnedActorStateDeps) {
     this.handle = handle;
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
+    this.command = null;
+  }
+
+  get currentCommand(): IActorCommand | null {
+    return this.command;
   }
 
   getPosition(): Vector3 {
@@ -40,18 +47,32 @@ export class GtaSpawnedActorState implements IActorState {
     setCharCoordinates(this.handle, position.x, position.y, position.z);
   }
 
-  createGoToCoordsCommand(
-    actor: IActor,
-    subscriber: ISubscriber<Vector3>,
-    options: GoToCoordsOptions
-  ): IActorCommand {
-    return new GtaGoToCoordsCommand(actor, this.handle, subscriber, options, {
-      geometry: this.geometry,
-      objectFactory: this.objectFactory,
+  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
+    return new Observable((subscriber: ISubscriber<Vector3>) => {
+      const command = new GtaGoToCoordsCommand(
+        this,
+        this.handle,
+        subscriber,
+        { coords, completeRadius },
+        { geometry: this.geometry, objectFactory: this.objectFactory }
+      );
+
+      this.command?.cancel(new Error('Актор получил другую команду'));
+      this.command = command;
+
+      subscriber.addTeardown(() => {
+        if (this.command === command) {
+          this.command = null;
+        }
+      });
+
+      command.start();
     });
   }
 
   despawn(): void {
+    this.command?.cancel(new Error('Актор деспавнен'));
+
     if (doesCharExist(this.handle)) {
       deleteChar(this.handle);
     }

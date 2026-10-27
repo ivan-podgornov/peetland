@@ -1,4 +1,4 @@
-import type { Criteria } from './types';
+import type { Condition } from './types';
 
 type Operator = (value: unknown, operand: unknown) => boolean;
 
@@ -7,11 +7,14 @@ const operators: Record<string, Operator> = {
 };
 
 /** Проверяет, что запись подходит под все критерии */
-export function matches<T>(entity: T, criteria: Criteria<T>): boolean {
+export function matches(
+  entity: Readonly<Record<string, unknown>>,
+  criteria: Readonly<Record<string, Condition<unknown> | undefined>>
+): boolean {
   return Object.entries(criteria).every(([field, condition]) => {
-    const value = (entity as Record<string, unknown>)[field];
+    const value = entity[field];
 
-    return Object.entries(condition as Record<string, unknown>).every(([name, operand]) => {
+    return Object.entries(condition ?? {}).every(([name, operand]) => {
       const operator = operators[name];
       if (!operator) {
         throw new Error(`Unsupported operator: ${name}`);

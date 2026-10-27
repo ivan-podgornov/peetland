@@ -2,13 +2,16 @@ import { describe, expect, it } from 'vitest';
 
 import { InMemoryRepository } from '../src';
 
-import { createPlace } from './helpers';
+import { createPlace, mockedPlace } from './helpers';
 
 describe('InMemoryRepository', () => {
   describe('#getById', () => {
     it('Возвращает запись с указанным id', async () => {
-      const target = createPlace({ id: 'target' });
-      const repository = new InMemoryRepository([createPlace({ id: 'other' }), target]);
+      const target = createPlace({ ...mockedPlace, id: 'target' });
+      const repository = new InMemoryRepository([
+        createPlace({ ...mockedPlace, id: 'other' }),
+        target,
+      ]);
 
       const place = await repository.getById('target');
 
@@ -16,7 +19,7 @@ describe('InMemoryRepository', () => {
     });
 
     it('Если записи с указанным id нет, возвращает undefined', async () => {
-      const repository = new InMemoryRepository([createPlace({ id: 'other' })]);
+      const repository = new InMemoryRepository([createPlace({ ...mockedPlace, id: 'other' })]);
 
       const place = await repository.getById('target');
 

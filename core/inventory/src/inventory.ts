@@ -1,6 +1,9 @@
 import type { Item } from './item';
 
-/** Хранит количество каждого предмета. Количество — целое неотрицательное число */
+/**
+ * Хранит количество каждого предмета. Количество — целое неотрицательное число. Предметы с нулевым
+ * количеством не хранятся
+ */
 export class Inventory {
   private readonly counts = new Map<Item, number>();
 
@@ -12,7 +15,7 @@ export class Inventory {
   /** Устанавливает количество предмета */
   set(item: Item, count: number): void {
     assertCount(count);
-    this.counts.set(item, count);
+    this.write(item, count);
   }
 
   /** Возвращает, есть ли предмет в инвентаре */
@@ -23,7 +26,7 @@ export class Inventory {
   /** Добавляет указанное количество предмета */
   add(item: Item, count: number): void {
     assertCount(count);
-    this.counts.set(item, this.get(item) + count);
+    this.write(item, this.get(item) + count);
   }
 
   /**
@@ -37,7 +40,7 @@ export class Inventory {
       return false;
     }
 
-    this.counts.set(item, current - count);
+    this.write(item, current - count);
     return true;
   }
 
@@ -46,6 +49,14 @@ export class Inventory {
     const copy = new Inventory();
     this.counts.forEach((count, item) => copy.set(item, count));
     return copy;
+  }
+
+  private write(item: Item, count: number): void {
+    if (count === 0) {
+      this.counts.delete(item);
+    } else {
+      this.counts.set(item, count);
+    }
   }
 }
 

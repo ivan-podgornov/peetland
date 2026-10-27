@@ -1,12 +1,8 @@
 import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActorCommand } from '@peetland/game';
+import type { GoToCoordsOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
-import {
-  clearCharTasksImmediately,
-  getCharCoordinates,
-  taskGoToObject,
-} from '@peetland/moonloader';
+import { clearCharTasksImmediately, taskGoToObject } from '@peetland/moonloader';
 
 import type { IGtaObjectFactory } from '../object';
 
@@ -17,6 +13,7 @@ export type GtaGoToCoordsCommandDeps = {
 
 /** Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию */
 export class GtaGoToCoordsCommand implements IActorCommand {
+  private readonly actor: IActor;
   private readonly handle: PedHandle;
   private readonly subscriber: ISubscriber<Vector3>;
   private readonly options: GoToCoordsOptions;
@@ -24,11 +21,13 @@ export class GtaGoToCoordsCommand implements IActorCommand {
   private readonly objectFactory: IGtaObjectFactory;
 
   constructor(
+    actor: IActor,
     handle: PedHandle,
     subscriber: ISubscriber<Vector3>,
     options: GoToCoordsOptions,
     deps: GtaGoToCoordsCommandDeps
   ) {
+    this.actor = actor;
     this.handle = handle;
     this.subscriber = subscriber;
     this.options = options;
@@ -68,11 +67,10 @@ export class GtaGoToCoordsCommand implements IActorCommand {
     this.subscriber.error(reason);
   }
 
-  /** Сообщает позицию персонажа и завершает команду, если он пришёл. Возвращает true, если пришёл */
+  /** Сообщает позицию актора и завершает команду, если он пришёл. Возвращает true, если пришёл */
   private tryArrive(): boolean {
     const { coords, completeRadius } = this.options;
-    const [x, y, z] = getCharCoordinates(this.handle);
-    const position = { x, y, z };
+    const position = this.actor.getPosition();
     this.subscriber.next(position);
     const arrived = this.geometry.isWithinRadius2d(position, coords, completeRadius);
 

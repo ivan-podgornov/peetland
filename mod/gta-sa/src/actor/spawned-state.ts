@@ -40,13 +40,12 @@ export class GtaSpawnedActorState implements IActorState {
     setCharCoordinates(this.handle, position.x, position.y, position.z);
   }
 
-  // Игровой персонаж управляется через handle, поэтому актор команде не нужен
   createGoToCoordsCommand(
-    _actor: IActor,
+    actor: IActor,
     subscriber: ISubscriber<Vector3>,
     options: GoToCoordsOptions
   ): IActorCommand {
-    return new GtaGoToCoordsCommand(this.handle, subscriber, options, {
+    return new GtaGoToCoordsCommand(actor, this.handle, subscriber, options, {
       geometry: this.geometry,
       objectFactory: this.objectFactory,
     });

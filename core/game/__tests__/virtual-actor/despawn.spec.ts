@@ -4,13 +4,6 @@ import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#despawn', () => {
-    it('Если актор уже деспавнен, выбрасывает ошибку', () => {
-      const actor = createActor();
-      actor.despawn();
-
-      expect(() => actor.despawn()).toThrow(Error);
-    });
-
     describe('При движении к определённым координатам', () => {
       it('Завершает движение ошибкой', () => {
         vi.useFakeTimers();

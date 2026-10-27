@@ -21,12 +21,5 @@ describe('VirtualActor', () => {
 
       expect(actor.getPosition()).toStrictEqual({ x: 5, y: 6, z: 7 });
     });
-
-    it('Если актор деспавнен, выбрасывает ошибку', () => {
-      const actor = createActor();
-      actor.despawn();
-
-      expect(() => actor.setPosition({ x: 5, y: 6, z: 7 })).toThrow(Error);
-    });
   });
 });

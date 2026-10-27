@@ -1,7 +1,7 @@
-import type { IActorState } from '../types';
+import type { IActor } from './types';
 
-/** Состояние деспавненного актора: любой его метод выбрасывает ошибку */
-export class DespawnedActorState implements IActorState {
+/** Деспавненный актор: любой его метод выбрасывает ошибку */
+export class DespawnedActor implements IActor {
   readonly currentCommand = null;
 
   getPosition(): never {

@@ -2,6 +2,9 @@ import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
 export interface IActor {
+  /** Команда, которую актор выполняет сейчас */
+  readonly currentCommand: IActorCommand | null;
+
   /** Возвращает позицию персонажа в игре */
   getPosition(): Vector3;
 
@@ -50,10 +53,4 @@ export interface IActorCommand {
 
   /** Прерывает команду, не дав ей выполниться. Завершает её Observable ошибкой reason */
   cancel(reason: unknown): void;
-}
-
-/** То, как актор устроен на самом деле. Actor делегирует ему все свои методы */
-export interface IActorState extends IActor {
-  /** Команда, которую актор выполняет сейчас */
-  readonly currentCommand: IActorCommand | null;
 }

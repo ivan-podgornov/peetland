@@ -40,12 +40,5 @@ describe('VirtualActor', () => {
 
       expect(next).toHaveBeenCalledExactlyOnceWith({ x: 0, y: 0, z: 0 });
     });
-
-    it('Если актор деспавнен, выбрасывает ошибку', () => {
-      const actor = createActor();
-      actor.despawn();
-
-      expect(() => actor.goToCoords({ x: 10, y: 0, z: 0 }, 1)).toThrow(Error);
-    });
   });
 });

@@ -1,10 +1,8 @@
-export { Actor } from './actor';
-export { DespawnedActorState } from './states/despawned';
+export { DespawnableActor } from './despawnable-actor';
 export type {
   CreateActorOptions,
   GoToCoordsOptions,
   IActor,
   IActorCommand,
   IActorFactory,
-  IActorState,
 } from './types';

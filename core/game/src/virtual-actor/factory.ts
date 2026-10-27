@@ -1,5 +1,6 @@
 import type { IGeometry } from '@peetland/geometry';
 
+import { DespawnableActor } from '../actor';
 import type { CreateActorOptions, IActorFactory } from '../actor';
 
 import { VirtualActor } from './actor';
@@ -15,7 +16,9 @@ export class VirtualActorFactory implements IActorFactory {
     this.geometry = deps.geometry;
   }
 
-  create(options: CreateActorOptions): VirtualActor {
-    return new VirtualActor({ position: options.position }, { geometry: this.geometry });
+  create(options: CreateActorOptions): DespawnableActor {
+    const actor = new VirtualActor({ position: options.position }, { geometry: this.geometry });
+
+    return new DespawnableActor(actor);
   }
 }

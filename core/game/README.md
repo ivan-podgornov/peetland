@@ -28,11 +28,16 @@ const actor = new DespawnableActor(new VirtualActor(options, deps));
 ```ts
 import { VirtualActorFactory } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
+import { IntervalObservable } from '@peetland/timings';
 
-const factory = new VirtualActorFactory({ geometry: new Geometry() });
+const factory = new VirtualActorFactory({
+  geometry: new Geometry(),
+  interval: new IntervalObservable(1000),
+});
 const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 ```
 
-`goToCoords` при подписке сообщает текущую позицию, а затем раз в секунду сдвигает актора к точке
-по прямой со скоростью пешехода (5 км/ч ≈ 1,39 м/с) и сообщает новую позицию. Когда актор входит в
+`goToCoords` при подписке сообщает текущую позицию, а затем на каждое значение интервала сдвигает
+актора к точке по прямой со скоростью пешехода (5 км/ч ≈ 1,39 м/с) и сообщает новую позицию. Шаг
+равен расстоянию, которое актор проходит за время из значения интервала. Когда актор входит в
 радиус (без учёта высоты), Observable завершается.

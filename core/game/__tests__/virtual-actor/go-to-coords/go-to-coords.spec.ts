@@ -1,15 +1,16 @@
+import { ManualIntervalObservable } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../helpers';
+import { createActor } from '../../helpers';
 
 describe('VirtualActor', () => {
   describe('#goToCoords', () => {
     it('Не двигает актора до подписки', () => {
-      vi.useFakeTimers();
-      const actor = createActor({ x: 0, y: 0, z: 0 });
+      const interval = new ManualIntervalObservable();
+      const actor = createActor({ position: { x: 0, y: 0, z: 0 }, interval });
 
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
-      vi.advanceTimersByTime(1000);
+      interval.tick(1000);
 
       expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
     });
@@ -23,8 +24,7 @@ describe('VirtualActor', () => {
     });
 
     it('При подписке делает движение к точке текущей командой', () => {
-      vi.useFakeTimers();
-      const actor = createActor({ x: 0, y: 0, z: 0 });
+      const actor = createActor();
 
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
@@ -32,8 +32,7 @@ describe('VirtualActor', () => {
     });
 
     it('При подписке сообщает текущую позицию актора', () => {
-      vi.useFakeTimers();
-      const actor = createActor({ x: 0, y: 0, z: 0 });
+      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
       const next = vi.fn();
 
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ next });

@@ -1,13 +1,13 @@
+import { ManualIntervalObservable } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor, WALKING_SPEED } from '../helpers';
+import { createActor, WALKING_SPEED } from '../../helpers';
 
 describe('VirtualActor', () => {
   describe('#goToCoords', () => {
     describe('Если актор выполняет другую команду', () => {
       it('При подписке прерывает её', () => {
-        vi.useFakeTimers();
-        const actor = createActor({ x: 0, y: 0, z: 0 });
+        const actor = createActor();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
         const cancel = vi.spyOn(actor.currentCommand!, 'cancel');
 
@@ -17,8 +17,7 @@ describe('VirtualActor', () => {
       });
 
       it('Завершает Observable прерванной команды ошибкой', () => {
-        vi.useFakeTimers();
-        const actor = createActor({ x: 0, y: 0, z: 0 });
+        const actor = createActor();
         const error = vi.fn();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
 
@@ -28,8 +27,7 @@ describe('VirtualActor', () => {
       });
 
       it('Делает текущей командой новое движение', () => {
-        vi.useFakeTimers();
-        const actor = createActor({ x: 0, y: 0, z: 0 });
+        const actor = createActor();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
         const previous = actor.currentCommand;
 
@@ -39,12 +37,12 @@ describe('VirtualActor', () => {
       });
 
       it('Двигает актора только к новой точке', () => {
-        vi.useFakeTimers();
-        const actor = createActor({ x: 0, y: 0, z: 0 });
+        const interval = new ManualIntervalObservable();
+        const actor = createActor({ position: { x: 0, y: 0, z: 0 }, interval });
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
-
         actor.goToCoords({ x: 0, y: 10, z: 0 }, 1).subscribe();
-        vi.advanceTimersByTime(1000);
+
+        interval.tick(1000);
 
         expect(actor.getPosition()).toStrictEqual({ x: 0, y: WALKING_SPEED, z: 0 });
       });

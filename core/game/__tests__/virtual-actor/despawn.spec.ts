@@ -1,12 +1,12 @@
+import { ManualIntervalObservable } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor } from './helpers';
+import { createActor } from '../helpers';
 
 describe('VirtualActor', () => {
   describe('#despawn', () => {
     describe('При движении к определённым координатам', () => {
       it('Завершает движение ошибкой', () => {
-        vi.useFakeTimers();
         const actor = createActor();
         const error = vi.fn();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
@@ -17,20 +17,17 @@ describe('VirtualActor', () => {
       });
 
       it('Останавливает движение', () => {
-        vi.useFakeTimers();
-        const actor = createActor();
-        const next = vi.fn();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ next });
-        next.mockClear();
+        const interval = new ManualIntervalObservable();
+        const actor = createActor({ interval });
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
         actor.despawn();
-        vi.advanceTimersByTime(1000);
+        interval.tick(1000);
 
-        expect(next).not.toHaveBeenCalled();
+        expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
       });
 
       it('Сбрасывает текущую команду', () => {
-        vi.useFakeTimers();
         const actor = createActor();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
@@ -41,8 +38,7 @@ describe('VirtualActor', () => {
     });
 
     it('Не влияет на завершённое движение', () => {
-      vi.useFakeTimers();
-      const actor = createActor({ x: 0, y: 0, z: 0 });
+      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
       const error = vi.fn();
       actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).subscribe({ error });
 

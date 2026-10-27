@@ -15,6 +15,8 @@ import {
   setCharCoordinates,
 } from '@peetland/moonloader';
 
+import type { Interval } from '@peetland/timings';
+
 import type { IGtaObjectFactory } from '../object';
 
 import { GtaGoToCoordsCommand } from './go-to-coords-command';
@@ -22,12 +24,15 @@ import { GtaGoToCoordsCommand } from './go-to-coords-command';
 export type ActorDeps = {
   geometry: IGeometry;
   objectFactory: IGtaObjectFactory;
+  /** Интервал, на каждое значение которого команды проверяют состояние персонажа */
+  interval: Interval;
 };
 
 export class GtaActor implements IActor {
   private readonly handle: PedHandle;
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
+  private readonly interval: Interval;
   private command: IActorCommand | null;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
@@ -41,6 +46,7 @@ export class GtaActor implements IActor {
 
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
+    this.interval = deps.interval;
     this.command = null;
   }
 
@@ -65,7 +71,7 @@ export class GtaActor implements IActor {
         this.handle,
         subscriber,
         { coords, completeRadius },
-        { geometry: this.geometry, objectFactory: this.objectFactory }
+        { geometry: this.geometry, objectFactory: this.objectFactory, interval: this.interval }
       );
 
       this.command?.cancel(new Error('Актор получил другую команду'));

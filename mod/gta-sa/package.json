@@ -8,6 +8,7 @@
     "@peetland/events": "0.0.0",
     "@peetland/game": "0.0.0",
     "@peetland/geometry": "0.0.0",
-    "@peetland/moonloader": "0.0.0"
+    "@peetland/moonloader": "0.0.0",
+    "@peetland/timings": "0.0.0"
   }
 }

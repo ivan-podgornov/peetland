@@ -4,14 +4,18 @@ import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import { clearCharTasksImmediately, taskGoToObject } from '@peetland/moonloader';
 
+import type { Interval } from '@peetland/timings';
+
 import type { IGtaObjectFactory } from '../object';
 
 export type GtaGoToCoordsCommandDeps = {
   geometry: IGeometry;
   objectFactory: IGtaObjectFactory;
+  /** Интервал, на каждое значение которого команда проверяет, пришёл ли персонаж */
+  interval: Interval;
 };
 
-/** Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию */
+/** Ведёт игрового персонажа к точке и на каждое значение интервала сообщает его позицию */
 export class GtaGoToCoordsCommand implements IActorCommand {
   private readonly actor: IActor;
   private readonly handle: PedHandle;
@@ -19,6 +23,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
   private readonly options: GoToCoordsOptions;
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
+  private readonly interval: Interval;
 
   constructor(
     actor: IActor,
@@ -33,6 +38,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
     this.options = options;
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
+    this.interval = deps.interval;
   }
 
   start(): void {
@@ -55,8 +61,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
     });
 
     taskGoToObject(this.handle, target.handle, -1, this.options.completeRadius);
-    const intervalId = setInterval(() => this.tryArrive(), 1000);
-    this.subscriber.addTeardown(() => clearInterval(intervalId));
+    this.interval.subscribe(() => this.tryArrive(), { signal: this.subscriber.signal });
   }
 
   stop(): void {

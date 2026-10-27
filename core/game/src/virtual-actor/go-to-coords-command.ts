@@ -1,24 +1,25 @@
 import type { ISubscriber } from '@peetland/events';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
+import type { Interval } from '@peetland/timings';
 
 import type { GoToCoordsOptions, IActor, IActorCommand } from '../actor';
-
-/** Как часто виртуальный актор делает шаг к точке, в миллисекундах */
-const STEP_INTERVAL = 1000;
 
 /** Скорость пешехода: 5 км/ч в метрах в секунду */
 const WALKING_SPEED = 5 / 3.6;
 
 export type VirtualGoToCoordsCommandDeps = {
   geometry: IGeometry;
+  /** Интервал, на каждое значение которого актор делает шаг к точке */
+  interval: Interval;
 };
 
-/** Раз в секунду двигает виртуального актора к точке по прямой */
+/** На каждое значение интервала двигает виртуального актора к точке по прямой */
 export class VirtualGoToCoordsCommand implements IActorCommand {
   private readonly actor: IActor;
   private readonly subscriber: ISubscriber<Vector3>;
   private readonly options: GoToCoordsOptions;
   private readonly geometry: IGeometry;
+  private readonly interval: Interval;
 
   constructor(
     actor: IActor,
@@ -30,6 +31,7 @@ export class VirtualGoToCoordsCommand implements IActorCommand {
     this.subscriber = subscriber;
     this.options = options;
     this.geometry = deps.geometry;
+    this.interval = deps.interval;
   }
 
   start(): void {
@@ -37,18 +39,20 @@ export class VirtualGoToCoordsCommand implements IActorCommand {
       return;
     }
 
-    const intervalId = setInterval(() => {
-      const position = this.geometry.moveTowards(
-        this.actor.getPosition(),
-        this.options.coords,
-        this.getSpeed()
-      );
+    this.interval.subscribe(
+      (elapsed) => {
+        const distance = (this.getSpeed() * elapsed) / 1000;
+        const position = this.geometry.moveTowards(
+          this.actor.getPosition(),
+          this.options.coords,
+          distance
+        );
 
-      this.actor.setPosition(position);
-      this.tryArrive();
-    }, STEP_INTERVAL);
-
-    this.subscriber.addTeardown(() => clearInterval(intervalId));
+        this.actor.setPosition(position);
+        this.tryArrive();
+      },
+      { signal: this.subscriber.signal }
+    );
   }
 
   stop(): void {

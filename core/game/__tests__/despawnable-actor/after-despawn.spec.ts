@@ -1,64 +1,65 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import type { IActorCommand } from '../../src';
-
-import { createActorMock } from './helpers';
+import { createActor } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('После деспавна', () => {
     it('currentCommand возвращает null', () => {
-      const command: IActorCommand = { start: vi.fn(), stop: vi.fn(), cancel: vi.fn() };
-      const actor = new DespawnableActor({ ...createActorMock(), currentCommand: command });
+      const actor = new DespawnableActor(createActor());
+      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+
       actor.despawn();
 
       expect(actor.currentCommand).toBeNull();
     });
 
     it('getPosition выбрасывает ошибку', () => {
-      const actor = new DespawnableActor(createActorMock());
+      const actor = new DespawnableActor(createActor());
       actor.despawn();
 
       expect(() => actor.getPosition()).toThrow(Error);
     });
 
     it('setPosition выбрасывает ошибку', () => {
-      const actor = new DespawnableActor(createActorMock());
+      const actor = new DespawnableActor(createActor());
       actor.despawn();
 
       expect(() => actor.setPosition({ x: 1, y: 2, z: 3 })).toThrow(Error);
     });
 
     it('goToCoords выбрасывает ошибку', () => {
-      const actor = new DespawnableActor(createActorMock());
+      const actor = new DespawnableActor(createActor());
       actor.despawn();
 
       expect(() => actor.goToCoords({ x: 1, y: 2, z: 3 }, 5)).toThrow(Error);
     });
 
     it('despawn выбрасывает ошибку', () => {
-      const actor = new DespawnableActor(createActorMock());
+      const actor = new DespawnableActor(createActor());
       actor.despawn();
 
       expect(() => actor.despawn()).toThrow(Error);
     });
 
     it('Больше не вызывает обёрнутого актора', () => {
-      const inner = createActorMock();
+      const inner = createActor();
+      const getPosition = vi.spyOn(inner, 'getPosition');
       const actor = new DespawnableActor(inner);
       actor.despawn();
 
       expect(() => actor.getPosition()).toThrow(Error);
-      expect(inner.getPosition).not.toHaveBeenCalled();
+      expect(getPosition).not.toHaveBeenCalled();
     });
 
-    it('Не вызывает despawn обёрнутого актора повторно', () => {
-      const inner = createActorMock();
+    it('Не деспавнит обёрнутого актора повторно', () => {
+      const inner = createActor();
+      const despawn = vi.spyOn(inner, 'despawn');
       const actor = new DespawnableActor(inner);
       actor.despawn();
 
       expect(() => actor.despawn()).toThrow(Error);
-      expect(inner.despawn).toHaveBeenCalledOnce();
+      expect(despawn).toHaveBeenCalledOnce();
     });
   });
 });

@@ -1,24 +1,18 @@
-import type { ISubscriber } from '@peetland/events';
 import { Actor } from '@peetland/game';
-import type { CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
-import type { IGeometry, Vector3 } from '@peetland/geometry';
+import type { CreateActorOptions, IActor } from '@peetland/game';
+import type { IGeometry } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
-
 import {
   createChar,
-  deleteChar,
-  doesCharExist,
   dontRemoveChar,
-  getCharCoordinates,
   loadAllModelsNow,
   markModelAsNoLongerNeeded,
   requestModel,
-  setCharCoordinates,
 } from '@peetland/moonloader';
 
 import type { IGtaObjectFactory } from '../object';
 
-import { GtaGoToCoordsCommand } from './go-to-coords-command';
+import { GtaSpawnedActorState } from './spawned-state';
 
 export type ActorDeps = {
   geometry: IGeometry;
@@ -31,51 +25,23 @@ export interface IGtaActor extends IActor {
 
 export class GtaActor extends Actor implements IGtaActor {
   readonly handle: PedHandle;
-  private readonly objectFactory: IGtaObjectFactory;
-  private readonly geometry: IGeometry;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
-    super();
-    requestModel(options.modelId);
-    loadAllModelsNow();
-
-    const { x, y, z } = options.position;
-    this.handle = createChar(4, options.modelId, x, y, z);
-    dontRemoveChar(this.handle);
-    markModelAsNoLongerNeeded(options.modelId);
-
-    this.geometry = deps.geometry;
-    this.objectFactory = deps.objectFactory;
+    const handle = spawnChar(options);
+    super(new GtaSpawnedActorState(handle, deps));
+    this.handle = handle;
   }
+}
 
-  protected readPosition(): Vector3 {
-    const [x, y, z] = getCharCoordinates(this.handle);
+/** Создаёт персонажа в игре и возвращает его handle */
+function spawnChar(options: CreateActorOptions): PedHandle {
+  requestModel(options.modelId);
+  loadAllModelsNow();
 
-    return { x, y, z };
-  }
+  const { x, y, z } = options.position;
+  const handle = createChar(4, options.modelId, x, y, z);
+  dontRemoveChar(handle);
+  markModelAsNoLongerNeeded(options.modelId);
 
-  protected writePosition(position: Vector3): void {
-    setCharCoordinates(this.handle, position.x, position.y, position.z);
-  }
-
-  protected createGoToCoordsCommand(
-    subscriber: ISubscriber<Vector3>,
-    coords: Vector3,
-    completeRadius: number
-  ): IActorCommand {
-    return new GtaGoToCoordsCommand({
-      actor: this,
-      subscriber,
-      geometry: this.geometry,
-      objectFactory: this.objectFactory,
-      coords,
-      completeRadius,
-    });
-  }
-
-  protected override onDespawn(): void {
-    if (doesCharExist(this.handle)) {
-      deleteChar(this.handle);
-    }
-  }
+  return handle;
 }

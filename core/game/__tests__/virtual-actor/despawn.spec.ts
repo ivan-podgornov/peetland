@@ -4,28 +4,47 @@ import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#despawn', () => {
-    it('Завершает текущее движение актора ошибкой', () => {
-      vi.useFakeTimers();
+    it('Если актор уже деспавнен, выбрасывает ошибку', () => {
       const actor = createActor();
-      const error = vi.fn();
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
-
       actor.despawn();
 
-      expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      expect(() => actor.despawn()).toThrow(Error);
     });
 
-    it('Останавливает текущее движение актора', () => {
-      vi.useFakeTimers();
-      const actor = createActor();
-      const next = vi.fn();
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ next });
-      next.mockClear();
+    describe('При движении к определённым координатам', () => {
+      it('Завершает движение ошибкой', () => {
+        vi.useFakeTimers();
+        const actor = createActor();
+        const error = vi.fn();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
 
-      actor.despawn();
-      vi.advanceTimersByTime(1000);
+        actor.despawn();
 
-      expect(next).not.toHaveBeenCalled();
+        expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      });
+
+      it('Останавливает движение', () => {
+        vi.useFakeTimers();
+        const actor = createActor();
+        const next = vi.fn();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ next });
+        next.mockClear();
+
+        actor.despawn();
+        vi.advanceTimersByTime(1000);
+
+        expect(next).not.toHaveBeenCalled();
+      });
+
+      it('Сбрасывает текущую команду', () => {
+        vi.useFakeTimers();
+        const actor = createActor();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+
+        actor.despawn();
+
+        expect(actor.currentCommand).toBeNull();
+      });
     });
 
     it('Не влияет на завершённое движение', () => {
@@ -37,13 +56,6 @@ describe('VirtualActor', () => {
       actor.despawn();
 
       expect(error).not.toHaveBeenCalled();
-    });
-
-    it('Если актор уже деспавнен, выбрасывает ошибку', () => {
-      const actor = createActor();
-      actor.despawn();
-
-      expect(() => actor.despawn()).toThrow(Error);
     });
   });
 });

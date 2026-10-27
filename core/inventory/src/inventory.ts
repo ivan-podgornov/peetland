@@ -1,15 +1,37 @@
-import type { Item } from './item';
+import { Item } from './item';
+
+/** Количество каждого предмета. Предметов, которых нет в инвентаре, в объекте нет */
+export type InventoryCounts = Partial<Record<Item, number>>;
 
 /**
- * Хранит количество каждого предмета. Количество — целое неотрицательное число. Предметы с нулевым
- * количеством не хранятся
+ * Хранит количество каждого предмета. Количество — конечное неотрицательное число, в том числе
+ * дробное. Предметы с нулевым количеством не хранятся
  */
 export class Inventory {
   private readonly counts = new Map<Item, number>();
 
+  /** @param counts - начальное количество предметов, например восстановленное из сохранения */
+  constructor(counts: InventoryCounts = {}) {
+    Object.values(Item).forEach((item) => {
+      const count = counts[item];
+      if (count !== undefined) {
+        this.set(item, count);
+      }
+    });
+  }
+
   /** Возвращает количество предмета или 0, если его нет */
   get(item: Item): number {
     return this.counts.get(item) ?? 0;
+  }
+
+  /** Возвращает количество всех предметов, которые есть в инвентаре */
+  getAll(): InventoryCounts {
+    const counts: InventoryCounts = {};
+    this.counts.forEach((count, item) => {
+      counts[item] = count;
+    });
+    return counts;
   }
 
   /** Устанавливает количество предмета */
@@ -46,9 +68,7 @@ export class Inventory {
 
   /** Возвращает независимую копию инвентаря */
   clone(): Inventory {
-    const copy = new Inventory();
-    this.counts.forEach((count, item) => copy.set(item, count));
-    return copy;
+    return new Inventory(this.getAll());
   }
 
   private write(item: Item, count: number): void {
@@ -61,7 +81,9 @@ export class Inventory {
 }
 
 function assertCount(count: number): void {
-  if (!Number.isInteger(count) || count < 0) {
-    throw new RangeError(`Количество должно быть целым неотрицательным числом, получено ${count}`);
+  if (!Number.isFinite(count) || count < 0) {
+    throw new RangeError(
+      `Количество должно быть конечным неотрицательным числом, получено ${count}`
+    );
   }
 }

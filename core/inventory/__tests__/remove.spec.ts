@@ -62,11 +62,20 @@ describe('Inventory', () => {
       expect(() => inventory.remove(Item.Money, -1)).toThrow(RangeError);
     });
 
-    it('Если количество дробное, выбрасывает RangeError', () => {
+    it('Отнимает дробное количество', () => {
+      const inventory = new Inventory();
+      inventory.set(Item.Money, 1);
+
+      inventory.remove(Item.Money, 0.5);
+
+      expect(inventory.get(Item.Money)).toBe(0.5);
+    });
+
+    it('Если количество не число, выбрасывает RangeError', () => {
       const inventory = new Inventory();
       inventory.set(Item.Money, 5);
 
-      expect(() => inventory.remove(Item.Money, 0.5)).toThrow(RangeError);
+      expect(() => inventory.remove(Item.Money, NaN)).toThrow(RangeError);
     });
   });
 });

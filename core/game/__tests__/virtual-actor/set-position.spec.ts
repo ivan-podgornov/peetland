@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { createActor } from './create-actor';
+import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#setPosition', () => {
     it('Переносит актора на переданную позицию', () => {
-      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
+      const actor = createActor({ x: 0, y: 0, z: 0 });
 
       actor.setPosition({ x: 5, y: 6, z: 7 });
 

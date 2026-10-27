@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor } from './create-actor';
+import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#despawn', () => {
@@ -30,7 +30,7 @@ describe('VirtualActor', () => {
 
     it('Не влияет на завершённое движение', () => {
       vi.useFakeTimers();
-      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
+      const actor = createActor({ x: 0, y: 0, z: 0 });
       const error = vi.fn();
       actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).subscribe({ error });
 

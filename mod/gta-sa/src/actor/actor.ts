@@ -1,11 +1,10 @@
-import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { CreateActorOptions, IActor } from '@peetland/game';
+import { Actor } from '@peetland/game';
+import type { CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 
 import {
-  clearCharTasksImmediately,
   createChar,
   deleteChar,
   doesCharExist,
@@ -15,10 +14,11 @@ import {
   markModelAsNoLongerNeeded,
   requestModel,
   setCharCoordinates,
-  taskGoToObject,
 } from '@peetland/moonloader';
 
 import type { IGtaObjectFactory } from '../object';
+
+import { GtaGoToCoordsCommand } from './go-to-coords-command';
 
 export type ActorDeps = {
   geometry: IGeometry;
@@ -29,12 +29,13 @@ export interface IGtaActor extends IActor {
   readonly handle: PedHandle;
 }
 
-export class GtaActor implements IGtaActor {
+export class GtaActor extends Actor implements IGtaActor {
   readonly handle: PedHandle;
   private readonly objectFactory: IGtaObjectFactory;
   private readonly geometry: IGeometry;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
+    super();
     requestModel(options.modelId);
     loadAllModelsNow();
 
@@ -47,58 +48,34 @@ export class GtaActor implements IGtaActor {
     this.objectFactory = deps.objectFactory;
   }
 
-  despawn(): void {
-    if (doesCharExist(this.handle)) {
-      deleteChar(this.handle);
-    }
-  }
-
-  getPosition(): Vector3 {
+  protected readPosition(): Vector3 {
     const [x, y, z] = getCharCoordinates(this.handle);
 
     return { x, y, z };
   }
 
-  setPosition(position: Vector3): void {
+  protected writePosition(position: Vector3): void {
     setCharCoordinates(this.handle, position.x, position.y, position.z);
   }
 
-  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
-    return new Observable((subscriber: ISubscriber<Vector3>) => {
-      /** Возвращает true, если actor прибыл в точку назначения */
-      const tryArrive = (): boolean => {
-        const current = this.getPosition();
-        subscriber.next(current);
-        const withinRadius = this.geometry.isWithinRadius2d(current, coords, completeRadius);
-
-        if (withinRadius) {
-          subscriber.complete();
-        }
-
-        return withinRadius;
-      };
-
-      const arrived = tryArrive();
-
-      if (!arrived) {
-        const target = this.objectFactory.create({
-          modelId: 3283, // Id модели конуса
-          position: coords,
-        });
-
-        target.freeze();
-        target.setVisibility(false);
-        target.setCollisionEnabled(false);
-
-        subscriber.addTeardown(() => {
-          target.remove();
-          clearCharTasksImmediately(this.handle);
-        });
-
-        taskGoToObject(this.handle, target.handle, -1, completeRadius);
-        const intervalId = setInterval(tryArrive, 1000);
-        subscriber.addTeardown(() => clearInterval(intervalId));
-      }
+  protected createGoToCoordsCommand(
+    subscriber: ISubscriber<Vector3>,
+    coords: Vector3,
+    completeRadius: number
+  ): IActorCommand {
+    return new GtaGoToCoordsCommand({
+      actor: this,
+      subscriber,
+      geometry: this.geometry,
+      objectFactory: this.objectFactory,
+      coords,
+      completeRadius,
     });
+  }
+
+  protected override onDespawn(): void {
+    if (doesCharExist(this.handle)) {
+      deleteChar(this.handle);
+    }
   }
 }

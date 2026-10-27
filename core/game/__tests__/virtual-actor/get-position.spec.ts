@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { createActor } from './create-actor';
+import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#getPosition', () => {
     it('Возвращает позицию, на которой создан актор', () => {
-      const actor = createActor({ position: { x: 1, y: 2, z: 3 } });
+      const actor = createActor({ x: 1, y: 2, z: 3 });
 
       const position = actor.getPosition();
 
@@ -13,7 +13,7 @@ describe('VirtualActor', () => {
     });
 
     it('Изменение возвращённой позиции не сдвигает актора', () => {
-      const actor = createActor({ position: { x: 1, y: 2, z: 3 } });
+      const actor = createActor({ x: 1, y: 2, z: 3 });
 
       actor.getPosition().x = 100;
 

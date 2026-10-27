@@ -32,3 +32,20 @@ export interface IActorFactory {
   /** Создаёт игрового персонажа */
   create(options: CreateActorOptions): IActor;
 }
+
+/** Команда, которую выполняет актор, например, движение к точке или проигрывание анимации */
+export interface IActorCommand {
+  /** Начинает выполнение команды */
+  start(): void;
+
+  /** Успешно завершает команду. Команда вызывает его сама, когда выполнена */
+  stop(): void;
+
+  /** Прерывает команду, не дав ей выполниться. Завершает её Observable ошибкой reason */
+  cancel(reason: unknown): void;
+}
+
+export interface IActorState {
+  /** Выбрасывает ошибку, если актор деспавнен */
+  throwIfDespawned(): void;
+}

@@ -1,11 +1,9 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { CreateActorOptions, IActor } from '@peetland/game';
+import type { CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
-
 import {
-  clearCharTasksImmediately,
   createChar,
   deleteChar,
   doesCharExist,
@@ -15,24 +13,26 @@ import {
   markModelAsNoLongerNeeded,
   requestModel,
   setCharCoordinates,
-  taskGoToObject,
 } from '@peetland/moonloader';
 
+import type { ITimer } from '@peetland/timings';
+
 import type { IGtaObjectFactory } from '../object';
+
+import { GtaGoToCoordsCommand } from './go-to-coords-command';
 
 export type ActorDeps = {
   geometry: IGeometry;
   objectFactory: IGtaObjectFactory;
+  timer: ITimer;
 };
 
-export interface IGtaActor extends IActor {
-  readonly handle: PedHandle;
-}
-
-export class GtaActor implements IGtaActor {
-  readonly handle: PedHandle;
-  private readonly objectFactory: IGtaObjectFactory;
+export class GtaActor implements IActor {
+  private readonly handle: PedHandle;
   private readonly geometry: IGeometry;
+  private readonly objectFactory: IGtaObjectFactory;
+  private readonly timer: ITimer;
+  private command: IActorCommand | null;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
     requestModel(options.modelId);
@@ -45,12 +45,12 @@ export class GtaActor implements IGtaActor {
 
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
+    this.timer = deps.timer;
+    this.command = null;
   }
 
-  despawn(): void {
-    if (doesCharExist(this.handle)) {
-      deleteChar(this.handle);
-    }
+  get currentCommand(): IActorCommand | null {
+    return this.command;
   }
 
   getPosition(): Vector3 {
@@ -65,40 +65,32 @@ export class GtaActor implements IGtaActor {
 
   goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
     return new Observable((subscriber: ISubscriber<Vector3>) => {
-      /** Возвращает true, если actor прибыл в точку назначения */
-      const tryArrive = (): boolean => {
-        const current = this.getPosition();
-        subscriber.next(current);
-        const withinRadius = this.geometry.isWithinRadius2d(current, coords, completeRadius);
+      const command = new GtaGoToCoordsCommand(
+        this,
+        this.handle,
+        subscriber,
+        { coords, completeRadius },
+        { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
+      );
 
-        if (withinRadius) {
-          subscriber.complete();
+      this.command?.cancel(new Error('Актор получил другую команду'));
+      this.command = command;
+
+      subscriber.addTeardown(() => {
+        if (this.command === command) {
+          this.command = null;
         }
+      });
 
-        return withinRadius;
-      };
-
-      const arrived = tryArrive();
-
-      if (!arrived) {
-        const target = this.objectFactory.create({
-          modelId: 3283, // Id модели конуса
-          position: coords,
-        });
-
-        target.freeze();
-        target.setVisibility(false);
-        target.setCollisionEnabled(false);
-
-        subscriber.addTeardown(() => {
-          target.remove();
-          clearCharTasksImmediately(this.handle);
-        });
-
-        taskGoToObject(this.handle, target.handle, -1, completeRadius);
-        const intervalId = setInterval(tryArrive, 1000);
-        subscriber.addTeardown(() => clearInterval(intervalId));
-      }
+      command.start();
     });
+  }
+
+  despawn(): void {
+    this.command?.cancel(new Error('Актор деспавнен'));
+
+    if (doesCharExist(this.handle)) {
+      deleteChar(this.handle);
+    }
   }
 }

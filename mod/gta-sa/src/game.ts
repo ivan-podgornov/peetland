@@ -1,15 +1,15 @@
-import type { IGame } from '@peetland/game';
+import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
+import { Timer } from '@peetland/timings';
 
 import { GtaActorFactory } from './actor';
-import type { IGtaActorFactory } from './actor';
 
 import { GtaObjectFactory } from './object';
 import type { IGtaObjectFactory } from './object';
 
 export class GtaGame implements IGame {
-  readonly actorFactory: IGtaActorFactory;
+  readonly actorFactory: IActorFactory;
   readonly objectFactory: IGtaObjectFactory;
   readonly geometry: IGeometry;
 
@@ -19,6 +19,7 @@ export class GtaGame implements IGame {
     this.actorFactory = new GtaActorFactory({
       geometry: this.geometry,
       objectFactory: this.objectFactory,
+      timer: new Timer(),
     });
   }
 }

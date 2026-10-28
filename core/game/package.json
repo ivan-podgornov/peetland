@@ -6,6 +6,7 @@
   "main": "./src/index.ts",
   "dependencies": {
     "@peetland/events": "0.0.0",
-    "@peetland/geometry": "0.0.0"
+    "@peetland/geometry": "0.0.0",
+    "@peetland/timings": "0.0.0"
   }
 }

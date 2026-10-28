@@ -14,7 +14,8 @@
       "vkeys": ["../moonloader/src/vkeys.ts"],
       "@peetland/events": ["../../toolkit/events/src/index.ts"],
       "@peetland/geometry": ["../../toolkit/geometry/src/index.ts"],
-      "@peetland/htn": ["../../toolkit/htn/src/index.ts"]
+      "@peetland/htn": ["../../toolkit/htn/src/index.ts"],
+      "@peetland/timings": ["../../toolkit/timings/src/index.ts"]
     }
   },
   "tstl": {

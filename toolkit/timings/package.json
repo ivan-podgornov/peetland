@@ -1,0 +1,10 @@
+{
+  "name": "@peetland/timings",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@peetland/events": "0.0.0"
+  }
+}

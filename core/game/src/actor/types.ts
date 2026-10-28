@@ -2,6 +2,9 @@ import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
 export interface IActor {
+  /** Команда, которую актор выполняет сейчас */
+  readonly currentCommand: IActorCommand | null;
+
   /** Возвращает позицию персонажа в игре */
   getPosition(): Vector3;
 
@@ -31,4 +34,23 @@ export type CreateActorOptions = {
 export interface IActorFactory {
   /** Создаёт игрового персонажа */
   create(options: CreateActorOptions): IActor;
+}
+
+export type GoToCoordsOptions = {
+  /** Координаты, к которым нужно прийти */
+  coords: Vector3;
+  /** Радиус, при котором можно считать, что персонаж пришёл к нужным координатам */
+  completeRadius: number;
+};
+
+/** Команда, которую выполняет актор, например, движение к точке или проигрывание анимации */
+export interface IActorCommand {
+  /** Начинает выполнение команды */
+  start(): void;
+
+  /** Успешно завершает команду. Команда вызывает его сама, когда выполнена */
+  stop(): void;
+
+  /** Прерывает команду, не дав ей выполниться. Завершает её Observable ошибкой reason */
+  cancel(reason: unknown): void;
 }

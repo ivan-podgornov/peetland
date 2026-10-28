@@ -44,6 +44,15 @@ describe('DespawnableActor', () => {
       expect(inner.getPosition().x).toBeGreaterThan(0);
     });
 
+    it('playAnimation проигрывает анимацию обёрнутым актором', () => {
+      const inner = createActor();
+      const actor = new DespawnableActor(inner);
+
+      actor.playAnimation('pay').subscribe();
+
+      expect(inner.currentCommand).not.toBeNull();
+    });
+
     it('despawn деспавнит обёрнутого актора', () => {
       const inner = createActor();
       const despawn = vi.spyOn(inner, 'despawn');

@@ -1,6 +1,6 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
+import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import {
@@ -19,7 +19,9 @@ import type { ITimer } from '@peetland/timings';
 
 import type { IGtaObjectFactory } from '../object';
 
+import { GTA_ANIMATIONS } from './animations';
 import { GtaGoToCoordsCommand } from './go-to-coords-command';
+import { GtaPlayAnimationCommand } from './play-animation-command';
 
 export type ActorDeps = {
   geometry: IGeometry;
@@ -73,16 +75,20 @@ export class GtaActor implements IActor {
         { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
       );
 
-      this.command?.cancel(new Error('Актор получил другую команду'));
-      this.command = command;
+      this.execute(command, subscriber);
+    });
+  }
 
-      subscriber.addTeardown(() => {
-        if (this.command === command) {
-          this.command = null;
-        }
-      });
+  playAnimation(animation: AnimationId): Observable<void> {
+    return new Observable((subscriber: ISubscriber<void>) => {
+      const command = new GtaPlayAnimationCommand(
+        this.handle,
+        subscriber,
+        GTA_ANIMATIONS[animation],
+        { timer: this.timer }
+      );
 
-      command.start();
+      this.execute(command, subscriber);
     });
   }
 
@@ -92,5 +98,19 @@ export class GtaActor implements IActor {
     if (doesCharExist(this.handle)) {
       deleteChar(this.handle);
     }
+  }
+
+  /** Прерывает текущую команду и начинает новую. Команда перестаёт быть текущей, когда завершится */
+  private execute<T>(command: IActorCommand, subscriber: ISubscriber<T>): void {
+    this.command?.cancel(new Error('Актор получил другую команду'));
+    this.command = command;
+
+    subscriber.addTeardown(() => {
+      if (this.command === command) {
+        this.command = null;
+      }
+    });
+
+    command.start();
   }
 }

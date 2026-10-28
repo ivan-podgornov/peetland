@@ -1,3 +1,4 @@
+export type { AnimationId } from './animation';
 export { DespawnableActor } from './despawnable-actor';
 export type {
   CreateActorOptions,

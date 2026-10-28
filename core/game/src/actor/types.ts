@@ -1,6 +1,8 @@
 import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
+import type { AnimationId } from './animation';
+
 export interface IActor {
   /** Команда, которую актор выполняет сейчас */
   readonly currentCommand: IActorCommand | null;
@@ -19,6 +21,13 @@ export interface IActor {
    * @param completeRadius - радиус, при котором можно считать, что персонаж пришел к нужным координатам
    */
   goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3>;
+
+  /**
+   * Проигрывает анимацию. Возвращает Observable, который завершается, когда анимация закончилась.
+   * Значений Observable не сообщает
+   * @param animation - какую анимацию проиграть
+   */
+  playAnimation(animation: AnimationId): Observable<void>;
 
   /** Деспавнит игрового персонажа */
   despawn(): void;

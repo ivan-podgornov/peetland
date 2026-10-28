@@ -35,6 +35,13 @@ describe('DespawnableActor', () => {
       expect(() => actor.goToCoords({ x: 1, y: 2, z: 3 }, 5)).toThrow(Error);
     });
 
+    it('playAnimation выбрасывает ошибку', () => {
+      const actor = new DespawnableActor(createActor());
+      actor.despawn();
+
+      expect(() => actor.playAnimation('pay')).toThrow(Error);
+    });
+
     it('despawn выбрасывает ошибку', () => {
       const actor = new DespawnableActor(createActor());
       actor.despawn();

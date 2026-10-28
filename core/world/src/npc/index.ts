@@ -1,1 +1,1 @@
-export type { NpcData } from './data';
+export type { NpcData, NpcFeelings, NpcTraits } from './data';

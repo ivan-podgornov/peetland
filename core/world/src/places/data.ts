@@ -1,6 +1,7 @@
 import type { Vector3 } from '@peetland/geometry';
 
 export enum PlaceType {
+  HomelessCamp = 'homeless-camp',
   Shop = 'shop',
   BottleCollection = 'bottle-collection',
   TrashBin = 'trash-bin',

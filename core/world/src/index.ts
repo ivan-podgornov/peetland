@@ -1,5 +1,4 @@
-export type { NpcData } from './npc-data';
-export { PlaceType } from './place-data';
-export type { PlaceData } from './place-data';
+export * from './npc';
+export * from './places';
 export { World } from './world';
 export type { WorldDeps } from './world';

@@ -54,6 +54,9 @@ export type GoToCoordsOptions = {
 
 /** Команда, которую выполняет актор, например, движение к точке или проигрывание анимации */
 export interface IActorCommand {
+  /** Название команды, например, go-to-coords или play-animation */
+  readonly name: string;
+
   /** Начинает выполнение команды */
   start(): void;
 

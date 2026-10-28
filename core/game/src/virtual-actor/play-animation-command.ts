@@ -14,6 +14,7 @@ export type VirtualPlayAnimationCommandDeps = {
 
 /** Завершается, когда по таймеру проходит длительность анимации */
 export class VirtualPlayAnimationCommand implements IActorCommand {
+  readonly name = 'play-animation';
   private readonly subscriber: ISubscriber<void>;
   private readonly duration: number;
   private readonly timer: ITimer;

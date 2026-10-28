@@ -8,20 +8,20 @@ import type { AnimationId, IActor, IActorCommand } from '../actor';
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 import { VirtualPlayAnimationCommand } from './play-animation-command';
 
-/** Длительность анимации, для которой нет записи в таблице длительностей, в миллисекундах */
-export const DEFAULT_ANIMATION_DURATION = 1000;
+/** Анимация виртуального актора */
+export type VirtualAnimation = {
+  /** Сколько длится анимация, в миллисекундах */
+  duration: number;
+};
 
-/** Длительности анимаций в миллисекундах */
-export type AnimationDurations = Partial<Record<AnimationId, number>>;
+/** Анимации виртуального актора. Для каждой анимации должна быть задана длительность */
+export type VirtualAnimations = Record<AnimationId, VirtualAnimation>;
 
 export type VirtualActorOptions = {
   /** Позиция, на которой появляется актор */
   position: Vector3;
-  /**
-   * Длительности анимаций. Для анимаций без записи используется DEFAULT_ANIMATION_DURATION.
-   * Если не указаны, все анимации длятся DEFAULT_ANIMATION_DURATION
-   */
-  animationDurations?: AnimationDurations;
+  /** Анимации, которые умеет проигрывать актор */
+  animations: VirtualAnimations;
 };
 
 export type VirtualActorDeps = {
@@ -33,14 +33,14 @@ export type VirtualActorDeps = {
 export class VirtualActor implements IActor {
   private readonly geometry: IGeometry;
   private readonly timer: ITimer;
-  private readonly animationDurations: AnimationDurations;
+  private readonly animations: VirtualAnimations;
   private position: Vector3;
   private command: IActorCommand | null;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.geometry = deps.geometry;
     this.timer = deps.timer;
-    this.animationDurations = { ...options.animationDurations };
+    this.animations = { ...options.animations };
     this.position = { ...options.position };
     this.command = null;
   }
@@ -70,9 +70,14 @@ export class VirtualActor implements IActor {
     });
   }
 
+  /**
+   * Выбрасывает ошибку, если анимации нет в таблице анимаций или для неё не задана длительность
+   * @inheritdoc
+   */
   playAnimation(animation: AnimationId): Observable<void> {
+    const duration = this.getAnimationDuration(animation);
+
     return new Observable((subscriber: ISubscriber<void>) => {
-      const duration = this.animationDurations[animation] ?? DEFAULT_ANIMATION_DURATION;
       const command = new VirtualPlayAnimationCommand(
         subscriber,
         { duration },
@@ -85,6 +90,17 @@ export class VirtualActor implements IActor {
 
   despawn(): void {
     this.command?.cancel(new Error('Актор деспавнен'));
+  }
+
+  /** Возвращает длительность анимации. Выбрасывает ошибку, если длительность не задана */
+  private getAnimationDuration(animation: AnimationId): number {
+    const info: Partial<VirtualAnimation> | undefined = this.animations[animation];
+
+    if (info?.duration === undefined) {
+      throw new Error(`Не задана длительность анимации ${animation}`);
+    }
+
+    return info.duration;
   }
 
   /** Прерывает текущую команду и начинает новую. Команда перестаёт быть текущей, когда завершится */

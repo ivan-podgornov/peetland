@@ -50,7 +50,7 @@ describe('DespawnableActor', () => {
 
       actor.playAnimation('pay').subscribe();
 
-      expect(inner.currentCommand).not.toBeNull();
+      expect(inner.currentCommand?.name).toBe('play-animation');
     });
 
     it('despawn деспавнит обёрнутого актора', () => {

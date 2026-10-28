@@ -1,8 +1,7 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_ANIMATION_DURATION } from '../../../src';
-import { createActor } from '../../helpers';
+import { ANIMATION_DURATION, createActor, createAnimations } from '../../helpers';
 
 describe('VirtualActor', () => {
   describe('#playAnimation', () => {
@@ -17,14 +16,13 @@ describe('VirtualActor', () => {
         expect(cancel).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
       });
 
-      it('Делает текущей командой новую анимацию', () => {
+      it('Делает текущей командой проигрывание анимации', () => {
         const actor = createActor();
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
-        const previous = actor.currentCommand;
 
         actor.playAnimation('pay').subscribe();
 
-        expect(actor.currentCommand).not.toBe(previous);
+        expect(actor.currentCommand?.name).toBe('play-animation');
       });
     });
 
@@ -46,24 +44,21 @@ describe('VirtualActor', () => {
         actor.playAnimation('pay').subscribe({ complete });
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
-        timer.advance(DEFAULT_ANIMATION_DURATION);
+        timer.advance(ANIMATION_DURATION);
 
         expect(complete).not.toHaveBeenCalled();
       });
 
       it('Не сбрасывает новую команду, когда проходит длительность прерванной анимации', () => {
         const timer = new ManualTimer();
-        const actor = createActor({
-          timer,
-          animationDurations: { pay: 1000, 'beg-sitting': 3000 },
-        });
+        const animations = { ...createAnimations(), pay: { duration: 1000 } };
+        const actor = createActor({ timer, animations });
         actor.playAnimation('pay').subscribe();
-        actor.playAnimation('beg-sitting').subscribe();
-        const current = actor.currentCommand;
+        actor.goToCoords({ x: 100, y: 0, z: 0 }, 1).subscribe();
 
         timer.advance(1000);
 
-        expect(actor.currentCommand).toBe(current);
+        expect(actor.currentCommand?.name).toBe('go-to-coords');
       });
     });
   });

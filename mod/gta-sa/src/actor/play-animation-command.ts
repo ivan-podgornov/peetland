@@ -29,6 +29,7 @@ const BLEND_SPEED = 4;
  * Блок выгружается, как только команда завершилась или прервалась
  */
 export class GtaPlayAnimationCommand implements IActorCommand {
+  readonly name = 'play-animation';
   private readonly handle: PedHandle;
   private readonly subscriber: ISubscriber<void>;
   private readonly animation: GtaAnimation;

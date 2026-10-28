@@ -38,7 +38,7 @@ import { Geometry } from '@peetland/geometry';
 import { Timer } from '@peetland/timings';
 
 const factory = new VirtualActorFactory(
-  { animationDurations: { pay: 4670 } },
+  { animations: { pay: { duration: 4670 } /* ...и остальные анимации */ } },
   { geometry: new Geometry(), timer: new Timer() }
 );
 const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
@@ -49,6 +49,6 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 позицию. Когда актор входит в
 радиус (без учёта высоты), Observable завершается.
 
-`playAnimation` завершается, когда по таймеру проходит длительность анимации. Длительности задаются
-таблицей `animationDurations` в опциях фабрики, для анимаций без записи используется
-`DEFAULT_ANIMATION_DURATION` (1 секунда).
+`playAnimation` завершается, когда по таймеру проходит длительность анимации. Анимации передаются
+таблицей `animations` в опциях фабрики: для каждой анимации обязательна запись с длительностью.
+Если записи или длительности нет, `playAnimation` выбрасывает ошибку.

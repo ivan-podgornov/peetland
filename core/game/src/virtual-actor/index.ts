@@ -1,5 +1,10 @@
-export { DEFAULT_ANIMATION_DURATION, VirtualActor } from './actor';
-export type { AnimationDurations, VirtualActorDeps, VirtualActorOptions } from './actor';
+export { VirtualActor } from './actor';
+export type {
+  VirtualActorDeps,
+  VirtualActorOptions,
+  VirtualAnimation,
+  VirtualAnimations,
+} from './actor';
 export { VirtualActorFactory } from './factory';
 export type { VirtualActorFactoryDeps, VirtualActorFactoryOptions } from './factory';
 export { VirtualGoToCoordsCommand } from './go-to-coords-command';

@@ -53,6 +53,16 @@ describe('DespawnableActor', () => {
       expect(inner.currentCommand?.name).toBe('play-animation');
     });
 
+    it('playAnimation передаёт обёрнутому актору время проигрывания', () => {
+      const inner = createActor();
+      const playAnimation = vi.spyOn(inner, 'playAnimation');
+      const actor = new DespawnableActor(inner);
+
+      actor.playAnimation('trash-search', 5000);
+
+      expect(playAnimation).toHaveBeenCalledExactlyOnceWith('trash-search', 5000);
+    });
+
     it('despawn деспавнит обёрнутого актора', () => {
       const inner = createActor();
       const despawn = vi.spyOn(inner, 'despawn');

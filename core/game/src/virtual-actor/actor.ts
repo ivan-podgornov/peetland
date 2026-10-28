@@ -3,6 +3,7 @@ import type { ISubscriber } from '@peetland/events';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
+import { assertPlaybackDuration } from '../actor';
 import type { AnimationId, IActor, IActorCommand } from '../actor';
 
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
@@ -71,11 +72,13 @@ export class VirtualActor implements IActor {
   }
 
   /**
-   * Выбрасывает ошибку, если анимации нет в таблице анимаций или для неё не задана длительность
+   * Незацикленная анимация длится столько, сколько указано в таблице анимаций. Выбрасывает ошибку,
+   * если анимации нет в таблице или для неё не задана длительность
    * @inheritdoc
    */
-  playAnimation(animation: AnimationId): Observable<void> {
-    const duration = this.getAnimationDuration(animation);
+  playAnimation(animation: AnimationId, playbackDuration?: number): Observable<void> {
+    assertPlaybackDuration(animation, playbackDuration);
+    const duration = playbackDuration ?? this.getAnimationDuration(animation);
 
     return new Observable((subscriber: ISubscriber<void>) => {
       const command = new VirtualPlayAnimationCommand(

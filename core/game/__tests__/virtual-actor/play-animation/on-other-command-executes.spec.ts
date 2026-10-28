@@ -32,7 +32,7 @@ describe('VirtualActor', () => {
         const error = vi.fn();
         actor.playAnimation('pay').subscribe({ error });
 
-        actor.playAnimation('beg-sitting').subscribe();
+        actor.playAnimation('item-give').subscribe();
 
         expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
       });

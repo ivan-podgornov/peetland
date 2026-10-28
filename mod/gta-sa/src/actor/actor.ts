@@ -1,5 +1,6 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
+import { ANIMATIONS, assertPlaybackDuration } from '@peetland/game';
 import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -79,14 +80,23 @@ export class GtaActor implements IActor {
     });
   }
 
-  playAnimation(animation: AnimationId): Observable<void> {
+  /**
+   * Незацикленная анимация длится столько, сколько указано в GTA_ANIMATIONS
+   * @inheritdoc
+   */
+  playAnimation(animation: AnimationId, playbackDuration?: number): Observable<void> {
+    assertPlaybackDuration(animation, playbackDuration);
+    const gtaAnimation = GTA_ANIMATIONS[animation];
+    const options = {
+      animation: gtaAnimation,
+      loop: ANIMATIONS[animation].loop,
+      duration: playbackDuration ?? gtaAnimation.duration,
+    };
+
     return new Observable((subscriber: ISubscriber<void>) => {
-      const command = new GtaPlayAnimationCommand(
-        this.handle,
-        subscriber,
-        GTA_ANIMATIONS[animation],
-        { timer: this.timer }
-      );
+      const command = new GtaPlayAnimationCommand(this.handle, subscriber, options, {
+        timer: this.timer,
+      });
 
       this.execute(command, subscriber);
     });

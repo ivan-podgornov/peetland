@@ -34,8 +34,8 @@ export class DespawnableActor implements IActor {
     return this.actor.goToCoords(coords, completeRadius);
   }
 
-  playAnimation(animation: AnimationId): Observable<void> {
-    return this.actor.playAnimation(animation);
+  playAnimation(animation: AnimationId, duration?: number): Observable<void> {
+    return this.actor.playAnimation(animation, duration);
   }
 
   despawn(): void {

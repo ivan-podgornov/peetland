@@ -24,10 +24,13 @@ export interface IActor {
 
   /**
    * Проигрывает анимацию. Возвращает Observable, который завершается, когда анимация закончилась.
-   * Значений Observable не сообщает
+   * Значений Observable не сообщает. Зацикленная анимация (см. ANIMATIONS) повторяется, пока не
+   * пройдёт duration; для незацикленной duration не передаётся, она идёт свою длительность.
+   * Выбрасывает ошибку, если duration не соответствует анимации (см. assertPlaybackDuration)
    * @param animation - какую анимацию проиграть
+   * @param duration - сколько проигрывать зацикленную анимацию, в миллисекундах
    */
-  playAnimation(animation: AnimationId): Observable<void>;
+  playAnimation(animation: AnimationId, duration?: number): Observable<void>;
 
   /** Деспавнит игрового персонажа */
   despawn(): void;

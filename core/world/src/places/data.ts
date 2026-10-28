@@ -8,9 +8,9 @@ export enum PlaceType {
 }
 
 /** Данные места, которые хранятся в репозитории */
-export type PlaceData = {
-  readonly id: string;
-  readonly type: PlaceType;
+export type PlaceData = Readonly<{
+  id: string;
+  type: PlaceType;
   /** Координаты места */
-  readonly position: Vector3;
-};
+  position: Vector3;
+}>;

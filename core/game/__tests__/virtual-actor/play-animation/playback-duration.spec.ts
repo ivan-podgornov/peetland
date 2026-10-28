@@ -1,15 +1,14 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor, createAnimations } from '../../helpers';
+import { createActor } from '../../helpers';
 
 describe('VirtualActor', () => {
   describe('#playAnimation', () => {
     describe('Для зацикленной анимации', () => {
       it('Завершает Observable, когда проходит переданное время проигрывания', () => {
         const timer = new ManualTimer();
-        const animations = { ...createAnimations(), 'trash-search': { duration: 2000 } };
-        const actor = createActor({ timer, animations });
+        const actor = createActor({ timer });
         const complete = vi.fn();
         actor.playAnimation('trash-search', 5000).subscribe({ complete });
 
@@ -20,8 +19,7 @@ describe('VirtualActor', () => {
 
       it('Не завершает Observable, пока переданное время проигрывания не прошло', () => {
         const timer = new ManualTimer();
-        const animations = { ...createAnimations(), 'trash-search': { duration: 2000 } };
-        const actor = createActor({ timer, animations });
+        const actor = createActor({ timer });
         const complete = vi.fn();
         actor.playAnimation('trash-search', 5000).subscribe({ complete });
 
@@ -67,7 +65,7 @@ describe('VirtualActor', () => {
         // Ошибка проверяется в других тестах
       }
 
-      expect(actor.currentCommand?.name).toBe('go-to-coords');
+      expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
     });
   });
 });

@@ -50,7 +50,7 @@ describe('DespawnableActor', () => {
 
       actor.playAnimation('pay').subscribe();
 
-      expect(inner.currentCommand?.name).toBe('play-animation');
+      expect(inner.currentCommand).toHaveProperty('name', 'play-animation');
     });
 
     it('playAnimation передаёт обёрнутому актору время проигрывания', () => {

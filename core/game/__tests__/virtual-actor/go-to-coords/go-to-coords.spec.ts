@@ -28,7 +28,7 @@ describe('VirtualActor', () => {
 
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
-      expect(actor.currentCommand?.name).toBe('go-to-coords');
+      expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
     });
 
     it('При подписке сообщает текущую позицию актора', () => {

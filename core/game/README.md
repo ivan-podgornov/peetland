@@ -38,12 +38,12 @@ const actor = new DespawnableActor(new VirtualActor(options, deps));
 тестируются задачи, NPC и мир.
 
 ```ts
-import { VirtualActorFactory } from '@peetland/game';
+import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { Timer } from '@peetland/timings';
 
 const factory = new VirtualActorFactory(
-  { animations: { pay: { duration: 4670 } /* ...и остальные анимации */ } },
+  { animations: VIRTUAL_ANIMATIONS },
   { geometry: new Geometry(), timer: new Timer() }
 );
 const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
@@ -57,4 +57,5 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 `playAnimation` завершается, когда по таймеру проходит время проигрывания для зацикленной анимации
 или длительность из таблицы для незацикленной. Анимации передаются
 таблицей `animations` в опциях фабрики: для каждой анимации обязательна запись с длительностью.
-Если записи или длительности нет, `playAnimation` выбрасывает ошибку.
+Если записи или длительности нет, `playAnimation` выбрасывает ошибку. Готовая таблица с
+длительностями анимаций игры — `VIRTUAL_ANIMATIONS`.

@@ -2,14 +2,13 @@ import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DespawnableActor, VirtualActorFactory } from '../../src';
-import { createAnimations } from '../helpers';
+import { DespawnableActor, VIRTUAL_ANIMATIONS, VirtualActorFactory } from '../../src';
 
 describe('VirtualActorFactory', () => {
   describe('#create', () => {
     it('Создаёт актора на переданной позиции', () => {
       const factory = new VirtualActorFactory(
-        { animations: createAnimations() },
+        { animations: VIRTUAL_ANIMATIONS },
         { geometry: new Geometry(), timer: new ManualTimer() }
       );
 
@@ -21,7 +20,7 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, который двигается по времени переданного таймера', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory(
-        { animations: createAnimations() },
+        { animations: VIRTUAL_ANIMATIONS },
         { geometry: new Geometry(), timer }
       );
       const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
@@ -34,7 +33,7 @@ describe('VirtualActorFactory', () => {
 
     it('Возвращает актора, защищённого от использования после деспавна', () => {
       const factory = new VirtualActorFactory(
-        { animations: createAnimations() },
+        { animations: VIRTUAL_ANIMATIONS },
         { geometry: new Geometry(), timer: new ManualTimer() }
       );
 
@@ -46,7 +45,7 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, анимации которого длятся по переданной таблице анимаций', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory(
-        { animations: { ...createAnimations(), pay: { duration: 3000 } } },
+        { animations: { ...VIRTUAL_ANIMATIONS, pay: { duration: 3000 } } },
         { geometry: new Geometry(), timer }
       );
       const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });

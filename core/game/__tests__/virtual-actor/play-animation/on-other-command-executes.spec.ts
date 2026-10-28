@@ -1,7 +1,8 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ANIMATION_DURATION, createActor, createAnimations } from '../../helpers';
+import { VIRTUAL_ANIMATIONS } from '../../../src';
+import { createActor } from '../../helpers';
 
 describe('VirtualActor', () => {
   describe('#playAnimation', () => {
@@ -22,7 +23,7 @@ describe('VirtualActor', () => {
 
         actor.playAnimation('pay').subscribe();
 
-        expect(actor.currentCommand?.name).toBe('play-animation');
+        expect(actor.currentCommand).toHaveProperty('name', 'play-animation');
       });
     });
 
@@ -44,21 +45,20 @@ describe('VirtualActor', () => {
         actor.playAnimation('pay').subscribe({ complete });
         actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
-        timer.advance(ANIMATION_DURATION);
+        timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
         expect(complete).not.toHaveBeenCalled();
       });
 
       it('Не сбрасывает новую команду, когда проходит длительность прерванной анимации', () => {
         const timer = new ManualTimer();
-        const animations = { ...createAnimations(), pay: { duration: 1000 } };
-        const actor = createActor({ timer, animations });
+        const actor = createActor({ timer });
         actor.playAnimation('pay').subscribe();
         actor.goToCoords({ x: 100, y: 0, z: 0 }, 1).subscribe();
 
-        timer.advance(1000);
+        timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
-        expect(actor.currentCommand?.name).toBe('go-to-coords');
+        expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
       });
     });
   });

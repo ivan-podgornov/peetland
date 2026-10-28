@@ -1,4 +1,4 @@
-import { ManualIntervalObservable } from '@peetland/timings';
+import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../helpers';
@@ -6,11 +6,11 @@ import { createActor } from '../../helpers';
 describe('VirtualActor', () => {
   describe('#goToCoords', () => {
     it('Не двигает актора до подписки', () => {
-      const interval = new ManualIntervalObservable();
-      const actor = createActor({ position: { x: 0, y: 0, z: 0 }, interval });
+      const timer = new ManualTimer();
+      const actor = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
 
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
-      interval.tick(1000);
+      timer.advance(1000);
 
       expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
     });

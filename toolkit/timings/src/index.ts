@@ -1,3 +1,3 @@
-export { IntervalObservable } from './interval-observable';
-export { ManualIntervalObservable } from './manual-interval-observable';
-export type { Interval } from './types';
+export { ManualTimer } from './manual-timer';
+export { Timer } from './timer';
+export type { ITimer } from './types';

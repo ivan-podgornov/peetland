@@ -1,4 +1,4 @@
-import { ManualIntervalObservable } from '@peetland/timings';
+import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
@@ -34,12 +34,12 @@ describe('DespawnableActor', () => {
     });
 
     it('goToCoords ведёт обёрнутого актора к точке', () => {
-      const interval = new ManualIntervalObservable();
-      const inner = createActor({ position: { x: 0, y: 0, z: 0 }, interval });
+      const timer = new ManualTimer();
+      const inner = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
       const actor = new DespawnableActor(inner);
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
-      interval.tick(1000);
+      timer.advance(1000);
 
       expect(inner.getPosition().x).toBeGreaterThan(0);
     });

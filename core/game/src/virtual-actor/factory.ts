@@ -1,5 +1,5 @@
 import type { IGeometry } from '@peetland/geometry';
-import type { Interval } from '@peetland/timings';
+import type { ITimer } from '@peetland/timings';
 
 import { DespawnableActor } from '../actor';
 import type { CreateActorOptions, IActorFactory } from '../actor';
@@ -8,23 +8,22 @@ import { VirtualActor } from './actor';
 
 export type VirtualActorFactoryDeps = {
   geometry: IGeometry;
-  /** Интервал, на каждое значение которого акторы делают шаг к точке */
-  interval: Interval;
+  timer: ITimer;
 };
 
 export class VirtualActorFactory implements IActorFactory {
   private readonly geometry: IGeometry;
-  private readonly interval: Interval;
+  private readonly timer: ITimer;
 
   constructor(deps: VirtualActorFactoryDeps) {
     this.geometry = deps.geometry;
-    this.interval = deps.interval;
+    this.timer = deps.timer;
   }
 
   create(options: CreateActorOptions): DespawnableActor {
     const actor = new VirtualActor(
       { position: options.position },
-      { geometry: this.geometry, interval: this.interval }
+      { geometry: this.geometry, timer: this.timer }
     );
 
     return new DespawnableActor(actor);

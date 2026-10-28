@@ -1,33 +1,45 @@
 # @peetland/timings
 
-Observable, которые сообщают, что прошло время. Тип `Interval` — это `Observable<number>`, каждое
-значение которого говорит, сколько миллисекунд прошло с прошлого значения.
+Таймеры, которые сообщают, что прошло время. Таймер реализует `ITimer`: метод `interval(period)`
+возвращает новый Observable, который раз в `period` миллисекунд сообщает, сколько миллисекунд
+прошло.
 
-Если классу нужно что-то делать со временем, принимайте `Interval` в зависимостях, а не создавайте
+Если классу нужно что-то делать со временем, принимайте `ITimer` в зависимостях, а не создавайте
 таймер внутри. Так в игре время будет идти само, а в тестах — тогда, когда этого хочет тест, без
 фейковых таймеров.
 
-## IntervalObservable
+## Каждому свой интервал
 
-Раз в `period` миллисекунд сообщает, что прошло `period` миллисекунд:
+Каждый вызов `interval` создаёт отдельный Observable со своим отсчётом времени: первое значение
+придёт через `period` после подписки на него. Поэтому интервал не нужно делить с другими классами,
+а нужно создавать там, где он нужен. Общий интервал работает неправильно: тот, кто подписался на
+него позже, получит первое значение раньше, чем пройдёт `period`.
 
-```ts
-import { IntervalObservable } from '@peetland/timings';
+## Timer
 
-const interval = new IntervalObservable(1000);
-
-interval.subscribe((elapsed) => console.log(elapsed)); // 1000 раз в секунду
-```
-
-## ManualIntervalObservable
-
-Сообщает, что прошло время, только когда вызывают `tick`. Нужен в тестах:
+Отсчитывает настоящее время:
 
 ```ts
-import { ManualIntervalObservable } from '@peetland/timings';
+import { Timer } from '@peetland/timings';
 
-const interval = new ManualIntervalObservable();
+const timer = new Timer();
 
-interval.subscribe((elapsed) => console.log(elapsed));
-interval.tick(500); // 500
+timer.interval(1000).subscribe((elapsed) => console.log(elapsed)); // 1000 раз в секунду
 ```
+
+## ManualTimer
+
+Время идёт, только когда вызывают `advance`. Нужен в тестах:
+
+```ts
+import { ManualTimer } from '@peetland/timings';
+
+const timer = new ManualTimer();
+
+timer.interval(1000).subscribe((elapsed) => console.log(elapsed));
+timer.advance(2500); // 1000, 1000
+```
+
+Если за одно продвижение подходит срок нескольких интервалов, они выдают значения в том порядке, в
+котором подошёл их срок. `interval` выбрасывает `RangeError`, если `period` не положительное конечное
+число, а `advance` — если время отрицательное или не конечное.

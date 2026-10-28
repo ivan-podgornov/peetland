@@ -1,7 +1,7 @@
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
-import { IntervalObservable } from '@peetland/timings';
+import { Timer } from '@peetland/timings';
 
 import { GtaActorFactory } from './actor';
 
@@ -19,7 +19,7 @@ export class GtaGame implements IGame {
     this.actorFactory = new GtaActorFactory({
       geometry: this.geometry,
       objectFactory: this.objectFactory,
-      interval: new IntervalObservable(1000),
+      timer: new Timer(),
     });
   }
 }

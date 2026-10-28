@@ -1,7 +1,7 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
-import type { Interval } from '@peetland/timings';
+import type { ITimer } from '@peetland/timings';
 
 import type { IActor, IActorCommand } from '../actor';
 
@@ -14,20 +14,19 @@ export type VirtualActorOptions = {
 
 export type VirtualActorDeps = {
   geometry: IGeometry;
-  /** Интервал, на каждое значение которого актор делает шаг к точке */
-  interval: Interval;
+  timer: ITimer;
 };
 
 /** Актор, который работает без игры и хранит всё в памяти */
 export class VirtualActor implements IActor {
   private readonly geometry: IGeometry;
-  private readonly interval: Interval;
+  private readonly timer: ITimer;
   private position: Vector3;
   private command: IActorCommand | null;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.geometry = deps.geometry;
-    this.interval = deps.interval;
+    this.timer = deps.timer;
     this.position = { ...options.position };
     this.command = null;
   }
@@ -50,7 +49,7 @@ export class VirtualActor implements IActor {
         this,
         subscriber,
         { coords, completeRadius },
-        { geometry: this.geometry, interval: this.interval }
+        { geometry: this.geometry, timer: this.timer }
       );
 
       this.command?.cancel(new Error('Актор получил другую команду'));

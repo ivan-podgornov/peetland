@@ -4,18 +4,20 @@ import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import { clearCharTasksImmediately, taskGoToObject } from '@peetland/moonloader';
 
-import type { Interval } from '@peetland/timings';
+import type { ITimer } from '@peetland/timings';
 
 import type { IGtaObjectFactory } from '../object';
 
 export type GtaGoToCoordsCommandDeps = {
   geometry: IGeometry;
   objectFactory: IGtaObjectFactory;
-  /** Интервал, на каждое значение которого команда проверяет, пришёл ли персонаж */
-  interval: Interval;
+  timer: ITimer;
 };
 
-/** Ведёт игрового персонажа к точке и на каждое значение интервала сообщает его позицию */
+/** Как часто команда проверяет, пришёл ли персонаж, в миллисекундах */
+const CHECK_PERIOD = 1000;
+
+/** Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию */
 export class GtaGoToCoordsCommand implements IActorCommand {
   private readonly actor: IActor;
   private readonly handle: PedHandle;
@@ -23,7 +25,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
   private readonly options: GoToCoordsOptions;
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
-  private readonly interval: Interval;
+  private readonly timer: ITimer;
 
   constructor(
     actor: IActor,
@@ -38,7 +40,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
     this.options = options;
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
-    this.interval = deps.interval;
+    this.timer = deps.timer;
   }
 
   start(): void {
@@ -61,7 +63,9 @@ export class GtaGoToCoordsCommand implements IActorCommand {
     });
 
     taskGoToObject(this.handle, target.handle, -1, this.options.completeRadius);
-    this.interval.subscribe(() => this.tryArrive(), { signal: this.subscriber.signal });
+    this.timer
+      .interval(CHECK_PERIOD)
+      .subscribe(() => this.tryArrive(), { signal: this.subscriber.signal });
   }
 
   stop(): void {

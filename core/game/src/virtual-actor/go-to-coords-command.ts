@@ -1,25 +1,27 @@
 import type { ISubscriber } from '@peetland/events';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
-import type { Interval } from '@peetland/timings';
+import type { ITimer } from '@peetland/timings';
 
 import type { GoToCoordsOptions, IActor, IActorCommand } from '../actor';
+
+/** Как часто актор делает шаг к точке, в миллисекундах */
+const STEP_PERIOD = 1000;
 
 /** Скорость пешехода: 5 км/ч в метрах в секунду */
 const WALKING_SPEED = 5 / 3.6;
 
 export type VirtualGoToCoordsCommandDeps = {
   geometry: IGeometry;
-  /** Интервал, на каждое значение которого актор делает шаг к точке */
-  interval: Interval;
+  timer: ITimer;
 };
 
-/** На каждое значение интервала двигает виртуального актора к точке по прямой */
+/** Раз в секунду двигает виртуального актора к точке по прямой */
 export class VirtualGoToCoordsCommand implements IActorCommand {
   private readonly actor: IActor;
   private readonly subscriber: ISubscriber<Vector3>;
   private readonly options: GoToCoordsOptions;
   private readonly geometry: IGeometry;
-  private readonly interval: Interval;
+  private readonly timer: ITimer;
 
   constructor(
     actor: IActor,
@@ -31,7 +33,7 @@ export class VirtualGoToCoordsCommand implements IActorCommand {
     this.subscriber = subscriber;
     this.options = options;
     this.geometry = deps.geometry;
-    this.interval = deps.interval;
+    this.timer = deps.timer;
   }
 
   start(): void {
@@ -39,7 +41,7 @@ export class VirtualGoToCoordsCommand implements IActorCommand {
       return;
     }
 
-    this.interval.subscribe(
+    this.timer.interval(STEP_PERIOD).subscribe(
       (elapsed) => {
         const distance = (this.getSpeed() * elapsed) / 1000;
         const position = this.geometry.moveTowards(

@@ -1,7 +1,6 @@
 import type { ISubscriber } from '@peetland/events';
+import type { IActorCommand } from '@peetland/game';
 import type { ITimer } from '@peetland/timings';
-
-import type { IActorCommand } from '../actor';
 
 export type VirtualPlayAnimationCommandOptions = {
   /** Сколько длится анимация, в миллисекундах */

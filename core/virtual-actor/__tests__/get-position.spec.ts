@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createActor } from '../helpers';
+import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
   describe('#getPosition', () => {

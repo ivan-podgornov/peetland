@@ -5,6 +5,12 @@ import { DespawnableActor } from '../actor';
 import type { CreateActorOptions, IActorFactory } from '../actor';
 
 import { VirtualActor } from './actor';
+import type { VirtualAnimations } from './actor';
+
+export type VirtualActorFactoryOptions = {
+  /** Анимации, которые умеют проигрывать создаваемые акторы */
+  animations: VirtualAnimations;
+};
 
 export type VirtualActorFactoryDeps = {
   geometry: IGeometry;
@@ -12,17 +18,19 @@ export type VirtualActorFactoryDeps = {
 };
 
 export class VirtualActorFactory implements IActorFactory {
+  private readonly animations: VirtualAnimations;
   private readonly geometry: IGeometry;
   private readonly timer: ITimer;
 
-  constructor(deps: VirtualActorFactoryDeps) {
+  constructor(options: VirtualActorFactoryOptions, deps: VirtualActorFactoryDeps) {
+    this.animations = { ...options.animations };
     this.geometry = deps.geometry;
     this.timer = deps.timer;
   }
 
   create(options: CreateActorOptions): DespawnableActor {
     const actor = new VirtualActor(
-      { position: options.position },
+      { position: options.position, animations: this.animations },
       { geometry: this.geometry, timer: this.timer }
     );
 

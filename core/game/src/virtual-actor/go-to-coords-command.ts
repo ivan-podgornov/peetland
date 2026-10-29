@@ -17,6 +17,7 @@ export type VirtualGoToCoordsCommandDeps = {
 
 /** Раз в секунду двигает виртуального актора к точке по прямой */
 export class VirtualGoToCoordsCommand implements IActorCommand {
+  readonly name = 'go-to-coords';
   private readonly actor: IActor;
   private readonly subscriber: ISubscriber<Vector3>;
   private readonly options: GoToCoordsOptions;

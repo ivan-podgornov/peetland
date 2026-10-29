@@ -50,7 +50,12 @@ describe('Command', () => {
 
     it("Если команда выполнена, onFinish остаётся вызванным только с 'success'", () => {
       const onFinish = vi.fn();
-      const command = executeCommand({ hooks: { onUpdate: () => 'success', onFinish } });
+      const command = executeCommand({
+        hooks: {
+          onUpdate: () => 'success',
+          onFinish,
+        },
+      });
 
       command.cancel(new Error());
 

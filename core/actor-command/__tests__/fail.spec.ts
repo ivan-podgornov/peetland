@@ -21,7 +21,12 @@ describe('Command', () => {
     it("Вызывает onFinish с 'failed'", () => {
       const onFinish = vi.fn();
 
-      executeCommand({ hooks: { onStart: ({ fail }) => fail(new Error()), onFinish } });
+      executeCommand({
+        hooks: {
+          onStart: ({ fail }) => fail(new Error()),
+          onFinish,
+        },
+      });
 
       expect(onFinish).toHaveBeenCalledExactlyOnceWith('failed');
     });

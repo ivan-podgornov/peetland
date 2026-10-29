@@ -33,7 +33,12 @@ describe('Command', () => {
       const onStart = vi.fn();
       const onUpdate = vi.fn(() => 'running' as const);
 
-      executeCommand({ hooks: { onStart, onUpdate } });
+      executeCommand({
+        hooks: {
+          onStart,
+          onUpdate,
+        },
+      });
 
       expect(onStart).toHaveBeenCalledBefore(onUpdate);
     });
@@ -41,7 +46,12 @@ describe('Command', () => {
     it('Если onStart вызвал fail, не вызывает onUpdate', () => {
       const onUpdate = vi.fn(() => 'running' as const);
 
-      executeCommand({ hooks: { onStart: ({ fail }) => fail(new Error()), onUpdate } });
+      executeCommand({
+        hooks: {
+          onStart: ({ fail }) => fail(new Error()),
+          onUpdate,
+        },
+      });
 
       expect(onUpdate).not.toHaveBeenCalled();
     });

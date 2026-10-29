@@ -1,0 +1,15 @@
+{
+  "name": "@peetland/actor-command",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@peetland/events": "0.0.0",
+    "@peetland/game": "0.0.0",
+    "@peetland/timings": "0.0.0"
+  },
+  "devDependencies": {
+    "@peetland/geometry": "0.0.0"
+  }
+}

@@ -9,6 +9,18 @@
 новая команда прерывает текущую, и её Observable завершается ошибкой. Команда сама вызывает `stop`,
 когда выполнена, а `cancel` вызывает актор, когда её нужно прервать.
 
+### Анимации
+
+`playAnimation` проигрывает анимацию и возвращает Observable, который завершается, когда она
+закончилась. Анимации задаются абстрактными id из `AnimationId`: они описывают, что делает персонаж
+(«рыться в мусорке», «пить стоя»), а не то, какой анимацией игры это показано. Анимации могут быть
+незаконченными, в цепочки их собирает HTN.
+
+Таблица `ANIMATIONS` говорит, какие анимации зациклены. Зацикленная анимация повторяется, пока не
+пройдёт время проигрывания, и это время обязательно передаётся вторым аргументом:
+`actor.playAnimation('trash-search', 5000)`. Незацикленная идёт свою длительность, и передать для
+неё время — ошибка.
+
 ### Деспавн
 
 Фабрика акторов оборачивает актора в декоратор `DespawnableActor`. Он передаёт вызовы актору, а
@@ -26,14 +38,14 @@ const actor = new DespawnableActor(new VirtualActor(options, deps));
 тестируются задачи, NPC и мир.
 
 ```ts
-import { VirtualActorFactory } from '@peetland/game';
+import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { Timer } from '@peetland/timings';
 
-const factory = new VirtualActorFactory({
-  geometry: new Geometry(),
-  timer: new Timer(),
-});
+const factory = new VirtualActorFactory(
+  { animations: VIRTUAL_ANIMATIONS },
+  { geometry: new Geometry(), timer: new Timer() }
+);
 const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 ```
 
@@ -41,3 +53,9 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 сдвигает актора к точке по прямой со скоростью пешехода (5 км/ч ≈ 1,39 м/с) и сообщает новую
 позицию. Когда актор входит в
 радиус (без учёта высоты), Observable завершается.
+
+`playAnimation` завершается, когда по таймеру проходит время проигрывания для зацикленной анимации
+или длительность из таблицы для незацикленной. Анимации передаются
+таблицей `animations` в опциях фабрики: для каждой анимации обязательна запись с длительностью.
+Если записи или длительности нет, `playAnimation` выбрасывает ошибку. Готовая таблица с
+длительностями анимаций игры — `VIRTUAL_ANIMATIONS`.

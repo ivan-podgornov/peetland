@@ -16,6 +16,10 @@ export class DespawnedActor implements IActor {
     throw this.createError();
   }
 
+  playAnimation(): never {
+    throw this.createError();
+  }
+
   despawn(): never {
     throw this.createError();
   }

@@ -1,6 +1,7 @@
 import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
+import type { AnimationId } from './animation';
 import { DespawnedActor } from './despawned-actor';
 import type { IActor, IActorCommand } from './types';
 
@@ -31,6 +32,10 @@ export class DespawnableActor implements IActor {
 
   goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
     return this.actor.goToCoords(coords, completeRadius);
+  }
+
+  playAnimation(animation: AnimationId, duration?: number): Observable<void> {
+    return this.actor.playAnimation(animation, duration);
   }
 
   despawn(): void {

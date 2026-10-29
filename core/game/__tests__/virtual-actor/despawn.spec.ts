@@ -37,6 +37,27 @@ describe('VirtualActor', () => {
       });
     });
 
+    describe('При проигрывании анимации', () => {
+      it('Завершает анимацию ошибкой', () => {
+        const actor = createActor();
+        const error = vi.fn();
+        actor.playAnimation('pay').subscribe({ error });
+
+        actor.despawn();
+
+        expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+      });
+
+      it('Сбрасывает текущую команду', () => {
+        const actor = createActor();
+        actor.playAnimation('pay').subscribe();
+
+        actor.despawn();
+
+        expect(actor.currentCommand).toBeNull();
+      });
+    });
+
     it('Не влияет на завершённое движение', () => {
       const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
       const error = vi.fn();

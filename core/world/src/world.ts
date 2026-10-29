@@ -20,6 +20,10 @@ export class World {
     });
 
     const trashBeen: Vector3 = { x: 2320.08, y: 14.22, z: 26.48 }; // Мусорка в Palomino Creek
-    actor.goToCoords(trashBeen, 2).subscribe();
+    actor.goToCoords(trashBeen, 0.5).subscribe({
+      complete: () => {
+        actor.playAnimation('trash-search', 100000).subscribe();
+      },
+    });
   }
 }

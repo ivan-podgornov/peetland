@@ -1,6 +1,8 @@
 import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
+import type { AnimationId } from './animation';
+
 export interface IActor {
   /** Команда, которую актор выполняет сейчас */
   readonly currentCommand: IActorCommand | null;
@@ -19,6 +21,16 @@ export interface IActor {
    * @param completeRadius - радиус, при котором можно считать, что персонаж пришел к нужным координатам
    */
   goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3>;
+
+  /**
+   * Проигрывает анимацию. Возвращает Observable, который завершается, когда анимация закончилась.
+   * Значений Observable не сообщает. Зацикленная анимация (см. ANIMATIONS) повторяется, пока не
+   * пройдёт duration; для незацикленной duration не передаётся, она идёт свою длительность.
+   * Выбрасывает ошибку, если duration не соответствует анимации (см. assertPlaybackDuration)
+   * @param animation - какую анимацию проиграть
+   * @param duration - сколько проигрывать зацикленную анимацию, в миллисекундах
+   */
+  playAnimation(animation: AnimationId, duration?: number): Observable<void>;
 
   /** Деспавнит игрового персонажа */
   despawn(): void;
@@ -45,6 +57,9 @@ export type GoToCoordsOptions = {
 
 /** Команда, которую выполняет актор, например, движение к точке или проигрывание анимации */
 export interface IActorCommand {
+  /** Название команды, например, go-to-coords или play-animation */
+  readonly name: string;
+
   /** Начинает выполнение команды */
   start(): void;
 

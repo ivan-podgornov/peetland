@@ -42,7 +42,7 @@ function setInterval(
   ...args: Parameters<AnyFunction>
 ): number {
   const id = intervalId++;
-  const thread = lua_thread.create(() => {
+  const thread = lua_thread.create_suspended(() => {
     while (intervals.has(id)) {
       wait(timeout);
 
@@ -53,6 +53,7 @@ function setInterval(
   });
 
   intervals.set(id, thread);
+  thread.run();
 
   return id;
 }

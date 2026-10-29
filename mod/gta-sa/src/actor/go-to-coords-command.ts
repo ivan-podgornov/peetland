@@ -63,7 +63,7 @@ export class GtaGoToCoordsCommand implements IActorCommand {
       clearCharTasksImmediately(this.handle);
     });
 
-    taskGoToObject(this.handle, target.handle, -1, this.options.completeRadius);
+    taskGoToObject(this.handle, target.handle, -1, 0.1);
     this.timer
       .interval(CHECK_PERIOD)
       .subscribe(() => this.tryArrive(), { signal: this.subscriber.signal });

@@ -1,6 +1,7 @@
 import type { ISubscriber } from '@peetland/events';
 import type { IActorCommand } from '@peetland/game';
 import type { PedHandle } from '@peetland/moonloader';
+
 import {
   clearCharTasks,
   clearCharTasksImmediately,
@@ -41,12 +42,14 @@ const BLEND_SPEED = 4;
  */
 export class GtaPlayAnimationCommand implements IActorCommand {
   readonly name = 'play-animation';
+
   private readonly handle: PedHandle;
   private readonly subscriber: ISubscriber<void>;
   private readonly animation: GtaAnimation;
   private readonly loop: boolean;
   private readonly duration: number;
   private readonly timer: ITimer;
+
   /** Сколько миллисекунд анимация уже проигрывается. null, если блок ещё загружается */
   private playedFor: number | null;
 

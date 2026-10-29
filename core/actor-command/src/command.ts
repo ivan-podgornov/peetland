@@ -1,82 +1,83 @@
-import type { IActorCommand } from '@peetland/game';
+import { AbortController, Observable } from '@peetland/events';
+import type { ISubscriber } from '@peetland/events';
+import type { IActor } from '@peetland/game';
 
-import type { CommandContext, CommandDeps, CommandStatus } from './types';
+import type { CommandDefinition, CommandDeps, CommandResult, CommandStatus } from './types';
 
 /**
  * Команда актора, которая раз в период обновления вызывает onUpdate, пока он не вернёт 'success'
  * или 'failed'. Сама подписывается на таймер, завершает Observable команды и не даёт завершить или
  * прервать её повторно. Наследнику остаётся описать в хуках, что команда делает
  */
-export abstract class Command<
-  TValue,
-  TOptions,
-  TDeps extends CommandDeps = CommandDeps,
-> implements IActorCommand {
-  abstract readonly name: string;
-  protected readonly context: CommandContext<TValue>;
+export abstract class Command<TValue, TOptions, TDeps extends CommandDeps = CommandDeps> {
+  readonly name: string;
+  protected readonly actor: IActor;
   protected readonly options: TOptions;
   protected readonly deps: TDeps;
   /** Как часто вызывать onUpdate, в миллисекундах */
   private readonly updatePeriod: number;
-  private finished: boolean;
+  /** Переходит в состояние aborted, когда команда завершена */
+  private readonly controller: AbortController;
+  /** Подписчик Observable команды. null, пока на него не подписались */
+  private subscriber: ISubscriber<TValue> | null;
+  /** Чем закончилась команда. null, пока она не завершена */
+  private result: CommandResult | null;
 
   /**
-   * @param context - актор, который выполняет команду, и подписчик её Observable
+   * @param definition - название команды и период обновления
+   * @param actor - актор, который выполняет команду
    * @param options - параметры команды
    * @param deps - зависимости команды
-   * @param updatePeriod - как часто вызывать onUpdate, в миллисекундах
    */
   protected constructor(
-    context: CommandContext<TValue>,
+    definition: CommandDefinition,
+    actor: IActor,
     options: TOptions,
-    deps: TDeps,
-    updatePeriod: number
+    deps: TDeps
   ) {
-    this.context = context;
+    this.name = definition.name;
+    this.updatePeriod = definition.updatePeriod;
+    this.actor = actor;
     this.options = options;
     this.deps = deps;
-    this.updatePeriod = updatePeriod;
-    this.finished = false;
+    this.controller = new AbortController();
+    this.subscriber = null;
+    this.result = null;
   }
 
-  /** Вызывает onStart и сразу первый onUpdate. Если команда не выполнена, подписывается на таймер */
-  start(): void {
-    if (this.isFinished()) {
-      return;
-    }
+  /**
+   * Возвращает Observable команды. Команда начинает выполняться, когда на него подписываются:
+   * вызывает onStart и сразу первый onUpdate, а если команда не выполнена, подписывается на таймер.
+   * Если команду прервали до подписки, Observable сразу завершается ошибкой
+   */
+  execute(): Observable<TValue> {
+    return new Observable((subscriber: ISubscriber<TValue>) => {
+      const { signal } = this.controller;
 
-    this.onStart();
-    this.update(0);
+      if (signal.aborted) {
+        subscriber.error(signal.reason);
+        return;
+      }
 
-    if (this.isFinished()) {
-      return;
-    }
+      this.subscriber = subscriber;
+      subscriber.addTeardown(() => this.teardown());
 
-    this.deps.timer
-      .interval(this.updatePeriod)
-      .subscribe((elapsed) => this.update(elapsed), { signal: this.context.subscriber.signal });
+      this.onStart();
+      this.update(0);
+
+      if (signal.aborted) {
+        return;
+      }
+
+      this.deps.timer
+        .interval(this.updatePeriod)
+        .subscribe((elapsed) => this.update(elapsed), { signal });
+    });
   }
 
-  /** Вызывает onFinish и успешно завершает Observable. Если команда уже завершена, ничего не делает */
-  stop(): void {
-    if (this.isFinished()) {
-      return;
-    }
-
-    this.finished = true;
-    this.onFinish();
-    this.context.subscriber.complete();
-  }
-
-  /** Вызывает onCancel и завершает Observable ошибкой reason. Если команда уже завершена, ничего не делает */
+  /** Прерывает команду и завершает её Observable ошибкой reason. Если команда завершена, ничего не делает */
   cancel(reason: unknown): void {
-    if (this.isFinished()) {
-      return;
-    }
-
-    this.finished = true;
-    this.onCancel();
-    this.context.subscriber.error(reason);
+    this.finish('cancelled', reason);
   }
 
   /** Вызывается, когда команда начинает выполняться, до первого onUpdate */
@@ -90,47 +91,59 @@ export abstract class Command<
    */
   protected abstract onUpdate(elapsed: number): CommandStatus;
 
-  /** Вызывается, когда команда выполнена, перед тем как Observable завершится */
-  protected onFinish(): void {}
-
-  /** Вызывается, когда команду прервали, перед тем как Observable завершится ошибкой */
-  protected onCancel(): void {}
+  /**
+   * Вызывается один раз, когда команда закончилась, как бы она ни закончилась. Нужен, чтобы
+   * освободить ресурсы. Если от Observable отписались, команда считается прерванной
+   * @param result - чем закончилась команда
+   */
+  protected onFinish(_result: CommandResult): void {}
 
   /** Сообщает значение подписчикам Observable команды */
   protected emit(value: TValue): void {
-    this.context.subscriber.next(value);
+    this.subscriber?.next(value);
   }
 
-  /**
-   * Завершает Observable ошибкой reason, не вызывая onFinish и onCancel. Если команда уже
-   * завершена, ничего не делает
-   */
+  /** Завершает Observable ошибкой reason. Если команда завершена, ничего не делает */
   protected fail(reason: unknown): void {
-    if (this.isFinished()) {
-      return;
-    }
-
-    this.finished = true;
-    this.context.subscriber.error(reason);
-  }
-
-  /** Возвращает true, если команда завершена или от её Observable отписались */
-  private isFinished(): boolean {
-    return this.finished || !this.context.subscriber.active;
+    this.finish('failed', reason);
   }
 
   /** Вызывает onUpdate и завершает команду, если она выполнена или выполнить её не удалось */
   private update(elapsed: number): void {
-    if (this.isFinished()) {
+    if (this.controller.signal.aborted) {
       return;
     }
 
     const status = this.onUpdate(elapsed);
 
     if (status === 'success') {
-      this.stop();
+      this.finish('success');
     } else if (status === 'failed') {
       this.fail(new Error(`Команда ${this.name} не выполнена`));
     }
+  }
+
+  /** Завершает команду и её Observable. Если команда уже завершена, ничего не делает */
+  private finish(result: CommandResult, reason?: unknown): void {
+    if (this.controller.signal.aborted) {
+      return;
+    }
+
+    this.result = result;
+    this.controller.abort(reason);
+
+    if (result === 'success') {
+      this.subscriber?.complete();
+    } else {
+      this.subscriber?.error(reason);
+    }
+  }
+
+  /** Освобождает ресурсы команды, когда её Observable завершился или от него отписались */
+  private teardown(): void {
+    const result = this.result ?? 'cancelled';
+
+    this.controller.abort();
+    this.onFinish(result);
   }
 }

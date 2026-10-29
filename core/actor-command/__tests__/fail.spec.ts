@@ -1,7 +1,7 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { startCommand, UPDATE_PERIOD } from './helpers';
+import { executeCommand, UPDATE_PERIOD } from './helpers';
 import type { TestCommandControls } from './helpers';
 
 describe('Command', () => {
@@ -10,12 +10,20 @@ describe('Command', () => {
       const reason = new Error('Не удалось');
       const error = vi.fn();
 
-      startCommand({ hooks: { onStart: ({ fail }) => fail(reason) }, observer: { error } });
+      executeCommand({ hooks: { onStart: ({ fail }) => fail(reason) }, observer: { error } });
 
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
 
-    it('Если onUpdate вызвал fail и вернул failed, завершает Observable ошибкой reason', () => {
+    it("Вызывает onFinish с 'failed'", () => {
+      const onFinish = vi.fn();
+
+      executeCommand({ hooks: { onStart: ({ fail }) => fail(new Error()), onFinish } });
+
+      expect(onFinish).toHaveBeenCalledExactlyOnceWith('failed');
+    });
+
+    it("Если onUpdate вызвал fail и вернул 'failed', завершает Observable ошибкой reason", () => {
       const reason = new Error('Не удалось');
       const error = vi.fn();
       const onUpdate = vi.fn((_: number, { fail }: TestCommandControls) => {
@@ -23,7 +31,7 @@ describe('Command', () => {
         return 'failed' as const;
       });
 
-      startCommand({ hooks: { onUpdate }, observer: { error } });
+      executeCommand({ hooks: { onUpdate }, observer: { error } });
 
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
@@ -34,19 +42,11 @@ describe('Command', () => {
         fail(new Error());
         return 'running' as const;
       });
-      startCommand({ hooks: { onUpdate }, timer });
+      executeCommand({ hooks: { onUpdate }, timer });
 
       timer.advance(UPDATE_PERIOD);
 
       expect(onUpdate).toHaveBeenCalledOnce();
-    });
-
-    it('Не вызывает onCancel', () => {
-      const onCancel = vi.fn();
-
-      startCommand({ hooks: { onStart: ({ fail }) => fail(new Error()), onCancel } });
-
-      expect(onCancel).not.toHaveBeenCalled();
     });
   });
 });

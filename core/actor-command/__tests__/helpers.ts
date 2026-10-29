@@ -1,12 +1,11 @@
-import { Observable } from '@peetland/events';
-import type { IObserver, ISubscriber, ObserveOptions } from '@peetland/events';
-import type { IActor } from '@peetland/game';
+import type { IObserver, ObserveOptions } from '@peetland/events';
+import { VIRTUAL_ANIMATIONS, VirtualActor } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import type { ITimer } from '@peetland/timings';
-import { vi } from 'vitest';
 
 import { Command } from '../src';
-import type { CommandContext, CommandDeps, CommandStatus } from '../src';
+import type { CommandDeps, CommandResult, CommandStatus } from '../src';
 
 /** Как часто тестовая команда обновляется, в миллисекундах */
 export const UPDATE_PERIOD = 100;
@@ -21,16 +20,13 @@ export type TestCommandControls = {
 export type TestCommandHooks = {
   onStart?: (controls: TestCommandControls) => void;
   onUpdate?: (elapsed: number, controls: TestCommandControls) => CommandStatus;
-  onFinish?: () => void;
-  onCancel?: () => void;
+  onFinish?: (result: CommandResult) => void;
 };
 
 /** Команда, хуки которой задаёт тест */
 export class TestCommand extends Command<number, TestCommandHooks> {
-  readonly name = 'test';
-
-  constructor(context: CommandContext<number>, hooks: TestCommandHooks, deps: CommandDeps) {
-    super(context, hooks, deps, UPDATE_PERIOD);
+  constructor(hooks: TestCommandHooks, deps: CommandDeps) {
+    super({ name: 'test', updatePeriod: UPDATE_PERIOD }, createActor(), hooks, deps);
   }
 
   protected override onStart(): void {
@@ -41,12 +37,8 @@ export class TestCommand extends Command<number, TestCommandHooks> {
     return this.options.onUpdate?.(elapsed, this.getControls()) ?? 'running';
   }
 
-  protected override onFinish(): void {
-    this.options.onFinish?.();
-  }
-
-  protected override onCancel(): void {
-    this.options.onCancel?.();
+  protected override onFinish(result: CommandResult): void {
+    this.options.onFinish?.(result);
   }
 
   private getControls(): TestCommandControls {
@@ -57,43 +49,34 @@ export class TestCommand extends Command<number, TestCommandHooks> {
   }
 }
 
-type StartCommandOptions = {
+type CreateCommandOptions = {
   hooks?: TestCommandHooks;
-  observer?: IObserver<number>;
-  observeOptions?: ObserveOptions;
   timer?: ITimer;
 };
 
-/**
- * Подписывается на Observable, который создаёт и запускает тестовую команду, и возвращает её.
- * Если таймер не указан, время для команды не идёт
- */
-export function startCommand(options: StartCommandOptions = {}): TestCommand {
-  let command: TestCommand | null = null;
+/** Создаёт тестовую команду. Если таймер не указан, время для команды не идёт */
+export function createCommand(options: CreateCommandOptions = {}): TestCommand {
+  return new TestCommand(options.hooks ?? {}, { timer: options.timer ?? new ManualTimer() });
+}
 
-  new Observable((subscriber: ISubscriber<number>) => {
-    command = new TestCommand({ actor: createActor(), subscriber }, options.hooks ?? {}, {
-      timer: options.timer ?? new ManualTimer(),
-    });
+type ExecuteCommandOptions = CreateCommandOptions & {
+  observer?: IObserver<number>;
+  observeOptions?: ObserveOptions;
+};
 
-    command.start();
-  }).subscribe(options.observer, options.observeOptions);
+/** Создаёт тестовую команду, подписывается на её Observable и возвращает её */
+export function executeCommand(options: ExecuteCommandOptions = {}): TestCommand {
+  const command = createCommand(options);
 
-  if (!command) {
-    throw new Error('Команда не создана');
-  }
+  command.execute().subscribe(options.observer, options.observeOptions);
 
   return command;
 }
 
-/** Создаёт актора, методы которого ничего не делают */
-function createActor(): IActor {
-  return {
-    currentCommand: null,
-    getPosition: vi.fn(() => ({ x: 0, y: 0, z: 0 })),
-    setPosition: vi.fn(),
-    goToCoords: vi.fn(),
-    playAnimation: vi.fn(),
-    despawn: vi.fn(),
-  };
+/** Создаёт виртуального актора в начале координат */
+function createActor(): VirtualActor {
+  return new VirtualActor(
+    { position: { x: 0, y: 0, z: 0 }, animations: VIRTUAL_ANIMATIONS },
+    { geometry: new Geometry(), timer: new ManualTimer() }
+  );
 }

@@ -1,43 +1,33 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { startCommand, UPDATE_PERIOD } from './helpers';
+import { createCommand, executeCommand, UPDATE_PERIOD } from './helpers';
 
 describe('Command', () => {
   describe('#cancel', () => {
-    it('Вызывает onCancel', () => {
-      const onCancel = vi.fn();
-      const command = startCommand({ hooks: { onCancel } });
-
-      command.cancel(new Error());
-
-      expect(onCancel).toHaveBeenCalledOnce();
-    });
-
     it('Завершает Observable ошибкой reason', () => {
       const reason = new Error('Прервана');
       const error = vi.fn();
-      const command = startCommand({ observer: { error } });
+      const command = executeCommand({ observer: { error } });
 
       command.cancel(reason);
 
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
 
-    it('Вызывает onCancel раньше, чем Observable завершается ошибкой', () => {
-      const onCancel = vi.fn();
-      const error = vi.fn();
-      const command = startCommand({ hooks: { onCancel }, observer: { error } });
+    it("Вызывает onFinish с 'cancelled'", () => {
+      const onFinish = vi.fn();
+      const command = executeCommand({ hooks: { onFinish } });
 
       command.cancel(new Error());
 
-      expect(onCancel).toHaveBeenCalledBefore(error);
+      expect(onFinish).toHaveBeenCalledExactlyOnceWith('cancelled');
     });
 
     it('Больше не вызывает onUpdate', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'running' as const);
-      const command = startCommand({ hooks: { onUpdate }, timer });
+      const command = executeCommand({ hooks: { onUpdate }, timer });
 
       command.cancel(new Error());
       timer.advance(UPDATE_PERIOD);
@@ -45,41 +35,56 @@ describe('Command', () => {
       expect(onUpdate).toHaveBeenCalledOnce();
     });
 
-    it('Не вызывает onFinish', () => {
+    it('Если команда уже прервана, не вызывает onFinish повторно', () => {
       const onFinish = vi.fn();
-      const command = startCommand({ hooks: { onFinish } });
+      const command = executeCommand({ hooks: { onFinish } });
+      command.cancel(new Error());
 
       command.cancel(new Error());
 
-      expect(onFinish).not.toHaveBeenCalled();
+      expect(onFinish).toHaveBeenCalledOnce();
     });
 
-    it('Если команда уже прервана, не вызывает onCancel повторно', () => {
-      const onCancel = vi.fn();
-      const command = startCommand({ hooks: { onCancel } });
-      command.cancel(new Error());
+    it("Если команда выполнена, onFinish остаётся вызванным только с 'success'", () => {
+      const onFinish = vi.fn();
+      const command = executeCommand({ hooks: { onUpdate: () => 'success', onFinish } });
 
       command.cancel(new Error());
 
-      expect(onCancel).toHaveBeenCalledOnce();
+      expect(onFinish).toHaveBeenCalledExactlyOnceWith('success');
     });
 
-    it('Если команда выполнена, не вызывает onCancel', () => {
-      const onCancel = vi.fn();
-      const command = startCommand({ hooks: { onUpdate: () => 'success', onCancel } });
+    describe('Если на Observable ещё не подписались', () => {
+      it('При подписке завершает Observable ошибкой reason', () => {
+        const reason = new Error('Прервана');
+        const error = vi.fn();
+        const command = createCommand();
+        command.cancel(reason);
 
-      command.cancel(new Error());
+        command.execute().subscribe({ error });
 
-      expect(onCancel).not.toHaveBeenCalled();
-    });
+        expect(error).toHaveBeenCalledExactlyOnceWith(reason);
+      });
 
-    it('Если команде не удалось выполниться, не вызывает onCancel', () => {
-      const onCancel = vi.fn();
-      const command = startCommand({ hooks: { onUpdate: () => 'failed', onCancel } });
+      it('При подписке не вызывает onStart', () => {
+        const onStart = vi.fn();
+        const command = createCommand({ hooks: { onStart } });
+        command.cancel(new Error());
 
-      command.cancel(new Error());
+        command.execute().subscribe();
 
-      expect(onCancel).not.toHaveBeenCalled();
+        expect(onStart).not.toHaveBeenCalled();
+      });
+
+      it('При подписке не вызывает onFinish', () => {
+        const onFinish = vi.fn();
+        const command = createCommand({ hooks: { onFinish } });
+        command.cancel(new Error());
+
+        command.execute().subscribe();
+
+        expect(onFinish).not.toHaveBeenCalled();
+      });
     });
   });
 });

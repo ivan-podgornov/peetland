@@ -10,7 +10,10 @@ describe('Command', () => {
       const reason = new Error('Не удалось');
       const error = vi.fn();
 
-      executeCommand({ hooks: { onStart: ({ fail }) => fail(reason) }, observer: { error } });
+      executeCommand({
+        hooks: { onStart: ({ fail }) => fail(reason) },
+        observer: { error },
+      });
 
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
@@ -31,7 +34,10 @@ describe('Command', () => {
         return 'failed' as const;
       });
 
-      executeCommand({ hooks: { onUpdate }, observer: { error } });
+      executeCommand({
+        hooks: { onUpdate },
+        observer: { error },
+      });
 
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
@@ -42,7 +48,10 @@ describe('Command', () => {
         fail(new Error());
         return 'running' as const;
       });
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD);
 

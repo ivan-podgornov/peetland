@@ -8,7 +8,10 @@ describe('Command', () => {
     it('Вызывает onUpdate раз в период обновления', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'running' as const);
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD * 3);
 
@@ -18,7 +21,10 @@ describe('Command', () => {
     it('Передаёт в onUpdate, сколько прошло с прошлого вызова', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'running' as const);
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD);
 
@@ -28,7 +34,10 @@ describe('Command', () => {
     it('Не вызывает onUpdate, пока не прошёл период обновления', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'running' as const);
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD - 1);
 

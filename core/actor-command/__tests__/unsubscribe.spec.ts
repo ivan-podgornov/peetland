@@ -9,7 +9,10 @@ describe('Command', () => {
     it("Вызывает onFinish с 'cancelled'", () => {
       const controller = new AbortController();
       const onFinish = vi.fn();
-      executeCommand({ hooks: { onFinish }, observeOptions: { signal: controller.signal } });
+      executeCommand({
+        hooks: { onFinish },
+        observeOptions: { signal: controller.signal },
+      });
 
       controller.abort();
 
@@ -20,7 +23,11 @@ describe('Command', () => {
       const timer = new ManualTimer();
       const controller = new AbortController();
       const onUpdate = vi.fn(() => 'running' as const);
-      executeCommand({ hooks: { onUpdate }, timer, observeOptions: { signal: controller.signal } });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+        observeOptions: { signal: controller.signal },
+      });
 
       controller.abort();
       timer.advance(UPDATE_PERIOD);

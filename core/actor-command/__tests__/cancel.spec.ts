@@ -27,7 +27,10 @@ describe('Command', () => {
     it('Больше не вызывает onUpdate', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'running' as const);
-      const command = executeCommand({ hooks: { onUpdate }, timer });
+      const command = executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       command.cancel(new Error());
       timer.advance(UPDATE_PERIOD);

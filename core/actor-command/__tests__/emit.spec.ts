@@ -8,7 +8,10 @@ describe('Command', () => {
     it('Сообщает значение подписчикам Observable', () => {
       const next = vi.fn();
 
-      executeCommand({ hooks: { onStart: ({ emit }) => emit(42) }, observer: { next } });
+      executeCommand({
+        hooks: { onStart: ({ emit }) => emit(42) },
+        observer: { next },
+      });
 
       expect(next).toHaveBeenCalledExactlyOnceWith(42);
     });

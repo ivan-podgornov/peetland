@@ -8,7 +8,10 @@ describe('Command', () => {
     it('Успешно завершает Observable', () => {
       const complete = vi.fn();
 
-      executeCommand({ hooks: { onUpdate: () => 'success' }, observer: { complete } });
+      executeCommand({
+        hooks: { onUpdate: () => 'success' },
+        observer: { complete },
+      });
 
       expect(complete).toHaveBeenCalledOnce();
     });
@@ -24,7 +27,10 @@ describe('Command', () => {
     it('Больше не вызывает onUpdate', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'success' as const);
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD);
 
@@ -34,7 +40,10 @@ describe('Command', () => {
     it('Если команда выполнена при обновлении по таймеру, больше не вызывает onUpdate', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn((elapsed: number) => (elapsed > 0 ? 'success' : 'running'));
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD * 2);
 

@@ -8,7 +8,10 @@ describe('Command', () => {
     it('Завершает Observable ошибкой', () => {
       const error = vi.fn();
 
-      executeCommand({ hooks: { onUpdate: () => 'failed' }, observer: { error } });
+      executeCommand({
+        hooks: { onUpdate: () => 'failed' },
+        observer: { error },
+      });
 
       expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
     });
@@ -24,7 +27,10 @@ describe('Command', () => {
     it('Больше не вызывает onUpdate', () => {
       const timer = new ManualTimer();
       const onUpdate = vi.fn(() => 'failed' as const);
-      executeCommand({ hooks: { onUpdate }, timer });
+      executeCommand({
+        hooks: { onUpdate },
+        timer,
+      });
 
       timer.advance(UPDATE_PERIOD);
 

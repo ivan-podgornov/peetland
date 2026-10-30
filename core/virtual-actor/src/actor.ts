@@ -1,20 +1,11 @@
-import type { ISubscriber } from '@peetland/events';
-import { ActorCommandSlot, assertPlaybackDuration, LegacyCommand } from '@peetland/game';
+import { ActorCommandSlot } from '@peetland/game';
 import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 import { VirtualPlayAnimationCommand } from './play-animation-command';
-
-/** Анимация виртуального актора */
-export type VirtualAnimation = {
-  /** Сколько длится анимация, в миллисекундах */
-  duration: number;
-};
-
-/** Анимации виртуального актора. Для каждой анимации должна быть задана длительность */
-export type VirtualAnimations = Record<AnimationId, VirtualAnimation>;
+import type { VirtualAnimations } from './play-animation-command';
 
 export type VirtualActorOptions = {
   /** Позиция, на которой появляется актор */
@@ -53,15 +44,10 @@ export class VirtualActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const command = new LegacyCommand(
-      'go-to-coords',
-      (subscriber: ISubscriber<Vector3>) =>
-        new VirtualGoToCoordsCommand(
-          this,
-          subscriber,
-          { coords, completeRadius },
-          { geometry: this.geometry, timer: this.timer }
-        )
+    const command = new VirtualGoToCoordsCommand(
+      this,
+      { coords, completeRadius },
+      { geometry: this.geometry, timer: this.timer }
     );
 
     return this.commands.bind(command);
@@ -73,13 +59,10 @@ export class VirtualActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
-    assertPlaybackDuration(animation, playbackDuration);
-    const duration = playbackDuration ?? this.getAnimationDuration(animation);
-
-    const command = new LegacyCommand(
-      'play-animation',
-      (subscriber: ISubscriber<void>) =>
-        new VirtualPlayAnimationCommand(subscriber, { duration }, { timer: this.timer })
+    const command = new VirtualPlayAnimationCommand(
+      this,
+      { animation, playbackDuration },
+      { animations: this.animations, timer: this.timer }
     );
 
     return this.commands.bind(command);
@@ -87,16 +70,5 @@ export class VirtualActor implements IActor {
 
   despawn(): void {
     this.commands.cancel(new Error('Актор деспавнен'));
-  }
-
-  /** Возвращает длительность анимации. Выбрасывает ошибку, если длительность не задана */
-  private getAnimationDuration(animation: AnimationId): number {
-    const info: Partial<VirtualAnimation> | undefined = this.animations[animation];
-
-    if (info?.duration === undefined) {
-      throw new Error(`Не задана длительность анимации ${animation}`);
-    }
-
-    return info.duration;
   }
 }

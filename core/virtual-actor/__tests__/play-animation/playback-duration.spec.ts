@@ -1,6 +1,7 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
+import { VIRTUAL_ANIMATIONS } from '../../src';
 import { createActor } from '../helpers';
 
 describe('VirtualActor', () => {
@@ -28,10 +29,26 @@ describe('VirtualActor', () => {
         expect(complete).not.toHaveBeenCalled();
       });
 
-      it('Если время проигрывания не передано, выбрасывает ошибку', () => {
-        const actor = createActor();
+      it('Если время проигрывания не передано, завершает Observable через длительность из таблицы', () => {
+        const timer = new ManualTimer();
+        const actor = createActor({ timer });
+        const complete = vi.fn();
+        actor.playAnimation('trash-search').execute().subscribe({ complete });
 
-        expect(() => actor.playAnimation('trash-search')).toThrow(Error);
+        timer.advance(VIRTUAL_ANIMATIONS['trash-search'].duration);
+
+        expect(complete).toHaveBeenCalledOnce();
+      });
+
+      it('Если время проигрывания не передано, не завершает Observable раньше длительности из таблицы', () => {
+        const timer = new ManualTimer();
+        const actor = createActor({ timer });
+        const complete = vi.fn();
+        actor.playAnimation('trash-search').execute().subscribe({ complete });
+
+        timer.advance(VIRTUAL_ANIMATIONS['trash-search'].duration - 1);
+
+        expect(complete).not.toHaveBeenCalled();
       });
 
       it('Если время проигрывания равно нулю, выбрасывает RangeError', () => {
@@ -61,7 +78,7 @@ describe('VirtualActor', () => {
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
 
       try {
-        actor.playAnimation('trash-search');
+        actor.playAnimation('pay', 5000);
       } catch {
         // Ошибка проверяется в других тестах
       }

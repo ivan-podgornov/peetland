@@ -5,6 +5,7 @@
   "type": "module",
   "main": "./src/index.ts",
   "dependencies": {
+    "@peetland/actor-command": "0.0.0",
     "@peetland/events": "0.0.0",
     "@peetland/game": "0.0.0",
     "@peetland/geometry": "0.0.0",

@@ -1,0 +1,73 @@
+name: Preview
+
+# Пре-релиз публикуется вручную: Actions → Preview → Run workflow, ветка пулл реквеста
+on:
+  workflow_dispatch:
+
+# Новый запуск для той же ветки отменяет предыдущий
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GH_REPO: ${{ github.repository }}
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    outputs:
+      number: ${{ steps.find.outputs.number }}
+    steps:
+      - name: Find open pull request
+        id: find
+        run: |
+          number=$(gh pr list --head "$GITHUB_REF_NAME" --state open --json number --jq '.[0].number')
+
+          if [ -z "$number" ]; then
+            echo "::error::Для ветки $GITHUB_REF_NAME нет открытого пулл реквеста"
+            exit 1
+          fi
+
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: pull-request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Build
+        run: npm run build -w @peetland/mod
+      - uses: actions/upload-artifact@v7
+        with:
+          name: peetland
+          path: mod/mod/dist/peetland.lua
+          if-no-files-found: error
+
+  deploy:
+    needs: [pull-request, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      PR_NUMBER: ${{ needs.pull-request.outputs.number }}
+      TAG: pr-${{ needs.pull-request.outputs.number }}
+    environment:
+      name: preview
+      url: https://github.com/${{ github.repository }}/releases/download/pr-${{ needs.pull-request.outputs.number }}/peetland.lua
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: peetland
+      - name: Publish pre-release
+        run: |
+          pr_title=$(gh pr view "$PR_NUMBER" --json title --jq .title)
+
+          gh release delete "$TAG" --cleanup-tag --yes || true
+          gh release create "$TAG" peetland.lua \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "PR #$PR_NUMBER: $pr_title" \
+            --notes "Сборка из $GITHUB_REF_NAME ($GITHUB_SHA)"

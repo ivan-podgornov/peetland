@@ -1,18 +1,10 @@
 import { Command } from '@peetland/actor-command';
 import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-command';
-import { ANIMATIONS, assertPlaybackDuration } from '@peetland/game';
+import type { AnimationPlayback, IAnimationManager } from '@peetland/animation-manager';
 import type { AnimationId, IActor } from '@peetland/game';
 import type { PedHandle } from '@peetland/moonloader';
-import {
-  clearCharTasks,
-  clearCharTasksImmediately,
-  hasAnimationLoaded,
-  removeAnimation,
-  requestAnimation,
-  taskPlayAnim,
-} from '@peetland/moonloader';
+import { clearCharTasks, clearCharTasksImmediately, taskPlayAnim } from '@peetland/moonloader';
 
-import { ALWAYS_LOADED_BLOCK, GTA_ANIMATIONS } from './animations';
 import type { GtaAnimation } from './animations';
 
 export type GtaPlayAnimationCommandOptions = {
@@ -22,39 +14,35 @@ export type GtaPlayAnimationCommandOptions = {
   animation: AnimationId;
   /**
    * Сколько проигрывать зацикленную анимацию, в миллисекундах. Если не передано, анимация идёт
-   * длительность из GTA_ANIMATIONS. Для незацикленной не передаётся
+   * длительность из таблицы анимаций. Для незацикленной не передаётся
    */
   playbackDuration?: number | undefined;
 };
 
-export type GtaPlayAnimationCommandDeps = CommandDeps;
+export type GtaPlayAnimationCommandDeps = CommandDeps & {
+  animations: IAnimationManager<GtaAnimation>;
+};
 
-/**
- * Команда проверяет, загрузился ли блок и закончилась ли анимация, раз в 100 миллисекунд
- */
+/** Команда проверяет, закончилась ли анимация, раз в 100 миллисекунд */
 const PLAY_ANIMATION = { name: 'play-animation', updatePeriod: 100 };
 
 /** Скорость перехода в анимацию из текущей позы. 4 — обычное значение для анимаций в игре */
 const BLEND_SPEED = 4;
 
 /**
- * Загружает блок анимации, проигрывает её и завершается, когда проходит время проигрывания.
- * Зацикленную анимацию по завершении плавно останавливает, а прерванную — сразу. Блок выгружается,
- * как только команда закончилась. Выбрасывает ошибку при создании, если время проигрывания не
- * подходит анимации (см. assertPlaybackDuration)
+ * Ждёт, пока менеджер загрузит блок анимации, проигрывает её и завершается, когда проходит время
+ * проигрывания. Зацикленную анимацию по завершении плавно останавливает, а прерванную — сразу.
+ * Блок нужен команде, пока она не закончилась. Выбрасывает ошибку при создании, если параметры не
+ * подходят анимации (см. IAnimationManager.resolve)
  */
 export class GtaPlayAnimationCommand extends Command<
   void,
   GtaPlayAnimationCommandOptions,
   GtaPlayAnimationCommandDeps
 > {
-  /** Анимация игры, которой показывается анимация актора */
-  private readonly gtaAnimation: GtaAnimation;
-  /** Повторять ли анимацию, пока не пройдёт duration */
-  private readonly loop: boolean;
-  /** Сколько проигрывать анимацию, в миллисекундах */
-  private readonly duration: number;
-  /** Сколько миллисекунд анимация уже проигрывается. null, если блок ещё загружается */
+  /** Что и как проигрывать */
+  private readonly playback: AnimationPlayback<GtaAnimation>;
+  /** Сколько миллисекунд анимация уже проигрывается. null, пока блок загружается */
   private playedFor: number | null;
 
   constructor(
@@ -62,60 +50,56 @@ export class GtaPlayAnimationCommand extends Command<
     options: GtaPlayAnimationCommandOptions,
     deps: GtaPlayAnimationCommandDeps
   ) {
-    const { animation, playbackDuration } = options;
-    assertPlaybackDuration(animation, playbackDuration);
+    const playback = deps.animations.resolve(options.animation, options.playbackDuration);
 
     super(PLAY_ANIMATION, actor, options, deps);
-    this.gtaAnimation = GTA_ANIMATIONS[animation];
-    this.loop = ANIMATIONS[animation].loop;
-    this.duration = playbackDuration ?? this.gtaAnimation.duration;
+    this.playback = playback;
     this.playedFor = null;
   }
 
   protected override onStart(): void {
-    const { block } = this.gtaAnimation;
-
-    if (block !== ALWAYS_LOADED_BLOCK) {
-      requestAnimation(block);
-    }
+    this.deps.animations
+      .acquire(this.options.animation)
+      .subscribe(() => this.play(), { signal: this.signal });
   }
 
-  /** Ждёт загрузки блока, а после начала анимации завершает команду, когда проходит время проигрывания */
+  /** После начала анимации завершает команду, когда проходит время проигрывания */
   protected onUpdate(elapsed: number): CommandStatus {
     if (this.playedFor === null) {
-      this.tryPlay();
       return 'running';
     }
 
     this.playedFor += elapsed;
 
-    return this.playedFor >= this.duration ? 'success' : 'running';
+    return this.playedFor >= this.playback.duration ? 'success' : 'running';
   }
 
+  /** Блок ещё загружен: команда отпускает его только после onFinish */
   protected override onFinish(result: CommandResult): void {
     const { handle } = this.options;
-    const { block } = this.gtaAnimation;
 
     if (result !== 'success') {
       clearCharTasksImmediately(handle);
-    } else if (this.loop) {
+    } else if (this.playback.loop) {
       clearCharTasks(handle);
-    }
-
-    if (block !== ALWAYS_LOADED_BLOCK) {
-      removeAnimation(block);
     }
   }
 
-  /** Начинает анимацию, если её блок загружен */
-  private tryPlay(): void {
-    const { block, name } = this.gtaAnimation;
+  /** Начинает анимацию. Вызывается, когда блок загружен */
+  private play(): void {
+    const { animation, loop } = this.playback;
 
-    if (block !== ALWAYS_LOADED_BLOCK && !hasAnimationLoaded(block)) {
-      return;
-    }
-
-    taskPlayAnim(this.options.handle, name, block, BLEND_SPEED, this.loop, false, false, false, -1);
+    taskPlayAnim(
+      this.options.handle,
+      animation.name,
+      animation.block,
+      BLEND_SPEED,
+      loop,
+      false,
+      false,
+      false,
+      -1
+    );
     this.playedFor = 0;
   }
 }

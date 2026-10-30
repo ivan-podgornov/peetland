@@ -1,5 +1,5 @@
 import { Observable } from '@peetland/events';
-import type { IObserver, ObserveOptions } from '@peetland/events';
+import type { IAbortSignal, IObserver, ObserveOptions } from '@peetland/events';
 import type { IActor, IActorCommand } from '@peetland/game';
 import type { Vector3 } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
@@ -28,6 +28,11 @@ export type TestCommandHooks = {
 export class TestCommand extends Command<number, TestCommandHooks> {
   constructor(hooks: TestCommandHooks, deps: CommandDeps) {
     super({ name: 'test', updatePeriod: UPDATE_PERIOD }, createActor(), hooks, deps);
+  }
+
+  /** Защищённый сигнал команды, открытый для тестов */
+  get lifetimeSignal(): IAbortSignal {
+    return this.signal;
   }
 
   protected override onStart(): void {

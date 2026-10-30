@@ -1,5 +1,5 @@
 import { AbortController, Observable } from '@peetland/events';
-import type { ISubscriber } from '@peetland/events';
+import type { IAbortSignal, ISubscriber } from '@peetland/events';
 import type { IActor, IActorCommand } from '@peetland/game';
 
 import type { CommandDefinition, CommandDeps, CommandResult, CommandStatus } from './types';
@@ -22,6 +22,8 @@ export abstract class Command<
   private readonly updatePeriod: number;
   /** Переходит в состояние aborted, когда команда завершена */
   private readonly controller: AbortController;
+  /** Переходит в состояние aborted, когда команда закончилась и onFinish уже вызван */
+  private readonly lifetime: AbortController;
   /** Подписчик Observable команды. null, пока на него не подписались */
   private subscriber: ISubscriber<TValue> | null;
   /** Чем закончилась команда. null, пока она не завершена */
@@ -45,6 +47,7 @@ export abstract class Command<
     this.options = options;
     this.deps = deps;
     this.controller = new AbortController();
+    this.lifetime = new AbortController();
     this.subscriber = null;
     this.result = null;
   }
@@ -102,6 +105,15 @@ export abstract class Command<
    */
   protected onFinish(_result: CommandResult): void {}
 
+  /**
+   * Сигнал, который переходит в состояние aborted, когда команда закончилась, как бы она ни
+   * закончилась, и уже после вызова onFinish. С ним удобно подписываться на Observable на время
+   * выполнения команды: подписка остаётся активной и в onFinish
+   */
+  protected get signal(): IAbortSignal {
+    return this.lifetime.signal;
+  }
+
   /** Сообщает значение подписчикам Observable команды */
   protected emit(value: TValue): void {
     this.subscriber?.next(value);
@@ -149,5 +161,6 @@ export abstract class Command<
 
     this.controller.abort();
     this.onFinish(result);
+    this.lifetime.abort();
   }
 }

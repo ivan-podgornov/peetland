@@ -1,31 +1,47 @@
-import { Geometry } from '@peetland/geometry';
+import { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
-import { ManualTimer } from '@peetland/timings';
-import type { ITimer } from '@peetland/timings';
 
-import { VIRTUAL_ANIMATIONS, VirtualActor } from '../src';
-import type { VirtualAnimations } from '../src';
+import type { IActor, IActorCommand } from '../src';
 
-/** Скорость пешехода: 5 км/ч в метрах в секунду */
-export const WALKING_SPEED = 5 / 3.6;
+/** Команда тестового актора, которая ничего не делает */
+export class TestCommand implements IActorCommand {
+  readonly name = 'test';
 
-type CreateActorOptions = {
-  position?: Vector3;
-  timer?: ITimer;
-  animations?: VirtualAnimations;
-};
+  start(): void {}
+
+  stop(): void {}
+
+  cancel(): void {}
+}
 
 /**
- * Создаёт виртуального актора. Если позиция не указана, актор появляется в начале координат.
- * Если таймер не указан, время для актора не идёт. Если анимации не указаны, используются
- * VIRTUAL_ANIMATIONS
+ * Актор, который только хранит позицию и текущую команду. goToCoords и playAnimation возвращают
+ * Observable, который ничего не сообщает и не завершается
  */
-export function createActor(options: CreateActorOptions = {}): VirtualActor {
-  return new VirtualActor(
-    {
-      position: options.position ?? { x: 0, y: 0, z: 0 },
-      animations: options.animations ?? VIRTUAL_ANIMATIONS,
-    },
-    { geometry: new Geometry(), timer: options.timer ?? new ManualTimer() }
-  );
+export class TestActor implements IActor {
+  currentCommand: IActorCommand | null = null;
+  private position: Vector3 = { x: 0, y: 0, z: 0 };
+
+  getPosition(): Vector3 {
+    return { ...this.position };
+  }
+
+  setPosition(position: Vector3): void {
+    this.position = { ...position };
+  }
+
+  goToCoords(): Observable<Vector3> {
+    return new Observable(() => {});
+  }
+
+  playAnimation(): Observable<void> {
+    return new Observable(() => {});
+  }
+
+  despawn(): void {}
+}
+
+/** Создаёт тестового актора в начале координат */
+export function createActor(): TestActor {
+  return new TestActor();
 }

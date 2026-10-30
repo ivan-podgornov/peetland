@@ -1,8 +1,7 @@
+import { DespawnableActor } from '@peetland/game';
+import type { CreateActorOptions, IActorFactory } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
-
-import { DespawnableActor } from '../actor';
-import type { CreateActorOptions, IActorFactory } from '../actor';
 
 import { VirtualActor } from './actor';
 import type { VirtualAnimations } from './actor';

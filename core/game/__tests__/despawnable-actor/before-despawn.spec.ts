@@ -1,22 +1,22 @@
-import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import { createActor } from '../helpers';
+import { createActor, TestCommand } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('До деспавна', () => {
     it('currentCommand возвращает текущую команду обёрнутого актора', () => {
       const inner = createActor();
+      const command = new TestCommand();
+      inner.currentCommand = command;
       const actor = new DespawnableActor(inner);
 
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
-
-      expect(actor.currentCommand).toBe(inner.currentCommand);
+      expect(actor.currentCommand).toBe(command);
     });
 
     it('getPosition возвращает позицию обёрнутого актора', () => {
-      const inner = createActor({ position: { x: 1, y: 2, z: 3 } });
+      const inner = createActor();
+      inner.setPosition({ x: 1, y: 2, z: 3 });
       const actor = new DespawnableActor(inner);
 
       const position = actor.getPosition();
@@ -33,24 +33,46 @@ describe('DespawnableActor', () => {
       expect(inner.getPosition()).toStrictEqual({ x: 1, y: 2, z: 3 });
     });
 
-    it('goToCoords ведёт обёрнутого актора к точке', () => {
-      const timer = new ManualTimer();
-      const inner = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
+    it('goToCoords передаёт обёрнутому актору точку и радиус', () => {
+      const inner = createActor();
+      const goToCoords = vi.spyOn(inner, 'goToCoords');
       const actor = new DespawnableActor(inner);
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
 
-      timer.advance(1000);
+      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
 
-      expect(inner.getPosition().x).toBeGreaterThan(0);
+      expect(goToCoords).toHaveBeenCalledExactlyOnceWith({ x: 10, y: 0, z: 0 }, 1);
     });
 
-    it('playAnimation проигрывает анимацию обёрнутым актором', () => {
+    it('goToCoords возвращает Observable обёрнутого актора', () => {
       const inner = createActor();
+      const observable = inner.goToCoords();
+      vi.spyOn(inner, 'goToCoords').mockReturnValue(observable);
       const actor = new DespawnableActor(inner);
 
-      actor.playAnimation('pay').subscribe();
+      const result = actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
 
-      expect(inner.currentCommand).toHaveProperty('name', 'play-animation');
+      expect(result).toBe(observable);
+    });
+
+    it('playAnimation передаёт обёрнутому актору анимацию', () => {
+      const inner = createActor();
+      const playAnimation = vi.spyOn(inner, 'playAnimation');
+      const actor = new DespawnableActor(inner);
+
+      actor.playAnimation('pay');
+
+      expect(playAnimation).toHaveBeenCalledExactlyOnceWith('pay', undefined);
+    });
+
+    it('playAnimation возвращает Observable обёрнутого актора', () => {
+      const inner = createActor();
+      const observable = inner.playAnimation();
+      vi.spyOn(inner, 'playAnimation').mockReturnValue(observable);
+      const actor = new DespawnableActor(inner);
+
+      const result = actor.playAnimation('pay');
+
+      expect(result).toBe(observable);
     });
 
     it('playAnimation передаёт обёрнутому актору время проигрывания', () => {

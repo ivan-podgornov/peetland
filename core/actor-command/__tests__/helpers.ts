@@ -1,6 +1,7 @@
+import { Observable } from '@peetland/events';
 import type { IObserver, ObserveOptions } from '@peetland/events';
-import { VIRTUAL_ANIMATIONS, VirtualActor } from '@peetland/game';
-import { Geometry } from '@peetland/geometry';
+import type { IActor, IActorCommand } from '@peetland/game';
+import type { Vector3 } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import type { ITimer } from '@peetland/timings';
 
@@ -73,10 +74,28 @@ export function executeCommand(options: ExecuteCommandOptions = {}): TestCommand
   return command;
 }
 
-/** Создаёт виртуального актора в начале координат */
-function createActor(): VirtualActor {
-  return new VirtualActor(
-    { position: { x: 0, y: 0, z: 0 }, animations: VIRTUAL_ANIMATIONS },
-    { geometry: new Geometry(), timer: new ManualTimer() }
-  );
+/** Актор, которого получает тестовая команда. Команде он не нужен, поэтому ничего не делает */
+class TestActor implements IActor {
+  readonly currentCommand: IActorCommand | null = null;
+
+  getPosition(): Vector3 {
+    return { x: 0, y: 0, z: 0 };
+  }
+
+  setPosition(): void {}
+
+  goToCoords(): Observable<Vector3> {
+    return new Observable(() => {});
+  }
+
+  playAnimation(): Observable<void> {
+    return new Observable(() => {});
+  }
+
+  despawn(): void {}
+}
+
+/** Создаёт тестового актора */
+function createActor(): TestActor {
+  return new TestActor();
 }

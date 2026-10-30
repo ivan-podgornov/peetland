@@ -4,7 +4,51 @@ import { describe, expect, it, vi } from 'vitest';
 import { createActor } from './helpers';
 
 describe('VirtualActor', () => {
+  describe('#signal', () => {
+    it('Пока актор заспавнен, не прерван', () => {
+      const actor = createActor();
+
+      expect(actor.signal.aborted).toBe(false);
+    });
+  });
+
   describe('#despawn', () => {
+    it('Прерывает сигнал актора', () => {
+      const actor = createActor();
+
+      actor.despawn();
+
+      expect(actor.signal.aborted).toBe(true);
+    });
+
+    it('Прерывает сигнал с ошибкой', () => {
+      const actor = createActor();
+
+      actor.despawn();
+
+      expect(actor.signal.reason).toBeInstanceOf(Error);
+    });
+
+    it('Повторный деспавн не меняет причину', () => {
+      const actor = createActor();
+      actor.despawn();
+      const { reason } = actor.signal;
+
+      actor.despawn();
+
+      expect(actor.signal.reason).toBe(reason);
+    });
+
+    it('Команда, на которую подписались после деспавна, завершается ошибкой', () => {
+      const actor = createActor();
+      const error = vi.fn();
+      actor.despawn();
+
+      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
+
+      expect(error).toHaveBeenCalledExactlyOnceWith(actor.signal.reason);
+    });
+
     describe('При движении к определённым координатам', () => {
       it('Завершает движение ошибкой', () => {
         const actor = createActor();

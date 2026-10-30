@@ -55,19 +55,32 @@ export abstract class Command<
   /**
    * Возвращает Observable команды. Команда начинает выполняться, когда на него подписываются:
    * вызывает onStart и сразу первый onUpdate, а если команда не выполнена, подписывается на таймер.
-   * Если команду прервали до подписки, Observable сразу завершается ошибкой
+   * Если команду прервали или актора деспавнили до подписки, Observable сразу завершается ошибкой.
+   * Когда актора деспавнят во время выполнения, команда прерывается с причиной из его сигнала
    */
   execute(): Observable<TValue> {
     return new Observable((subscriber: ISubscriber<TValue>) => {
       const { signal } = this.controller;
+      const despawn = this.actor.signal;
 
       if (signal.aborted) {
         subscriber.error(signal.reason);
         return;
       }
 
+      if (despawn.aborted) {
+        subscriber.error(despawn.reason);
+        return;
+      }
+
+      const onDespawn = (reason: unknown) => this.cancel(reason);
+      despawn.addEventListener('abort', onDespawn, { once: true });
+
       this.subscriber = subscriber;
-      subscriber.addTeardown(() => this.teardown());
+      subscriber.addTeardown(() => {
+        despawn.removeEventListener('abort', onDespawn);
+        this.teardown();
+      });
 
       this.onStart();
       this.update(0);

@@ -1,4 +1,3 @@
-import { DespawnableActor } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -34,18 +33,6 @@ describe('VirtualActorFactory', () => {
       timer.advance(1000);
 
       expect(actor.getPosition().x).toBeGreaterThan(0);
-    });
-
-    it('Возвращает актора, защищённого от использования после деспавна', () => {
-      const factory = new VirtualActorFactory({
-        animations: createAnimationManager(),
-        geometry: new Geometry(),
-        timer: new ManualTimer(),
-      });
-
-      const actor = factory.create({ modelId: 230, position: { x: 1, y: 2, z: 3 } });
-
-      expect(actor).toBeInstanceOf(DespawnableActor);
     });
 
     it('Создаёт актора, анимации которого длятся по таблице переданного менеджера анимаций', () => {

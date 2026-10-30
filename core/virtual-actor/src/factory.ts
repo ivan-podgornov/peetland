@@ -1,5 +1,4 @@
 import type { IAnimationManager } from '@peetland/animation-manager';
-import { DespawnableActor } from '@peetland/game';
 import type { CreateActorOptions, IActorFactory } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
@@ -25,12 +24,10 @@ export class VirtualActorFactory implements IActorFactory {
     this.timer = deps.timer;
   }
 
-  create(options: CreateActorOptions): DespawnableActor {
-    const actor = new VirtualActor(
+  create(options: CreateActorOptions): VirtualActor {
+    return new VirtualActor(
       { position: options.position },
       { animations: this.animations, geometry: this.geometry, timer: this.timer }
     );
-
-    return new DespawnableActor(actor);
   }
 }

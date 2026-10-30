@@ -1,5 +1,6 @@
 import type { IAnimationManager } from '@peetland/animation-manager';
-import { ActorCommandSlot } from '@peetland/game';
+import { AbortController } from '@peetland/events';
+import type { IAbortSignal } from '@peetland/events';
 import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -37,7 +38,7 @@ export class GtaActor implements IActor {
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
   private readonly timer: ITimer;
-  private readonly commands: ActorCommandSlot;
+  private readonly despawnController: AbortController;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
     requestModel(options.modelId);
@@ -52,7 +53,11 @@ export class GtaActor implements IActor {
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
     this.timer = deps.timer;
-    this.commands = new ActorCommandSlot();
+    this.despawnController = new AbortController();
+  }
+
+  get signal(): IAbortSignal {
+    return this.despawnController.signal;
   }
 
   getPosition(): Vector3 {
@@ -66,13 +71,11 @@ export class GtaActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const command = new GtaGoToCoordsCommand(
+    return new GtaGoToCoordsCommand(
       this,
       { handle: this.handle, coords, completeRadius },
       { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
     );
-
-    return this.commands.bind(command);
   }
 
   /**
@@ -81,17 +84,15 @@ export class GtaActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
-    const command = new GtaPlayAnimationCommand(
+    return new GtaPlayAnimationCommand(
       this,
       { handle: this.handle, animation, playbackDuration },
       { animations: this.animations, timer: this.timer }
     );
-
-    return this.commands.bind(command);
   }
 
   despawn(): void {
-    this.commands.cancel(new Error('Актор деспавнен'));
+    this.despawnController.abort(new Error('Актор деспавнен'));
 
     if (doesCharExist(this.handle)) {
       deleteChar(this.handle);

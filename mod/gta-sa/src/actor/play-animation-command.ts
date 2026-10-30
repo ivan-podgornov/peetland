@@ -1,5 +1,5 @@
 import type { ISubscriber } from '@peetland/events';
-import type { IActorCommand } from '@peetland/game';
+import type { ILegacyActorCommand } from '@peetland/game';
 import type { PedHandle } from '@peetland/moonloader';
 
 import {
@@ -40,7 +40,7 @@ const BLEND_SPEED = 4;
  * Зацикленную анимацию по завершении плавно останавливает. Блок выгружается, как только команда
  * завершилась или прервалась
  */
-export class GtaPlayAnimationCommand implements IActorCommand {
+export class GtaPlayAnimationCommand implements ILegacyActorCommand {
   readonly name = 'play-animation';
 
   private readonly handle: PedHandle;

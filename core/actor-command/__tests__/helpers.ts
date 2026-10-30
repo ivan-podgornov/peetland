@@ -84,15 +84,24 @@ class TestActor implements IActor {
 
   setPosition(): void {}
 
-  goToCoords(): Observable<Vector3> {
-    return new Observable(() => {});
+  goToCoords(): IActorCommand<Vector3> {
+    return createIdleCommand();
   }
 
-  playAnimation(): Observable<void> {
-    return new Observable(() => {});
+  playAnimation(): IActorCommand<void> {
+    return createIdleCommand();
   }
 
   despawn(): void {}
+}
+
+/** Создаёт команду, которая ничего не делает и не завершается */
+function createIdleCommand<TValue>(): IActorCommand<TValue> {
+  return {
+    name: 'idle',
+    execute: () => new Observable(() => {}),
+    cancel: () => {},
+  };
 }
 
 /** Создаёт тестового актора */

@@ -9,7 +9,7 @@ describe('VirtualActor', () => {
       it('Завершает движение ошибкой', () => {
         const actor = createActor();
         const error = vi.fn();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe({ error });
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
 
         actor.despawn();
 
@@ -19,7 +19,7 @@ describe('VirtualActor', () => {
       it('Останавливает движение', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
 
         actor.despawn();
         timer.advance(1000);
@@ -29,7 +29,7 @@ describe('VirtualActor', () => {
 
       it('Сбрасывает текущую команду', () => {
         const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
 
         actor.despawn();
 
@@ -41,7 +41,7 @@ describe('VirtualActor', () => {
       it('Завершает анимацию ошибкой', () => {
         const actor = createActor();
         const error = vi.fn();
-        actor.playAnimation('pay').subscribe({ error });
+        actor.playAnimation('pay').execute().subscribe({ error });
 
         actor.despawn();
 
@@ -50,7 +50,7 @@ describe('VirtualActor', () => {
 
       it('Сбрасывает текущую команду', () => {
         const actor = createActor();
-        actor.playAnimation('pay').subscribe();
+        actor.playAnimation('pay').execute().subscribe();
 
         actor.despawn();
 
@@ -61,7 +61,7 @@ describe('VirtualActor', () => {
     it('Не влияет на завершённое движение', () => {
       const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
       const error = vi.fn();
-      actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).subscribe({ error });
+      actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).execute().subscribe({ error });
 
       actor.despawn();
 

@@ -10,7 +10,7 @@ describe('VirtualActor', () => {
         const timer = new ManualTimer();
         const actor = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
         const complete = vi.fn();
-        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).subscribe({ complete });
+        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).execute().subscribe({ complete });
 
         timer.advance(1000);
 
@@ -20,7 +20,7 @@ describe('VirtualActor', () => {
       it('Больше не двигает актора', () => {
         const timer = new ManualTimer();
         const actor = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
-        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).subscribe();
+        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).execute().subscribe();
 
         timer.advance(1000);
         timer.advance(1000);
@@ -31,7 +31,7 @@ describe('VirtualActor', () => {
       it('Сбрасывает текущую команду', () => {
         const timer = new ManualTimer();
         const actor = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
-        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).subscribe();
+        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).execute().subscribe();
 
         timer.advance(1000);
 
@@ -42,7 +42,7 @@ describe('VirtualActor', () => {
         const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
         const complete = vi.fn();
 
-        actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).subscribe({ complete });
+        actor.goToCoords({ x: 1, y: 0, z: 0 }, 2).execute().subscribe({ complete });
 
         expect(complete).toHaveBeenCalledOnce();
       });
@@ -51,7 +51,7 @@ describe('VirtualActor', () => {
         const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
         const complete = vi.fn();
 
-        actor.goToCoords({ x: 1, y: 0, z: 50 }, 2).subscribe({ complete });
+        actor.goToCoords({ x: 1, y: 0, z: 50 }, 2).execute().subscribe({ complete });
 
         expect(complete).toHaveBeenCalledOnce();
       });

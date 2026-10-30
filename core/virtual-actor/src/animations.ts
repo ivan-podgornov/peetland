@@ -1,4 +1,4 @@
-import type { VirtualAnimations } from './actor';
+import type { VirtualAnimations } from './play-animation-command';
 
 /**
  * Анимации виртуального актора с длительностями, как у анимаций игры. Для зацикленных анимаций

@@ -4,7 +4,7 @@ import type { IGeometry } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
 import { VirtualActor } from './actor';
-import type { VirtualAnimations } from './actor';
+import type { VirtualAnimations } from './play-animation-command';
 
 export type VirtualActorFactoryOptions = {
   /** Анимации, которые умеют проигрывать создаваемые акторы */

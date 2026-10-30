@@ -34,3 +34,9 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 длительности нет, `playAnimation` выбрасывает ошибку. Готовая таблица с длительностями анимаций
 игры — `VIRTUAL_ANIMATIONS`. Загружать виртуальному актору нечего, поэтому менеджеру передаётся
 `InstantAnimationLoader`.
+
+## Для тестов
+
+`@peetland/virtual-actor/dev` даёт `createActor({ position?, timer?, animations? })`: виртуального
+актора с менеджером анимаций, у которого все анимации загружены сразу. По умолчанию актор стоит в
+начале координат, время для него не идёт (`ManualTimer`), а анимации — `VIRTUAL_ANIMATIONS`.

@@ -1,7 +1,8 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor, WALKING_SPEED } from '../helpers';
+import { createActor } from '../../dev';
+import { WALKING_SPEED } from '../helpers';
 
 describe('VirtualActor', () => {
   describe('#goToCoords', () => {

@@ -1,8 +1,5 @@
-import { Observable } from '@peetland/events';
-import type { ISubscriber } from '@peetland/events';
-
-import { AnimationManager } from '../src';
-import type { AnimationTable, IAnimationLoader } from '../src';
+import { createAnimationManager, ManualAnimationLoader } from '../dev';
+import type { AnimationManager, AnimationTable, IAnimationLoader } from '../src';
 
 /** Анимация для тестов менеджера анимаций. Анимации одной группы загружаются одной загрузкой */
 export type TestAnimation = {
@@ -26,39 +23,14 @@ export const TEST_ANIMATIONS: AnimationTable<TestAnimation> = {
   'drink-standing-2': { duration: 2330, group: 'drink-standing-2' },
 };
 
-/** Загрузчик, который загружает группу анимаций, только когда это скажет тест */
-export class ManualAnimationLoader implements IAnimationLoader<TestAnimation> {
-  /** Сколько раз загрузчик начинал загрузку */
-  loads = 0;
-  /** Сколько раз загрузчик выгружал анимации */
-  unloads = 0;
-  /** Подписчики загрузок, которые ещё не выгружены, по группам */
-  private readonly subscribers = new Map<string, ISubscriber<void>>();
-
-  key(animation: TestAnimation): string {
-    return animation.group;
-  }
-
-  load(animation: TestAnimation): Observable<void> {
-    return new Observable((subscriber: ISubscriber<void>) => {
-      this.loads += 1;
-      this.subscribers.set(animation.group, subscriber);
-      subscriber.addTeardown(() => {
-        this.unloads += 1;
-        this.subscribers.delete(animation.group);
-      });
-    });
-  }
-
-  /** Завершает загрузку группы анимаций */
-  finish(group: string): void {
-    this.subscribers.get(group)?.next();
-  }
+/** Создаёт загрузчик, который загружает группу анимаций, только когда это скажет тест */
+export function createManualLoader(): ManualAnimationLoader<TestAnimation> {
+  return new ManualAnimationLoader({ key: (animation) => animation.group });
 }
 
 /** Создаёт менеджер анимаций с TEST_ANIMATIONS и переданным загрузчиком */
-export function createAnimationManager(
-  loader: IAnimationLoader<TestAnimation> = new ManualAnimationLoader()
+export function createTestAnimationManager(
+  loader: IAnimationLoader<TestAnimation> = createManualLoader()
 ): AnimationManager<TestAnimation> {
-  return new AnimationManager({ animations: TEST_ANIMATIONS }, { loader });
+  return createAnimationManager(TEST_ANIMATIONS, loader);
 }

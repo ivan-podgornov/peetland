@@ -1,11 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  createControlledObservable,
-  createMockedObserver,
-  getDefaultObservableOptions,
-  getDefaultSubscribeOptions,
-} from '../helpers';
+import { createControlledObservable, createMockedObserver } from '../../../dev';
+import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#switchMap', () => {

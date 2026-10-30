@@ -35,3 +35,13 @@ controller.abort();
 
 target.dispatchEvent('npcDied', 43); // обработчик уже отписан
 ```
+
+## Для тестов
+
+`@peetland/events/dev` даёт то, что нужно тестам с событиями и Observable:
+
+- `createMockedObserver()` — наблюдатель, все методы которого — моки;
+- `createControlledObservable(options?)` — Observable, который запоминает своих подписчиков, чтобы
+  тест управлял ими;
+- `createMockedAbortSignal(aborted)` — сигнал в переданном состоянии;
+- `flushPromises()` — ждёт, пока выполнятся запланированные микрозадачи.

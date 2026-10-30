@@ -1,9 +1,9 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createActor } from '../../dev';
 import { VIRTUAL_ANIMATIONS } from '../../src';
 import type { VirtualAnimations } from '../../src';
-import { createActor } from '../helpers';
 
 describe('VirtualActor', () => {
   describe('#playAnimation', () => {

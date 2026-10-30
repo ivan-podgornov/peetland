@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
 import { Subscriber } from '../../src/subscriber/subscriber';
 
-import { createDeactivator, createMockedObserver, getDefaultConstructorOptions } from './helpers';
+import { createDeactivator, getDefaultConstructorOptions } from './helpers';
 
 function getCasesAfterDeactivation() {
   return [

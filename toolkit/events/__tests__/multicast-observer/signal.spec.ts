@@ -1,14 +1,11 @@
 import { describe, it, expect } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
 import { MulticastObserver } from '../../src/multicast-observer';
 
-import {
-  createMockedObserver,
-  getDefaultMulticastOptions,
-  getDefaultObserveOptions,
-} from './helpers';
+import { getDefaultMulticastOptions, getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#signal', () => {

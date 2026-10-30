@@ -26,15 +26,6 @@ describe('VirtualActor', () => {
 
         expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
       });
-
-      it('Сбрасывает текущую команду', () => {
-        const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
-
-        actor.despawn();
-
-        expect(actor.currentCommand).toBeNull();
-      });
     });
 
     describe('При проигрывании анимации', () => {
@@ -46,15 +37,6 @@ describe('VirtualActor', () => {
         actor.despawn();
 
         expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
-      });
-
-      it('Сбрасывает текущую команду', () => {
-        const actor = createActor();
-        actor.playAnimation('pay').execute().subscribe();
-
-        actor.despawn();
-
-        expect(actor.currentCommand).toBeNull();
       });
     });
 

@@ -16,16 +16,6 @@ describe('VirtualActor', () => {
         expect(error).not.toHaveBeenCalled();
       });
 
-      it('При подписке прерывает её', () => {
-        const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
-        const cancel = vi.spyOn(actor.currentCommand!, 'cancel');
-
-        actor.goToCoords({ x: -10, y: 0, z: 0 }, 1).execute().subscribe();
-
-        expect(cancel).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
-      });
-
       it('Завершает Observable прерванной команды ошибкой', () => {
         const actor = createActor();
         const error = vi.fn();
@@ -34,16 +24,6 @@ describe('VirtualActor', () => {
         actor.goToCoords({ x: -10, y: 0, z: 0 }, 1).execute().subscribe();
 
         expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
-      });
-
-      it('Делает текущей командой новое движение', () => {
-        const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
-        const previous = actor.currentCommand;
-
-        actor.goToCoords({ x: -10, y: 0, z: 0 }, 1).execute().subscribe();
-
-        expect(actor.currentCommand).not.toBe(previous);
       });
 
       it('Двигает актора только к новой точке', () => {

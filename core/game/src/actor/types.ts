@@ -4,9 +4,6 @@ import type { Vector3 } from '@peetland/geometry';
 import type { AnimationId } from './animation';
 
 export interface IActor {
-  /** Команда, которую актор выполняет сейчас */
-  readonly currentCommand: IActorCommand | null;
-
   /** Возвращает позицию персонажа в игре */
   getPosition(): Vector3;
 

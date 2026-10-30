@@ -85,19 +85,6 @@ describe('VirtualActor', () => {
 
         expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
       });
-
-      it('Если наблюдатель отписался, сбрасывает текущую команду', () => {
-        const actor = createActor();
-        const controller = new AbortController();
-        actor
-          .goToCoords({ x: 10, y: 0, z: 0 }, 1)
-          .execute()
-          .subscribe({}, { signal: controller.signal });
-
-        controller.abort();
-
-        expect(actor.currentCommand).toBeNull();
-      });
     });
   });
 });

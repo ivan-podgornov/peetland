@@ -54,31 +54,5 @@ describe('VirtualActor', () => {
 
       expect(next).not.toHaveBeenCalled();
     });
-
-    it('Не меняет текущую команду до подписки', () => {
-      const actor = createActor();
-
-      actor.playAnimation('pay');
-
-      expect(actor.currentCommand).toBeNull();
-    });
-
-    it('При подписке делает проигрывание анимации текущей командой', () => {
-      const actor = createActor();
-
-      actor.playAnimation('pay').execute().subscribe();
-
-      expect(actor.currentCommand).toHaveProperty('name', 'play-animation');
-    });
-
-    it('Сбрасывает текущую команду, когда анимация закончилась', () => {
-      const timer = new ManualTimer();
-      const actor = createActor({ timer });
-      actor.playAnimation('pay').execute().subscribe();
-
-      timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-
-      expect(actor.currentCommand).toBeNull();
-    });
   });
 });

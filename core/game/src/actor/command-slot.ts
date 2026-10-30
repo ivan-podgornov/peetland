@@ -13,11 +13,6 @@ export class ActorCommandSlot {
     this.command = null;
   }
 
-  /** Команда, которую актор выполняет сейчас */
-  get current(): IActorCommand | null {
-    return this.command;
-  }
-
   /** Возвращает команду, которая при подписке прерывает текущую и становится текущей */
   bind<TValue>(command: IActorCommand<TValue>): IActorCommand<TValue> {
     return new SlotCommand(command, {

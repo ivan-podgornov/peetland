@@ -28,16 +28,6 @@ describe('VirtualActor', () => {
         expect(actor.getPosition().x).toBeCloseTo(WALKING_SPEED);
       });
 
-      it('Сбрасывает текущую команду', () => {
-        const timer = new ManualTimer();
-        const actor = createActor({ position: { x: 0, y: 0, z: 0 }, timer });
-        actor.goToCoords({ x: 2, y: 0, z: 0 }, 1).execute().subscribe();
-
-        timer.advance(1000);
-
-        expect(actor.currentCommand).toBeNull();
-      });
-
       it('Если актор уже в радиусе, при подписке завершается', () => {
         const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
         const complete = vi.fn();

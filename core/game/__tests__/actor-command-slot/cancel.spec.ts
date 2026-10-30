@@ -16,13 +16,16 @@ describe('ActorCommandSlot', () => {
       expect(error).toHaveBeenCalledExactlyOnceWith(reason);
     });
 
-    it('Текущей команды после этого нет', () => {
+    it('Прерванная команда перестаёт быть текущей', () => {
       const slot = new ActorCommandSlot();
-      slot.bind(new ManualCommand()).execute().subscribe();
+      const inner = new ManualCommand();
+      const cancel = vi.spyOn(inner, 'cancel');
+      slot.bind(inner).execute().subscribe();
+      slot.cancel(new Error());
 
       slot.cancel(new Error());
 
-      expect(slot.current).toBeNull();
+      expect(cancel).toHaveBeenCalledOnce();
     });
 
     it('Если текущей команды нет, ничего не выбрасывает', () => {

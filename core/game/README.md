@@ -15,20 +15,16 @@ actor
   .subscribe({ complete: () => console.log('Пришёл') });
 ```
 
-Актор выполняет одну команду за раз, она доступна в `currentCommand`. Новая команда при подписке
-прерывает текущую, и Observable текущей завершается ошибкой. Пока на новую команду не подписались,
-текущая выполняется дальше. `cancel` прерывает команду. Если её прервали до подписки, при подписке
-Observable сразу завершится ошибкой, а текущую команду она не прервёт.
+Актор выполняет одну команду за раз. Новая команда при подписке прерывает текущую, и Observable
+текущей завершается ошибкой. Пока на новую команду не подписались, текущая выполняется дальше.
+`cancel` прерывает команду. Если её прервали до подписки, при подписке Observable сразу завершится
+ошибкой, а текущую команду она не прервёт.
 
 Чтобы следить за текущей командой, актор оборачивает каждую команду, которую возвращает, в
 `ActorCommandSlot`:
 
 ```ts
 private readonly commands = new ActorCommandSlot();
-
-get currentCommand(): IActorCommand | null {
-  return this.commands.current;
-}
 
 goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
   return this.commands.bind(new GoToCoordsCommand(/* ... */));

@@ -17,10 +17,6 @@ export class DespawnableActor implements IActor {
     this.actor = actor;
   }
 
-  get currentCommand(): IActorCommand | null {
-    return this.actor.currentCommand;
-  }
-
   getPosition(): Vector3 {
     return this.actor.getPosition();
   }

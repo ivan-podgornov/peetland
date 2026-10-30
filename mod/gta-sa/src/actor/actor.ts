@@ -56,10 +56,6 @@ export class GtaActor implements IActor {
     this.commands = new ActorCommandSlot();
   }
 
-  get currentCommand(): IActorCommand | null {
-    return this.commands.current;
-  }
-
   getPosition(): Vector3 {
     const [x, y, z] = getCharCoordinates(this.handle);
 

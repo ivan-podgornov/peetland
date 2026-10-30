@@ -76,8 +76,6 @@ export function executeCommand(options: ExecuteCommandOptions = {}): TestCommand
 
 /** Актор, которого получает тестовая команда. Команде он не нужен, поэтому ничего не делает */
 class TestActor implements IActor {
-  readonly currentCommand: IActorCommand | null = null;
-
   getPosition(): Vector3 {
     return { x: 0, y: 0, z: 0 };
   }

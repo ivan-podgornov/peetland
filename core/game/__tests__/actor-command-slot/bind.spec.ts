@@ -16,19 +16,23 @@ describe('ActorCommandSlot', () => {
 
     it('До подписки не делает команду текущей', () => {
       const slot = new ActorCommandSlot();
+      const inner = new ManualCommand();
+      const cancel = vi.spyOn(inner, 'cancel');
+      slot.bind(inner);
 
-      slot.bind(new ManualCommand());
+      slot.cancel(new Error());
 
-      expect(slot.current).toBeNull();
+      expect(cancel).not.toHaveBeenCalled();
     });
 
     it('При подписке делает команду текущей', () => {
       const slot = new ActorCommandSlot();
-      const command = slot.bind(new ManualCommand());
+      const error = vi.fn();
+      slot.bind(new ManualCommand()).execute().subscribe({ error });
 
-      command.execute().subscribe();
+      slot.cancel(new Error());
 
-      expect(slot.current).toBe(command);
+      expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
     });
 
     it('При подписке прерывает текущую команду', () => {
@@ -66,21 +70,26 @@ describe('ActorCommandSlot', () => {
     it('Когда команда завершилась, она перестаёт быть текущей', () => {
       const slot = new ActorCommandSlot();
       const inner = new ManualCommand();
+      const cancel = vi.spyOn(inner, 'cancel');
       slot.bind(inner).execute().subscribe();
-
       inner.subscriber!.complete();
 
-      expect(slot.current).toBeNull();
+      slot.cancel(new Error());
+
+      expect(cancel).not.toHaveBeenCalled();
     });
 
     it('Когда от команды отписались, она перестаёт быть текущей', () => {
       const slot = new ActorCommandSlot();
       const controller = new AbortController();
-      slot.bind(new ManualCommand()).execute().subscribe({}, { signal: controller.signal });
-
+      const inner = new ManualCommand();
+      const cancel = vi.spyOn(inner, 'cancel');
+      slot.bind(inner).execute().subscribe({}, { signal: controller.signal });
       controller.abort();
 
-      expect(slot.current).toBeNull();
+      slot.cancel(new Error());
+
+      expect(cancel).not.toHaveBeenCalled();
     });
 
     it('Когда от команды отписались, отписывается от обёрнутой команды', () => {
@@ -94,14 +103,15 @@ describe('ActorCommandSlot', () => {
       expect(inner.subscriber!.active).toBe(false);
     });
 
-    it('Прерванная команда не перестаёт быть текущей за новую', () => {
+    it('Когда прерванная команда завершается, новая остаётся текущей', () => {
       const slot = new ActorCommandSlot();
+      const error = vi.fn();
       slot.bind(new ManualCommand()).execute().subscribe();
-      const command = slot.bind(new ManualCommand());
+      slot.bind(new ManualCommand()).execute().subscribe({ error });
 
-      command.execute().subscribe();
+      slot.cancel(new Error());
 
-      expect(slot.current).toBe(command);
+      expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
     });
 
     it('cancel прерывает обёрнутую команду', () => {
@@ -131,12 +141,15 @@ describe('ActorCommandSlot', () => {
 
       it('При подписке не становится текущей', () => {
         const slot = new ActorCommandSlot();
-        const command = slot.bind(new ManualCommand());
+        const inner = new ManualCommand();
+        const cancel = vi.spyOn(inner, 'cancel');
+        const command = slot.bind(inner);
         command.cancel(new Error());
-
         command.execute().subscribe();
 
-        expect(slot.current).toBeNull();
+        slot.cancel(new Error());
+
+        expect(cancel).toHaveBeenCalledOnce();
       });
     });
   });

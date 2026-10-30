@@ -44,10 +44,6 @@ export class VirtualActor implements IActor {
     this.commands = new ActorCommandSlot();
   }
 
-  get currentCommand(): IActorCommand | null {
-    return this.commands.current;
-  }
-
   getPosition(): Vector3 {
     return { ...this.position };
   }

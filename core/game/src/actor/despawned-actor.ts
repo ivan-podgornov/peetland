@@ -2,8 +2,6 @@ import type { IActor } from './types';
 
 /** Деспавненный актор: любой его метод выбрасывает ошибку */
 export class DespawnedActor implements IActor {
-  readonly currentCommand = null;
-
   getPosition(): never {
     throw this.createError();
   }

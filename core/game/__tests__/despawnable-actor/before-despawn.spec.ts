@@ -1,19 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import { createActor, TestCommand } from '../helpers';
+import { createActor } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('До деспавна', () => {
-    it('currentCommand возвращает текущую команду обёрнутого актора', () => {
-      const inner = createActor();
-      const command = new TestCommand();
-      inner.currentCommand = command;
-      const actor = new DespawnableActor(inner);
-
-      expect(actor.currentCommand).toBe(command);
-    });
-
     it('getPosition возвращает позицию обёрнутого актора', () => {
       const inner = createActor();
       inner.setPosition({ x: 1, y: 2, z: 3 });

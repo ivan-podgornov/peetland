@@ -16,11 +16,10 @@ export class TestCommand<TValue = unknown> implements IActorCommand<TValue> {
 }
 
 /**
- * Актор, который только хранит позицию и текущую команду. goToCoords и playAnimation возвращают
+ * Актор, который только хранит позицию. goToCoords и playAnimation возвращают
  * команду, которая ничего не сообщает и не завершается
  */
 export class TestActor implements IActor {
-  currentCommand: IActorCommand | null = null;
   private position: Vector3 = { x: 0, y: 0, z: 0 };
 
   getPosition(): Vector3 {

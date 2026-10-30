@@ -15,22 +15,6 @@ describe('VirtualActor', () => {
       expect(actor.getPosition()).toStrictEqual({ x: 0, y: 0, z: 0 });
     });
 
-    it('Не меняет текущую команду до подписки', () => {
-      const actor = createActor();
-
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
-
-      expect(actor.currentCommand).toBeNull();
-    });
-
-    it('При подписке делает движение к точке текущей командой', () => {
-      const actor = createActor();
-
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
-
-      expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
-    });
-
     it('При подписке сообщает текущую позицию актора', () => {
       const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
       const next = vi.fn();

@@ -1,20 +1,20 @@
 import { ActorCommandSlot } from '@peetland/game';
-import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
+import type { AnimationId, IActor, IActorCommand, IAnimationManager } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
+import type { VirtualAnimation } from './animations';
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 import { VirtualPlayAnimationCommand } from './play-animation-command';
-import type { VirtualAnimations } from './play-animation-command';
 
 export type VirtualActorOptions = {
   /** Позиция, на которой появляется актор */
   position: Vector3;
-  /** Анимации, которые умеет проигрывать актор */
-  animations: VirtualAnimations;
 };
 
 export type VirtualActorDeps = {
+  /** Менеджер анимаций. Один на всех акторов */
+  animations: IAnimationManager<VirtualAnimation>;
   geometry: IGeometry;
   timer: ITimer;
 };
@@ -23,14 +23,14 @@ export type VirtualActorDeps = {
 export class VirtualActor implements IActor {
   private readonly geometry: IGeometry;
   private readonly timer: ITimer;
-  private readonly animations: VirtualAnimations;
+  private readonly animations: IAnimationManager<VirtualAnimation>;
   private position: Vector3;
   private readonly commands: ActorCommandSlot;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.geometry = deps.geometry;
     this.timer = deps.timer;
-    this.animations = { ...options.animations };
+    this.animations = deps.animations;
     this.position = { ...options.position };
     this.commands = new ActorCommandSlot();
   }
@@ -54,8 +54,9 @@ export class VirtualActor implements IActor {
   }
 
   /**
-   * Незацикленная анимация длится столько, сколько указано в таблице анимаций. Выбрасывает ошибку,
-   * если анимации нет в таблице или для неё не задана длительность
+   * Если время проигрывания не передано, анимация длится столько, сколько указано в таблице
+   * менеджера анимаций. Выбрасывает ошибку, если параметры не подходят анимации (см.
+   * IAnimationManager.resolve)
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {

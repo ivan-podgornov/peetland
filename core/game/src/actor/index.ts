@@ -1,4 +1,4 @@
-export { ANIMATIONS, assertPlaybackDuration } from './animation';
+export { ANIMATIONS } from './animation';
 export type { AnimationId, AnimationInfo } from './animation';
 export { ActorCommandSlot } from './command-slot';
 export { DespawnableActor } from './despawnable-actor';

@@ -53,21 +53,3 @@ export const ANIMATIONS: Record<AnimationId, AnimationInfo> = {
   'drink-standing-1': { loop: true },
   'drink-standing-2': { loop: true },
 };
-
-/**
- * Проверяет время проигрывания анимации. Выбрасывает ошибку, если время передано для незацикленной
- * анимации. RangeError — если время не положительное конечное число
- * @param animation - какую анимацию проигрывают
- * @param duration - сколько её проигрывать, в миллисекундах
- */
-export function assertPlaybackDuration(animation: AnimationId, duration?: number): void {
-  const { loop } = ANIMATIONS[animation];
-
-  if (!loop && duration !== undefined) {
-    throw new Error(`Для незацикленной анимации ${animation} нельзя передать время проигрывания`);
-  }
-
-  if (duration !== undefined && (!Number.isFinite(duration) || duration <= 0)) {
-    throw new RangeError('Время проигрывания должно быть положительным конечным числом');
-  }
-}

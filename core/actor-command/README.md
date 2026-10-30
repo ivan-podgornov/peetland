@@ -168,8 +168,18 @@ protected override onFinish(result: CommandResult): void {
 }
 ```
 
-Так же освобождаются и другие ресурсы. Например, команда анимации в `onStart` загружает блок
-анимации, а в `onFinish` выгружает его.
+Если команде что-то нужно на всё время выполнения, на это удобно подписаться с защищённым сигналом
+`this.signal`. Он прерывается, когда команда закончилась, уже после `onFinish`, поэтому подписка
+сама отменится, а в `onFinish` то, на что подписана команда, ещё доступно. Например, команда
+анимации так держит блок анимации загруженным:
+
+```ts
+protected override onStart(): void {
+  this.deps.animations
+    .acquire(this.options.animation)
+    .subscribe(() => this.play(), { signal: this.signal });
+}
+```
 
 ## Прерывание
 

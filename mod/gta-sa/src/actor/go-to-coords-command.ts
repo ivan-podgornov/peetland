@@ -29,7 +29,7 @@ export class GtaGoToCoordsCommand extends Command<
   GtaGoToCoordsCommandOptions,
   GtaGoToCoordsCommandDeps
 > {
-  /** Невидимый объект в точке, к которому идёт персонаж. null, пока персонаж не пошёл */
+  /** Невидимый объект в точке, к которому идёт персонаж. null, пока команда не началась */
   private target: IGtaObject | null;
 
   constructor(actor: IActor, options: GtaGoToCoordsCommandOptions, deps: GtaGoToCoordsCommandDeps) {
@@ -37,33 +37,8 @@ export class GtaGoToCoordsCommand extends Command<
     this.target = null;
   }
 
-  protected onUpdate(): CommandStatus {
-    const { coords, completeRadius } = this.options;
-    const position = this.actor.getPosition();
-    this.emit(position);
-
-    if (this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)) {
-      return 'success';
-    }
-
-    if (!this.target) {
-      this.startWalking();
-    }
-
-    return 'running';
-  }
-
-  protected override onFinish(_result: CommandResult): void {
-    if (!this.target) {
-      return;
-    }
-
-    this.target.remove();
-    clearCharTasksImmediately(this.options.handle);
-  }
-
   /** Ставит в точку невидимый объект и отправляет к нему персонажа */
-  private startWalking(): void {
+  protected override onStart(): void {
     const target = this.deps.objectFactory.create({
       modelId: TARGET_MODEL_ID,
       position: this.options.coords,
@@ -75,5 +50,24 @@ export class GtaGoToCoordsCommand extends Command<
 
     taskGoToObject(this.options.handle, target.handle, -1, 0.1);
     this.target = target;
+  }
+
+  protected onUpdate(): CommandStatus {
+    const { coords, completeRadius } = this.options;
+    const position = this.actor.getPosition();
+    this.emit(position);
+
+    return this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)
+      ? 'success'
+      : 'running';
+  }
+
+  protected override onFinish(_result: CommandResult): void {
+    if (!this.target) {
+      return;
+    }
+
+    this.target.remove();
+    clearCharTasksImmediately(this.options.handle);
   }
 }

@@ -1,4 +1,10 @@
-import type { VirtualAnimations } from './play-animation-command';
+import type { AnimationRecord, AnimationTable } from '@peetland/animation-manager';
+
+/** Анимация виртуального актора: виртуальному актору нужна только длительность */
+export type VirtualAnimation = AnimationRecord;
+
+/** Анимации виртуального актора. Для каждой анимации должна быть задана длительность */
+export type VirtualAnimations = AnimationTable<VirtualAnimation>;
 
 /**
  * Анимации виртуального актора с длительностями, как у анимаций игры. Для зацикленных анимаций

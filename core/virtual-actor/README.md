@@ -6,14 +6,19 @@
 тестируются задачи, NPC и мир.
 
 ```ts
+import { AnimationManager, InstantAnimationLoader } from '@peetland/animation-manager';
 import { Geometry } from '@peetland/geometry';
 import { Timer } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/virtual-actor';
 
-const factory = new VirtualActorFactory(
-  { animations: VIRTUAL_ANIMATIONS },
-  { geometry: new Geometry(), timer: new Timer() }
-);
+const factory = new VirtualActorFactory({
+  animations: new AnimationManager(
+    { animations: VIRTUAL_ANIMATIONS },
+    { loader: new InstantAnimationLoader() }
+  ),
+  geometry: new Geometry(),
+  timer: new Timer(),
+});
 const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 ```
 
@@ -24,7 +29,8 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 новую позицию. Когда актор входит в радиус (без учёта высоты), Observable завершается.
 
 Команда `playAnimation` завершается, когда по таймеру проходит переданное время проигрывания, а если
-его не передали, — длительность анимации из таблицы. Анимации передаются таблицей `animations` в
-опциях фабрики: для каждой анимации обязательна запись с длительностью. Если записи или длительности
-нет, `playAnimation` выбрасывает ошибку. Готовая таблица с длительностями анимаций игры —
-`VIRTUAL_ANIMATIONS`.
+его не передали, — длительность анимации из таблицы. Таблицу анимаций держит менеджер анимаций из
+зависимостей фабрики: для каждой анимации обязательна запись с длительностью. Если записи или
+длительности нет, `playAnimation` выбрасывает ошибку. Готовая таблица с длительностями анимаций
+игры — `VIRTUAL_ANIMATIONS`. Загружать виртуальному актору нечего, поэтому менеджеру передаётся
+`InstantAnimationLoader`.

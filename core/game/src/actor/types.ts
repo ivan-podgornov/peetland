@@ -1,9 +1,16 @@
-import type { Observable } from '@peetland/events';
+import type { IAbortSignal, Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
 import type { AnimationId } from './animation';
 
 export interface IActor {
+  /**
+   * Сигнал деспавна. Пока актор заспавнен, сигнал в состоянии pending. despawn переводит его в
+   * состояние aborted с ошибкой «Актор деспавнен», и после этого актором больше не пользуются:
+   * актор ничего не гарантирует для вызовов после деспавна
+   */
+  readonly signal: IAbortSignal;
+
   /** Возвращает позицию персонажа в игре */
   getPosition(): Vector3;
 
@@ -30,7 +37,10 @@ export interface IActor {
    */
   playAnimation(animation: AnimationId, duration?: number): IActorCommand<void>;
 
-  /** Деспавнит игрового персонажа */
+  /**
+   * Деспавнит игрового персонажа. Сначала прерывает signal, чтобы команды прервались, пока
+   * персонаж ещё есть в игре, а потом удаляет персонажа. Повторный вызов signal не меняет
+   */
   despawn(): void;
 }
 
@@ -56,7 +66,8 @@ export type GoToCoordsOptions = {
 /**
  * Команда, которую выполняет актор, например, движение к точке или проигрывание анимации.
  * Методы актора только создают команду. Выполняться она начинает, когда подписываются на
- * Observable из execute: тогда она прерывает текущую команду актора и становится текущей
+ * Observable из execute. Актор не следит, сколько команд выполняется: чтобы он выполнял одну
+ * команду за раз, тот, кто управляет актором, сам прерывает текущую команду перед новой
  */
 export interface IActorCommand<TValue = unknown> {
   /** Название команды, например, go-to-coords или play-animation */

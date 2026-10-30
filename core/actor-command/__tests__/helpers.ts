@@ -1,4 +1,4 @@
-import { Observable } from '@peetland/events';
+import { AbortController, Observable } from '@peetland/events';
 import type { IAbortSignal, IObserver, ObserveOptions } from '@peetland/events';
 import type { IActor, IActorCommand } from '@peetland/game';
 import type { Vector3 } from '@peetland/geometry';
@@ -10,6 +10,33 @@ import type { CommandDeps, CommandResult, CommandStatus } from '../src';
 
 /** Как часто тестовая команда обновляется, в миллисекундах */
 export const UPDATE_PERIOD = 100;
+
+/** Актор, которого получает тестовая команда. Умеет только деспавниться */
+export class TestActor implements IActor {
+  private readonly controller = new AbortController();
+
+  get signal(): IAbortSignal {
+    return this.controller.signal;
+  }
+
+  getPosition(): Vector3 {
+    return { x: 0, y: 0, z: 0 };
+  }
+
+  setPosition(): void {}
+
+  goToCoords(): IActorCommand<Vector3> {
+    return createIdleCommand();
+  }
+
+  playAnimation(): IActorCommand<void> {
+    return createIdleCommand();
+  }
+
+  despawn(): void {
+    this.controller.abort(new Error('Актор деспавнен'));
+  }
+}
 
 /** Защищённые методы команды, которые тест может вызвать из хуков */
 export type TestCommandControls = {
@@ -26,8 +53,8 @@ export type TestCommandHooks = {
 
 /** Команда, хуки которой задаёт тест */
 export class TestCommand extends Command<number, TestCommandHooks> {
-  constructor(hooks: TestCommandHooks, deps: CommandDeps) {
-    super({ name: 'test', updatePeriod: UPDATE_PERIOD }, createActor(), hooks, deps);
+  constructor(actor: IActor, hooks: TestCommandHooks, deps: CommandDeps) {
+    super({ name: 'test', updatePeriod: UPDATE_PERIOD }, actor, hooks, deps);
   }
 
   /** Защищённый сигнал команды, открытый для тестов */
@@ -56,13 +83,19 @@ export class TestCommand extends Command<number, TestCommandHooks> {
 }
 
 type CreateCommandOptions = {
+  actor?: TestActor;
   hooks?: TestCommandHooks;
   timer?: ITimer;
 };
 
-/** Создаёт тестовую команду. Если таймер не указан, время для команды не идёт */
+/**
+ * Создаёт тестовую команду. Если таймер не указан, время для команды не идёт. Если актор не указан,
+ * команда получает нового заспавненного актора
+ */
 export function createCommand(options: CreateCommandOptions = {}): TestCommand {
-  return new TestCommand(options.hooks ?? {}, { timer: options.timer ?? new ManualTimer() });
+  return new TestCommand(options.actor ?? new TestActor(), options.hooks ?? {}, {
+    timer: options.timer ?? new ManualTimer(),
+  });
 }
 
 type ExecuteCommandOptions = CreateCommandOptions & {
@@ -79,25 +112,6 @@ export function executeCommand(options: ExecuteCommandOptions = {}): TestCommand
   return command;
 }
 
-/** Актор, которого получает тестовая команда. Команде он не нужен, поэтому ничего не делает */
-class TestActor implements IActor {
-  getPosition(): Vector3 {
-    return { x: 0, y: 0, z: 0 };
-  }
-
-  setPosition(): void {}
-
-  goToCoords(): IActorCommand<Vector3> {
-    return createIdleCommand();
-  }
-
-  playAnimation(): IActorCommand<void> {
-    return createIdleCommand();
-  }
-
-  despawn(): void {}
-}
-
 /** Создаёт команду, которая ничего не делает и не завершается */
 function createIdleCommand<TValue>(): IActorCommand<TValue> {
   return {
@@ -105,9 +119,4 @@ function createIdleCommand<TValue>(): IActorCommand<TValue> {
     execute: () => new Observable(() => {}),
     cancel: () => {},
   };
-}
-
-/** Создаёт тестового актора */
-function createActor(): TestActor {
-  return new TestActor();
 }

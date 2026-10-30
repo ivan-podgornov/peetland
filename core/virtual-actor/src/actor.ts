@@ -1,5 +1,6 @@
 import type { IAnimationManager } from '@peetland/animation-manager';
-import { ActorCommandSlot } from '@peetland/game';
+import { AbortController } from '@peetland/events';
+import type { IAbortSignal } from '@peetland/events';
 import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
@@ -26,14 +27,18 @@ export class VirtualActor implements IActor {
   private readonly timer: ITimer;
   private readonly animations: IAnimationManager<VirtualAnimation>;
   private position: Vector3;
-  private readonly commands: ActorCommandSlot;
+  private readonly despawnController: AbortController;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.geometry = deps.geometry;
     this.timer = deps.timer;
     this.animations = deps.animations;
     this.position = { ...options.position };
-    this.commands = new ActorCommandSlot();
+    this.despawnController = new AbortController();
+  }
+
+  get signal(): IAbortSignal {
+    return this.despawnController.signal;
   }
 
   getPosition(): Vector3 {
@@ -45,13 +50,11 @@ export class VirtualActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const command = new VirtualGoToCoordsCommand(
+    return new VirtualGoToCoordsCommand(
       this,
       { coords, completeRadius },
       { geometry: this.geometry, timer: this.timer }
     );
-
-    return this.commands.bind(command);
   }
 
   /**
@@ -61,16 +64,14 @@ export class VirtualActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
-    const command = new VirtualPlayAnimationCommand(
+    return new VirtualPlayAnimationCommand(
       this,
       { animation, playbackDuration },
       { animations: this.animations, timer: this.timer }
     );
-
-    return this.commands.bind(command);
   }
 
   despawn(): void {
-    this.commands.cancel(new Error('Актор деспавнен'));
+    this.despawnController.abort(new Error('Актор деспавнен'));
   }
 }

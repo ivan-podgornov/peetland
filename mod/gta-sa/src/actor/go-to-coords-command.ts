@@ -1,56 +1,71 @@
-import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActor, ILegacyActorCommand } from '@peetland/game';
+import { Command } from '@peetland/actor-command';
+import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-command';
+import type { GoToCoordsOptions, IActor } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import { clearCharTasksImmediately, taskGoToObject } from '@peetland/moonloader';
 
-import type { ITimer } from '@peetland/timings';
+import type { IGtaObject, IGtaObjectFactory } from '../object';
 
-import type { IGtaObjectFactory } from '../object';
-
-export type GtaGoToCoordsCommandDeps = {
-  geometry: IGeometry;
-  objectFactory: IGtaObjectFactory;
-  timer: ITimer;
+export type GtaGoToCoordsCommandOptions = GoToCoordsOptions & {
+  /** Персонаж, которого нужно вести к точке */
+  handle: PedHandle;
 };
 
-/** Как часто команда проверяет, пришёл ли персонаж, в миллисекундах */
-const CHECK_PERIOD = 1000;
+export type GtaGoToCoordsCommandDeps = CommandDeps & {
+  geometry: IGeometry;
+  objectFactory: IGtaObjectFactory;
+};
+
+/** Команда проверяет, пришёл ли персонаж, раз в секунду */
+const GO_TO_COORDS = { name: 'go-to-coords', updatePeriod: 1000 };
+
+/** Id модели конуса, к которому идёт персонаж */
+const TARGET_MODEL_ID = 3283;
 
 /** Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию */
-export class GtaGoToCoordsCommand implements ILegacyActorCommand {
-  readonly name = 'go-to-coords';
-  private readonly actor: IActor;
-  private readonly handle: PedHandle;
-  private readonly subscriber: ISubscriber<Vector3>;
-  private readonly options: GoToCoordsOptions;
-  private readonly geometry: IGeometry;
-  private readonly objectFactory: IGtaObjectFactory;
-  private readonly timer: ITimer;
+export class GtaGoToCoordsCommand extends Command<
+  Vector3,
+  GtaGoToCoordsCommandOptions,
+  GtaGoToCoordsCommandDeps
+> {
+  /** Невидимый объект в точке, к которому идёт персонаж. null, пока персонаж не пошёл */
+  private target: IGtaObject | null;
 
-  constructor(
-    actor: IActor,
-    handle: PedHandle,
-    subscriber: ISubscriber<Vector3>,
-    options: GoToCoordsOptions,
-    deps: GtaGoToCoordsCommandDeps
-  ) {
-    this.actor = actor;
-    this.handle = handle;
-    this.subscriber = subscriber;
-    this.options = options;
-    this.geometry = deps.geometry;
-    this.objectFactory = deps.objectFactory;
-    this.timer = deps.timer;
+  constructor(actor: IActor, options: GtaGoToCoordsCommandOptions, deps: GtaGoToCoordsCommandDeps) {
+    super(GO_TO_COORDS, actor, options, deps);
+    this.target = null;
   }
 
-  start(): void {
-    if (this.tryArrive()) {
+  protected onUpdate(): CommandStatus {
+    const { coords, completeRadius } = this.options;
+    const position = this.actor.getPosition();
+    this.emit(position);
+
+    if (this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)) {
+      return 'success';
+    }
+
+    if (!this.target) {
+      this.startWalking();
+    }
+
+    return 'running';
+  }
+
+  protected override onFinish(_result: CommandResult): void {
+    if (!this.target) {
       return;
     }
 
-    const target = this.objectFactory.create({
-      modelId: 3283, // Id модели конуса
+    this.target.remove();
+    clearCharTasksImmediately(this.options.handle);
+  }
+
+  /** Ставит в точку невидимый объект и отправляет к нему персонажа */
+  private startWalking(): void {
+    const target = this.deps.objectFactory.create({
+      modelId: TARGET_MODEL_ID,
       position: this.options.coords,
     });
 
@@ -58,36 +73,7 @@ export class GtaGoToCoordsCommand implements ILegacyActorCommand {
     target.setVisibility(false);
     target.setCollisionEnabled(false);
 
-    this.subscriber.addTeardown(() => {
-      target.remove();
-      clearCharTasksImmediately(this.handle);
-    });
-
-    taskGoToObject(this.handle, target.handle, -1, 0.1);
-    this.timer
-      .interval(CHECK_PERIOD)
-      .subscribe(() => this.tryArrive(), { signal: this.subscriber.signal });
-  }
-
-  stop(): void {
-    this.subscriber.complete();
-  }
-
-  cancel(reason: unknown): void {
-    this.subscriber.error(reason);
-  }
-
-  /** Сообщает позицию актора и завершает команду, если он пришёл. Возвращает true, если пришёл */
-  private tryArrive(): boolean {
-    const { coords, completeRadius } = this.options;
-    const position = this.actor.getPosition();
-    this.subscriber.next(position);
-    const arrived = this.geometry.isWithinRadius2d(position, coords, completeRadius);
-
-    if (arrived) {
-      this.stop();
-    }
-
-    return arrived;
+    taskGoToObject(this.options.handle, target.handle, -1, 0.1);
+    this.target = target;
   }
 }

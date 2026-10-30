@@ -1,9 +1,8 @@
 name: Release
 
+# Релиз публикуется вручную: Actions → Release → Run workflow, ветка main
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 # Релизы идут строго по очереди: следующий ждёт, а не отменяет текущий.
 concurrency:
@@ -14,6 +13,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "::error::Релиз публикуется только из main, а не из $GITHUB_REF_NAME"
+          exit 1
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment

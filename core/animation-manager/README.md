@@ -24,3 +24,12 @@ const animations = new AnimationManager(
   { loader: new GtaAnimationLoader({ timer }) }
 );
 ```
+
+## Для тестов
+
+`@peetland/animation-manager/dev` даёт то, что нужно тестам с менеджером анимаций:
+
+- `createAnimationManager(animations, loader?)` создаёт менеджер с переданной таблицей. Если
+  загрузчик не указан, используется `InstantAnimationLoader`.
+- `ManualAnimationLoader` загружает анимации с одним ключом, только когда тест вызовет
+  `finish(key)`, и считает загрузки и выгрузки.

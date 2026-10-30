@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { AnimationManager } from '../src';
 import type { AnimationTable } from '../src';
 
-import { createAnimationManager, ManualAnimationLoader, TEST_ANIMATIONS } from './helpers';
+import { createTestAnimationManager, createManualLoader, TEST_ANIMATIONS } from './helpers';
 import type { TestAnimation } from './helpers';
 
 describe('AnimationManager', () => {
   describe('#resolve', () => {
     it('Возвращает запись из таблицы анимаций', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       const playback = manager.resolve('pay');
 
@@ -17,7 +17,7 @@ describe('AnimationManager', () => {
     });
 
     it('Если время проигрывания не передано, возвращает длительность из таблицы', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       const playback = manager.resolve('trash-search');
 
@@ -25,7 +25,7 @@ describe('AnimationManager', () => {
     });
 
     it('Если время проигрывания передано, возвращает его', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       const playback = manager.resolve('trash-search', 5000);
 
@@ -33,7 +33,7 @@ describe('AnimationManager', () => {
     });
 
     it('Для зацикленной анимации возвращает loop', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       const playback = manager.resolve('trash-search');
 
@@ -41,7 +41,7 @@ describe('AnimationManager', () => {
     });
 
     it('Для незацикленной анимации не возвращает loop', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       const playback = manager.resolve('pay');
 
@@ -49,19 +49,19 @@ describe('AnimationManager', () => {
     });
 
     it('Если время проигрывания передано для незацикленной анимации, выбрасывает ошибку', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       expect(() => manager.resolve('pay', 5000)).toThrow(Error);
     });
 
     it('Если время проигрывания равно нулю, выбрасывает RangeError', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       expect(() => manager.resolve('trash-search', 0)).toThrow(RangeError);
     });
 
     it('Если время проигрывания бесконечно, выбрасывает RangeError', () => {
-      const manager = createAnimationManager();
+      const manager = createTestAnimationManager();
 
       expect(() => manager.resolve('trash-search', Infinity)).toThrow(RangeError);
     });
@@ -71,7 +71,7 @@ describe('AnimationManager', () => {
       delete animations.pay;
       const manager = new AnimationManager(
         { animations: animations as AnimationTable<TestAnimation> },
-        { loader: new ManualAnimationLoader() }
+        { loader: createManualLoader() }
       );
 
       expect(() => manager.resolve('pay')).toThrow(Error);
@@ -82,7 +82,7 @@ describe('AnimationManager', () => {
         ...TEST_ANIMATIONS,
         pay: { group: 'money' },
       } as AnimationTable<TestAnimation>;
-      const manager = new AnimationManager({ animations }, { loader: new ManualAnimationLoader() });
+      const manager = new AnimationManager({ animations }, { loader: createManualLoader() });
 
       expect(() => manager.resolve('pay')).toThrow(Error);
     });

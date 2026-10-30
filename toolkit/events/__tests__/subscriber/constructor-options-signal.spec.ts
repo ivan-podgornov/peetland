@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
 import { Subscriber } from '../../src/subscriber/subscriber';
 
 import { describeBehaviorOnDeactivation } from './describe-behavior-on-deactivation';
 import { describeBehaviorOnRepeatDeactivation } from './describe-behaviour-on-repeat-deactivation';
-import { createMockedObserver, getDefaultConstructorOptions } from './helpers';
+import { getDefaultConstructorOptions } from './helpers';
 
 describe('Subscriber', () => {
   describe('#constructor', () => {

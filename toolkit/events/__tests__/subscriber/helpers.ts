@@ -1,16 +1,6 @@
-import { vi } from 'vitest';
-
 import { AbortController } from '../../src/abort-controller';
-import type { IObserver, ISubscriber } from '../../src/subscriber';
+import type { ISubscriber } from '../../src/subscriber';
 import type { SubscriberConstructorOptions } from '../../src/subscriber/subscriber';
-
-export function createMockedObserver() {
-  return {
-    next: vi.fn(),
-    complete: vi.fn(),
-    error: vi.fn(),
-  } satisfies IObserver<unknown>;
-}
 
 export function getDefaultConstructorOptions(): SubscriberConstructorOptions {
   return {};

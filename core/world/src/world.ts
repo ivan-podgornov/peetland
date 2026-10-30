@@ -6,15 +6,16 @@ export type WorldDeps = {
 };
 
 export class World {
-  private readonly game: IGame;
+  private readonly deps: WorldDeps;
 
   constructor(deps: WorldDeps) {
-    this.game = deps.game;
+    this.deps = deps;
   }
 
   /** Запускает жизнедеятельность мира */
   bigBang() {
-    const actor = this.game.actorFactory.create({
+    const { game } = this.deps;
+    const actor = game.actorFactory.create({
       modelId: 230, // Бомж в капюшончике
       position: { x: 2269.6, y: 65.66, z: 26.48 }, // Подворотня в Palomino Creek
     });

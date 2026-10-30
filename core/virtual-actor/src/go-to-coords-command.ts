@@ -25,14 +25,13 @@ export class VirtualGoToCoordsCommand extends Command<
 
   protected onUpdate(elapsed: number): CommandStatus {
     const { coords, completeRadius } = this.options;
+    const { geometry } = this.deps;
     const distance = (WALKING_SPEED * elapsed) / 1000;
-    const position = this.deps.geometry.moveTowards(this.actor.getPosition(), coords, distance);
+    const position = geometry.moveTowards(this.actor.getPosition(), coords, distance);
 
     this.actor.setPosition(position);
     this.emit(position);
 
-    return this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)
-      ? 'success'
-      : 'running';
+    return geometry.isWithinRadius2d(position, coords, completeRadius) ? 'success' : 'running';
   }
 }

@@ -19,10 +19,10 @@ const CHECK_PERIOD = 100;
  * всегда загружен, поэтому его загрузчик не загружает и не выгружает
  */
 export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
-  private readonly timer: ITimer;
+  private readonly deps: GtaAnimationLoaderDeps;
 
   constructor(deps: GtaAnimationLoaderDeps) {
-    this.timer = deps.timer;
+    this.deps = deps;
   }
 
   key(animation: GtaAnimation): string {
@@ -31,6 +31,7 @@ export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
 
   load(animation: GtaAnimation): Observable<void> {
     const { block } = animation;
+    const { timer } = this.deps;
 
     return new Observable((subscriber: ISubscriber<void>) => {
       if (block === ALWAYS_LOADED_BLOCK) {
@@ -50,7 +51,7 @@ export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
       const checking = new AbortController();
       subscriber.addTeardown(() => checking.abort());
 
-      this.timer.interval(CHECK_PERIOD).subscribe(
+      timer.interval(CHECK_PERIOD).subscribe(
         () => {
           if (hasAnimationLoaded(block)) {
             checking.abort();

@@ -89,9 +89,9 @@ export abstract class Command<
         return;
       }
 
-      this.deps.timer
-        .interval(this.updatePeriod)
-        .subscribe((elapsed) => this.update(elapsed), { signal });
+      const { timer } = this.deps;
+
+      timer.interval(this.updatePeriod).subscribe((elapsed) => this.update(elapsed), { signal });
     });
   }
 

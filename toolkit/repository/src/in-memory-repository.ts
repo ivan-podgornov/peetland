@@ -2,7 +2,11 @@ import { matches } from './matches';
 import type { Criteria, Entity, IRepository } from './types';
 
 export class InMemoryRepository<T extends Entity<Id>, Id = string> implements IRepository<T, Id> {
-  constructor(private readonly entities: readonly T[]) {}
+  private readonly entities: readonly T[];
+
+  constructor(entities: readonly T[]) {
+    this.entities = entities;
+  }
 
   getAll(): Promise<T[]> {
     return Promise.resolve([...this.entities]);

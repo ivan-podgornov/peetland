@@ -58,7 +58,9 @@ export class GtaPlayAnimationCommand extends Command<
   }
 
   protected override onStart(): void {
-    this.deps.animations
+    const { animations } = this.deps;
+
+    animations
       .acquire(this.options.animation)
       .subscribe(() => this.play(), { signal: this.signal });
   }

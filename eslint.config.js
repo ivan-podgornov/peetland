@@ -62,10 +62,19 @@ export default defineConfig([
         'error',
         { argsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
+      '@typescript-eslint/parameter-properties': 'error',
 
       // Core rules
       'func-style': ['error', 'declaration'],
       'no-console': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "MemberExpression[object.type='MemberExpression'][object.object.type='ThisExpression'][object.property.name='deps']",
+          message: 'Деструктурируйте this.deps',
+        },
+      ],
       'no-use-before-define': 'off',
 
       // Import rules

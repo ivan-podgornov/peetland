@@ -1,44 +1,33 @@
-import type { ISubscriber } from '@peetland/events';
-import type { ILegacyActorCommand } from '@peetland/game';
-import type { ITimer } from '@peetland/timings';
+import { Command } from '@peetland/actor-command';
+import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
+import type { IActor } from '@peetland/game';
 
 export type VirtualPlayAnimationCommandOptions = {
   /** Сколько длится анимация, в миллисекундах */
   duration: number;
 };
 
-export type VirtualPlayAnimationCommandDeps = {
-  timer: ITimer;
-};
+export type VirtualPlayAnimationCommandDeps = CommandDeps;
 
 /** Завершается, когда по таймеру проходит длительность анимации */
-export class VirtualPlayAnimationCommand implements ILegacyActorCommand {
-  readonly name = 'play-animation';
-  private readonly subscriber: ISubscriber<void>;
-  private readonly duration: number;
-  private readonly timer: ITimer;
+export class VirtualPlayAnimationCommand extends Command<void, VirtualPlayAnimationCommandOptions> {
+  /** Сколько миллисекунд анимация уже проигрывается */
+  private playedFor: number;
 
   constructor(
-    subscriber: ISubscriber<void>,
+    actor: IActor,
     options: VirtualPlayAnimationCommandOptions,
     deps: VirtualPlayAnimationCommandDeps
   ) {
-    this.subscriber = subscriber;
-    this.duration = options.duration;
-    this.timer = deps.timer;
+    // Виртуальной анимации нечего делать между тиками, поэтому период равен длительности: так
+    // команда завершается ровно тогда, когда проходит duration, а не на ближайшем тике после
+    super({ name: 'play-animation', updatePeriod: options.duration }, actor, options, deps);
+    this.playedFor = 0;
   }
 
-  start(): void {
-    this.timer
-      .interval(this.duration)
-      .subscribe(() => this.stop(), { signal: this.subscriber.signal });
-  }
+  protected onUpdate(elapsed: number): CommandStatus {
+    this.playedFor += elapsed;
 
-  stop(): void {
-    this.subscriber.complete();
-  }
-
-  cancel(reason: unknown): void {
-    this.subscriber.error(reason);
+    return this.playedFor >= this.options.duration ? 'success' : 'running';
   }
 }

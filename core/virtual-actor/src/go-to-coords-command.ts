@@ -1,86 +1,38 @@
-import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActor, ILegacyActorCommand } from '@peetland/game';
+import { Command } from '@peetland/actor-command';
+import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
+import type { GoToCoordsOptions, IActor } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
-import type { ITimer } from '@peetland/timings';
-
-/** Как часто актор делает шаг к точке, в миллисекундах */
-const STEP_PERIOD = 1000;
 
 /** Скорость пешехода: 5 км/ч в метрах в секунду */
 const WALKING_SPEED = 5 / 3.6;
 
-export type VirtualGoToCoordsCommandDeps = {
+/** Актор делает шаг к точке раз в секунду */
+const GO_TO_COORDS = { name: 'go-to-coords', updatePeriod: 1000 };
+
+export type VirtualGoToCoordsCommandDeps = CommandDeps & {
   geometry: IGeometry;
-  timer: ITimer;
 };
 
-/** Раз в секунду двигает виртуального актора к точке по прямой */
-export class VirtualGoToCoordsCommand implements ILegacyActorCommand {
-  readonly name = 'go-to-coords';
-  private readonly actor: IActor;
-  private readonly subscriber: ISubscriber<Vector3>;
-  private readonly options: GoToCoordsOptions;
-  private readonly geometry: IGeometry;
-  private readonly timer: ITimer;
-
-  constructor(
-    actor: IActor,
-    subscriber: ISubscriber<Vector3>,
-    options: GoToCoordsOptions,
-    deps: VirtualGoToCoordsCommandDeps
-  ) {
-    this.actor = actor;
-    this.subscriber = subscriber;
-    this.options = options;
-    this.geometry = deps.geometry;
-    this.timer = deps.timer;
+/** Раз в секунду двигает виртуального актора к точке по прямой и сообщает его позицию */
+export class VirtualGoToCoordsCommand extends Command<
+  Vector3,
+  GoToCoordsOptions,
+  VirtualGoToCoordsCommandDeps
+> {
+  constructor(actor: IActor, options: GoToCoordsOptions, deps: VirtualGoToCoordsCommandDeps) {
+    super(GO_TO_COORDS, actor, options, deps);
   }
 
-  start(): void {
-    if (this.tryArrive()) {
-      return;
-    }
-
-    this.timer.interval(STEP_PERIOD).subscribe(
-      (elapsed) => {
-        const distance = (this.getSpeed() * elapsed) / 1000;
-        const position = this.geometry.moveTowards(
-          this.actor.getPosition(),
-          this.options.coords,
-          distance
-        );
-
-        this.actor.setPosition(position);
-        this.tryArrive();
-      },
-      { signal: this.subscriber.signal }
-    );
-  }
-
-  stop(): void {
-    this.subscriber.complete();
-  }
-
-  cancel(reason: unknown): void {
-    this.subscriber.error(reason);
-  }
-
-  /** Возвращает скорость актора в метрах в секунду */
-  private getSpeed(): number {
-    return WALKING_SPEED;
-  }
-
-  /** Сообщает позицию актора и завершает команду, если он пришёл. Возвращает true, если пришёл */
-  private tryArrive(): boolean {
+  protected onUpdate(elapsed: number): CommandStatus {
     const { coords, completeRadius } = this.options;
-    const position = this.actor.getPosition();
-    this.subscriber.next(position);
-    const arrived = this.geometry.isWithinRadius2d(position, coords, completeRadius);
+    const distance = (WALKING_SPEED * elapsed) / 1000;
+    const position = this.deps.geometry.moveTowards(this.actor.getPosition(), coords, distance);
 
-    if (arrived) {
-      this.stop();
-    }
+    this.actor.setPosition(position);
+    this.emit(position);
 
-    return arrived;
+    return this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)
+      ? 'success'
+      : 'running';
   }
 }

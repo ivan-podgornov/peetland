@@ -1,5 +1,4 @@
-import type { ISubscriber } from '@peetland/events';
-import { ActorCommandSlot, assertPlaybackDuration, LegacyCommand } from '@peetland/game';
+import { ActorCommandSlot, assertPlaybackDuration } from '@peetland/game';
 import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
@@ -53,15 +52,10 @@ export class VirtualActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const command = new LegacyCommand(
-      'go-to-coords',
-      (subscriber: ISubscriber<Vector3>) =>
-        new VirtualGoToCoordsCommand(
-          this,
-          subscriber,
-          { coords, completeRadius },
-          { geometry: this.geometry, timer: this.timer }
-        )
+    const command = new VirtualGoToCoordsCommand(
+      this,
+      { coords, completeRadius },
+      { geometry: this.geometry, timer: this.timer }
     );
 
     return this.commands.bind(command);
@@ -76,11 +70,7 @@ export class VirtualActor implements IActor {
     assertPlaybackDuration(animation, playbackDuration);
     const duration = playbackDuration ?? this.getAnimationDuration(animation);
 
-    const command = new LegacyCommand(
-      'play-animation',
-      (subscriber: ISubscriber<void>) =>
-        new VirtualPlayAnimationCommand(subscriber, { duration }, { timer: this.timer })
-    );
+    const command = new VirtualPlayAnimationCommand(this, { duration }, { timer: this.timer });
 
     return this.commands.bind(command);
   }

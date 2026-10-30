@@ -6,7 +6,7 @@
 тестируются задачи, NPC и мир.
 
 ```ts
-import { AnimationManager, InstantAnimationLoader } from '@peetland/game';
+import { AnimationManager, InstantAnimationLoader } from '@peetland/animation-manager';
 import { Geometry } from '@peetland/geometry';
 import { Timer } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/virtual-actor';

@@ -1,4 +1,4 @@
-import { AnimationManager } from '@peetland/game';
+import { AnimationManager } from '@peetland/animation-manager';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';

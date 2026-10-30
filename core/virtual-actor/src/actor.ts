@@ -1,5 +1,6 @@
+import type { IAnimationManager } from '@peetland/animation-manager';
 import { ActorCommandSlot } from '@peetland/game';
-import type { AnimationId, IActor, IActorCommand, IAnimationManager } from '@peetland/game';
+import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 

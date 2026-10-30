@@ -1,5 +1,5 @@
-import { AnimationManager, InstantAnimationLoader } from '@peetland/game';
-import type { IAnimationManager } from '@peetland/game';
+import { AnimationManager, InstantAnimationLoader } from '@peetland/animation-manager';
+import type { IAnimationManager } from '@peetland/animation-manager';
 import { Geometry } from '@peetland/geometry';
 import type { Vector3 } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';

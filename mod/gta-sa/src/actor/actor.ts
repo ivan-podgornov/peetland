@@ -1,11 +1,6 @@
+import type { IAnimationManager } from '@peetland/animation-manager';
 import { ActorCommandSlot } from '@peetland/game';
-import type {
-  AnimationId,
-  CreateActorOptions,
-  IActor,
-  IActorCommand,
-  IAnimationManager,
-} from '@peetland/game';
+import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import {

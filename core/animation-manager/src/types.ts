@@ -1,6 +1,6 @@
 import type { Observable } from '@peetland/events';
 
-import type { AnimationId } from '../actor';
+import type { AnimationId } from '@peetland/game';
 
 /** Запись таблицы анимаций. У каждой реализации актора она своя, но длительность есть у всех */
 export type AnimationRecord = {

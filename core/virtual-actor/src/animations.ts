@@ -1,4 +1,4 @@
-import type { AnimationRecord, AnimationTable } from '@peetland/game';
+import type { AnimationRecord, AnimationTable } from '@peetland/animation-manager';
 
 /** Анимация виртуального актора: виртуальному актору нужна только длительность */
 export type VirtualAnimation = AnimationRecord;

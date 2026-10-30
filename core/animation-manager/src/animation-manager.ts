@@ -1,8 +1,8 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
 
-import { ANIMATIONS } from '../actor';
-import type { AnimationId } from '../actor';
+import { ANIMATIONS } from '@peetland/game';
+import type { AnimationId } from '@peetland/game';
 
 import type {
   AnimationPlayback,

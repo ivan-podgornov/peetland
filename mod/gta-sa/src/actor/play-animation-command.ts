@@ -1,6 +1,7 @@
 import { Command } from '@peetland/actor-command';
 import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-command';
-import type { AnimationId, AnimationPlayback, IActor, IAnimationManager } from '@peetland/game';
+import type { AnimationPlayback, IAnimationManager } from '@peetland/animation-manager';
+import type { AnimationId, IActor } from '@peetland/game';
 import type { PedHandle } from '@peetland/moonloader';
 import { clearCharTasks, clearCharTasksImmediately, taskPlayAnim } from '@peetland/moonloader';
 

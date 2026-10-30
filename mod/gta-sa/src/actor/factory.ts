@@ -1,5 +1,6 @@
+import type { IAnimationManager } from '@peetland/animation-manager';
 import { DespawnableActor } from '@peetland/game';
-import type { CreateActorOptions, IActorFactory, IAnimationManager } from '@peetland/game';
+import type { CreateActorOptions, IActorFactory } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 
 import type { ITimer } from '@peetland/timings';

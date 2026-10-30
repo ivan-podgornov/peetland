@@ -1,6 +1,7 @@
 import { Command } from '@peetland/actor-command';
 import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
-import type { AnimationId, IActor, IAnimationManager } from '@peetland/game';
+import type { IAnimationManager } from '@peetland/animation-manager';
+import type { AnimationId, IActor } from '@peetland/game';
 
 import type { VirtualAnimation } from './animations';
 

@@ -1,6 +1,6 @@
+import type { IAnimationLoader } from '@peetland/animation-manager';
 import { AbortController, Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { IAnimationLoader } from '@peetland/game';
 import { hasAnimationLoaded, removeAnimation, requestAnimation } from '@peetland/moonloader';
 import type { ITimer } from '@peetland/timings';
 

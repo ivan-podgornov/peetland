@@ -76,23 +76,30 @@ export function executeCommand(options: ExecuteCommandOptions = {}): TestCommand
 
 /** Актор, которого получает тестовая команда. Команде он не нужен, поэтому ничего не делает */
 class TestActor implements IActor {
-  readonly currentCommand: IActorCommand | null = null;
-
   getPosition(): Vector3 {
     return { x: 0, y: 0, z: 0 };
   }
 
   setPosition(): void {}
 
-  goToCoords(): Observable<Vector3> {
-    return new Observable(() => {});
+  goToCoords(): IActorCommand<Vector3> {
+    return createIdleCommand();
   }
 
-  playAnimation(): Observable<void> {
-    return new Observable(() => {});
+  playAnimation(): IActorCommand<void> {
+    return createIdleCommand();
   }
 
   despawn(): void {}
+}
+
+/** Создаёт команду, которая ничего не делает и не завершается */
+function createIdleCommand<TValue>(): IActorCommand<TValue> {
+  return {
+    name: 'idle',
+    execute: () => new Observable(() => {}),
+    cancel: () => {},
+  };
 }
 
 /** Создаёт тестового актора */

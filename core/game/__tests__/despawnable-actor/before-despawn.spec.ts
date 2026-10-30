@@ -1,19 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import { createActor, TestCommand } from '../helpers';
+import { createActor } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('До деспавна', () => {
-    it('currentCommand возвращает текущую команду обёрнутого актора', () => {
-      const inner = createActor();
-      const command = new TestCommand();
-      inner.currentCommand = command;
-      const actor = new DespawnableActor(inner);
-
-      expect(actor.currentCommand).toBe(command);
-    });
-
     it('getPosition возвращает позицию обёрнутого актора', () => {
       const inner = createActor();
       inner.setPosition({ x: 1, y: 2, z: 3 });
@@ -43,15 +34,15 @@ describe('DespawnableActor', () => {
       expect(goToCoords).toHaveBeenCalledExactlyOnceWith({ x: 10, y: 0, z: 0 }, 1);
     });
 
-    it('goToCoords возвращает Observable обёрнутого актора', () => {
+    it('goToCoords возвращает команду обёрнутого актора', () => {
       const inner = createActor();
-      const observable = inner.goToCoords();
-      vi.spyOn(inner, 'goToCoords').mockReturnValue(observable);
+      const command = inner.goToCoords();
+      vi.spyOn(inner, 'goToCoords').mockReturnValue(command);
       const actor = new DespawnableActor(inner);
 
       const result = actor.goToCoords({ x: 10, y: 0, z: 0 }, 1);
 
-      expect(result).toBe(observable);
+      expect(result).toBe(command);
     });
 
     it('playAnimation передаёт обёрнутому актору анимацию', () => {
@@ -64,15 +55,15 @@ describe('DespawnableActor', () => {
       expect(playAnimation).toHaveBeenCalledExactlyOnceWith('pay', undefined);
     });
 
-    it('playAnimation возвращает Observable обёрнутого актора', () => {
+    it('playAnimation возвращает команду обёрнутого актора', () => {
       const inner = createActor();
-      const observable = inner.playAnimation();
-      vi.spyOn(inner, 'playAnimation').mockReturnValue(observable);
+      const command = inner.playAnimation();
+      vi.spyOn(inner, 'playAnimation').mockReturnValue(command);
       const actor = new DespawnableActor(inner);
 
       const result = actor.playAnimation('pay');
 
-      expect(result).toBe(observable);
+      expect(result).toBe(command);
     });
 
     it('playAnimation передаёт обёрнутому актору время проигрывания', () => {

@@ -11,7 +11,7 @@ describe('VirtualActor', () => {
       const timer = new ManualTimer();
       const actor = createActor({ timer, animations: VIRTUAL_ANIMATIONS });
       const complete = vi.fn();
-      actor.playAnimation('pay').subscribe({ complete });
+      actor.playAnimation('pay').execute().subscribe({ complete });
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
@@ -22,7 +22,7 @@ describe('VirtualActor', () => {
       const timer = new ManualTimer();
       const actor = createActor({ timer, animations: VIRTUAL_ANIMATIONS });
       const complete = vi.fn();
-      actor.playAnimation('pay').subscribe({ complete });
+      actor.playAnimation('pay').execute().subscribe({ complete });
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration - 1);
 
@@ -48,37 +48,11 @@ describe('VirtualActor', () => {
       const timer = new ManualTimer();
       const actor = createActor({ timer });
       const next = vi.fn();
-      actor.playAnimation('pay').subscribe({ next });
+      actor.playAnimation('pay').execute().subscribe({ next });
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
       expect(next).not.toHaveBeenCalled();
-    });
-
-    it('Не меняет текущую команду до подписки', () => {
-      const actor = createActor();
-
-      actor.playAnimation('pay');
-
-      expect(actor.currentCommand).toBeNull();
-    });
-
-    it('При подписке делает проигрывание анимации текущей командой', () => {
-      const actor = createActor();
-
-      actor.playAnimation('pay').subscribe();
-
-      expect(actor.currentCommand).toHaveProperty('name', 'play-animation');
-    });
-
-    it('Сбрасывает текущую команду, когда анимация закончилась', () => {
-      const timer = new ManualTimer();
-      const actor = createActor({ timer });
-      actor.playAnimation('pay').subscribe();
-
-      timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-
-      expect(actor.currentCommand).toBeNull();
     });
   });
 });

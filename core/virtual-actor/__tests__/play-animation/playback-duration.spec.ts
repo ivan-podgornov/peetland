@@ -10,7 +10,7 @@ describe('VirtualActor', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
         const complete = vi.fn();
-        actor.playAnimation('trash-search', 5000).subscribe({ complete });
+        actor.playAnimation('trash-search', 5000).execute().subscribe({ complete });
 
         timer.advance(5000);
 
@@ -21,7 +21,7 @@ describe('VirtualActor', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
         const complete = vi.fn();
-        actor.playAnimation('trash-search', 5000).subscribe({ complete });
+        actor.playAnimation('trash-search', 5000).execute().subscribe({ complete });
 
         timer.advance(4999);
 
@@ -57,7 +57,8 @@ describe('VirtualActor', () => {
 
     it('Если время проигрывания не подходит анимации, не прерывает текущую команду', () => {
       const actor = createActor();
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+      const error = vi.fn();
+      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
 
       try {
         actor.playAnimation('trash-search');
@@ -65,7 +66,7 @@ describe('VirtualActor', () => {
         // Ошибка проверяется в других тестах
       }
 
-      expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
+      expect(error).not.toHaveBeenCalled();
     });
   });
 });

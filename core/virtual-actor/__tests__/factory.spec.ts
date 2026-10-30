@@ -25,7 +25,7 @@ describe('VirtualActorFactory', () => {
         { geometry: new Geometry(), timer }
       );
       const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
 
       timer.advance(1000);
 
@@ -51,7 +51,7 @@ describe('VirtualActorFactory', () => {
       );
       const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
       const complete = vi.fn();
-      actor.playAnimation('pay').subscribe({ complete });
+      actor.playAnimation('pay').execute().subscribe({ complete });
 
       timer.advance(3000);
 

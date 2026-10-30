@@ -1,5 +1,5 @@
 import type { ISubscriber } from '@peetland/events';
-import type { IActorCommand } from '@peetland/game';
+import type { ILegacyActorCommand } from '@peetland/game';
 import type { ITimer } from '@peetland/timings';
 
 export type VirtualPlayAnimationCommandOptions = {
@@ -12,7 +12,7 @@ export type VirtualPlayAnimationCommandDeps = {
 };
 
 /** Завершается, когда по таймеру проходит длительность анимации */
-export class VirtualPlayAnimationCommand implements IActorCommand {
+export class VirtualPlayAnimationCommand implements ILegacyActorCommand {
   readonly name = 'play-animation';
   private readonly subscriber: ISubscriber<void>;
   private readonly duration: number;

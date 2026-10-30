@@ -1,5 +1,5 @@
 import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActor, IActorCommand } from '@peetland/game';
+import type { GoToCoordsOptions, IActor, ILegacyActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
 import { clearCharTasksImmediately, taskGoToObject } from '@peetland/moonloader';
@@ -18,7 +18,7 @@ export type GtaGoToCoordsCommandDeps = {
 const CHECK_PERIOD = 1000;
 
 /** Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию */
-export class GtaGoToCoordsCommand implements IActorCommand {
+export class GtaGoToCoordsCommand implements ILegacyActorCommand {
   readonly name = 'go-to-coords';
   private readonly actor: IActor;
   private readonly handle: PedHandle;

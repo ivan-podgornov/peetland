@@ -1,5 +1,4 @@
 import type { IAnimationManager } from '@peetland/animation-manager';
-import { DespawnableActor } from '@peetland/game';
 import type { CreateActorOptions, IActorFactory } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 
@@ -26,14 +25,12 @@ export class GtaActorFactory implements IActorFactory {
     this.timer = deps.timer;
   }
 
-  create(options: CreateActorOptions): DespawnableActor {
-    const actor = new GtaActor(options, {
+  create(options: CreateActorOptions): GtaActor {
+    return new GtaActor(options, {
       animations: this.animations,
       geometry: this.geometry,
       objectFactory: this.objectFactory,
       timer: this.timer,
     });
-
-    return new DespawnableActor(actor);
   }
 }

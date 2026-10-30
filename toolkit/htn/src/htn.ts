@@ -15,14 +15,14 @@ export function getDefaultDeps<TState>(): HTNDeps<TState> {
 }
 
 export class HTN<TState> {
-  private readonly executorFactory: HTNDeps<TState>['executorFactory'];
+  private readonly deps: HTNDeps<TState>;
   private readonly planner: IPlanner<TState>;
   private readonly root: Task<TState>;
 
   private executor: IExecutor<TState> | null;
 
   constructor(root: Task<TState>, deps: HTNDeps<TState> = getDefaultDeps<TState>()) {
-    this.executorFactory = deps.executorFactory;
+    this.deps = deps;
     this.planner = deps.plannerFactory();
     this.root = root;
     this.executor = null;
@@ -30,13 +30,14 @@ export class HTN<TState> {
 
   update(state: TState) {
     if (!this.executor) {
+      const { executorFactory } = this.deps;
       const tasks = this.planner.plan(this.root, state);
 
       if (!tasks) {
         return;
       }
 
-      this.executor = this.executorFactory(tasks);
+      this.executor = executorFactory(tasks);
     }
 
     const status = this.executor.update(state);

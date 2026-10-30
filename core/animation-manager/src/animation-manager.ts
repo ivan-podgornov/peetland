@@ -38,7 +38,7 @@ export class AnimationManager<
   TAnimation extends AnimationRecord,
 > implements IAnimationManager<TAnimation> {
   private readonly animations: AnimationTable<TAnimation>;
-  private readonly loader: IAnimationLoader<TAnimation>;
+  private readonly deps: AnimationManagerDeps<TAnimation>;
   private readonly loads: Map<string, SharedLoad>;
 
   constructor(
@@ -46,7 +46,7 @@ export class AnimationManager<
     deps: AnimationManagerDeps<TAnimation>
   ) {
     this.animations = { ...options.animations };
-    this.loader = deps.loader;
+    this.deps = deps;
     this.loads = new Map();
   }
 
@@ -100,7 +100,8 @@ export class AnimationManager<
 
   /** Возвращает общую загрузку для ключа записи. Если её ещё нет, создаёт */
   private getLoad(record: TAnimation): SharedLoad {
-    const key = this.loader.key(record);
+    const { loader } = this.deps;
+    const key = loader.key(record);
     const existing = this.loads.get(key);
 
     if (existing) {
@@ -112,7 +113,7 @@ export class AnimationManager<
       observable: new Observable((subscriber: ISubscriber<void>) => {
         subscriber.addTeardown(() => (load.loaded = false));
 
-        this.loader.load(record).subscribe(
+        loader.load(record).subscribe(
           {
             next: () => {
               load.loaded = true;

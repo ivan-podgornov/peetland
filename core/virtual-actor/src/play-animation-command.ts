@@ -49,7 +49,9 @@ export class VirtualPlayAnimationCommand extends Command<
   }
 
   protected override onStart(): void {
-    this.deps.animations
+    const { animations } = this.deps;
+
+    animations
       .acquire(this.options.animation)
       .subscribe(() => (this.playedFor = 0), { signal: this.signal });
   }

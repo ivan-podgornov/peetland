@@ -34,10 +34,7 @@ export type ActorDeps = {
 
 export class GtaActor implements IActor {
   private readonly handle: PedHandle;
-  private readonly animations: IAnimationManager<GtaAnimation>;
-  private readonly geometry: IGeometry;
-  private readonly objectFactory: IGtaObjectFactory;
-  private readonly timer: ITimer;
+  private readonly deps: ActorDeps;
   private readonly despawnController: AbortController;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
@@ -49,10 +46,7 @@ export class GtaActor implements IActor {
     dontRemoveChar(this.handle);
     markModelAsNoLongerNeeded(options.modelId);
 
-    this.animations = deps.animations;
-    this.geometry = deps.geometry;
-    this.objectFactory = deps.objectFactory;
-    this.timer = deps.timer;
+    this.deps = deps;
     this.despawnController = new AbortController();
   }
 
@@ -71,10 +65,12 @@ export class GtaActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
+    const { geometry, objectFactory, timer } = this.deps;
+
     return new GtaGoToCoordsCommand(
       this,
       { handle: this.handle, coords, completeRadius },
-      { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
+      { geometry, objectFactory, timer }
     );
   }
 
@@ -84,10 +80,12 @@ export class GtaActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
+    const { animations, timer } = this.deps;
+
     return new GtaPlayAnimationCommand(
       this,
       { handle: this.handle, animation, playbackDuration },
-      { animations: this.animations, timer: this.timer }
+      { animations, timer }
     );
   }
 

@@ -7,23 +7,24 @@ import { createActor } from '../helpers';
 describe('VirtualActor', () => {
   describe('#playAnimation', () => {
     describe('Если актор выполняет другую команду', () => {
-      it('При подписке прерывает её', () => {
+      it('До подписки не прерывает её', () => {
         const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
-        const cancel = vi.spyOn(actor.currentCommand!, 'cancel');
+        const error = vi.fn();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
 
-        actor.playAnimation('pay').subscribe();
+        actor.playAnimation('pay');
 
-        expect(cancel).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
+        expect(error).not.toHaveBeenCalled();
       });
 
-      it('Делает текущей командой проигрывание анимации', () => {
+      it('При подписке завершает её Observable ошибкой', () => {
         const actor = createActor();
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+        const error = vi.fn();
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
 
-        actor.playAnimation('pay').subscribe();
+        actor.playAnimation('pay').execute().subscribe();
 
-        expect(actor.currentCommand).toHaveProperty('name', 'play-animation');
+        expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
       });
     });
 
@@ -31,9 +32,9 @@ describe('VirtualActor', () => {
       it('Завершает Observable анимации ошибкой', () => {
         const actor = createActor();
         const error = vi.fn();
-        actor.playAnimation('pay').subscribe({ error });
+        actor.playAnimation('pay').execute().subscribe({ error });
 
-        actor.playAnimation('item-give').subscribe();
+        actor.playAnimation('item-give').execute().subscribe();
 
         expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
       });
@@ -42,23 +43,25 @@ describe('VirtualActor', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
         const complete = vi.fn();
-        actor.playAnimation('pay').subscribe({ complete });
-        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+        actor.playAnimation('pay').execute().subscribe({ complete });
+        actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
 
         timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
         expect(complete).not.toHaveBeenCalled();
       });
 
-      it('Не сбрасывает новую команду, когда проходит длительность прерванной анимации', () => {
+      it('Когда проходит длительность прерванной анимации, деспавн всё ещё прерывает новую команду', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
-        actor.playAnimation('pay').subscribe();
-        actor.goToCoords({ x: 100, y: 0, z: 0 }, 1).subscribe();
-
+        const error = vi.fn();
+        actor.playAnimation('pay').execute().subscribe();
+        actor.goToCoords({ x: 100, y: 0, z: 0 }, 1).execute().subscribe({ error });
         timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
 
-        expect(actor.currentCommand).toHaveProperty('name', 'go-to-coords');
+        actor.despawn();
+
+        expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
       });
     });
   });

@@ -1,4 +1,3 @@
-import type { Observable } from '@peetland/events';
 import type { Vector3 } from '@peetland/geometry';
 
 import type { AnimationId } from './animation';
@@ -18,10 +17,6 @@ export class DespawnableActor implements IActor {
     this.actor = actor;
   }
 
-  get currentCommand(): IActorCommand | null {
-    return this.actor.currentCommand;
-  }
-
   getPosition(): Vector3 {
     return this.actor.getPosition();
   }
@@ -30,11 +25,11 @@ export class DespawnableActor implements IActor {
     this.actor.setPosition(position);
   }
 
-  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
+  goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
     return this.actor.goToCoords(coords, completeRadius);
   }
 
-  playAnimation(animation: AnimationId, duration?: number): Observable<void> {
+  playAnimation(animation: AnimationId, duration?: number): IActorCommand<void> {
     return this.actor.playAnimation(animation, duration);
   }
 

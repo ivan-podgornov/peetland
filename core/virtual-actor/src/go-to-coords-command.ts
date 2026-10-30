@@ -1,5 +1,5 @@
 import type { ISubscriber } from '@peetland/events';
-import type { GoToCoordsOptions, IActor, IActorCommand } from '@peetland/game';
+import type { GoToCoordsOptions, IActor, ILegacyActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
@@ -15,7 +15,7 @@ export type VirtualGoToCoordsCommandDeps = {
 };
 
 /** Раз в секунду двигает виртуального актора к точке по прямой */
-export class VirtualGoToCoordsCommand implements IActorCommand {
+export class VirtualGoToCoordsCommand implements ILegacyActorCommand {
   readonly name = 'go-to-coords';
   private readonly actor: IActor;
   private readonly subscriber: ISubscriber<Vector3>;

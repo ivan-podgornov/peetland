@@ -1,6 +1,6 @@
 import { AbortController, Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import type { IActor } from '@peetland/game';
+import type { IActor, IActorCommand } from '@peetland/game';
 
 import type { CommandDefinition, CommandDeps, CommandResult, CommandStatus } from './types';
 
@@ -9,7 +9,11 @@ import type { CommandDefinition, CommandDeps, CommandResult, CommandStatus } fro
  * или 'failed'. Сама подписывается на таймер, завершает Observable команды и не даёт завершить или
  * прервать её повторно. Наследнику остаётся описать в хуках, что команда делает
  */
-export abstract class Command<TValue, TOptions, TDeps extends CommandDeps = CommandDeps> {
+export abstract class Command<
+  TValue,
+  TOptions,
+  TDeps extends CommandDeps = CommandDeps,
+> implements IActorCommand<TValue> {
   readonly name: string;
   protected readonly actor: IActor;
   protected readonly options: TOptions;

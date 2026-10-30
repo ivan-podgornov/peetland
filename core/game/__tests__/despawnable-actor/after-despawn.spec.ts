@@ -1,20 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import { createActor, TestCommand } from '../helpers';
+import { createActor } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('После деспавна', () => {
-    it('currentCommand возвращает null', () => {
-      const inner = createActor();
-      inner.currentCommand = new TestCommand();
-      const actor = new DespawnableActor(inner);
-
-      actor.despawn();
-
-      expect(actor.currentCommand).toBeNull();
-    });
-
     it('getPosition выбрасывает ошибку', () => {
       const actor = new DespawnableActor(createActor());
       actor.despawn();

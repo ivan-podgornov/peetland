@@ -1,6 +1,5 @@
-import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import { assertPlaybackDuration } from '@peetland/game';
+import { ActorCommandSlot, assertPlaybackDuration, LegacyCommand } from '@peetland/game';
 import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
@@ -35,18 +34,14 @@ export class VirtualActor implements IActor {
   private readonly timer: ITimer;
   private readonly animations: VirtualAnimations;
   private position: Vector3;
-  private command: IActorCommand | null;
+  private readonly commands: ActorCommandSlot;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.geometry = deps.geometry;
     this.timer = deps.timer;
     this.animations = { ...options.animations };
     this.position = { ...options.position };
-    this.command = null;
-  }
-
-  get currentCommand(): IActorCommand | null {
-    return this.command;
+    this.commands = new ActorCommandSlot();
   }
 
   getPosition(): Vector3 {
@@ -57,17 +52,19 @@ export class VirtualActor implements IActor {
     this.position = { ...position };
   }
 
-  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
-    return new Observable((subscriber: ISubscriber<Vector3>) => {
-      const command = new VirtualGoToCoordsCommand(
-        this,
-        subscriber,
-        { coords, completeRadius },
-        { geometry: this.geometry, timer: this.timer }
-      );
+  goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
+    const command = new LegacyCommand(
+      'go-to-coords',
+      (subscriber: ISubscriber<Vector3>) =>
+        new VirtualGoToCoordsCommand(
+          this,
+          subscriber,
+          { coords, completeRadius },
+          { geometry: this.geometry, timer: this.timer }
+        )
+    );
 
-      this.execute(command, subscriber);
-    });
+    return this.commands.bind(command);
   }
 
   /**
@@ -75,23 +72,21 @@ export class VirtualActor implements IActor {
    * если анимации нет в таблице или для неё не задана длительность
    * @inheritdoc
    */
-  playAnimation(animation: AnimationId, playbackDuration?: number): Observable<void> {
+  playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
     assertPlaybackDuration(animation, playbackDuration);
     const duration = playbackDuration ?? this.getAnimationDuration(animation);
 
-    return new Observable((subscriber: ISubscriber<void>) => {
-      const command = new VirtualPlayAnimationCommand(
-        subscriber,
-        { duration },
-        { timer: this.timer }
-      );
+    const command = new LegacyCommand(
+      'play-animation',
+      (subscriber: ISubscriber<void>) =>
+        new VirtualPlayAnimationCommand(subscriber, { duration }, { timer: this.timer })
+    );
 
-      this.execute(command, subscriber);
-    });
+    return this.commands.bind(command);
   }
 
   despawn(): void {
-    this.command?.cancel(new Error('Актор деспавнен'));
+    this.commands.cancel(new Error('Актор деспавнен'));
   }
 
   /** Возвращает длительность анимации. Выбрасывает ошибку, если длительность не задана */
@@ -103,19 +98,5 @@ export class VirtualActor implements IActor {
     }
 
     return info.duration;
-  }
-
-  /** Прерывает текущую команду и начинает новую. Команда перестаёт быть текущей, когда завершится */
-  private execute<T>(command: IActorCommand, subscriber: ISubscriber<T>): void {
-    this.command?.cancel(new Error('Актор получил другую команду'));
-    this.command = command;
-
-    subscriber.addTeardown(() => {
-      if (this.command === command) {
-        this.command = null;
-      }
-    });
-
-    command.start();
   }
 }

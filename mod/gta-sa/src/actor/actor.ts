@@ -1,6 +1,10 @@
-import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import { ANIMATIONS, assertPlaybackDuration } from '@peetland/game';
+import {
+  ActorCommandSlot,
+  ANIMATIONS,
+  assertPlaybackDuration,
+  LegacyCommand,
+} from '@peetland/game';
 import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -35,7 +39,7 @@ export class GtaActor implements IActor {
   private readonly geometry: IGeometry;
   private readonly objectFactory: IGtaObjectFactory;
   private readonly timer: ITimer;
-  private command: IActorCommand | null;
+  private readonly commands: ActorCommandSlot;
 
   constructor(options: CreateActorOptions, deps: ActorDeps) {
     requestModel(options.modelId);
@@ -49,11 +53,7 @@ export class GtaActor implements IActor {
     this.geometry = deps.geometry;
     this.objectFactory = deps.objectFactory;
     this.timer = deps.timer;
-    this.command = null;
-  }
-
-  get currentCommand(): IActorCommand | null {
-    return this.command;
+    this.commands = new ActorCommandSlot();
   }
 
   getPosition(): Vector3 {
@@ -66,25 +66,27 @@ export class GtaActor implements IActor {
     setCharCoordinates(this.handle, position.x, position.y, position.z);
   }
 
-  goToCoords(coords: Vector3, completeRadius: number): Observable<Vector3> {
-    return new Observable((subscriber: ISubscriber<Vector3>) => {
-      const command = new GtaGoToCoordsCommand(
-        this,
-        this.handle,
-        subscriber,
-        { coords, completeRadius },
-        { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
-      );
+  goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
+    const command = new LegacyCommand(
+      'go-to-coords',
+      (subscriber: ISubscriber<Vector3>) =>
+        new GtaGoToCoordsCommand(
+          this,
+          this.handle,
+          subscriber,
+          { coords, completeRadius },
+          { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
+        )
+    );
 
-      this.execute(command, subscriber);
-    });
+    return this.commands.bind(command);
   }
 
   /**
    * Незацикленная анимация длится столько, сколько указано в GTA_ANIMATIONS
    * @inheritdoc
    */
-  playAnimation(animation: AnimationId, playbackDuration?: number): Observable<void> {
+  playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
     assertPlaybackDuration(animation, playbackDuration);
     const gtaAnimation = GTA_ANIMATIONS[animation];
     const options = {
@@ -93,34 +95,20 @@ export class GtaActor implements IActor {
       duration: playbackDuration ?? gtaAnimation.duration,
     };
 
-    return new Observable((subscriber: ISubscriber<void>) => {
-      const command = new GtaPlayAnimationCommand(this.handle, subscriber, options, {
-        timer: this.timer,
-      });
+    const command = new LegacyCommand(
+      'play-animation',
+      (subscriber: ISubscriber<void>) =>
+        new GtaPlayAnimationCommand(this.handle, subscriber, options, { timer: this.timer })
+    );
 
-      this.execute(command, subscriber);
-    });
+    return this.commands.bind(command);
   }
 
   despawn(): void {
-    this.command?.cancel(new Error('Актор деспавнен'));
+    this.commands.cancel(new Error('Актор деспавнен'));
 
     if (doesCharExist(this.handle)) {
       deleteChar(this.handle);
     }
-  }
-
-  /** Прерывает текущую команду и начинает новую. Команда перестаёт быть текущей, когда завершится */
-  private execute<T>(command: IActorCommand, subscriber: ISubscriber<T>): void {
-    this.command?.cancel(new Error('Актор получил другую команду'));
-    this.command = command;
-
-    subscriber.addTeardown(() => {
-      if (this.command === command) {
-        this.command = null;
-      }
-    });
-
-    command.start();
   }
 }

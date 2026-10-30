@@ -1,13 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { DespawnableActor } from '../../src';
-import { createActor } from '../helpers';
+import { createActor, TestCommand } from '../helpers';
 
 describe('DespawnableActor', () => {
   describe('После деспавна', () => {
     it('currentCommand возвращает null', () => {
-      const actor = new DespawnableActor(createActor());
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).subscribe();
+      const inner = createActor();
+      inner.currentCommand = new TestCommand();
+      const actor = new DespawnableActor(inner);
 
       actor.despawn();
 

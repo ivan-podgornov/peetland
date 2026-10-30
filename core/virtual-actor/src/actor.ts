@@ -1,10 +1,9 @@
 import { Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
+import { assertPlaybackDuration } from '@peetland/game';
+import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
-
-import { assertPlaybackDuration } from '../actor';
-import type { AnimationId, IActor, IActorCommand } from '../actor';
 
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 import { VirtualPlayAnimationCommand } from './play-animation-command';

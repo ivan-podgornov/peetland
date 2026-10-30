@@ -1,8 +1,9 @@
+import { DespawnableActor } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DespawnableActor, VIRTUAL_ANIMATIONS, VirtualActorFactory } from '../../src';
+import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '../src';
 
 describe('VirtualActorFactory', () => {
   describe('#create', () => {

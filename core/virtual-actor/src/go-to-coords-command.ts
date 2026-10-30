@@ -1,8 +1,7 @@
 import type { ISubscriber } from '@peetland/events';
+import type { GoToCoordsOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
-
-import type { GoToCoordsOptions, IActor, IActorCommand } from '../actor';
 
 /** Как часто актор делает шаг к точке, в миллисекундах */
 const STEP_PERIOD = 1000;

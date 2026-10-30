@@ -1,10 +1,4 @@
-import type { ISubscriber } from '@peetland/events';
-import {
-  ActorCommandSlot,
-  ANIMATIONS,
-  assertPlaybackDuration,
-  LegacyCommand,
-} from '@peetland/game';
+import { ActorCommandSlot } from '@peetland/game';
 import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -24,7 +18,6 @@ import type { ITimer } from '@peetland/timings';
 
 import type { IGtaObjectFactory } from '../object';
 
-import { GTA_ANIMATIONS } from './animations';
 import { GtaGoToCoordsCommand } from './go-to-coords-command';
 import { GtaPlayAnimationCommand } from './play-animation-command';
 
@@ -67,16 +60,10 @@ export class GtaActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const command = new LegacyCommand(
-      'go-to-coords',
-      (subscriber: ISubscriber<Vector3>) =>
-        new GtaGoToCoordsCommand(
-          this,
-          this.handle,
-          subscriber,
-          { coords, completeRadius },
-          { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
-        )
+    const command = new GtaGoToCoordsCommand(
+      this,
+      { handle: this.handle, coords, completeRadius },
+      { geometry: this.geometry, objectFactory: this.objectFactory, timer: this.timer }
     );
 
     return this.commands.bind(command);
@@ -87,18 +74,10 @@ export class GtaActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
-    assertPlaybackDuration(animation, playbackDuration);
-    const gtaAnimation = GTA_ANIMATIONS[animation];
-    const options = {
-      animation: gtaAnimation,
-      loop: ANIMATIONS[animation].loop,
-      duration: playbackDuration ?? gtaAnimation.duration,
-    };
-
-    const command = new LegacyCommand(
-      'play-animation',
-      (subscriber: ISubscriber<void>) =>
-        new GtaPlayAnimationCommand(this.handle, subscriber, options, { timer: this.timer })
+    const command = new GtaPlayAnimationCommand(
+      this,
+      { handle: this.handle, animation, playbackDuration },
+      { timer: this.timer }
     );
 
     return this.commands.bind(command);

@@ -7,6 +7,7 @@
     "target": "esnext",
     "verbatimModuleSyntax": false,
     "paths": {
+      "@peetland/actor-command": ["../../core/actor-command/src/index.ts"],
       "@peetland/game": ["../../core/game/src/index.ts"],
       "@peetland/world": ["../../core/world/src/index.ts"],
       "@peetland/gta-sa": ["../gta-sa/src/index.ts"],

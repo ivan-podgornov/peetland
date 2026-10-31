@@ -7,40 +7,44 @@ import { AchieveAngleTask } from '../../src';
 import { createNpcContext, createNpcState } from './helpers';
 
 describe('AchieveAngleTask', () => {
-  it('#start отдаёт актору команду повернуться на угол', () => {
-    const actor = createActor();
-    const achieveAngle = vi.spyOn(actor, 'achieveAngle');
-    const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
+  describe('#start', () => {
+    it('Отдаёт актору команду повернуться на угол', () => {
+      const actor = createActor();
+      const achieveAngle = vi.spyOn(actor, 'achieveAngle');
+      const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
 
-    task.start(createNpcState(), createNpcContext(actor));
+      task.start(createNpcState(), createNpcContext(actor));
 
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith(90, 5);
+      expect(achieveAngle).toHaveBeenCalledExactlyOnceWith(90, 5);
+    });
+
+    it("Возвращает 'success', если актор уже повёрнут на угол", () => {
+      const context = createNpcContext(createActor({ angle: 90 }));
+      const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
+
+      const result = task.start(createNpcState(), context);
+
+      expect(result).toBe('success');
+    });
   });
 
-  it("#start возвращает 'success', если актор уже повёрнут на угол", () => {
-    const context = createNpcContext(createActor({ angle: 90 }));
-    const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
+  describe('#applyEffects', () => {
+    it('Поворачивает актора в состоянии на угол', () => {
+      const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
 
-    const result = task.start(createNpcState(), context);
+      const state = task.applyEffects(
+        createNpcState({ actor: { position: { x: 1, y: 2, z: 3 }, angle: 0 } })
+      );
 
-    expect(result).toBe('success');
-  });
+      expect(state.actor).toEqual({ position: { x: 1, y: 2, z: 3 }, angle: 90 });
+    });
 
-  it('#applyEffects поворачивает актора в состоянии на угол', () => {
-    const task = new AchieveAngleTask({ angle: 90, tolerance: 5 }, { geometry: new Geometry() });
+    it('Приводит угол к [0, 360)', () => {
+      const task = new AchieveAngleTask({ angle: -90, tolerance: 5 }, { geometry: new Geometry() });
 
-    const state = task.applyEffects(
-      createNpcState({ actor: { position: { x: 1, y: 2, z: 3 }, angle: 0 } })
-    );
+      const state = task.applyEffects(createNpcState());
 
-    expect(state.actor).toEqual({ position: { x: 1, y: 2, z: 3 }, angle: 90 });
-  });
-
-  it('#applyEffects приводит угол к [0, 360)', () => {
-    const task = new AchieveAngleTask({ angle: -90, tolerance: 5 }, { geometry: new Geometry() });
-
-    const state = task.applyEffects(createNpcState());
-
-    expect(state.actor.angle).toBe(270);
+      expect(state.actor.angle).toBe(270);
+    });
   });
 });

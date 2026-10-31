@@ -8,34 +8,40 @@ import { PlayAnimationTask } from '../../src';
 import { createNpcContext, createNpcState } from './helpers';
 
 describe('PlayAnimationTask', () => {
-  it('#start отдаёт актору команду проиграть анимацию', () => {
-    const actor = createActor();
-    const playAnimation = vi.spyOn(actor, 'playAnimation');
-    const task = new PlayAnimationTask({ animation: 'drink-standing-1', duration: 5000 });
+  describe('#start', () => {
+    it('Отдаёт актору команду проиграть анимацию', () => {
+      const actor = createActor();
+      const playAnimation = vi.spyOn(actor, 'playAnimation');
+      const task = new PlayAnimationTask({ animation: 'drink-standing-1', duration: 5000 });
 
-    task.start(createNpcState(), createNpcContext(actor));
+      task.start(createNpcState(), createNpcContext(actor));
 
-    expect(playAnimation).toHaveBeenCalledExactlyOnceWith('drink-standing-1', 5000);
+      expect(playAnimation).toHaveBeenCalledExactlyOnceWith('drink-standing-1', 5000);
+    });
   });
 
-  it("#update возвращает 'success', когда анимация закончилась", () => {
-    const timer = new ManualTimer();
-    const context = createNpcContext(createActor({ timer }));
-    const task = new PlayAnimationTask({ animation: 'pay' });
-    task.start(createNpcState(), context);
+  describe('#update', () => {
+    it("Возвращает 'success', когда анимация закончилась", () => {
+      const timer = new ManualTimer();
+      const context = createNpcContext(createActor({ timer }));
+      const task = new PlayAnimationTask({ animation: 'pay' });
+      task.start(createNpcState(), context);
 
-    timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-    const result = task.update(createNpcState(), context);
+      timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
+      const result = task.update(createNpcState(), context);
 
-    expect(result).toBe('success');
+      expect(result).toBe('success');
+    });
   });
 
-  it('#applyEffects не меняет состояние', () => {
-    const task = new PlayAnimationTask({ animation: 'pay' });
-    const before = createNpcState();
+  describe('#applyEffects', () => {
+    it('Не меняет состояние', () => {
+      const task = new PlayAnimationTask({ animation: 'pay' });
+      const before = createNpcState();
 
-    const after = task.applyEffects(before);
+      const after = task.applyEffects(before);
 
-    expect(after).toEqual(before);
+      expect(after).toEqual(before);
+    });
   });
 });

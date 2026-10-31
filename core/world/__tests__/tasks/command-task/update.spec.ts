@@ -67,5 +67,21 @@ describe('CommandTask', () => {
 
       expect(result).toBe('running');
     });
+
+    it('Если задачу этим актором уже выполняли, возвращает результат новой команды', () => {
+      const first = createControlledCommand();
+      const second = createControlledCommand();
+      const commands = [first.command, second.command];
+      const task = new TestCommandTask(() => commands.shift()!);
+      const context = createNpcContext();
+      task.start(createNpcState(), context);
+      first.subscriber.complete();
+      task.update(createNpcState(), context);
+      task.start(createNpcState(), context);
+
+      const result = task.update(createNpcState(), context);
+
+      expect(result).toBe('running');
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { Observable } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import type { IActor, IActorCommand } from '@peetland/game';
 import { Inventory } from '@peetland/inventory';
@@ -5,8 +6,8 @@ import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { CommandTask } from '../../src';
 import type { NpcContext, NpcState } from '../../src';
+import { CommandTask } from '../../src/tasks/command-task';
 
 /** Создаёт состояние NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcState(state: Partial<NpcState> = {}): NpcState {
@@ -34,6 +35,22 @@ export function createControlledCommand() {
   };
 
   return { command, subscriber };
+}
+
+/** Создаёт команду, Observable которой завершается сразу при подписке */
+export function createImmediateCommand(finish: 'complete' | 'error'): IActorCommand {
+  return {
+    name: 'immediate',
+    execute: () =>
+      new Observable((subscriber) => {
+        if (finish === 'complete') {
+          subscriber.complete();
+        } else {
+          subscriber.error(new Error('Не выполнена'));
+        }
+      }),
+    cancel: vi.fn(),
+  };
 }
 
 /** Задача, которая отдаёт актору переданную команду. Нужна, чтобы проверить общее поведение задач-команд */

@@ -3,7 +3,12 @@ import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-
 import type { AnimationPlayback, IAnimationManager } from '@peetland/animation-manager';
 import type { AnimationId, IActor } from '@peetland/game';
 import type { PedHandle } from '@peetland/moonloader';
-import { clearCharTasks, clearCharTasksImmediately, taskPlayAnim } from '@peetland/moonloader';
+import {
+  clearCharTasks,
+  clearCharTasksImmediately,
+  print,
+  taskPlayAnim,
+} from '@peetland/moonloader';
 
 import type { GtaAnimation } from './animations';
 
@@ -89,6 +94,7 @@ export class GtaPlayAnimationCommand extends Command<
   private play(): void {
     const { animation, loop } = this.playback;
 
+    print('А может падает вообще тут?');
     taskPlayAnim(
       this.options.handle,
       animation.name,

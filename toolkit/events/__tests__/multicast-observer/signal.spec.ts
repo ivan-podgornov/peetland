@@ -5,18 +5,18 @@ import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
 import { MulticastObserver } from '../../src/multicast-observer';
 
-import { getDefaultMulticastOptions, getDefaultObserveOptions } from './helpers';
+import { getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#signal', () => {
     it('Сигнал находится в состоянии pending, если ни один из наблюдателей не был передан', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       expect(multicast.signal.aborted).toBe(false);
     });
 
     it('Сигнал находится в состоянии pending, если наблюдатель добавлен без параметра signal', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const observer = createMockedObserver();
       const { signal, ...optionsWithoutSignal } = getDefaultObserveOptions();
 
@@ -29,7 +29,7 @@ describe('MulticastObserver', () => {
       const abortController = new AbortController();
       const firstObserver = createMockedObserver();
       const secondObserver = createMockedObserver();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, {
@@ -45,7 +45,7 @@ describe('MulticastObserver', () => {
       const firstAbortController = new AbortController();
       const secondAbortController = new AbortController();
       const observer = createMockedObserver();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer, {
         ...getDefaultObserveOptions(),
@@ -62,7 +62,7 @@ describe('MulticastObserver', () => {
     });
 
     it('Если добавить единственного наблюдателя с сигналом в состоянии aborted, сигнал переходит в состояние aborted', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const observer = createMockedObserver();
 
       multicast.add(observer, {
@@ -74,7 +74,7 @@ describe('MulticastObserver', () => {
     });
 
     it('Если добавить единственного наблюдателя с сигналом в состоянии aborted, причиной перехода сигнала в состояние aborted, будет причина переданного сигнала', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const observer = createMockedObserver();
 
       multicast.add(observer, {
@@ -86,7 +86,7 @@ describe('MulticastObserver', () => {
     });
 
     it('Если добавить наблюдателя с сигналом в состоянии aborted к наблюдателю без этого сигнала, сигнал MulticastObserver продолжит быть в состоянии pending', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const observer = createMockedObserver();
 
       multicast.add(createMockedObserver(), getDefaultObserveOptions());
@@ -103,7 +103,7 @@ describe('MulticastObserver', () => {
       const firstObserver = createMockedObserver();
       const secondObserver = createMockedObserver();
       const secondObserverAbortController = new AbortController();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, {
         ...getDefaultObserveOptions(),
@@ -125,7 +125,7 @@ describe('MulticastObserver', () => {
       const firstObserver = createMockedObserver();
       const secondObserver = createMockedObserver();
       const secondObserverAbortController = new AbortController();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, {
         ...getDefaultObserveOptions(),

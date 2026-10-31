@@ -94,60 +94,37 @@ describe('Subscriber', () => {
         expect(() => subscriber.error()).not.toThrow();
       });
 
-      it('Если observer.error выбрасывает ошибку и в конструкторе задан onError, вызывается onError с ошибкой которую выбросил observer.error', () => {
+      it('Если observer.error выбрасывает ошибку, вызывается reportError с ошибкой, которую выбросил observer.error', () => {
         const error = new Error();
         const throwsError = vi.fn().mockThrow(error);
-        const constructorOnError = vi.fn();
         const observer = { ...createMockedObserver(), error: throwsError };
-        const subscriber = new Subscriber(observer, {
-          ...getDefaultConstructorOptions(),
-          onError: constructorOnError,
-        });
+        const subscriber = new Subscriber(observer);
 
         subscriber.error();
 
-        expect(constructorOnError).toHaveBeenCalledWith(error);
+        expect(reportError).toHaveBeenCalledWith(error);
       });
 
-      it('Если в конструкторе задан onError, не вызывает этот onError - ошибка обрабатывается в observer.error', () => {
-        const constructorOnError = vi.fn();
-        const subscriber = new Subscriber(createMockedObserver(), {
-          ...getDefaultConstructorOptions(),
-          onError: constructorOnError,
-        });
+      it('Не вызывает reportError: ошибка обрабатывается в observer.error', () => {
+        const subscriber = new Subscriber(createMockedObserver());
 
         subscriber.error();
 
-        expect(constructorOnError).not.toHaveBeenCalled();
+        expect(reportError).not.toHaveBeenCalled();
       });
     });
 
     describe('При отсутствии error в наблюдателе', () => {
       it.each(casesWithoutErrorInObserver)(
-        '$description и onError не передан в конструктор, вызов subscriber.error не приводит к ошибке',
+        '$description, вызывается reportError с параметром, переданным в subscriber.error',
         ({ createObserverWithoutError }) => {
           const observer = createObserverWithoutError();
-          const { onError, ...options } = getDefaultConstructorOptions(); // Убираем onError из options
-          const subscriber = new Subscriber(observer, options);
-
-          expect(() => subscriber.error()).not.toThrow();
-        }
-      );
-
-      it.each(casesWithoutErrorInObserver)(
-        '$description и onError передан в конструктор, вызывается onError с параметром переданным в subscriber.error',
-        ({ createObserverWithoutError }) => {
-          const observer = createObserverWithoutError();
-          const onError = vi.fn();
           const error = 'some error';
-          const subscriber = new Subscriber(observer, {
-            ...getDefaultConstructorOptions(),
-            onError,
-          });
+          const subscriber = new Subscriber(observer);
 
           subscriber.error(error);
 
-          expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+          expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
         }
       );
     });

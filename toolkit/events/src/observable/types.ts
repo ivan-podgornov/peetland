@@ -3,13 +3,7 @@ import type { ISubscriber } from '../subscriber';
 
 import type { Observable } from './observable';
 
-export type ErrorHandler = (error?: unknown) => void;
-
 export type Executor<T> = (subscriber: ISubscriber<T>) => void;
-
-export type ObservableOptions = {
-  onError?: ErrorHandler;
-};
 
 /** Значения, которые Observable.from умеет превращать в Observable */
 export type ObservableInput<T> = Observable<T> | ReadonlyArray<T> | Promise<T>;

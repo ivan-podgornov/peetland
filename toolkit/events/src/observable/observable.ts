@@ -5,21 +5,10 @@ import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../su
 import { ObservableFactory } from './factory';
 import { InspectObserver } from './inspect-observer';
 import { SwitchMapObserver } from './switch-map-observer';
-import type {
-  ErrorHandler,
-  Executor,
-  Inspector,
-  Mapper,
-  ObservableInput,
-  ObservableOptions,
-  SubscribeOptions,
-} from './types';
+import type { Executor, Inspector, Mapper, ObservableInput, SubscribeOptions } from './types';
 
 export class Observable<T> extends ObservableFactory {
   private readonly executor: Executor<T>;
-  /** Опции этого Observable. Их же получают Observable, которые создаются его операторами */
-  private readonly options: ObservableOptions;
-  private readonly onError: ErrorHandler;
   private multicast: MulticastObserver<T> | null;
   private subscriber: ISubscriber<T> | null;
 
@@ -27,11 +16,9 @@ export class Observable<T> extends ObservableFactory {
    * Первым параметром принимает функцию, которая вызывается при подписке первого наблюдателя.
    * Функция принимает подписчика и может сгенерировать новые значения в этом подписчике.
    */
-  constructor(executor: Executor<T>, options: ObservableOptions = {}) {
+  constructor(executor: Executor<T>) {
     super();
     this.executor = executor;
-    this.options = options;
-    this.onError = options.onError ?? (() => {});
     this.multicast = null;
     this.subscriber = null;
   }
@@ -45,10 +32,7 @@ export class Observable<T> extends ObservableFactory {
     multicast.add(observer, options);
 
     const subscriberActive = this.subscriber?.active ?? false;
-    const subscriber = this.getOrCreateSubscriber(multicast, {
-      signal: multicast.signal,
-      onError: this.onError,
-    });
+    const subscriber = this.getOrCreateSubscriber(multicast, { signal: multicast.signal });
 
     if (!subscriberActive) {
       try {
@@ -71,11 +55,11 @@ export class Observable<T> extends ObservableFactory {
       const observer = new SwitchMapObserver({
         subscriber,
         mapper,
-        toObservable: (input) => Observable.from(input, this.options),
+        toObservable: (input) => Observable.from(input),
       });
 
       this.subscribe(observer, { signal: subscriber.signal });
-    }, this.options);
+    });
   }
 
   /**
@@ -85,10 +69,10 @@ export class Observable<T> extends ObservableFactory {
    */
   inspect(inspector: Inspector<T> = {}): Observable<T> {
     return new Observable<T>((subscriber) => {
-      const observer = new InspectObserver({ subscriber, inspector, onError: this.onError });
+      const observer = new InspectObserver({ subscriber, inspector });
 
       observer.observe(this);
-    }, this.options);
+    });
   }
 
   /**
@@ -100,7 +84,7 @@ export class Observable<T> extends ObservableFactory {
       return this.multicast;
     }
 
-    this.multicast = new MulticastObserver({ onError: this.onError });
+    this.multicast = new MulticastObserver<T>();
     return this.multicast;
   }
 

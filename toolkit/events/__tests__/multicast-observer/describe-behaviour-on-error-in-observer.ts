@@ -1,14 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createMockedObserver } from '../../dev';
 import { MulticastObserver } from '../../src/multicast-observer';
 
-import {
-  callMethod,
-  createObserverWithThrowsMethod,
-  getDefaultMulticastOptions,
-  getDefaultObserveOptions,
-} from './helpers';
+import { callMethod, createObserverWithThrowsMethod, getDefaultObserveOptions } from './helpers';
 
 import type { CreateMockedObserverOptions } from './helpers';
 
@@ -18,7 +13,7 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
 
   describe(`При ошибке при вызове ${methodName}`, () => {
     it(`Вызывает обработчик ${method} остальных наблюдателей с параметрами, которые были переданы в multicastObserver.${method}`, () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const firstObserver = createMockedObserver();
       const secondObserver = createObserverWithThrowsMethod(options, new Error('observer error'));
       const thirdObserver = createMockedObserver();
@@ -34,36 +29,22 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
 
     it(`Выброс ошибки из ${methodName}, не приводит к выбросу ошибки`, () => {
       const observer = createObserverWithThrowsMethod(options, new Error('observer error'));
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer);
 
       expect(() => callMethod(multicast, method)).not.toThrow();
     });
 
-    it('Если в конструкторе не указан onError, то ошибка не выбрасывается', () => {
-      const { onError, ...multicastOptionsWithoutOnError } = getDefaultMulticastOptions();
-      const observer = createObserverWithThrowsMethod(options, new Error('observer error'));
-      const multicast = new MulticastObserver(multicastOptionsWithoutOnError);
-
-      multicast.add(observer);
-
-      expect(() => callMethod(multicast, method)).not.toThrow();
-    });
-
-    it('Если в конструкторе указан onError, то ошибка передаётся в onError', () => {
+    it('Передаёт ошибку в reportError', () => {
       const error = new Error('observer error');
-      const constructorOnError = vi.fn();
       const observer = createObserverWithThrowsMethod(options, error);
-      const multicast = new MulticastObserver({
-        ...getDefaultMulticastOptions(),
-        onError: constructorOnError,
-      });
+      const multicast = new MulticastObserver();
 
       multicast.add(observer);
       callMethod(multicast, method);
 
-      expect(constructorOnError).toHaveBeenCalledWith(error);
+      expect(reportError).toHaveBeenCalledWith(error);
     });
   });
 }

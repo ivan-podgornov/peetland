@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createMockedObserver } from '../../dev';
 import { MulticastObserver } from '../../src/multicast-observer';
@@ -8,7 +8,7 @@ import { describeBehaviourWhenMethodAbsent } from './describe-behaviour-when-met
 import { describeRecallObserver } from './describe-recall-observers';
 import { describeSignalFinish } from './describe-signal-finish';
 
-import { getDefaultMulticastOptions, getDefaultObserveOptions } from './helpers';
+import { getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#error', () => {
@@ -18,80 +18,46 @@ describe('MulticastObserver', () => {
     describeBehaviourWhenMethodAbsent({ method: 'error', observerAsFunction: true });
     describeSignalFinish({ method: 'error', reason: 'subscriber failed' });
 
-    describe('При отсутствии error в наблюдателях - взаимодействие с onError в конструкторе', () => {
-      it('Если один из добавленных наблюдателей является функцией и в конструкторе указан onError, то ошибка уходит в onError', () => {
+    describe('При отсутствии error в наблюдателях', () => {
+      it('Если один из добавленных наблюдателей является функцией, ошибка уходит в reportError', () => {
         const error = new Error();
-        const constructorOnError = vi.fn();
-        const multicast = new MulticastObserver({
-          ...getDefaultMulticastOptions(),
-          onError: constructorOnError,
-        });
+        const multicast = new MulticastObserver();
 
         multicast.add(() => {}, getDefaultObserveOptions());
         multicast.error(error);
 
-        expect(constructorOnError).toHaveBeenCalledWith(error);
+        expect(reportError).toHaveBeenCalledWith(error);
       });
 
-      it('Если добавлено несколько наблюдателей у которых не реализован обработчик ошибки и в конструкторе задан onError, onError вызывается для каждого такого наблюдателя', () => {
+      it('Если добавлено несколько наблюдателей без обработчика ошибки, reportError вызывается для каждого такого наблюдателя', () => {
         const error = new Error();
-        const constructorOnError = vi.fn();
-        const multicast = new MulticastObserver({
-          ...getDefaultMulticastOptions(),
-          onError: constructorOnError,
-        });
+        const multicast = new MulticastObserver();
 
         multicast.add(() => {}, getDefaultObserveOptions());
         multicast.add(() => {}, getDefaultObserveOptions());
         multicast.error(error);
 
-        expect(constructorOnError).toHaveBeenCalledTimes(2);
+        expect(reportError).toHaveBeenCalledTimes(2);
       });
 
-      it('Если обработчик error наблюдателя отработал успешно и в конструкторе указан onError, то ошибка в onError не уходит', () => {
+      it('Если обработчик error наблюдателя отработал успешно, ошибка в reportError не уходит', () => {
         const error = new Error();
-        const constructorOnError = vi.fn();
-        const multicast = new MulticastObserver({
-          ...getDefaultMulticastOptions(),
-          onError: constructorOnError,
-        });
+        const multicast = new MulticastObserver();
 
         multicast.add(createMockedObserver(), getDefaultObserveOptions());
         multicast.error(error);
 
-        expect(constructorOnError).not.toHaveBeenCalled();
+        expect(reportError).not.toHaveBeenCalled();
       });
 
-      it('Если один из добавленных наблюдателей является функцией и если в конструкторе не указан onError, ошибка не выбрасывается', () => {
-        const { onError, ...multicastOptionsWithoutOnError } = getDefaultMulticastOptions();
-        const multicast = new MulticastObserver(multicastOptionsWithoutOnError);
-
-        multicast.add(() => {}, getDefaultObserveOptions());
-
-        expect(() => multicast.error(new Error('multicast error'))).not.toThrow();
-      });
-
-      it('Если один из добавленных наблюдателей указан как undefined и в конструкторе указан onError, то ошибка передаётся в onError', () => {
+      it('Если один из добавленных наблюдателей указан как undefined, ошибка передаётся в reportError', () => {
         const error = new Error();
-        const constructorOnError = vi.fn();
-        const multicast = new MulticastObserver({
-          ...getDefaultMulticastOptions(),
-          onError: constructorOnError,
-        });
+        const multicast = new MulticastObserver();
 
         multicast.add();
         multicast.error(error);
 
-        expect(constructorOnError).toHaveBeenCalledWith(error);
-      });
-
-      it('Если один из добавленных наблюдателей указан как undefined и если в конструкторе не указан onError, ошибка не выбрасывается', () => {
-        const { onError, ...multicastOptionsWithoutOnError } = getDefaultMulticastOptions();
-        const multicast = new MulticastObserver(multicastOptionsWithoutOnError);
-
-        multicast.add(undefined);
-
-        expect(() => multicast.error(new Error('multicast error'))).not.toThrow();
+        expect(reportError).toHaveBeenCalledWith(error);
       });
     });
   });

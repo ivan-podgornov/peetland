@@ -7,24 +7,22 @@ import { EventTarget } from '../event-target';
 import type { EventMap } from '../event-target';
 
 import { Observable } from './observable';
-import type { ObservableOptions } from './types';
 
 declare module '../event-target/types' {
   interface IEventTarget<Events extends EventMap<Events>> {
-    when<K extends keyof Events>(type: K, options?: ObservableOptions): Observable<Events[K][0]>;
+    when<K extends keyof Events>(type: K): Observable<Events[K][0]>;
   }
 }
 
 declare module '../event-target/event-target' {
   interface EventTarget<Events extends EventMap<Events>> {
-    when<K extends keyof Events>(type: K, options?: ObservableOptions): Observable<Events[K][0]>;
+    when<K extends keyof Events>(type: K): Observable<Events[K][0]>;
   }
 }
 
 EventTarget.prototype.when = function <Events extends EventMap<Events>, K extends keyof Events>(
   this: EventTarget<Events>,
-  type: K,
-  options: ObservableOptions = {}
+  type: K
 ): Observable<Events[K][0]> {
   return new Observable<Events[K][0]>((subscriber) => {
     function listener(...args: Events[K]) {
@@ -33,5 +31,5 @@ EventTarget.prototype.when = function <Events extends EventMap<Events>, K extend
 
     this.addEventListener(type, listener);
     subscriber.addTeardown(() => this.removeEventListener(type, listener));
-  }, options);
+  });
 };

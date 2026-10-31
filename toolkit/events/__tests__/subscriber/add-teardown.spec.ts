@@ -67,21 +67,19 @@ describe('Subscriber', () => {
         expect(() => subscriber.addTeardown(throwsErrorCallback)).not.toThrow();
       });
 
-      it('Если один из teardown-колбэков выбрасывает ошибку и в конструкторе Subscriber указан onError, onError вызывается с этой ошибкой', () => {
+      it('Если один из teardown-колбэков выбрасывает ошибку, reportError вызывается с этой ошибкой', () => {
         const error = 'some error';
         const throwsErrorCallback = vi.fn().mockThrow(error);
-        const constructorOnError = vi.fn();
         const controller = new AbortController();
         const subscriber = new Subscriber(createMockedObserver(), {
           ...getDefaultConstructorOptions(),
           signal: controller.signal,
-          onError: constructorOnError,
         });
 
         deactivate(subscriber, controller);
         subscriber.addTeardown(throwsErrorCallback);
 
-        expect(constructorOnError).toHaveBeenCalledWith(error);
+        expect(reportError).toHaveBeenCalledWith(error);
       });
     });
   });

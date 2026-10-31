@@ -3,12 +3,9 @@
 // Observable.from в this лежит сам класс Observable.
 
 import type { Observable } from './observable';
-import type { Executor, ObservableInput, ObservableOptions } from './types';
+import type { Executor, ObservableInput } from './types';
 
-type ObservableConstructor = new <T>(
-  executor: Executor<T>,
-  options?: ObservableOptions
-) => Observable<T>;
+type ObservableConstructor = new <T>(executor: Executor<T>) => Observable<T>;
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class -- класс нужен только для того, чтобы Observable унаследовал его статические методы
 export class ObservableFactory {
@@ -18,21 +15,17 @@ export class ObservableFactory {
    * выполнился, и завершается, а если отклонён, завершается с ошибкой.
    * Для остальных значений выбрасывает TypeError.
    */
-  static from<T>(
-    this: ObservableConstructor,
-    value: ObservableInput<T>,
-    options: ObservableOptions = {}
-  ): Observable<T> {
+  static from<T>(this: ObservableConstructor, value: ObservableInput<T>): Observable<T> {
     if (value instanceof this) {
       return value;
     }
 
     if (Array.isArray(value)) {
-      return fromArray<T>(this, value, options);
+      return fromArray<T>(this, value);
     }
 
     if (value instanceof Promise) {
-      return fromPromise(this, value, options);
+      return fromPromise(this, value);
     }
 
     throw new TypeError('Observable.from поддерживает только Observable, массивы и промисы');
@@ -41,8 +34,7 @@ export class ObservableFactory {
 
 function fromArray<T>(
   ObservableClass: ObservableConstructor,
-  values: ReadonlyArray<T>,
-  options: ObservableOptions
+  values: ReadonlyArray<T>
 ): Observable<T> {
   return new ObservableClass<T>((subscriber) => {
     // Массив читается при каждой подписке, а не при вызове from, как того требует спецификация
@@ -55,13 +47,12 @@ function fromArray<T>(
     }
 
     subscriber.complete();
-  }, options);
+  });
 }
 
 function fromPromise<T>(
   ObservableClass: ObservableConstructor,
-  promise: Promise<T>,
-  options: ObservableOptions
+  promise: Promise<T>
 ): Observable<T> {
   return new ObservableClass<T>((subscriber) => {
     promise.then(
@@ -71,5 +62,5 @@ function fromPromise<T>(
       },
       (reason: unknown) => subscriber.error(reason)
     );
-  }, options);
+  });
 }

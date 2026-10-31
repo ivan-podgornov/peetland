@@ -3,12 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createMockedObserver } from '../../dev';
 import { MulticastObserver } from '../../src/multicast-observer';
 
-import {
-  callMethod,
-  createObserverWithAbsentMethod,
-  getDefaultObserveOptions,
-  getDefaultMulticastOptions,
-} from './helpers';
+import { callMethod, createObserverWithAbsentMethod, getDefaultObserveOptions } from './helpers';
 
 import type { CreateMockedObserverOptions } from './helpers';
 
@@ -21,7 +16,7 @@ export function describeBehaviourWhenMethodAbsent(options: CreateMockedObserverO
   describe(`При отсутствии ${method} в одном из наблюдателей, ${titleSuffix}`, () => {
     it(`Вызов multicastObserver.${method} не приводит к выбросу ошибки`, () => {
       const observer = createObserverWithAbsentMethod(options);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer, getDefaultObserveOptions());
 
@@ -32,7 +27,7 @@ export function describeBehaviourWhenMethodAbsent(options: CreateMockedObserverO
       const firstObserver = createMockedObserver();
       const secondObserver = createObserverWithAbsentMethod(options);
       const thirdObserver = createMockedObserver();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());

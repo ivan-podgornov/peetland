@@ -93,21 +93,19 @@ export function describeBehaviorOnDeactivation(method: DeactivateMethod) {
       expect(anotherTeardown).toHaveBeenCalled();
     });
 
-    it('Если один из teardown-колбэков выбросил ошибку и в конструкторе Subscriber указан onError, onError вызывается с этой ошибкой', () => {
+    it('Если один из teardown-колбэков выбросил ошибку, reportError вызывается с этой ошибкой', () => {
       const controller = new AbortController();
       const error = 'some error';
       const throwsErrorTeardown = vi.fn().mockThrow(error);
-      const constructorOnError = vi.fn();
       const subscriber = new Subscriber(createMockedObserver(), {
         ...getDefaultConstructorOptions(),
-        onError: constructorOnError,
         signal: controller.signal,
       });
 
       subscriber.addTeardown(throwsErrorTeardown);
       deactivate(subscriber, controller);
 
-      expect(constructorOnError).toHaveBeenCalledWith(error);
+      expect(reportError).toHaveBeenCalledWith(error);
     });
 
     it('На момент вызова teardown-колбэков, подписчик уже находится в деактивированном состоянии - subscriber.active = false', () => {

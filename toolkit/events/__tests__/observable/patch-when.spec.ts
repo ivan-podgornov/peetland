@@ -5,7 +5,7 @@ import { EventTarget } from '../../src';
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from './helpers';
+import { getDefaultSubscribeOptions } from './helpers';
 
 type Events = {
   update: [value: string];
@@ -16,7 +16,7 @@ describe('EventTarget', () => {
   describe('#when', () => {
     it('Возвращает observable, который сообщает о событиях с указанным именем каждый раз, когда они происходят в EventTarget', () => {
       const eventTarget = new EventTarget<Events>();
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const observer = createMockedObserver();
 
       observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -28,7 +28,7 @@ describe('EventTarget', () => {
 
     it('Если у EventTarget происходит событие с другим именем, observable о нём не сообщает наблюдателям', () => {
       const eventTarget = new EventTarget<Events>();
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const observer = createMockedObserver();
 
       observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -39,7 +39,7 @@ describe('EventTarget', () => {
 
     it('Значения observable равны тем значениям, которые эмитит EventTarget', () => {
       const eventTarget = new EventTarget<Events>();
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const observer = createMockedObserver();
 
       observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -53,7 +53,7 @@ describe('EventTarget', () => {
     it('Не снимает подписку, если сигнал переданный в параметрах subscribe, не переходит в состояние aborted', () => {
       const eventTarget = new EventTarget<Events>();
       const removeEventListenerSpy = vi.spyOn(eventTarget, 'removeEventListener');
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const controller = new AbortController();
 
       observable.subscribe(createMockedObserver(), {
@@ -67,7 +67,7 @@ describe('EventTarget', () => {
     it('Снимает подписку, когда сигнал переданный в параметрах subscribe, переходит в состояние aborted', () => {
       const eventTarget = new EventTarget<Events>();
       const removeEventListenerSpy = vi.spyOn(eventTarget, 'removeEventListener');
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const controller = new AbortController();
 
       observable.subscribe(createMockedObserver(), {
@@ -82,7 +82,7 @@ describe('EventTarget', () => {
     it('Моментально снимает подписку, если сигнал единственного наблюдателя изначально находится в состоянии aborted', () => {
       const eventTarget = new EventTarget<Events>();
       const removeEventListenerSpy = vi.spyOn(eventTarget, 'removeEventListener');
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
 
       observable.subscribe(createMockedObserver(), {
         ...getDefaultSubscribeOptions(),
@@ -95,7 +95,7 @@ describe('EventTarget', () => {
     it('Если один из наблюдателей ещё активен и добавляется второй с сигналом в состоянии aborted, подписка не снимается', () => {
       const eventTarget = new EventTarget<Events>();
       const removeEventListenerSpy = vi.spyOn(eventTarget, 'removeEventListener');
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
 
       observable.subscribe(createMockedObserver());
       observable.subscribe(createMockedObserver(), {
@@ -108,7 +108,7 @@ describe('EventTarget', () => {
 
     it('Если один из наблюдателей ещё активен и добавляется второй с сигналом в состоянии aborted, значения продолжают поступать активному наблюдателю', () => {
       const eventTarget = new EventTarget<Events>();
-      const observable = eventTarget.when('update', getDefaultObservableOptions());
+      const observable = eventTarget.when('update');
       const activeObserver = createMockedObserver();
 
       observable.subscribe(activeObserver);
@@ -121,14 +121,10 @@ describe('EventTarget', () => {
       expect(activeObserver.next).toHaveBeenCalledExactlyOnceWith('value');
     });
 
-    it('При ошибке в обработчиках наблюдателя, вызывает onError, переданный во втором параметре when', () => {
+    it('При ошибке в обработчиках наблюдателя, вызывает reportError', () => {
       const error = new Error('observer error');
       const eventTarget = new EventTarget<Events>();
-      const onError = vi.fn();
-      const observable = eventTarget.when('update', {
-        ...getDefaultObservableOptions(),
-        onError,
-      });
+      const observable = eventTarget.when('update');
       const observer = {
         ...createMockedObserver(),
         next: vi.fn().mockThrow(error),
@@ -137,7 +133,7 @@ describe('EventTarget', () => {
       observable.subscribe(observer);
       eventTarget.dispatchEvent('update', 'value');
 
-      expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+      expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
     });
   });
 });

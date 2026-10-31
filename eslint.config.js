@@ -9,6 +9,8 @@ import tseslint from 'typescript-eslint';
 
 const devFiles = [
   'eslint.config.js',
+  'vitest.config.ts',
+  'vitest.setup.ts',
   '{toolkit,core,mod}/**/*.test.{ts,tsx}',
   '{toolkit,core,mod}/**/*.spec.{ts,tsx}',
   '{toolkit,core,mod}/**/__tests__/**/*.{ts,tsx}',
@@ -105,7 +107,7 @@ export default defineConfig([
   },
   // Конфигурационные файлы
   {
-    files: ['**/eslint.config.js'],
+    files: ['**/eslint.config.js', 'vitest.config.ts'],
     rules: {
       'import-x/no-default-export': 'off',
     },

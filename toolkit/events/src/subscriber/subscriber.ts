@@ -7,7 +7,6 @@ import type { ISubscriber, IObserver, TeardownCallback } from './types';
 
 export type SubscriberConstructorOptions = {
   signal?: IAbortSignal;
-  onError?: (error?: unknown) => void;
 };
 
 type CallObserver = () => void;
@@ -20,11 +19,9 @@ export class Subscriber<T> implements ISubscriber<T> {
   private readonly observer: NormalizedObserver<T>;
   private readonly abortController: AbortController;
   private readonly teardowns: TeardownCallback[];
-  private readonly onError: (error?: unknown) => void;
 
   constructor(observer?: IObserver<T>, options: SubscriberConstructorOptions = {}) {
-    this.onError = options.onError ?? noop;
-    this.observer = normalizeObserver({ onError: this.onError }, observer);
+    this.observer = normalizeObserver(observer);
 
     this.abortController = new AbortController();
     this.teardowns = [];
@@ -63,7 +60,7 @@ export class Subscriber<T> implements ISubscriber<T> {
     try {
       this.observer.next(value);
     } catch (error) {
-      this.onError(error);
+      reportError(error);
     }
   }
 
@@ -97,7 +94,7 @@ export class Subscriber<T> implements ISubscriber<T> {
       try {
         callObserver();
       } catch (error) {
-        this.onError(error);
+        reportError(error);
       }
     }
   }
@@ -112,7 +109,7 @@ export class Subscriber<T> implements ISubscriber<T> {
     try {
       teardown();
     } catch (error) {
-      this.onError(error);
+      reportError(error);
     }
   }
 }

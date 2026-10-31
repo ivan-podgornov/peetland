@@ -15,3 +15,9 @@ declare function setInterval<Callback extends AnyFunction>(
 ): number;
 
 declare function clearInterval(intervalId: number): void;
+
+/**
+ * Сообщает об ошибке, которую некому обработать, например, об исключении в обработчике события.
+ * Как reportError в браузерах
+ */
+declare function reportError(error: unknown): void;

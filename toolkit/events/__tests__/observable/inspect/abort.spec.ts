@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createControlledObservable, createMockedObserver } from '../../../dev';
 import { AbortController } from '../../../src/abort-controller';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#inspect', () => {
@@ -35,11 +35,10 @@ describe('Observable', () => {
         expect(source.subscriber.active).toBe(false);
       });
 
-      it('Если inspector.abort выбросил исключение, вызывает onError, переданный в конструктор исходного observable', () => {
+      it('Если inspector.abort выбросил исключение, вызывает reportError', () => {
         const error = new Error('inspector error');
-        const onError = vi.fn();
         const controller = new AbortController();
-        const source = createControlledObservable({ ...getDefaultObservableOptions(), onError });
+        const source = createControlledObservable();
 
         source.observable
           .inspect({ abort: vi.fn().mockThrow(error) })
@@ -49,7 +48,7 @@ describe('Observable', () => {
           });
         controller.abort();
 
-        expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+        expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
       });
     });
   });

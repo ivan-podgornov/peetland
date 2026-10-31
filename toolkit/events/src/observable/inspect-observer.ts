@@ -2,14 +2,12 @@ import type { AbortListener } from '../abort-signal';
 import type { IObserverObject, ISubscriber } from '../subscriber';
 
 import type { Observable } from './observable';
-import type { ErrorHandler, Inspector, InspectorObject } from './types';
+import type { Inspector, InspectorObject } from './types';
 
 export type InspectObserverOptions<T> = {
   /** Подписчик результата inspect, которому передаются события исходного Observable */
   subscriber: ISubscriber<T>;
   inspector: Inspector<T>;
-  /** Получает исключения из inspector.abort: к этому моменту передать их в поток уже нельзя */
-  onError: ErrorHandler;
 };
 
 /**
@@ -20,7 +18,6 @@ export type InspectObserverOptions<T> = {
 export class InspectObserver<T> implements IObserverObject<T> {
   private readonly subscriber: ISubscriber<T>;
   private readonly inspector: InspectorObject<T>;
-  private readonly onError: ErrorHandler;
   private readonly abortListener: AbortListener;
 
   constructor(options: InspectObserverOptions<T>) {
@@ -30,7 +27,6 @@ export class InspectObserver<T> implements IObserverObject<T> {
     // self получила бы вместо значения сам объект inspector
     this.inspector =
       typeof inspector === 'function' ? { next: (value: T) => inspector(value) } : inspector;
-    this.onError = options.onError;
     this.abortListener = () => this.callAbort();
   }
 
@@ -91,7 +87,8 @@ export class InspectObserver<T> implements IObserverObject<T> {
     try {
       this.inspector.abort?.(this.subscriber.signal.reason);
     } catch (error) {
-      this.onError(error);
+      // К этому моменту передать исключение в поток уже нельзя
+      reportError(error);
     }
   }
 }

@@ -145,20 +145,16 @@ describe('Subscriber', () => {
       );
 
       it.each(getCasesWithObserverNext())(
-        '$description, $nextName выбрасывает ошибку и в конструкторе задан onError, вызывается onError с ошибкой которую выбросил $nextName',
+        '$description, $nextName выбрасывает ошибку, вызывается reportError с ошибкой, которую выбросил $nextName',
         ({ createObserver }) => {
           const error = 'some error';
           const next = vi.fn().mockThrow(error);
-          const constructorOnError = vi.fn();
           const observer = createObserver(next);
-          const subscriber = new Subscriber(observer, {
-            ...getDefaultConstructorOptions(),
-            onError: constructorOnError,
-          });
+          const subscriber = new Subscriber(observer);
 
           subscriber.next('some value');
 
-          expect(constructorOnError).toHaveBeenCalledWith(error);
+          expect(reportError).toHaveBeenCalledWith(error);
         }
       );
     });

@@ -5,12 +5,6 @@ import type { IEventTarget, ListenerOptions } from '../event-target';
 import { normalizeObserver } from '../subscriber';
 import type { IObserver, IObserverObject, ObserveOptions } from '../subscriber';
 
-type ErrorHandler = (error?: unknown) => void;
-
-export type MulticastOptions = {
-  onError?: ErrorHandler;
-};
-
 type ObserverEvents<T> = {
   complete: [];
   next: [value: T];
@@ -19,14 +13,12 @@ type ObserverEvents<T> = {
 
 export class MulticastObserver<T> implements IObserverObject<T> {
   private readonly abortController: AbortController;
-  private readonly onError: ErrorHandler;
   private readonly eventTarget: IEventTarget<ObserverEvents<T>>;
   private observersCount: number;
 
-  constructor(options: MulticastOptions = {}) {
+  constructor() {
     this.abortController = new AbortController();
-    this.onError = options.onError ?? (() => {});
-    this.eventTarget = new EventTarget<ObserverEvents<T>>({ onError: this.onError });
+    this.eventTarget = new EventTarget<ObserverEvents<T>>();
     this.observersCount = 0;
   }
 
@@ -42,12 +34,7 @@ export class MulticastObserver<T> implements IObserverObject<T> {
    */
   add(observer?: IObserver<T>, options: ObserveOptions = {}) {
     this.observersCount += 1;
-    const normalizedObserver = normalizeObserver(
-      {
-        onError: (error?: unknown) => this.onError(error),
-      },
-      observer
-    );
+    const normalizedObserver = normalizeObserver(observer);
 
     const signals: IAbortSignal[] = [this.signal];
 

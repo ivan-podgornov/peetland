@@ -3,14 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMockedObserver, createControlledObservable } from '../../../dev';
 import { Observable } from '../../../src/observable';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#subscribe', () => {
     describe('При подписке к observable, subscriber которого активен', () => {
       it('Не вызывает callback-executor повторно', () => {
         const executor = vi.fn();
-        const observable = new Observable(executor, getDefaultObservableOptions());
+        const observable = new Observable(executor);
         const observer = createMockedObserver();
 
         observable.subscribe(observer, getDefaultSubscribeOptions());

@@ -59,10 +59,9 @@ function setInterval(
 }
 
 function clearInterval(intervalId: number) {
-  const thread = intervals.get(intervalId);
-  if (thread) {
-    thread.terminate();
-  }
+  // Поток не завершается через terminate: clearInterval часто вызывают из колбэка этого же
+  // интервала, и после terminate нативные функции в оставшейся части колбэка роняют игру.
+  // Поток завершится сам: после wait цикл увидит, что интервала больше нет
   intervals.delete(intervalId);
 }
 

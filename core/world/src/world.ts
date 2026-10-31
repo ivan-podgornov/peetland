@@ -1,6 +1,9 @@
 import type { IGame } from '@peetland/game';
 import type { Vector3 } from '@peetland/geometry';
 
+/** Насколько актор может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
+const TRASH_FACING_TOLERANCE = 15;
+
 export type WorldDeps = {
   game: IGame;
 };
@@ -27,7 +30,16 @@ export class World {
       .execute()
       .subscribe({
         complete: () => {
-          actor.playAnimation('trash-search', 100000).execute().subscribe();
+          const angle = game.geometry.getAngleTo(actor.getPosition(), trashBeen);
+
+          actor
+            .achieveAngle(angle, TRASH_FACING_TOLERANCE)
+            .execute()
+            .subscribe({
+              complete: () => {
+                actor.playAnimation('trash-search', 100000).execute().subscribe();
+              },
+            });
         },
       });
   }

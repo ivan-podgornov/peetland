@@ -5,6 +5,7 @@ import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { ITimer } from '@peetland/timings';
 
+import { VirtualAchieveAngleCommand } from './achieve-angle-command';
 import type { VirtualAnimation } from './animations';
 import { VirtualGoToCoordsCommand } from './go-to-coords-command';
 import { VirtualPlayAnimationCommand } from './play-animation-command';
@@ -27,7 +28,7 @@ export type VirtualActorDeps = {
 export class VirtualActor implements IActor {
   private readonly deps: VirtualActorDeps;
   private position: Vector3;
-  private readonly angle: number;
+  private angle: number;
   private readonly despawnController: AbortController;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
@@ -51,6 +52,18 @@ export class VirtualActor implements IActor {
 
   setPosition(position: Vector3): void {
     this.position = { ...position };
+  }
+
+  setAngle(angle: number): void {
+    const { geometry } = this.deps;
+
+    this.angle = geometry.normalizeAngle(angle);
+  }
+
+  achieveAngle(angle: number, tolerance: number): IActorCommand<number> {
+    const { geometry, timer } = this.deps;
+
+    return new VirtualAchieveAngleCommand(this, { angle, tolerance }, { geometry, timer });
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {

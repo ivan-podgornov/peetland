@@ -1,5 +1,7 @@
 import type { IGame } from '@peetland/game';
-import type { Vector3 } from '@peetland/geometry';
+
+/** Насколько актор может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
+const TRASH_FACING_TOLERANCE = 15;
 
 export type WorldDeps = {
   game: IGame;
@@ -21,13 +23,21 @@ export class World {
       angle: 0,
     });
 
-    const trashBeen: Vector3 = { x: 2320.08, y: 14.22, z: 26.48 }; // Мусорка в Palomino Creek
+    // Мусорка в Palomino Creek: где встать и куда смотреть, чтобы быть лицом к ней
+    const trashBin = { position: { x: 2320.08, y: 14.22, z: 26.48 }, angle: 276.6 };
     actor
-      .goToCoords(trashBeen, 0.5)
+      .goToCoords(trashBin.position, 0.5)
       .execute()
       .subscribe({
         complete: () => {
-          actor.playAnimation('trash-search', 100000).execute().subscribe();
+          actor
+            .achieveAngle(trashBin.angle, TRASH_FACING_TOLERANCE)
+            .execute()
+            .subscribe({
+              complete: () => {
+                actor.playAnimation('trash-search', 100000).execute().subscribe();
+              },
+            });
         },
       });
   }

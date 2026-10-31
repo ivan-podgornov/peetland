@@ -1,39 +1,93 @@
-import { lua_thread, wait } from '@peetland/moonloader';
-import type { LuaThread } from '@peetland/moonloader';
+import { lua_thread, localClock, print, wait } from '@peetland/moonloader';
 
 type AnyFunction = (...args: never[]) => unknown;
 
-let timeoutId = 0;
-const timeouts = new Map<number, LuaThread<unknown[]>>();
-let intervalId = 0;
-const intervals = new Map<number, LuaThread<unknown[]>>();
+type ScheduledTimer = {
+  callback: AnyFunction;
+  args: Parameters<AnyFunction>;
+  /** Через сколько миллисекунд вызывать колбэк */
+  delay: number;
+  /** Когда вызвать колбэк, в миллисекундах от запуска скрипта */
+  dueAt: number;
+  /** Вызывать ли колбэк повторно, как setInterval */
+  repeat: boolean;
+};
+
+/**
+ * Все таймеры живут в одном потоке, который запускает startTimers. Отдельный поток на каждый таймер
+ * не годится: поток, созданный из колбэка другого таймера, после первого wait не продолжается
+ */
+const timers = new Map<number, ScheduledTimer>();
+let lastTimerId = 0;
+
+/** Текущее время в миллисекундах от запуска скрипта */
+function now(): number {
+  return localClock() * 1000;
+}
+
+function schedule(
+  callback: AnyFunction,
+  delay: number,
+  args: Parameters<AnyFunction>,
+  repeat: boolean
+): number {
+  const id = ++lastTimerId;
+  timers.set(id, { callback, args, delay, dueAt: now() + delay, repeat });
+
+  return id;
+}
+
+/** Вызывает колбэки таймеров, которым пора сработать */
+function runDueTimers(): void {
+  const time = now();
+
+  // Колбэки могут добавлять и удалять таймеры, поэтому обходим копию
+  for (const [id, timer] of [...timers]) {
+    if (!timers.has(id) || timer.dueAt > time) {
+      continue;
+    }
+
+    if (timer.repeat) {
+      // Если поток долго не вызывался, например, игра стояла на паузе, интервал срабатывает один
+      // раз, а не столько, сколько пропустил
+      timer.dueAt = Math.max(timer.dueAt + timer.delay, time);
+    } else {
+      timers.delete(id);
+    }
+
+    try {
+      timer.callback(...timer.args);
+    } catch (error) {
+      // Ошибка одного колбэка не должна останавливать остальные таймеры
+      print(`Ошибка в таймере: ${String(error)}`);
+    }
+  }
+}
+
+/**
+ * Запускает поток, который каждый кадр вызывает колбэки таймеров. Вызывается один раз из main:
+ * до этого setTimeout и setInterval только запоминают таймеры
+ * @param canRun - можно ли сейчас вызывать колбэки. Пока нельзя, таймеры не срабатывают, а после
+ * срабатывают те, которым пора
+ */
+export function startTimers(canRun: () => boolean): void {
+  lua_thread.create(() => {
+    while (true) {
+      wait(0);
+
+      if (canRun()) {
+        runDueTimers();
+      }
+    }
+  });
+}
 
 function setTimeout(
   callback: AnyFunction,
   timeout: number = 0,
   ...args: Parameters<AnyFunction>
 ): number {
-  const id = timeoutId++;
-  const thread = lua_thread.create(() => {
-    wait(timeout);
-
-    if (timeouts.has(id)) {
-      timeouts.delete(id);
-      callback(...args);
-    }
-  });
-
-  timeouts.set(id, thread);
-
-  return id;
-}
-
-function clearTimeout(timeoutId: number) {
-  const thread = timeouts.get(timeoutId);
-  if (thread) {
-    thread.terminate();
-  }
-  timeouts.delete(timeoutId);
+  return schedule(callback, timeout, args, false);
 }
 
 function setInterval(
@@ -41,31 +95,14 @@ function setInterval(
   timeout: number = 0,
   ...args: Parameters<AnyFunction>
 ): number {
-  const id = intervalId++;
-  const thread = lua_thread.create_suspended(() => {
-    while (intervals.has(id)) {
-      wait(timeout);
-
-      if (intervals.has(id)) {
-        callback(...args);
-      }
-    }
-  });
-
-  intervals.set(id, thread);
-  thread.run();
-
-  return id;
+  return schedule(callback, timeout, args, true);
 }
 
-function clearInterval(intervalId: number) {
-  // Поток не завершается через terminate: clearInterval часто вызывают из колбэка этого же
-  // интервала, и после terminate нативные функции в оставшейся части колбэка роняют игру.
-  // Поток завершится сам: после wait цикл увидит, что интервала больше нет
-  intervals.delete(intervalId);
+function clearTimer(timerId: number): void {
+  timers.delete(timerId);
 }
 
 globalThis.setTimeout = setTimeout;
-globalThis.clearTimeout = clearTimeout;
+globalThis.clearTimeout = clearTimer;
 globalThis.setInterval = setInterval;
-globalThis.clearInterval = clearInterval;
+globalThis.clearInterval = clearTimer;

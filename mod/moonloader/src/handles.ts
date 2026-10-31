@@ -1,3 +1,7 @@
+export interface PlayerHandle {
+  readonly $brand: 'Player';
+}
+
 export interface PedHandle {
   readonly $brand: 'Ped';
 }

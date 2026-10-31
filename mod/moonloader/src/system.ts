@@ -1,3 +1,5 @@
+import type { PlayerHandle } from './handles';
+
 export type VKey = (typeof import('vkeys'))[keyof typeof import('vkeys')];
 
 /**
@@ -55,6 +57,9 @@ interface SystemGlobal {
   /** Проверяет загружен ли скрипт */
   isScriptLoaded(this: void, scriptName: string): boolean;
 
+  /** Возвращает время в секундах с момента запуска скрипта */
+  localClock(this: void): number;
+
   /** Получает FPS */
   getFramerate(this: void): number;
 
@@ -67,8 +72,8 @@ interface SystemGlobal {
   /** Получает указатель на игрока */
   getPlayerPointer(this: void): number;
 
-  /** Проверяет, в игре ли игрок */
-  isPlayerPlaying(this: void): boolean;
+  /** Проверяет, в игре ли игрок: загружена ли игра и управляет ли он персонажем */
+  isPlayerPlaying(this: void, player: PlayerHandle): boolean;
 }
 
 declare const _G: SystemGlobal;
@@ -89,6 +94,7 @@ export const {
   reloadScript,
   getAllScripts,
   isScriptLoaded,
+  localClock,
   getFramerate,
   isGamePaused,
   getGameVersion,

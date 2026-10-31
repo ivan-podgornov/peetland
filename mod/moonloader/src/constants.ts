@@ -1,4 +1,4 @@
-import type { PedHandle } from './handles';
+import type { PedHandle, PlayerHandle } from './handles';
 
 /**
  * Интерфейс констант MoonLoader
@@ -6,6 +6,8 @@ import type { PedHandle } from './handles';
 interface ConstantsGlobal {
   /** Главный персонаж игрока */
   readonly PLAYER_PED: PedHandle;
+  /** Игрок */
+  readonly PLAYER_HANDLE: PlayerHandle;
 }
 
 declare const _G: ConstantsGlobal;
@@ -113,4 +115,4 @@ export enum VehicleModel {
   // ... добавьте остальные модели по необходимости
 }
 
-export const { PLAYER_PED } = _G;
+export const { PLAYER_PED, PLAYER_HANDLE } = _G;

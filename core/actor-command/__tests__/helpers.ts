@@ -29,6 +29,12 @@ export class TestActor implements IActor {
 
   setPosition(): void {}
 
+  setAngle(): void {}
+
+  achieveAngle(): IActorCommand<number> {
+    return createIdleCommand();
+  }
+
   goToCoords(): IActorCommand<Vector3> {
     return createIdleCommand();
   }

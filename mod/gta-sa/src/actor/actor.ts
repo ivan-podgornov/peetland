@@ -22,6 +22,7 @@ import type { ITimer } from '@peetland/timings';
 
 import type { IGtaObjectFactory } from '../object';
 
+import { GtaAchieveAngleCommand } from './achieve-angle-command';
 import type { GtaAnimation } from './animations';
 import { GtaGoToCoordsCommand } from './go-to-coords-command';
 import { GtaPlayAnimationCommand } from './play-animation-command';
@@ -71,6 +72,22 @@ export class GtaActor implements IActor {
 
   setPosition(position: Vector3): void {
     setCharCoordinates(this.handle, position.x, position.y, position.z);
+  }
+
+  setAngle(angle: number): void {
+    const { geometry } = this.deps;
+
+    setCharHeading(this.handle, geometry.normalizeAngle(angle));
+  }
+
+  achieveAngle(angle: number, tolerance: number): IActorCommand<number> {
+    const { geometry, timer } = this.deps;
+
+    return new GtaAchieveAngleCommand(
+      this,
+      { handle: this.handle, angle, tolerance },
+      { geometry, timer }
+    );
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {

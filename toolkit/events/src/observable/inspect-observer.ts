@@ -25,8 +25,11 @@ export class InspectObserver<T> implements IObserverObject<T> {
 
   constructor(options: InspectObserverOptions<T>) {
     this.subscriber = options.subscriber;
+    const { inspector } = options;
+    // Функцию оборачиваем, а не кладём как есть: в Lua next вызывается как метод, и функция без
+    // self получила бы вместо значения сам объект inspector
     this.inspector =
-      typeof options.inspector === 'function' ? { next: options.inspector } : options.inspector;
+      typeof inspector === 'function' ? { next: (value: T) => inspector(value) } : inspector;
     this.onError = options.onError;
     this.abortListener = () => this.callAbort();
   }

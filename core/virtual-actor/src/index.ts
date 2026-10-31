@@ -1,3 +1,5 @@
+export { VirtualAchieveAngleCommand } from './achieve-angle-command';
+export type { VirtualAchieveAngleCommandDeps } from './achieve-angle-command';
 export { VirtualActor } from './actor';
 export type { VirtualActorDeps, VirtualActorOptions } from './actor';
 export { VIRTUAL_ANIMATIONS } from './animations';

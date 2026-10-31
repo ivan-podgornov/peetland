@@ -23,6 +23,9 @@ export interface IActor {
   /** Устанавливает позицию персонажа в игре */
   setPosition(position: Vector3): void;
 
+  /** Сразу поворачивает персонажа на угол в градусах (см. getAngle). Угол приводится к [0, 360) */
+  setAngle(angle: number): void;
+
   /**
    * Возвращает команду идти к определённым координатам. Её Observable будет выполнен, когда
    * персонаж окажется в ожидаемом радиусе от нужных координат, и будет сообщать всем наблюдателям
@@ -31,6 +34,15 @@ export interface IActor {
    * @param completeRadius - радиус, при котором можно считать, что персонаж пришел к нужным координатам
    */
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3>;
+
+  /**
+   * Возвращает команду повернуться на угол. Её Observable будет выполнен, когда персонаж окажется
+   * повёрнут на угол с отклонением не больше tolerance, и будет сообщать всем наблюдателям текущий
+   * угол персонажа по мере поворота. Если персонаж уже повёрнут как нужно, команда сразу выполняется
+   * @param angle - угол в градусах, на который нужно повернуться (см. getAngle)
+   * @param tolerance - допустимое отклонение в градусах
+   */
+  achieveAngle(angle: number, tolerance: number): IActorCommand<number>;
 
   /**
    * Возвращает команду проиграть анимацию. Её Observable завершается, когда анимация закончилась,
@@ -63,6 +75,13 @@ export interface IActorFactory {
   /** Создаёт игрового персонажа */
   create(options: CreateActorOptions): IActor;
 }
+
+export type AchieveAngleOptions = {
+  /** Угол в градусах, на который нужно повернуться */
+  angle: number;
+  /** Допустимое отклонение в градусах, при котором можно считать, что персонаж повернулся */
+  tolerance: number;
+};
 
 export type GoToCoordsOptions = {
   /** Координаты, к которым нужно прийти */

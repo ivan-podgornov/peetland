@@ -66,21 +66,23 @@ export class MulticastObserver<T> implements IObserverObject<T> {
 
     const listenerOptions: ListenerOptions = { signal: AbortSignal.any(signals) };
 
+    // Слушатели — стрелочные функции, а не bind: в Lua bind возвращает функцию, которая ждёт self
+    // первым аргументом, а EventTarget вызывает слушателей без self, и значение терялось
     this.eventTarget.addEventListener(
       'next',
-      normalizedObserver.next.bind(normalizedObserver),
+      (value) => normalizedObserver.next(value as T),
       listenerOptions
     );
 
     this.eventTarget.addEventListener(
       'complete',
-      normalizedObserver.complete.bind(normalizedObserver),
+      () => normalizedObserver.complete(),
       listenerOptions
     );
 
     this.eventTarget.addEventListener(
       'error',
-      normalizedObserver.error.bind(normalizedObserver),
+      (error) => normalizedObserver.error(error),
       listenerOptions
     );
   }

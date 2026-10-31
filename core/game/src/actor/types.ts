@@ -14,6 +14,12 @@ export interface IActor {
   /** Возвращает позицию персонажа в игре */
   getPosition(): Vector3;
 
+  /**
+   * Возвращает угол поворота персонажа в градусах в диапазоне [0, 360): 0° — север (+Y), угол
+   * растёт против часовой стрелки, 90° — запад (−X)
+   */
+  getAngle(): number;
+
   /** Устанавливает позицию персонажа в игре */
   setPosition(position: Vector3): void;
 
@@ -49,6 +55,8 @@ export type CreateActorOptions = {
   modelId: number;
   /** Позиция, на которой нужно заспавнить персонажа */
   position: Vector3;
+  /** Угол поворота в градусах, с которым нужно заспавнить персонажа (см. IActor.getAngle) */
+  angle: number;
 };
 
 export interface IActorFactory {

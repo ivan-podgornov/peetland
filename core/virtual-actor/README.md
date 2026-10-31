@@ -19,7 +19,7 @@ const factory = new VirtualActorFactory({
   geometry: new Geometry(),
   timer: new Timer(),
 });
-const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
+const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
 ```
 
 Команды актора наследуются от `Command` из `@peetland/actor-command`.
@@ -37,6 +37,6 @@ const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
 
 ## Для тестов
 
-`@peetland/virtual-actor/dev` даёт `createActor({ position?, timer?, animations? })`: виртуального
+`@peetland/virtual-actor/dev` даёт `createActor({ position?, angle?, timer?, animations? })`: виртуального
 актора с менеджером анимаций, у которого все анимации загружены сразу. По умолчанию актор стоит в
-начале координат, время для него не идёт (`ManualTimer`), а анимации — `VIRTUAL_ANIMATIONS`.
+начале координат и повёрнут на 0°, время для него не идёт (`ManualTimer`), а анимации — `VIRTUAL_ANIMATIONS`.

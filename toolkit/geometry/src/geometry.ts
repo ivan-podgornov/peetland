@@ -61,8 +61,7 @@ export class Geometry implements IGeometry {
     return this.normalizeAngle(angle);
   }
 
-  /** Приводит угол к диапазону [0, 360) */
-  private normalizeAngle(angle: number): number {
+  normalizeAngle(angle: number): number {
     const { FULL_TURN } = Geometry;
 
     return ((angle % FULL_TURN) + FULL_TURN) % FULL_TURN;

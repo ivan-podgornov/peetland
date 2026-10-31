@@ -12,6 +12,8 @@ import { VirtualPlayAnimationCommand } from './play-animation-command';
 export type VirtualActorOptions = {
   /** Позиция, на которой появляется актор */
   position: Vector3;
+  /** Угол поворота в градусах, с которым появляется актор. Приводится к [0, 360) */
+  angle: number;
 };
 
 export type VirtualActorDeps = {
@@ -25,11 +27,13 @@ export type VirtualActorDeps = {
 export class VirtualActor implements IActor {
   private readonly deps: VirtualActorDeps;
   private position: Vector3;
+  private readonly angle: number;
   private readonly despawnController: AbortController;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
     this.deps = deps;
     this.position = { ...options.position };
+    this.angle = deps.geometry.normalizeAngle(options.angle);
     this.despawnController = new AbortController();
   }
 
@@ -39,6 +43,10 @@ export class VirtualActor implements IActor {
 
   getPosition(): Vector3 {
     return { ...this.position };
+  }
+
+  getAngle(): number {
+    return this.angle;
   }
 
   setPosition(position: Vector3): void {

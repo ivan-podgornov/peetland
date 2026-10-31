@@ -14,9 +14,21 @@ describe('VirtualActorFactory', () => {
         timer: new ManualTimer(),
       });
 
-      const actor = factory.create({ modelId: 230, position: { x: 1, y: 2, z: 3 } });
+      const actor = factory.create({ modelId: 230, position: { x: 1, y: 2, z: 3 }, angle: 0 });
 
       expect(actor.getPosition()).toStrictEqual({ x: 1, y: 2, z: 3 });
+    });
+
+    it('Создаёт актора, повёрнутого на переданный угол', () => {
+      const factory = new VirtualActorFactory({
+        animations: createAnimationManager(VIRTUAL_ANIMATIONS),
+        geometry: new Geometry(),
+        timer: new ManualTimer(),
+      });
+
+      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 180 });
+
+      expect(actor.getAngle()).toBe(180);
     });
 
     it('Создаёт актора, который двигается по времени переданного таймера', () => {
@@ -26,7 +38,7 @@ describe('VirtualActorFactory', () => {
         geometry: new Geometry(),
         timer,
       });
-      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
+      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
       actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
 
       timer.advance(1000);
@@ -41,7 +53,7 @@ describe('VirtualActorFactory', () => {
         geometry: new Geometry(),
         timer,
       });
-      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 } });
+      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
       const complete = vi.fn();
       actor.playAnimation('pay').execute().subscribe({ complete });
 

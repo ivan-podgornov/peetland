@@ -32,6 +32,12 @@ export interface IGeometry {
   moveTowards(current: Vector3, target: Vector3, maxDistance: number): Vector3;
 
   /**
+   * Приводит угол в градусах к диапазону [0, 360), например, −10° к 350°, а 450° к 90°
+   * @param angle - угол, который нужно привести
+   */
+  normalizeAngle(angle: number): number;
+
+  /**
    * Проверяет, что угол отличается от целевого не больше чем на `tolerance`. Углы в градусах.
    * Разница считается по кратчайшему пути, с учётом перехода через 0°/360°: между 350° и 5° — 15°
    * @param angle - угол, который проверяем

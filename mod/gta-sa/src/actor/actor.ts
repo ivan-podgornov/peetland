@@ -10,10 +10,12 @@ import {
   doesCharExist,
   dontRemoveChar,
   getCharCoordinates,
+  getCharHeading,
   loadAllModelsNow,
   markModelAsNoLongerNeeded,
   requestModel,
   setCharCoordinates,
+  setCharHeading,
 } from '@peetland/moonloader';
 
 import type { ITimer } from '@peetland/timings';
@@ -43,6 +45,7 @@ export class GtaActor implements IActor {
 
     const { x, y, z } = options.position;
     this.handle = createChar(4, options.modelId, x, y, z);
+    setCharHeading(this.handle, deps.geometry.normalizeAngle(options.angle));
     dontRemoveChar(this.handle);
     markModelAsNoLongerNeeded(options.modelId);
 
@@ -58,6 +61,12 @@ export class GtaActor implements IActor {
     const [x, y, z] = getCharCoordinates(this.handle);
 
     return { x, y, z };
+  }
+
+  getAngle(): number {
+    const { geometry } = this.deps;
+
+    return geometry.normalizeAngle(getCharHeading(this.handle));
   }
 
   setPosition(position: Vector3): void {

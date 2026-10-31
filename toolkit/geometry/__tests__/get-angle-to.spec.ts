@@ -5,9 +5,9 @@ import type { Vector2, Vector3 } from '../src';
 
 describe('Geometry', () => {
   describe('#getAngleTo', () => {
-    it('Если цель по оси +X, возвращает 0', () => {
+    it('Если цель на севере (+Y), возвращает 0', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: 1, y: 0 };
+      const to: Vector2 = { x: 0, y: 1 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -15,9 +15,9 @@ describe('Geometry', () => {
       expect(angle).toBeCloseTo(0);
     });
 
-    it('Если цель по оси +Y, возвращает 90', () => {
+    it('Если цель на западе (−X), возвращает 90', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: 0, y: 1 };
+      const to: Vector2 = { x: -1, y: 0 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -25,9 +25,9 @@ describe('Geometry', () => {
       expect(angle).toBeCloseTo(90);
     });
 
-    it('Если цель по оси −X, возвращает 180', () => {
+    it('Если цель на юге (−Y), возвращает 180', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: -1, y: 0 };
+      const to: Vector2 = { x: 0, y: -1 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -35,9 +35,9 @@ describe('Geometry', () => {
       expect(angle).toBeCloseTo(180);
     });
 
-    it('Если цель по оси −Y, возвращает 270', () => {
+    it('Если цель на востоке (+X), возвращает 270', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: 0, y: -1 };
+      const to: Vector2 = { x: 1, y: 0 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -45,9 +45,9 @@ describe('Geometry', () => {
       expect(angle).toBeCloseTo(270);
     });
 
-    it('Если цель между осями +X и +Y, возвращает 45', () => {
+    it('Если цель на северо-западе, возвращает 45', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: 1, y: 1 };
+      const to: Vector2 = { x: -1, y: 1 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -55,9 +55,9 @@ describe('Geometry', () => {
       expect(angle).toBeCloseTo(45);
     });
 
-    it('Если цель между осями +X и −Y, возвращает 315', () => {
+    it('Если цель на северо-востоке, возвращает 315', () => {
       const from: Vector2 = { x: 0, y: 0 };
-      const to: Vector2 = { x: 1, y: -1 };
+      const to: Vector2 = { x: 1, y: 1 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -67,7 +67,7 @@ describe('Geometry', () => {
 
     it('Считает угол относительно точки from, а не начала координат', () => {
       const from: Vector2 = { x: 10, y: 10 };
-      const to: Vector2 = { x: 10, y: 15 };
+      const to: Vector2 = { x: 5, y: 10 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);
@@ -86,7 +86,7 @@ describe('Geometry', () => {
 
     it('Не учитывает высоту точек', () => {
       const from: Vector3 = { x: 0, y: 0, z: 0 };
-      const to: Vector3 = { x: 0, y: 1, z: 50 };
+      const to: Vector3 = { x: -1, y: 0, z: 50 };
       const geometry = new Geometry();
 
       const angle = geometry.getAngleTo(from, to);

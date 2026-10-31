@@ -106,6 +106,7 @@ export class GtaPlayAnimationCommand extends Command<
       false,
       -1
     );
+    print('До сюда выполнение не доходит');
     this.playedFor = 0;
   }
 }

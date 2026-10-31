@@ -1,17 +1,21 @@
 import { createControlledObservable } from '@peetland/events/dev';
+import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
+import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { NpcFactory } from '../../src';
+import type { NpcState } from '../../src';
 
-import { createActorFactory, createHtn, createNpcData } from './helpers';
+import { createMockedRootTaskFactory, createNpcData } from './helpers';
 
 describe('NpcFactory', () => {
   describe('#create', () => {
     it('Создаёт NPC по переданным данным', () => {
       const factory = new NpcFactory({
-        actorFactory: createActorFactory(),
+        actorFactory: createMockedActorFactory(),
+        htnFactory: createMockedHTNFactory(),
+        rootTaskFactory: createMockedRootTaskFactory(),
         frames: createControlledObservable().observable,
-        createHtn,
       });
 
       const npc = factory.create(createNpcData({ id: 'peet' }));
@@ -20,11 +24,12 @@ describe('NpcFactory', () => {
     });
 
     it('Создаёт актора NPC переданной фабрикой акторов', () => {
-      const actorFactory = createActorFactory();
+      const actorFactory = createMockedActorFactory();
       const factory = new NpcFactory({
         actorFactory,
+        htnFactory: createMockedHTNFactory(),
+        rootTaskFactory: createMockedRootTaskFactory(),
         frames: createControlledObservable().observable,
-        createHtn,
       });
 
       factory.create(createNpcData());
@@ -33,12 +38,15 @@ describe('NpcFactory', () => {
     });
 
     it('Создаёт каждому NPC своего HTN-агента', () => {
-      const firstHtn = createHtn();
-      const secondHtn = createHtn();
+      const firstHtn = createMockedHTN<NpcState>();
+      const secondHtn = createMockedHTN<NpcState>();
+      const htnFactory = createMockedHTNFactory<NpcState>();
+      vi.mocked(htnFactory.create).mockReturnValueOnce(firstHtn).mockReturnValueOnce(secondHtn);
       const factory = new NpcFactory({
-        actorFactory: createActorFactory(),
+        actorFactory: createMockedActorFactory(),
+        htnFactory,
+        rootTaskFactory: createMockedRootTaskFactory(),
         frames: createControlledObservable().observable,
-        createHtn: vi.fn().mockReturnValueOnce(firstHtn).mockReturnValueOnce(secondHtn),
       });
       const first = factory.create(createNpcData({ id: 'first' }));
       factory.create(createNpcData({ id: 'second' }));
@@ -51,11 +59,12 @@ describe('NpcFactory', () => {
 
     it('Создаёт NPC, HTN-агент которого обновляется на кадры из переданного Observable', () => {
       const frames = createControlledObservable();
-      const htn = createHtn();
+      const htn = createMockedHTN<NpcState>();
       const factory = new NpcFactory({
-        actorFactory: createActorFactory(),
+        actorFactory: createMockedActorFactory(),
+        htnFactory: createMockedHTNFactory(htn),
+        rootTaskFactory: createMockedRootTaskFactory(),
         frames: frames.observable,
-        createHtn: () => htn,
       });
       factory.create(createNpcData());
 

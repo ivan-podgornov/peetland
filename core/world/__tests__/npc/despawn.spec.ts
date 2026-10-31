@@ -1,20 +1,21 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createActor } from '@peetland/virtual-actor/dev';
+import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
+import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { Npc } from '../../src';
+import type { NpcState } from '../../src';
 
-import { createActorFactory, createHtn, createNpcData } from './helpers';
+import { createNpcData, createNpcDeps } from './helpers';
 
 describe('Npc', () => {
   describe('#despawn', () => {
     it('Останавливает HTN-агента', () => {
-      const htn = createHtn();
-      const npc = new Npc(createNpcData(), {
-        actorFactory: createActorFactory(),
-        htn,
-        frames: createControlledObservable().observable,
-      });
+      const htn = createMockedHTN<NpcState>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn) })
+      );
 
       npc.despawn();
 
@@ -23,11 +24,10 @@ describe('Npc', () => {
 
     it('Деспавнит актора', () => {
       const actor = createActor();
-      const npc = new Npc(createNpcData(), {
-        actorFactory: createActorFactory(actor),
-        htn: createHtn(),
-        frames: createControlledObservable().observable,
-      });
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
+      );
 
       npc.despawn();
 
@@ -36,12 +36,11 @@ describe('Npc', () => {
 
     it('После деспавна кадры не вызывают htn.update', () => {
       const frames = createControlledObservable();
-      const htn = createHtn();
-      const npc = new Npc(createNpcData(), {
-        actorFactory: createActorFactory(),
-        htn,
-        frames: frames.observable,
-      });
+      const htn = createMockedHTN<NpcState>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+      );
 
       npc.despawn();
       frames.subscriber.next(undefined);

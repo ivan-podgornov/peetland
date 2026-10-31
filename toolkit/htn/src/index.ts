@@ -1,3 +1,5 @@
+export { HTNFactory } from './factory';
+export type { IHTNFactory } from './factory';
 export { HTN } from './htn';
 export type { IHTN } from './htn';
 

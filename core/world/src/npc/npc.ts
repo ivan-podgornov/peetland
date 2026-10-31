@@ -1,17 +1,20 @@
 import { AbortController } from '@peetland/events';
 import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
-import type { IHTN } from '@peetland/htn';
+import type { IHTN, IHTNFactory } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
 
-import type { NpcData } from './data';
+import type { NpcData, NpcFeelings, NpcTraits } from './data';
+import type { INpcRootTaskFactory } from './root-task';
 import type { NpcState } from './state';
 
 export type NpcDeps = {
   /** Фабрика, которой NPC создаёт своего актора */
   actorFactory: IActorFactory;
-  /** HTN-агент NPC. Планирует и перепланирует задачи сам, у каждого NPC он свой */
-  htn: IHTN<NpcState>;
+  /** Фабрика, которой NPC создаёт своего HTN-агента. Агент сам планирует и перепланирует задачи */
+  htnFactory: IHTNFactory<NpcState>;
+  /** Фабрика корневой задачи, которую планирует HTN-агент NPC */
+  rootTaskFactory: INpcRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
 };
@@ -20,44 +23,42 @@ export type NpcDeps = {
 export class Npc {
   readonly id: string;
   readonly inventory: Inventory;
-  /** Совестливость от 0 до 100. Черта характера, со временем не меняется */
-  readonly conscientiousness: number;
-  /** Стыд от 0 до 100 */
-  readonly shame: number;
+  readonly traits: NpcTraits;
+  readonly feelings: NpcFeelings;
 
   private readonly actor: IActor;
-  private readonly deps: NpcDeps;
+  private readonly htn: IHTN<NpcState>;
   private readonly lifetime: AbortController;
 
   /**
-   * Создаёт актора по данным NPC и каждый кадр передаёт HTN-агенту актуальное состояние
+   * Создаёт актора и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htn } = deps;
+    const { actorFactory, frames, htnFactory, rootTaskFactory } = deps;
 
-    this.deps = deps;
     this.id = data.id;
     this.inventory = new Inventory(data.inventory);
-    this.conscientiousness = data.traits.conscientiousness;
-    this.shame = data.feelings.shame;
+    this.traits = data.traits;
+    this.feelings = data.feelings;
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({
       modelId: data.modelId,
       position: data.spawnPosition,
       angle: data.spawnAngle,
     });
+    this.htn = htnFactory.create(rootTaskFactory.create(this.actor));
 
-    frames.subscribe(() => htn.update(this.getState()), { signal: this.lifetime.signal });
+    frames.subscribe(() => this.htn.update(this.getState()), { signal: this.lifetime.signal });
   }
 
-  /** Возвращает состояние NPC с живыми инвентарём и актором (см. NpcState) */
+  /** Возвращает состояние NPC с живым инвентарём и слепком актора (см. NpcState) */
   getState(): NpcState {
     return {
-      actor: this.actor,
+      actor: { position: this.actor.getPosition(), angle: this.actor.getAngle() },
       inventory: this.inventory,
-      conscientiousness: this.conscientiousness,
-      shame: this.shame,
+      traits: this.traits,
+      feelings: this.feelings,
     };
   }
 
@@ -66,10 +67,8 @@ export class Npc {
    * актора. После деспавна NPC больше не пользуются
    */
   despawn(): void {
-    const { htn } = this.deps;
-
     this.lifetime.abort();
-    htn.stop();
+    this.htn.stop();
     this.actor.despawn();
   }
 }

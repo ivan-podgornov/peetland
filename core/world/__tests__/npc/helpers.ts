@@ -1,9 +1,10 @@
-import type { IActor, IActorFactory } from '@peetland/game';
-import type { IHTN } from '@peetland/htn';
-import { createActor } from '@peetland/virtual-actor/dev';
+import { createControlledObservable } from '@peetland/events/dev';
+import type { Task } from '@peetland/htn';
+import { createMockedHTNFactory } from '@peetland/htn/dev';
+import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
-import type { NpcData, NpcState } from '../../src';
+import type { INpcRootTaskFactory, NpcData, NpcDeps, NpcState } from '../../src';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -19,12 +20,20 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
   };
 }
 
-/** Создаёт HTN-агента, который ничего не делает */
-export function createHtn(): IHTN<NpcState> {
-  return { update: vi.fn(), stop: vi.fn() };
+/** Создаёт фабрику, которая всегда возвращает переданную корневую задачу */
+export function createMockedRootTaskFactory(
+  root: Task<NpcState> = { name: 'root', methods: [] }
+): INpcRootTaskFactory {
+  return { create: vi.fn(() => root) };
 }
 
-/** Создаёт фабрику, которая всегда возвращает переданного актора */
-export function createActorFactory(actor: IActor = createActor()): IActorFactory {
-  return { create: vi.fn(() => actor) };
+/** Создаёт зависимости NPC. Зависимости, которые не переданы, заполняются незначимыми моками */
+export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
+  return {
+    actorFactory: createMockedActorFactory(),
+    htnFactory: createMockedHTNFactory(),
+    rootTaskFactory: createMockedRootTaskFactory(),
+    frames: createControlledObservable().observable,
+    ...deps,
+  };
 }

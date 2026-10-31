@@ -3,5 +3,9 @@
   "private": true,
   "type": "module",
   "version": "0.0.0",
-  "main": "./src/index.ts"
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./dev": "./dev/index.ts"
+  }
 }

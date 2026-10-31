@@ -1,22 +1,22 @@
 import { createControlledObservable } from '@peetland/events/dev';
+import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Npc } from '../../src';
 import type { NpcState } from '../../src';
 
-import { createActorFactory, createHtn, createNpcData } from './helpers';
+import { createNpcData, createNpcDeps } from './helpers';
 
 describe('Npc', () => {
   describe('Каждый кадр', () => {
     it('Вызывает htn.update с состоянием NPC', () => {
       const frames = createControlledObservable();
-      const htn = createHtn();
-      const npc = new Npc(createNpcData(), {
-        actorFactory: createActorFactory(),
-        htn,
-        frames: frames.observable,
-      });
+      const htn = createMockedHTN<NpcState>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+      );
 
       frames.subscriber.next(undefined);
 
@@ -25,12 +25,11 @@ describe('Npc', () => {
 
     it('Вызывает htn.update на каждый кадр', () => {
       const frames = createControlledObservable();
-      const htn = createHtn();
-      new Npc(createNpcData(), {
-        actorFactory: createActorFactory(),
-        htn,
-        frames: frames.observable,
-      });
+      const htn = createMockedHTN<NpcState>();
+      new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+      );
 
       frames.subscriber.next(undefined);
       frames.subscriber.next(undefined);
@@ -40,15 +39,14 @@ describe('Npc', () => {
 
     it('Если задача поменяла инвентарь из состояния, меняется инвентарь NPC', () => {
       const frames = createControlledObservable();
-      const htn = createHtn();
+      const htn = createMockedHTN<NpcState>();
       vi.mocked(htn.update).mockImplementation((state: NpcState) => {
         state.inventory.add(Item.Booze, 1);
       });
-      const npc = new Npc(createNpcData(), {
-        actorFactory: createActorFactory(),
-        htn,
-        frames: frames.observable,
-      });
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+      );
 
       frames.subscriber.next(undefined);
 

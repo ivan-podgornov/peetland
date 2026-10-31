@@ -1,6 +1,9 @@
 import type { IGeometry, Vector2, Vector3 } from './types';
 
 export class Geometry implements IGeometry {
+  /** Полный оборот в градусах */
+  private static readonly FULL_TURN = 360;
+
   getDistance2d(pointA: Vector2, pointB: Vector2): number {
     const x = Math.pow(pointB.x - pointA.x, 2);
     const y = Math.pow(pointB.y - pointA.y, 2);
@@ -41,5 +44,27 @@ export class Geometry implements IGeometry {
       y: current.y + dy * ratio,
       z: current.z + dz * ratio,
     };
+  }
+
+  isWithinAngle(angle: number, target: number, tolerance = 0): boolean {
+    const difference = this.normalizeAngle(angle - target);
+    const shortestDifference = Math.min(difference, Geometry.FULL_TURN - difference);
+
+    return shortestDifference <= tolerance;
+  }
+
+  getAngleTo(from: Vector2, to: Vector2): number {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const angle = (Math.atan2(-dx, dy) * 180) / Math.PI;
+
+    return this.normalizeAngle(angle);
+  }
+
+  /** Приводит угол к диапазону [0, 360) */
+  private normalizeAngle(angle: number): number {
+    const { FULL_TURN } = Geometry;
+
+    return ((angle % FULL_TURN) + FULL_TURN) % FULL_TURN;
   }
 }

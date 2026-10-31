@@ -56,7 +56,7 @@ export class Geometry implements IGeometry {
   getAngleTo(from: Vector2, to: Vector2): number {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
-    const angle = (Math.atan2(-dx, dy) * 180) / Math.PI;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
 
     return this.normalizeAngle(angle);
   }

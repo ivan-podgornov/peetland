@@ -59,10 +59,6 @@ function setInterval(
 }
 
 function clearInterval(intervalId: number) {
-  const thread = intervals.get(intervalId);
-  if (thread) {
-    thread.terminate();
-  }
   intervals.delete(intervalId);
 }
 

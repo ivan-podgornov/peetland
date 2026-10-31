@@ -8,6 +8,7 @@ import {
   wasKeyPressed,
   PLAYER_PED,
   setCharCoordinates,
+  setCharHeading,
 } from '@peetland/moonloader';
 import { World } from '@peetland/world';
 
@@ -28,6 +29,7 @@ function main() {
 
     if (wasKeyPressed(VK_J)) {
       setCharCoordinates(PLAYER_PED, 2269.6, 65.66, 26.48);
+      setCharHeading(PLAYER_PED, 0);
     }
   }
 }

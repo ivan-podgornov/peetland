@@ -44,6 +44,22 @@ describe('Geometry', () => {
       expect(result).toBe(true);
     });
 
+    it('Если допуск не передан и углы совпадают, возвращает true', () => {
+      const geometry = new Geometry();
+
+      const result = geometry.isWithinAngle(90, 90);
+
+      expect(result).toBe(true);
+    });
+
+    it('Если допуск не передан и углы отличаются, возвращает false', () => {
+      const geometry = new Geometry();
+
+      const result = geometry.isWithinAngle(91, 90);
+
+      expect(result).toBe(false);
+    });
+
     it('Если угол близок к целевому через переход 360°, возвращает true', () => {
       const geometry = new Geometry();
 

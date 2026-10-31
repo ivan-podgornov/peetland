@@ -1,14 +1,9 @@
 import type { IGeometry, Vector2, Vector3 } from './types';
 
-/** Полный оборот в градусах */
-const FULL_TURN = 360;
-
-/** Приводит угол к диапазону [0, 360) */
-function normalizeAngle(angle: number): number {
-  return ((angle % FULL_TURN) + FULL_TURN) % FULL_TURN;
-}
-
 export class Geometry implements IGeometry {
+  /** Полный оборот в градусах */
+  private static readonly FULL_TURN = 360;
+
   getDistance2d(pointA: Vector2, pointB: Vector2): number {
     const x = Math.pow(pointB.x - pointA.x, 2);
     const y = Math.pow(pointB.y - pointA.y, 2);
@@ -51,9 +46,9 @@ export class Geometry implements IGeometry {
     };
   }
 
-  isWithinAngle(angle: number, target: number, tolerance: number): boolean {
-    const difference = normalizeAngle(angle - target);
-    const shortestDifference = Math.min(difference, FULL_TURN - difference);
+  isWithinAngle(angle: number, target: number, tolerance = 0): boolean {
+    const difference = this.normalizeAngle(angle - target);
+    const shortestDifference = Math.min(difference, Geometry.FULL_TURN - difference);
 
     return shortestDifference <= tolerance;
   }
@@ -63,6 +58,13 @@ export class Geometry implements IGeometry {
     const dy = to.y - from.y;
     const angle = (Math.atan2(-dx, dy) * 180) / Math.PI;
 
-    return normalizeAngle(angle);
+    return this.normalizeAngle(angle);
+  }
+
+  /** Приводит угол к диапазону [0, 360) */
+  private normalizeAngle(angle: number): number {
+    const { FULL_TURN } = Geometry;
+
+    return ((angle % FULL_TURN) + FULL_TURN) % FULL_TURN;
   }
 }

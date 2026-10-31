@@ -67,12 +67,17 @@ function runDueTimers(): void {
 /**
  * Запускает поток, который каждый кадр вызывает колбэки таймеров. Вызывается один раз из main:
  * до этого setTimeout и setInterval только запоминают таймеры
+ * @param canRun - можно ли сейчас вызывать колбэки. Пока нельзя, таймеры не срабатывают, а после
+ * срабатывают те, которым пора
  */
-export function startTimers(): void {
+export function startTimers(canRun: () => boolean): void {
   lua_thread.create(() => {
     while (true) {
       wait(0);
-      runDueTimers();
+
+      if (canRun()) {
+        runDueTimers();
+      }
     }
   });
 }

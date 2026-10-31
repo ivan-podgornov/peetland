@@ -20,6 +20,8 @@ export type NpcData = Readonly<{
   modelId: number;
   /** Позиция, на которой спавнится NPC */
   spawnPosition: Vector3;
+  /** Угол поворота в градусах, на который NPC повёрнут при спавне */
+  spawnAngle: number;
   traits: NpcTraits;
   /** Начальные чувства */
   feelings: NpcFeelings;

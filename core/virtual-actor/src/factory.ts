@@ -13,6 +13,6 @@ export class VirtualActorFactory implements IActorFactory {
   }
 
   create(options: CreateActorOptions): VirtualActor {
-    return new VirtualActor({ position: options.position, angle: options.angle }, this.deps);
+    return new VirtualActor(options, this.deps);
   }
 }

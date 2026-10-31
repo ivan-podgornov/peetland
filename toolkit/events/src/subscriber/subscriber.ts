@@ -104,7 +104,7 @@ export class Subscriber<T> implements ISubscriber<T> {
 
   /** Вызывает все зарегистрированные teardown-колбэки */
   private callRegisteredTeardowns() {
-    [...this.teardowns].reverse().forEach(this.callOneTeardown.bind(this));
+    [...this.teardowns].reverse().forEach((teardown) => this.callOneTeardown(teardown));
   }
 
   /** Вызывает один конкретный teardown-колбэк */

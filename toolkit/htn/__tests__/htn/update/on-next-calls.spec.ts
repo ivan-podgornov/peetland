@@ -2,7 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import { HTN, getDefaultDeps } from '../../../src/htn';
 import type { TaskResult } from '../../../src/task';
-import { getDummyExecutor, getDummyPlanner, primitive, testState } from '../../helpers';
+import {
+  getDummyExecutor,
+  getDummyPlanner,
+  primitive,
+  testContext,
+  testState,
+} from '../../helpers';
 
 describe('HTN', () => {
   describe('#update', () => {
@@ -12,13 +18,13 @@ describe('HTN', () => {
         const planner = getDummyPlanner(null);
         const htn = new HTN(root, { ...getDefaultDeps(), plannerFactory: () => planner });
 
-        htn.update(testState); // Первый вызов, задачи выполняться не начали
-        htn.update(testState); // Второй вызов, должна произойти новая попытка планирования
+        htn.update(testState, testContext); // Первый вызов, задачи выполняться не начали
+        htn.update(testState, testContext); // Второй вызов, должна произойти новая попытка планирования
 
         expect(planner.plan).toHaveBeenNthCalledWith(2, root, testState);
       });
 
-      it('Если перепланирование, после неудачного прошлого планирования удалось, начинает выполнение с состоянием, с которым вызывался update', () => {
+      it('Если перепланирование, после неудачного прошлого планирования удалось, начинает выполнение с состоянием и контекстом, с которыми вызывался update', () => {
         const root = primitive('Primitive Task');
         const executor = getDummyExecutor('running');
         const planner = getDummyPlanner(null, [root]);
@@ -28,10 +34,10 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.update(testState); // Первый вызов, задачи выполняться не начали
-        htn.update(testState); // Второй вызов, должна произойти новая удачная попытка планирования и начало выполнения
+        htn.update(testState, testContext); // Первый вызов, задачи выполняться не начали
+        htn.update(testState, testContext); // Второй вызов, должна произойти новая удачная попытка планирования и начало выполнения
 
-        expect(executor.update).toHaveBeenCalledExactlyOnceWith(testState);
+        expect(executor.update).toHaveBeenCalledExactlyOnceWith(testState, testContext);
       });
 
       it.each([
@@ -49,8 +55,8 @@ describe('HTN', () => {
             plannerFactory: () => planner,
           });
 
-          htn.update(testState); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
-          htn.update(testState); // Второй вызов, должна произойти новая попытка планирования
+          htn.update(testState, testContext); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
+          htn.update(testState, testContext); // Второй вызов, должна произойти новая попытка планирования
 
           expect(planner.plan).toHaveBeenNthCalledWith(2, root, testState);
         }
@@ -60,7 +66,7 @@ describe('HTN', () => {
         ['success', 'успешно'],
         ['failed', 'с ошибкой'],
       ] as [TaskResult, string][])(
-        'Если при предыдущем вызове задача была выполнена $1, и если перепланирование удалось, начинает выполнять root задачу с состоянием, с которым вызвался update',
+        'Если при предыдущем вызове задача была выполнена $1, и если перепланирование удалось, начинает выполнять root задачу с состоянием и контекстом, с которыми вызвался update',
         (status) => {
           const root = primitive('Primitive Task');
           const executor = getDummyExecutor(status);
@@ -71,10 +77,10 @@ describe('HTN', () => {
             plannerFactory: () => planner,
           });
 
-          htn.update(testState); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
-          htn.update(testState); // Второй вызов, должна произойти новая попытка планирования и выполнение
+          htn.update(testState, testContext); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
+          htn.update(testState, testContext); // Второй вызов, должна произойти новая попытка планирования и выполнение
 
-          expect(executor.update).toHaveBeenNthCalledWith(2, testState);
+          expect(executor.update).toHaveBeenNthCalledWith(2, testState, testContext);
         }
       );
 
@@ -88,8 +94,8 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.update(testState); // Первый вызов, задачи запланировались, начали выполняться
-        htn.update(testState); // Второй вызов, перепланирование не происходит, выполнение продолжается
+        htn.update(testState, testContext); // Первый вызов, задачи запланировались, начали выполняться
+        htn.update(testState, testContext); // Второй вызов, перепланирование не происходит, выполнение продолжается
 
         expect(planner.plan).toHaveBeenCalledTimes(1);
       });
@@ -104,11 +110,11 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.update(testState); // Первый вызов, задачи запланировались, начали выполняться
-        htn.update(testState); // Второй вызов, перепланирование не происходит, выполнение продолжается
+        htn.update(testState, testContext); // Первый вызов, задачи запланировались, начали выполняться
+        htn.update(testState, testContext); // Второй вызов, перепланирование не происходит, выполнение продолжается
 
         expect(executor.update).toHaveBeenCalledTimes(2);
-        expect(executor.update).toHaveBeenLastCalledWith(testState);
+        expect(executor.update).toHaveBeenLastCalledWith(testState, testContext);
       });
     });
   });

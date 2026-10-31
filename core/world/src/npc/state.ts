@@ -1,5 +1,5 @@
 import type { Vector3 } from '@peetland/geometry';
-import type { Inventory } from '@peetland/inventory';
+import type { InventoryCounts } from '@peetland/inventory';
 
 import type { NpcFeelings, NpcTraits } from './data';
 
@@ -11,14 +11,13 @@ export type NpcActorState = Readonly<{
 }>;
 
 /**
- * Состояние NPC, с которым HTN-агент планирует и исполняет задачи. Инвентарь — живой, а не копия:
- * задачи при исполнении меняют настоящий инвентарь NPC. Копию инвентаря задача делает только в
- * applyEffects через clone(). Актора в состоянии нет, только слепок: команды актору задачи отдают
- * через актора, которого получили при создании
+ * Состояние NPC, с которым HTN-агент планирует и исполняет задачи. Содержит только данные: слепок
+ * актора и содержимое инвентаря. Эффекты задач меняют копию этих данных, а команды живым актору и
+ * инвентарю задачи отдают через контекст (см. NpcContext)
  */
 export type NpcState = Readonly<{
   actor: NpcActorState;
-  inventory: Inventory;
+  inventory: Readonly<InventoryCounts>;
   traits: NpcTraits;
   feelings: NpcFeelings;
 }>;

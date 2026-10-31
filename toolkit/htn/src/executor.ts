@@ -3,20 +3,20 @@ import type { PrimitiveTask, TaskResult } from './task';
 /** Статус выполнения задачи */
 export type ExecuteStatus = TaskResult | 'idle' | 'stopped';
 
-export interface IExecutor<TState> {
+export interface IExecutor<TState, TContext> {
   /** Обновляет выполнение текущей задачи или, если ранее задачи выполняться не начали, начинает выполнять */
-  update(state: TState): ExecuteStatus;
+  update(state: TState, context: TContext): ExecuteStatus;
 
   /** Останавливает выполнение */
-  stop(): void;
+  stop(context: TContext): void;
 
   /** Возвращает задачу, которая выполняется в данный момент */
-  get currentTask(): PrimitiveTask<TState> | null;
+  get currentTask(): PrimitiveTask<TState, TContext> | null;
 }
 
-export class Executor<TState> implements IExecutor<TState> {
+export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   private currentTaskIndex: number;
-  private readonly tasks: readonly PrimitiveTask<TState>[];
+  private readonly tasks: readonly PrimitiveTask<TState, TContext>[];
   private status: ExecuteStatus;
   private taskStarted: boolean;
 
@@ -26,7 +26,7 @@ export class Executor<TState> implements IExecutor<TState> {
    * может быть пустым, так как пустой список задач - это повод их перепланировать, а не выполнять.
    * @param tasks - декомпозированный список задач
    */
-  constructor(tasks: readonly PrimitiveTask<TState>[]) {
+  constructor(tasks: readonly PrimitiveTask<TState, TContext>[]) {
     if (!tasks.length) {
       throw new Error("Tasks list can't be empty");
     }
@@ -37,7 +37,7 @@ export class Executor<TState> implements IExecutor<TState> {
     this.taskStarted = false;
   }
 
-  get currentTask(): PrimitiveTask<TState> {
+  get currentTask(): PrimitiveTask<TState, TContext> {
     const task = this.tasks[this.currentTaskIndex];
 
     if (!task) {
@@ -48,12 +48,14 @@ export class Executor<TState> implements IExecutor<TState> {
     return task;
   }
 
-  update(state: TState): TaskResult {
+  update(state: TState, context: TContext): TaskResult {
     if (!this.canTouchTask()) {
       throw new Error(`Can't update, because execution is already ${this.status}`);
     }
 
-    this.status = this.taskStarted ? this.currentTask.update(state) : this.start(state);
+    this.status = this.taskStarted
+      ? this.currentTask.update(state, context)
+      : this.start(state, context);
 
     if (this.status === 'failed') {
       return this.status;
@@ -76,7 +78,7 @@ export class Executor<TState> implements IExecutor<TState> {
     return this.status;
   }
 
-  stop() {
+  stop(context: TContext) {
     if (!this.canTouchTask()) {
       throw new Error(`Can't stop, because execution is already ${this.status}`);
     }
@@ -84,17 +86,17 @@ export class Executor<TState> implements IExecutor<TState> {
     this.status = 'stopped';
 
     if (this.taskStarted) {
-      this.currentTask.stop();
+      this.currentTask.stop(context);
     }
   }
 
   /** Начинает выполнение задачи */
-  private start(state: TState): TaskResult {
+  private start(state: TState, context: TContext): TaskResult {
     if (!this.currentTask.canExecute(state)) {
       return 'failed';
     }
 
-    const result = this.currentTask.start(state);
+    const result = this.currentTask.start(state, context);
     this.taskStarted = true;
 
     return result;
@@ -109,7 +111,7 @@ export class Executor<TState> implements IExecutor<TState> {
   }
 
   /** Возвращает следующую к выполнению задачу */
-  private get nextTask(): PrimitiveTask<TState> | null {
+  private get nextTask(): PrimitiveTask<TState, TContext> | null {
     const index = this.currentTaskIndex + 1;
 
     return this.tasks[index] ?? null;

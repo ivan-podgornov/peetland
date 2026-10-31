@@ -13,7 +13,7 @@ import {
   testState,
 } from '../helpers';
 
-import type { TestState } from '../helpers';
+import type { TestContext, TestState } from '../helpers';
 
 describe('Planner', () => {
   describe('#plan', () => {
@@ -116,7 +116,7 @@ describe('Planner', () => {
         );
 
         const tasks = planner.plan(root, { ...testState, canExecute: true });
-        const names = getNames(tasks as Task<TestState>[]);
+        const names = getNames(tasks as Task<TestState, TestContext>[]);
 
         expect(names).toStrictEqual([
           'Primitive 1',

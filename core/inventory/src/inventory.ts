@@ -66,11 +66,6 @@ export class Inventory {
     return true;
   }
 
-  /** Возвращает независимую копию инвентаря */
-  clone(): Inventory {
-    return new Inventory(this.getAll());
-  }
-
   private write(item: Item, count: number): void {
     if (count === 0) {
       this.counts.delete(item);

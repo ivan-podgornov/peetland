@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { HTN, getDefaultDeps } from '../../src/htn';
 import type { TaskResult } from '../../src/task';
-import { getDummyExecutor, getDummyPlanner, primitive, testState } from '../helpers';
+import { getDummyExecutor, getDummyPlanner, primitive, testContext, testState } from '../helpers';
 
 describe('HTN', () => {
   describe('#stop', () => {
-    it('Если задачи уже начали выполняться, останавливает выполнение', () => {
+    it('Если задачи уже начали выполняться, останавливает выполнение с контекстом', () => {
       const root = primitive('Primitive Task');
       const executor = getDummyExecutor('running');
       const planner = getDummyPlanner([root]);
@@ -16,10 +16,10 @@ describe('HTN', () => {
         plannerFactory: () => planner,
       });
 
-      htn.update(testState); // спланировали, начали выполнять
-      htn.stop(); // остановили выполнение
+      htn.update(testState, testContext); // спланировали, начали выполнять
+      htn.stop(testContext); // остановили выполнение
 
-      expect(executor.stop).toHaveBeenCalledOnce();
+      expect(executor.stop).toHaveBeenCalledExactlyOnceWith(testContext);
     });
 
     it.each([
@@ -37,8 +37,8 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.update(testState); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
-        htn.update(testState); // Второй вызов, должна произойти новая попытка планирования
+        htn.update(testState, testContext); // Первый вызов, задачи запланировались, начали выполняться и выполнение завершилось со статусом status
+        htn.update(testState, testContext); // Второй вызов, должна произойти новая попытка планирования
 
         expect(executor.stop).not.toHaveBeenCalled();
       }
@@ -54,7 +54,7 @@ describe('HTN', () => {
         plannerFactory: () => planner,
       });
 
-      htn.stop(); // остановили выполнение
+      htn.stop(testContext); // остановили выполнение
 
       expect(executor.stop).not.toHaveBeenCalled();
     });

@@ -2,45 +2,51 @@ import { Executor, type IExecutor } from './executor';
 import { Planner, type IPlanner } from './planner';
 import type { PrimitiveTask, Task } from './task';
 
-export type HTNDeps<TState> = {
-  executorFactory: (tasks: readonly PrimitiveTask<TState>[]) => IExecutor<TState>;
+export type HTNDeps<TState, TContext> = {
+  executorFactory: (
+    tasks: readonly PrimitiveTask<TState, TContext>[]
+  ) => IExecutor<TState, TContext>;
   plannerFactory: () => IPlanner<TState>;
 };
 
-export function getDefaultDeps<TState>(): HTNDeps<TState> {
+export function getDefaultDeps<TState, TContext>(): HTNDeps<TState, TContext> {
   return {
-    executorFactory: (tasks: readonly PrimitiveTask<TState>[]) => new Executor<TState>(tasks),
+    executorFactory: (tasks: readonly PrimitiveTask<TState, TContext>[]) =>
+      new Executor<TState, TContext>(tasks),
     plannerFactory: () => new Planner<TState>(),
   };
 }
 
 /** HTN-агент: планирует корневую задачу, исполняет план и перепланирует, когда план закончился */
-export interface IHTN<TState> {
+export interface IHTN<TState, TContext> {
   /**
    * Продвигает исполнение плана с актуальным состоянием. Если плана нет, потому что он ещё не
-   * составлен, завершился или упал, сначала составляет новый
+   * составлен, завершился или упал, сначала составляет новый. Контекст передаётся задачам плана
    */
-  update(state: TState): void;
+  update(state: TState, context: TContext): void;
 
-  /** Останавливает исполнение текущего плана */
-  stop(): void;
+  /** Останавливает исполнение текущего плана. Контекст передаётся задаче, которую останавливают */
+  stop(context: TContext): void;
 }
 
-export class HTN<TState> implements IHTN<TState> {
-  private readonly deps: HTNDeps<TState>;
+export class HTN<TState, TContext> implements IHTN<TState, TContext> {
+  private readonly deps: HTNDeps<TState, TContext>;
   private readonly planner: IPlanner<TState>;
-  private readonly root: Task<TState>;
+  private readonly root: Task<TState, TContext>;
 
-  private executor: IExecutor<TState> | null;
+  private executor: IExecutor<TState, TContext> | null;
 
-  constructor(root: Task<TState>, deps: HTNDeps<TState> = getDefaultDeps<TState>()) {
+  constructor(
+    root: Task<TState, TContext>,
+    deps: HTNDeps<TState, TContext> = getDefaultDeps<TState, TContext>()
+  ) {
     this.deps = deps;
     this.planner = deps.plannerFactory();
     this.root = root;
     this.executor = null;
   }
 
-  update(state: TState) {
+  update(state: TState, context: TContext) {
     if (!this.executor) {
       const { executorFactory } = this.deps;
       const tasks = this.planner.plan(this.root, state);
@@ -52,19 +58,19 @@ export class HTN<TState> implements IHTN<TState> {
       this.executor = executorFactory(tasks);
     }
 
-    const status = this.executor.update(state);
+    const status = this.executor.update(state, context);
 
     if (status !== 'running') {
       this.executor = null;
     }
   }
 
-  stop() {
+  stop(context: TContext) {
     if (!this.executor) {
       return;
     }
 
-    this.executor.stop();
+    this.executor.stop(context);
     this.executor = null;
   }
 }

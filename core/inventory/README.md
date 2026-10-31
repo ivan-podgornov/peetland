@@ -35,8 +35,3 @@ inventory.get(Item.Bottles); // 0
 const saved = inventory.getAll(); // { bottles: 3, money: 0.5 }
 const restored = new Inventory(saved);
 ```
-
-## Копирование
-
-`clone()` возвращает независимую копию инвентаря. Её можно менять в `applyEffects` HTN-задач, не
-затрагивая инвентарь, по которому строится план.

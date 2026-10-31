@@ -1,16 +1,26 @@
 import { isPrimitive } from './task';
 import type { PrimitiveTask, Task } from './task';
 
+/** Планировщик работает только с состоянием и о контексте исполнения задач не знает */
 export interface IPlanner<TState> {
-  plan(root: Task<TState>, state: TState): PrimitiveTask<TState>[] | null;
+  plan<TContext>(
+    root: Task<TState, TContext>,
+    state: TState
+  ): PrimitiveTask<TState, TContext>[] | null;
 }
 
 export class Planner<TState> implements IPlanner<TState> {
-  plan(root: Task<TState>, state: TState): PrimitiveTask<TState>[] | null {
+  plan<TContext>(
+    root: Task<TState, TContext>,
+    state: TState
+  ): PrimitiveTask<TState, TContext>[] | null {
     return this.decompose([root], state);
   }
 
-  private decompose(tasks: Task<TState>[], state: TState): PrimitiveTask<TState>[] | null {
+  private decompose<TContext>(
+    tasks: Task<TState, TContext>[],
+    state: TState
+  ): PrimitiveTask<TState, TContext>[] | null {
     const [head, ...tail] = tasks;
 
     if (!head) {

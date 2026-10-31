@@ -17,18 +17,29 @@ export type GtaAchieveAngleCommandDeps = CommandDeps & {
 /** Персонаж поворачивается быстрее секунды, поэтому команда проверяет угол часто */
 const ACHIEVE_ANGLE = { name: 'achieve-angle', updatePeriod: 100 };
 
-/** Поворачивает игрового персонажа на угол и сообщает его угол по мере поворота */
+/** Сколько миллисекунд персонаж может поворачиваться сам, прежде чем его повернут сразу */
+const TURN_TIMEOUT = 1000;
+
+/**
+ * Поворачивает игрового персонажа на угол и сообщает его угол по мере поворота. Игра поворачивает
+ * персонажа не всегда до конца, поэтому, если за секунду он не повернулся, команда сразу ставит
+ * ему нужный угол
+ */
 export class GtaAchieveAngleCommand extends Command<
   number,
   GtaAchieveAngleCommandOptions,
   GtaAchieveAngleCommandDeps
 > {
+  /** Сколько миллисекунд персонаж уже поворачивается */
+  private turningFor: number;
+
   constructor(
     actor: IActor,
     options: GtaAchieveAngleCommandOptions,
     deps: GtaAchieveAngleCommandDeps
   ) {
     super(ACHIEVE_ANGLE, actor, options, deps);
+    this.turningFor = 0;
   }
 
   protected override onStart(): void {
@@ -38,9 +49,15 @@ export class GtaAchieveAngleCommand extends Command<
     taskAchieveHeading(handle, geometry.normalizeAngle(angle));
   }
 
-  protected onUpdate(): CommandStatus {
+  protected onUpdate(elapsed: number): CommandStatus {
     const { angle, tolerance } = this.options;
     const { geometry } = this.deps;
+    this.turningFor += elapsed;
+
+    if (this.turningFor >= TURN_TIMEOUT) {
+      this.actor.setAngle(angle);
+    }
+
     const current = this.actor.getAngle();
     this.emit(current);
 

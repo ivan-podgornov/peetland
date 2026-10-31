@@ -15,6 +15,15 @@ const devFiles = [
   '{toolkit,core,mod}/**/dev/**/*.{ts,tsx}',
 ];
 
+/** Ограничения синтаксиса для всех файлов */
+const restrictedSyntax = [
+  {
+    selector:
+      "MemberExpression[object.type='MemberExpression'][object.object.type='ThisExpression'][object.property.name='deps']",
+    message: 'Деструктурируйте this.deps',
+  },
+];
+
 export default defineConfig([
   {
     ignores: ['**/node_modules/', '**/dist/'],
@@ -67,14 +76,7 @@ export default defineConfig([
       // Core rules
       'func-style': ['error', 'declaration'],
       'no-console': 'error',
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector:
-            "MemberExpression[object.type='MemberExpression'][object.object.type='ThisExpression'][object.property.name='deps']",
-          message: 'Деструктурируйте this.deps',
-        },
-      ],
+      'no-restricted-syntax': ['error', ...restrictedSyntax],
       'no-use-before-define': 'off',
 
       // Import rules
@@ -108,12 +110,24 @@ export default defineConfig([
       'import-x/no-default-export': 'off',
     },
   },
-  // Правила для прод-файлов
+  // Правила для прод-файлов. Они собираются в Lua, а тесты и dev-файлы — нет
   {
     files: ['**/*.ts'],
     ignores: devFiles,
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'error',
+      // В Lua у функции либо есть self, либо нет. TypeScriptToLua проверяет это при сборке, но не
+      // видит, если метод передали без объекта или вызвали через bind, call и apply (см. #68)
+      '@typescript-eslint/unbound-method': 'error',
+      'no-restricted-syntax': [
+        'error',
+        ...restrictedSyntax,
+        {
+          selector: 'CallExpression > MemberExpression.callee[property.name=/^(bind|call|apply)$/]',
+          message:
+            'Не используйте bind, call и apply: в Lua они ломают передачу self. Оберните вызов в стрелочную функцию',
+        },
+      ],
     },
   },
   // Правила для файлов с тестами

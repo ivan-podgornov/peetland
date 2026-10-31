@@ -19,7 +19,7 @@ export function normalizeObserver<T>(
 
   const defaultObserver: NormalizedObserver<T> = {
     next: noop,
-    error: options.onError,
+    error: (error) => options.onError(error),
     complete: noop,
   };
 
@@ -33,14 +33,14 @@ export function normalizeObserver<T>(
     return { ...defaultObserver, next: (value: T) => observer(value) };
   }
 
+  // Методы вызываются через observer, а не через bind: в Lua bind ломает передачу self
+  const { next, complete, error } = observer;
+
   return {
-    ...defaultObserver,
-    next: typeof observer.next === 'function' ? observer.next.bind(observer) : defaultObserver.next,
+    next: typeof next === 'function' ? (value) => observer.next?.(value) : defaultObserver.next,
     complete:
-      typeof observer.complete === 'function'
-        ? observer.complete.bind(observer)
-        : defaultObserver.complete,
+      typeof complete === 'function' ? () => observer.complete?.() : defaultObserver.complete,
     error:
-      typeof observer.error === 'function' ? observer.error.bind(observer) : defaultObserver.error,
+      typeof error === 'function' ? (reason) => observer.error?.(reason) : defaultObserver.error,
   };
 }

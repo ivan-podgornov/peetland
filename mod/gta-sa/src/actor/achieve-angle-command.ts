@@ -64,7 +64,14 @@ export class GtaAchieveAngleCommand extends Command<
     return geometry.isWithinAngle(current, angle, tolerance) ? 'success' : 'running';
   }
 
-  protected override onFinish(_result: CommandResult): void {
-    clearCharTasksImmediately(this.options.handle);
+  /**
+   * Задачу поворота снимает, только если команду прервали или она не выполнилась. После успеха
+   * задачи не трогает: следующая команда получает задачу персонажу сразу, в том же кадре, и
+   * clearCharTasksImmediately мог бы её сбросить
+   */
+  protected override onFinish(result: CommandResult): void {
+    if (result !== 'success') {
+      clearCharTasksImmediately(this.options.handle);
+    }
   }
 }

@@ -45,7 +45,7 @@ export class GtaActor implements IActor {
 
     const { x, y, z } = options.position;
     this.handle = createChar(4, options.modelId, x, y, z);
-    setCharHeading(this.handle, options.angle);
+    setCharHeading(this.handle, deps.geometry.normalizeAngle(options.angle));
     dontRemoveChar(this.handle);
     markModelAsNoLongerNeeded(options.modelId);
 
@@ -64,7 +64,9 @@ export class GtaActor implements IActor {
   }
 
   getAngle(): number {
-    return getCharHeading(this.handle);
+    const { geometry } = this.deps;
+
+    return geometry.normalizeAngle(getCharHeading(this.handle));
   }
 
   setPosition(position: Vector3): void {

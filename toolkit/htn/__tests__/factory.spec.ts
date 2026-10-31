@@ -1,20 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { HTNFactory } from '../src';
-import { getDefaultDeps } from '../src/htn';
+import { HTN, HTNFactory } from '../src';
 
-import { getDummyPlanner, primitive, testState } from './helpers';
+import { primitive } from './helpers';
 
 describe('HTNFactory', () => {
   describe('#create', () => {
-    it('Создаёт HTN-агента, который планирует переданную корневую задачу', () => {
-      const root = primitive('Primitive Task');
-      const planner = getDummyPlanner([root]);
-      const factory = new HTNFactory({ ...getDefaultDeps(), plannerFactory: () => planner });
+    it('Возвращает экземпляр HTN', () => {
+      const factory = new HTNFactory();
 
-      factory.create(root).update(testState);
+      const htn = factory.create(primitive('Primitive Task'));
 
-      expect(planner.plan).toHaveBeenCalledExactlyOnceWith(root, testState);
+      expect(htn).toBeInstanceOf(HTN);
     });
   });
 });

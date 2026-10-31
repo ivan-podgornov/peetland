@@ -55,6 +55,9 @@ interface SystemGlobal {
   /** Проверяет загружен ли скрипт */
   isScriptLoaded(this: void, scriptName: string): boolean;
 
+  /** Возвращает время в секундах с момента запуска скрипта */
+  localClock(this: void): number;
+
   /** Получает FPS */
   getFramerate(this: void): number;
 
@@ -89,6 +92,7 @@ export const {
   reloadScript,
   getAllScripts,
   isScriptLoaded,
+  localClock,
   getFramerate,
   isGamePaused,
   getGameVersion,

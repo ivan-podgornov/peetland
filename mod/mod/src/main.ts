@@ -1,5 +1,3 @@
-import './patch-global';
-
 import { GtaGame } from '@peetland/gta-sa';
 import {
   getCharCoordinates,
@@ -14,7 +12,11 @@ import { World } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
 
+import { startTimers } from './patch-global';
+
 function main() {
+  startTimers();
+
   while (true) {
     wait(40);
 

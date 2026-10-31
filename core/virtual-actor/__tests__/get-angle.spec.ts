@@ -4,7 +4,7 @@ import { createActor } from '../dev';
 
 describe('VirtualActor', () => {
   describe('#getAngle', () => {
-    it('Возвращает угол, на который актор повёрнут при создании', () => {
+    it('Возвращает угол, переданный при создании', () => {
       const actor = createActor({ angle: 90 });
 
       const angle = actor.getAngle();

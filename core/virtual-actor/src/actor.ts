@@ -12,7 +12,7 @@ import { VirtualPlayAnimationCommand } from './play-animation-command';
 export type VirtualActorOptions = {
   /** Позиция, на которой появляется актор */
   position: Vector3;
-  /** Угол поворота в градусах, на который актор повёрнут при появлении. Приводится к [0, 360) */
+  /** Угол поворота в градусах, с которым появляется актор. Приводится к [0, 360) */
   angle: number;
 };
 

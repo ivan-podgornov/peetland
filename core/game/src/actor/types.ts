@@ -55,7 +55,7 @@ export type CreateActorOptions = {
   modelId: number;
   /** Позиция, на которой нужно заспавнить персонажа */
   position: Vector3;
-  /** Угол поворота в градусах, на который персонаж повёрнут при спавне (см. IActor.getAngle) */
+  /** Угол поворота в градусах, с которым нужно заспавнить персонажа (см. IActor.getAngle) */
   angle: number;
 };
 

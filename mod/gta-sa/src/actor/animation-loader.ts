@@ -1,7 +1,7 @@
 import type { IAnimationLoader } from '@peetland/animation-manager';
 import { AbortController, Observable } from '@peetland/events';
 import type { ISubscriber } from '@peetland/events';
-import { hasAnimationLoaded, print, removeAnimation, requestAnimation } from '@peetland/moonloader';
+import { removeAnimation, requestAnimation } from '@peetland/moonloader';
 import type { ITimer } from '@peetland/timings';
 
 import { ALWAYS_LOADED_BLOCK } from './animations';
@@ -38,7 +38,6 @@ export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
         return;
       }
 
-      print('requestAnimation');
       requestAnimation(block);
       subscriber.addTeardown(() => removeAnimation(block));
 
@@ -48,11 +47,8 @@ export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
 
       this.timer.interval(CHECK_PERIOD).subscribe(
         () => {
-          print('hasAnimationLoaded');
-          if (hasAnimationLoaded(block)) {
-            checking.abort();
-            subscriber.next();
-          }
+          checking.abort();
+          subscriber.next();
         },
         { signal: checking.signal }
       );

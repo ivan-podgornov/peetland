@@ -1,10 +1,17 @@
 import './patch-global';
 
 import { GtaGame } from '@peetland/gta-sa';
-import { getCharCoordinates, print, wait, wasKeyPressed, PLAYER_PED } from '@peetland/moonloader';
+import {
+  getCharCoordinates,
+  print,
+  wait,
+  wasKeyPressed,
+  PLAYER_PED,
+  setCharCoordinates,
+} from '@peetland/moonloader';
 import { World } from '@peetland/world';
 
-import { VK_G, VK_H } from 'vkeys';
+import { VK_G, VK_H, VK_J } from 'vkeys';
 
 function main() {
   while (true) {
@@ -17,6 +24,10 @@ function main() {
 
     if (wasKeyPressed(VK_H)) {
       new World({ game: new GtaGame() }).bigBang();
+    }
+
+    if (wasKeyPressed(VK_J)) {
+      setCharCoordinates(PLAYER_PED, 2269.6, 65.66, 26.48);
     }
   }
 }

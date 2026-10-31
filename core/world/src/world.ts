@@ -2,7 +2,7 @@ import type { IGame } from '@peetland/game';
 import type { Vector3 } from '@peetland/geometry';
 
 /** Насколько актор может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
-const TRASH_FACING_TOLERANCE = 15;
+const TRASH_FACING_TOLERANCE = 5;
 
 export type WorldDeps = {
   game: IGame;

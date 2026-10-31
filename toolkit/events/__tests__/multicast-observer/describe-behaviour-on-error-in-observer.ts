@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { MulticastObserver } from '../../src/multicast-observer';
 
 import {
   callMethod,
-  createMockedObserver,
   createObserverWithThrowsMethod,
   getDefaultMulticastOptions,
   getDefaultObserveOptions,

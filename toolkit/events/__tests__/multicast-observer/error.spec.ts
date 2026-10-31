@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { MulticastObserver } from '../../src/multicast-observer';
 
 import { describeBehaviourOnErrorInObserver } from './describe-behaviour-on-error-in-observer';
@@ -7,11 +8,7 @@ import { describeBehaviourWhenMethodAbsent } from './describe-behaviour-when-met
 import { describeRecallObserver } from './describe-recall-observers';
 import { describeSignalFinish } from './describe-signal-finish';
 
-import {
-  createMockedObserver,
-  getDefaultMulticastOptions,
-  getDefaultObserveOptions,
-} from './helpers';
+import { getDefaultMulticastOptions, getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#error', () => {

@@ -39,7 +39,8 @@ export class GtaGoToCoordsCommand extends Command<
 
   /** Ставит в точку невидимый объект и отправляет к нему персонажа */
   protected override onStart(): void {
-    const target = this.deps.objectFactory.create({
+    const { objectFactory } = this.deps;
+    const target = objectFactory.create({
       modelId: TARGET_MODEL_ID,
       position: this.options.coords,
     });
@@ -54,12 +55,11 @@ export class GtaGoToCoordsCommand extends Command<
 
   protected onUpdate(): CommandStatus {
     const { coords, completeRadius } = this.options;
+    const { geometry } = this.deps;
     const position = this.actor.getPosition();
     this.emit(position);
 
-    return this.deps.geometry.isWithinRadius2d(position, coords, completeRadius)
-      ? 'success'
-      : 'running';
+    return geometry.isWithinRadius2d(position, coords, completeRadius) ? 'success' : 'running';
   }
 
   protected override onFinish(_result: CommandResult): void {

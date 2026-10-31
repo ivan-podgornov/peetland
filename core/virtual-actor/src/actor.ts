@@ -23,16 +23,12 @@ export type VirtualActorDeps = {
 
 /** Актор, который работает без игры и хранит всё в памяти */
 export class VirtualActor implements IActor {
-  private readonly geometry: IGeometry;
-  private readonly timer: ITimer;
-  private readonly animations: IAnimationManager<VirtualAnimation>;
+  private readonly deps: VirtualActorDeps;
   private position: Vector3;
   private readonly despawnController: AbortController;
 
   constructor(options: VirtualActorOptions, deps: VirtualActorDeps) {
-    this.geometry = deps.geometry;
-    this.timer = deps.timer;
-    this.animations = deps.animations;
+    this.deps = deps;
     this.position = { ...options.position };
     this.despawnController = new AbortController();
   }
@@ -50,11 +46,9 @@ export class VirtualActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    return new VirtualGoToCoordsCommand(
-      this,
-      { coords, completeRadius },
-      { geometry: this.geometry, timer: this.timer }
-    );
+    const { geometry, timer } = this.deps;
+
+    return new VirtualGoToCoordsCommand(this, { coords, completeRadius }, { geometry, timer });
   }
 
   /**
@@ -64,10 +58,12 @@ export class VirtualActor implements IActor {
    * @inheritdoc
    */
   playAnimation(animation: AnimationId, playbackDuration?: number): IActorCommand<void> {
+    const { animations, timer } = this.deps;
+
     return new VirtualPlayAnimationCommand(
       this,
       { animation, playbackDuration },
-      { animations: this.animations, timer: this.timer }
+      { animations, timer }
     );
   }
 

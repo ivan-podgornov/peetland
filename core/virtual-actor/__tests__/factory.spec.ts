@@ -1,16 +1,15 @@
+import { createAnimationManager } from '@peetland/animation-manager/dev';
 import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
 import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '../src';
 
-import { createAnimationManager } from './helpers';
-
 describe('VirtualActorFactory', () => {
   describe('#create', () => {
     it('Создаёт актора на переданной позиции', () => {
       const factory = new VirtualActorFactory({
-        animations: createAnimationManager(),
+        animations: createAnimationManager(VIRTUAL_ANIMATIONS),
         geometry: new Geometry(),
         timer: new ManualTimer(),
       });
@@ -23,7 +22,7 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, который двигается по времени переданного таймера', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory({
-        animations: createAnimationManager(),
+        animations: createAnimationManager(VIRTUAL_ANIMATIONS),
         geometry: new Geometry(),
         timer,
       });

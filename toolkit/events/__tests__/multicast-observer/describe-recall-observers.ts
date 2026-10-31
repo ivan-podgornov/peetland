@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
 import { MulticastObserver } from '../../src/multicast-observer';
@@ -8,7 +9,6 @@ import type { CreateMockedObserverOptions } from './helpers';
 
 import {
   callMethod,
-  createMockedObserver,
   createObserverWithMethod,
   getDefaultMulticastOptions,
   getDefaultObserveOptions,

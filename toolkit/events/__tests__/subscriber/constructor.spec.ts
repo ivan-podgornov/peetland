@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { createMockedObserver } from '../../dev';
 import { Subscriber } from '../../src/subscriber/subscriber';
 
-import { createMockedObserver, getDefaultConstructorOptions } from './helpers';
+import { getDefaultConstructorOptions } from './helpers';
 
 describe('Subscriber', () => {
   describe('#constructor', () => {

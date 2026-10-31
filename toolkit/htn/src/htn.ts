@@ -14,7 +14,19 @@ export function getDefaultDeps<TState>(): HTNDeps<TState> {
   };
 }
 
-export class HTN<TState> {
+/** HTN-агент: планирует корневую задачу, исполняет план и перепланирует, когда план закончился */
+export interface IHTN<TState> {
+  /**
+   * Продвигает исполнение плана с актуальным состоянием. Если плана нет, потому что он ещё не
+   * составлен, завершился или упал, сначала составляет новый
+   */
+  update(state: TState): void;
+
+  /** Останавливает исполнение текущего плана */
+  stop(): void;
+}
+
+export class HTN<TState> implements IHTN<TState> {
   private readonly deps: HTNDeps<TState>;
   private readonly planner: IPlanner<TState>;
   private readonly root: Task<TState>;

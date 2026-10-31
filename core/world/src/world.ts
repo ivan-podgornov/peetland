@@ -18,6 +18,7 @@ export class World {
     const actor = game.actorFactory.create({
       modelId: 230, // Бомж в капюшончике
       position: { x: 2269.6, y: 65.66, z: 26.48 }, // Подворотня в Palomino Creek
+      angle: 0,
     });
 
     const trashBeen: Vector3 = { x: 2320.08, y: 14.22, z: 26.48 }; // Мусорка в Palomino Creek

@@ -23,6 +23,10 @@ export class TestActor implements IActor {
     return { x: 0, y: 0, z: 0 };
   }
 
+  getAngle(): number {
+    return 0;
+  }
+
   setPosition(): void {}
 
   goToCoords(): IActorCommand<Vector3> {

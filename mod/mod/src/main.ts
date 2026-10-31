@@ -3,6 +3,7 @@ import './patch-global';
 import { GtaGame } from '@peetland/gta-sa';
 import {
   getCharCoordinates,
+  getCharHeading,
   print,
   wait,
   wasKeyPressed,
@@ -20,7 +21,8 @@ function main() {
 
     if (wasKeyPressed(VK_G)) {
       const [x, y, z] = getCharCoordinates(PLAYER_PED);
-      print(`x: ${x}, y: ${y}, z: ${z}`);
+      const angle = getCharHeading(PLAYER_PED);
+      print(`x: ${x}, y: ${y}, z: ${z}, angle: ${angle}`);
     }
 
     if (wasKeyPressed(VK_H)) {

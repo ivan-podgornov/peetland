@@ -12,6 +12,11 @@ export enum PlaceType {
 export type PlaceData = Readonly<{
   id: string;
   type: PlaceType;
-  /** Координаты места */
+  /** Координаты места: где нужно встать, чтобы им воспользоваться */
   position: Vector3;
+  /**
+   * Угол поворота в градусах, на который нужно повернуться, стоя в position, например, чтобы
+   * оказаться лицом к мусорке
+   */
+  angle: number;
 }>;

@@ -42,18 +42,13 @@ export class GtaAnimationLoader implements IAnimationLoader<GtaAnimation> {
       requestAnimation(block);
       subscriber.addTeardown(() => removeAnimation(block));
 
-      print('hasAnimationLoaded');
-      if (hasAnimationLoaded(block)) {
-        subscriber.next();
-        return;
-      }
-
       // Проверку останавливаем, как только блок загрузился, а выгружаем блок — по отписке
       const checking = new AbortController();
       subscriber.addTeardown(() => checking.abort());
 
       this.timer.interval(CHECK_PERIOD).subscribe(
         () => {
+          print('hasAnimationLoaded');
           if (hasAnimationLoaded(block)) {
             checking.abort();
             subscriber.next();

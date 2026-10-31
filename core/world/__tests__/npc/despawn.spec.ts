@@ -4,14 +4,14 @@ import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/d
 import { describe, expect, it } from 'vitest';
 
 import { Npc } from '../../src';
-import type { NpcState } from '../../src';
+import type { NpcContext, NpcState } from '../../src';
 
 import { createNpcData, createNpcDeps } from './helpers';
 
 describe('Npc', () => {
   describe('#despawn', () => {
     it('Останавливает HTN-агента', () => {
-      const htn = createMockedHTN<NpcState>();
+      const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ htnFactory: createMockedHTNFactory(htn) })
@@ -20,6 +20,34 @@ describe('Npc', () => {
       npc.despawn();
 
       expect(htn.stop).toHaveBeenCalledOnce();
+    });
+
+    it('Передаёт HTN-агенту при остановке контекст с актором NPC', () => {
+      const actor = createActor();
+      const htn = createMockedHTN<NpcState, NpcContext>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({
+          actorFactory: createMockedActorFactory(actor),
+          htnFactory: createMockedHTNFactory(htn),
+        })
+      );
+
+      npc.despawn();
+
+      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ actor }));
+    });
+
+    it('Передаёт HTN-агенту при остановке контекст с инвентарём NPC', () => {
+      const htn = createMockedHTN<NpcState, NpcContext>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn) })
+      );
+
+      npc.despawn();
+
+      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ inventory: npc.inventory }));
     });
 
     it('Деспавнит актора', () => {
@@ -36,7 +64,7 @@ describe('Npc', () => {
 
     it('После деспавна кадры не вызывают htn.update', () => {
       const frames = createControlledObservable();
-      const htn = createMockedHTN<NpcState>();
+      const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { Executor } from '../../../src/executor';
-import { primitive, testState } from '../../helpers';
+import { primitive, testContext, testState } from '../../helpers';
 
 describe('Executor', () => {
   describe('#update', () => {
@@ -11,7 +11,7 @@ describe('Executor', () => {
         const canExecuteSpy = vi.spyOn(task, 'canExecute').mockReturnValue(false);
 
         const executor = new Executor([task]);
-        executor.update(testState);
+        executor.update(testState, testContext);
 
         expect(canExecuteSpy).toHaveBeenCalledExactlyOnceWith(testState);
       });
@@ -23,21 +23,21 @@ describe('Executor', () => {
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
         const executor = new Executor([task]);
-        executor.update(testState);
+        executor.update(testState, testContext);
 
         expect(startSpy).not.toHaveBeenCalled();
         expect(updateSpy).not.toHaveBeenCalled();
       });
 
-      it('Начинает выполнять первую задачу из списка', () => {
+      it('Начинает выполнять первую задачу из списка с состоянием и контекстом', () => {
         const task = primitive('Primitive Task');
         const startSpy = vi.spyOn(task, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
         const executor = new Executor([task]);
-        executor.update(testState);
+        executor.update(testState, testContext);
 
-        expect(startSpy).toHaveBeenCalledExactlyOnceWith(testState);
+        expect(startSpy).toHaveBeenCalledExactlyOnceWith(testState, testContext);
         expect(updateSpy).not.toHaveBeenCalled();
       });
 
@@ -49,7 +49,7 @@ describe('Executor', () => {
         const updateSpy = vi.spyOn(anotherTask, 'update').mockReturnValue('running');
 
         const executor = new Executor([successTask, anotherTask]);
-        executor.update(testState);
+        executor.update(testState, testContext);
 
         expect(startSpy).not.toHaveBeenCalled();
         expect(updateSpy).not.toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe('Executor', () => {
         vi.spyOn(task, 'start').mockReturnValue('success');
 
         const executor = new Executor([task]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('success');
       });
@@ -70,7 +70,7 @@ describe('Executor', () => {
         vi.spyOn(task, 'start').mockReturnValue('running');
 
         const executor = new Executor([task]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
       });
@@ -80,7 +80,7 @@ describe('Executor', () => {
         vi.spyOn(successTask, 'start').mockReturnValue('success');
 
         const executor = new Executor([successTask, primitive('Another Task')]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
       });
@@ -90,7 +90,7 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'start').mockReturnValue('failed');
 
         const executor = new Executor([failedTask]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });
@@ -100,7 +100,7 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'canExecute').mockReturnValue(false);
 
         const executor = new Executor([failedTask]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });
@@ -110,7 +110,7 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'start').mockReturnValue('failed');
 
         const executor = new Executor([failedTask, primitive('Another Task')]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });

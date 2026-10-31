@@ -1,13 +1,13 @@
 import type { Task } from '@peetland/htn';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { Npc } from '../../src';
-import type { NpcState } from '../../src';
+import type { NpcContext, NpcState } from '../../src';
 
-import { createMockedRootTaskFactory, createNpcData, createNpcDeps } from './helpers';
+import { createNpcData, createNpcDeps } from './helpers';
 
 describe('Npc', () => {
   describe('#constructor', () => {
@@ -52,32 +52,17 @@ describe('Npc', () => {
       expect(npc.feelings).toStrictEqual(data.feelings);
     });
 
-    it('Создаёт корневую задачу для своего актора', () => {
-      const actor = createActor();
-      const rootTaskFactory = createMockedRootTaskFactory();
-
-      new Npc(
-        createNpcData(),
-        createNpcDeps({ actorFactory: createMockedActorFactory(actor), rootTaskFactory })
-      );
-
-      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith(actor);
-    });
-
     it('Создаёт HTN-агента с корневой задачей', () => {
-      const root: Task<NpcState> = { name: 'root', methods: [] };
-      const htnFactory = createMockedHTNFactory<NpcState>();
+      const rootTask: Task<NpcState, NpcContext> = { name: 'root', methods: [] };
+      const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
 
-      new Npc(
-        createNpcData(),
-        createNpcDeps({ htnFactory, rootTaskFactory: createMockedRootTaskFactory(root) })
-      );
+      new Npc(createNpcData(), createNpcDeps({ htnFactory, rootTask }));
 
-      expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(root);
+      expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(rootTask);
     });
 
     it('Не обновляет HTN-агента, пока не наступил кадр', () => {
-      const htn = createMockedHTN<NpcState>();
+      const htn = createMockedHTN<NpcState, NpcContext>();
 
       new Npc(createNpcData(), createNpcDeps({ htnFactory: createMockedHTNFactory(htn) }));
 

@@ -1,3 +1,4 @@
+import { Item } from '@peetland/inventory';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -7,10 +8,19 @@ import { createNpcData, createNpcDeps } from './helpers';
 
 describe('Npc', () => {
   describe('#getState', () => {
-    it('Возвращает живой инвентарь NPC, а не копию', () => {
-      const npc = new Npc(createNpcData(), createNpcDeps());
+    it('Возвращает содержимое инвентаря NPC', () => {
+      const npc = new Npc(createNpcData({ inventory: { [Item.Money]: 150 } }), createNpcDeps());
 
-      expect(npc.getState().inventory).toBe(npc.inventory);
+      expect(npc.getState().inventory).toStrictEqual({ [Item.Money]: 150 });
+    });
+
+    it('Возвращает слепок инвентаря, который не меняется, когда меняется инвентарь', () => {
+      const npc = new Npc(createNpcData({ inventory: { [Item.Money]: 150 } }), createNpcDeps());
+      const state = npc.getState();
+
+      npc.inventory.add(Item.Money, 50);
+
+      expect(state.inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает позицию актора', () => {

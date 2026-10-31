@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { HTN, getDefaultDeps } from '../../../src/htn';
-import { getDummyExecutor, getDummyPlanner, primitive, testState } from '../../helpers';
+import {
+  getDummyExecutor,
+  getDummyPlanner,
+  primitive,
+  testContext,
+  testState,
+} from '../../helpers';
 
 describe('HTN', () => {
   describe('#update', () => {
@@ -16,8 +22,8 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.stop(); // остановили выполнение
-        htn.update(testState); // спланировали
+        htn.stop(testContext); // остановили выполнение
+        htn.update(testState, testContext); // спланировали
 
         expect(planner.plan).toHaveBeenCalledExactlyOnceWith(root, testState);
       });
@@ -32,9 +38,9 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.update(testState); // спланировали, начали выполнять
-        htn.stop(); // остановили выполнение
-        htn.update(testState); // перепланировали
+        htn.update(testState, testContext); // спланировали, начали выполнять
+        htn.stop(testContext); // остановили выполнение
+        htn.update(testState, testContext); // перепланировали
 
         expect(planner.plan).toHaveBeenCalledTimes(2);
         expect(planner.plan).toHaveBeenLastCalledWith(root, testState);
@@ -50,8 +56,8 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.stop(); // остановили выполнение
-        htn.update(testState); // спланировали
+        htn.stop(testContext); // остановили выполнение
+        htn.update(testState, testContext); // спланировали
 
         expect(executor.update).not.toHaveBeenCalled();
       });
@@ -66,10 +72,10 @@ describe('HTN', () => {
           plannerFactory: () => planner,
         });
 
-        htn.stop(); // остановили выполнение
-        htn.update(testState); // спланировали и начали выполнять
+        htn.stop(testContext); // остановили выполнение
+        htn.update(testState, testContext); // спланировали и начали выполнять
 
-        expect(executor.update).toHaveBeenCalledWith(testState);
+        expect(executor.update).toHaveBeenCalledWith(testState, testContext);
       });
     });
   });

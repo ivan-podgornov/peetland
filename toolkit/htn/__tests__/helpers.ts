@@ -9,7 +9,11 @@ export type TestState = { canExecute: boolean; counter: number };
 
 export const testState = { canExecute: true, counter: 0 };
 
-export function primitive(name: string): PrimitiveTask<TestState> {
+export type TestContext = { name: string };
+
+export const testContext: TestContext = { name: 'context' };
+
+export function primitive(name: string): PrimitiveTask<TestState, TestContext> {
   return {
     name,
     applyEffects: (state) => ({ ...state, canExecute: true }),
@@ -20,21 +24,27 @@ export function primitive(name: string): PrimitiveTask<TestState> {
   };
 }
 
-export function blockedPrimitive(name: string): PrimitiveTask<TestState> {
+export function blockedPrimitive(name: string): PrimitiveTask<TestState, TestContext> {
   return {
     ...primitive(name),
     canExecute: () => false,
   };
 }
 
-export function compound(name: string, ...methods: Method<TestState>[]): CompoundTask<TestState> {
+export function compound(
+  name: string,
+  ...methods: Method<TestState, TestContext>[]
+): CompoundTask<TestState, TestContext> {
   return {
     name,
     methods,
   };
 }
 
-export function method(name: string, ...tasks: Task<TestState>[]): Method<TestState> {
+export function method(
+  name: string,
+  ...tasks: Task<TestState, TestContext>[]
+): Method<TestState, TestContext> {
   return {
     name,
     tasks,
@@ -42,7 +52,10 @@ export function method(name: string, ...tasks: Task<TestState>[]): Method<TestSt
   };
 }
 
-export function blockedMethod(name: string, ...tasks: Task<TestState>[]): Method<TestState> {
+export function blockedMethod(
+  name: string,
+  ...tasks: Task<TestState, TestContext>[]
+): Method<TestState, TestContext> {
   return {
     ...method(name, ...tasks),
     preconditions: () => false,
@@ -56,8 +69,8 @@ export function blockedMethod(name: string, ...tasks: Task<TestState>[]): Method
 export function spyPrimitive(
   name: string,
   stateAfter?: TestState
-): PrimitiveTask<TestState> &
-  Pick<Mocked<PrimitiveTask<TestState>>, 'canExecute' | 'applyEffects'> {
+): PrimitiveTask<TestState, TestContext> &
+  Pick<Mocked<PrimitiveTask<TestState, TestContext>>, 'canExecute' | 'applyEffects'> {
   return {
     ...primitive(name),
     canExecute: vi.fn(() => true),
@@ -68,21 +81,21 @@ export function spyPrimitive(
 /** Метод-шпион: подходит всегда, а `preconditions` запоминает вызовы */
 export function spyMethod(
   name: string,
-  ...tasks: Task<TestState>[]
-): Method<TestState> & Pick<Mocked<Method<TestState>>, 'preconditions'> {
+  ...tasks: Task<TestState, TestContext>[]
+): Method<TestState, TestContext> & Pick<Mocked<Method<TestState, TestContext>>, 'preconditions'> {
   return {
     ...method(name, ...tasks),
     preconditions: vi.fn(() => true),
   };
 }
 
-export function getNames(tasks: Task<TestState>[]): string[] {
+export function getNames(tasks: Task<TestState, TestContext>[]): string[] {
   return tasks.map((task) => task.name);
 }
 
 export function getDummyPlanner(
-  plan: PrimitiveTask<TestState>[] | null,
-  secondPlan?: PrimitiveTask<TestState>[] | null
+  plan: PrimitiveTask<TestState, TestContext>[] | null,
+  secondPlan?: PrimitiveTask<TestState, TestContext>[] | null
 ): IPlanner<TestState> {
   return {
     plan: vi
@@ -92,7 +105,7 @@ export function getDummyPlanner(
   };
 }
 
-export function getDummyExecutor(taskResult: TaskResult): IExecutor<TestState> {
+export function getDummyExecutor(taskResult: TaskResult): IExecutor<TestState, TestContext> {
   return {
     currentTask: null,
     update: vi.fn().mockReturnValue(taskResult),

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { Executor } from '../../../src/executor';
-import { primitive, testState } from '../../helpers';
+import { primitive, testContext, testState } from '../../helpers';
 
 describe('Executor', () => {
   describe('#update', () => {
@@ -11,9 +11,9 @@ describe('Executor', () => {
         vi.spyOn(task, 'start').mockReturnValue('success');
         const executor = new Executor([task]);
 
-        executor.update(testState);
+        executor.update(testState, testContext);
 
-        expect(() => executor.update(testState)).toThrow(
+        expect(() => executor.update(testState, testContext)).toThrow(
           "Can't update, because execution is already success"
         );
       });
@@ -23,9 +23,9 @@ describe('Executor', () => {
         vi.spyOn(task, 'start').mockReturnValue('failed');
         const executor = new Executor([task]);
 
-        executor.update(testState);
+        executor.update(testState, testContext);
 
-        expect(() => executor.update(testState)).toThrow(
+        expect(() => executor.update(testState, testContext)).toThrow(
           "Can't update, because execution is already failed"
         );
       });
@@ -33,9 +33,9 @@ describe('Executor', () => {
       it('Выбрасывает ошибку, если выполнение задач было остановлено ранее', () => {
         const executor = new Executor([primitive('Primitive Task')]);
 
-        executor.stop();
+        executor.stop(testContext);
 
-        expect(() => executor.update(testState)).toThrow(
+        expect(() => executor.update(testState, testContext)).toThrow(
           "Can't update, because execution is already stopped"
         );
       });

@@ -1,21 +1,21 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { Executor } from '../../../src/executor';
-import { primitive, testState } from '../../helpers';
+import { primitive, testContext, testState } from '../../helpers';
 
 describe('Executor', () => {
   describe('#update', () => {
     describe('Если задачи уже начали выполняться', () => {
-      it('Если при прошлом вызове задача не завершила своё выполнение, продолжает её выполнять', () => {
+      it('Если при прошлом вызове задача не завершила своё выполнение, продолжает её выполнять с состоянием и контекстом', () => {
         const task = primitive('Primitive Task');
         vi.spyOn(task, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
         const executor = new Executor([task]);
-        executor.update(testState); // Начинаем выполнять задачу
-        executor.update(testState); // Продолжаем выполнять задачу
+        executor.update(testState, testContext); // Начинаем выполнять задачу
+        executor.update(testState, testContext); // Продолжаем выполнять задачу
 
-        expect(updateSpy).toHaveBeenCalledExactlyOnceWith(testState);
+        expect(updateSpy).toHaveBeenCalledExactlyOnceWith(testState, testContext);
       });
 
       it('Если при прошлом вызове задача не завершила своё выполнение, больше не проверяет можно ли её выполнять при текущем состоянии мира', () => {
@@ -25,8 +25,8 @@ describe('Executor', () => {
         const canExecuteSpy = vi.spyOn(task, 'canExecute').mockReturnValue(true);
 
         const executor = new Executor([task]);
-        executor.update(testState); // Начинаем выполнять задачу
-        executor.update(testState); // Продолжаем выполнять задачу
+        executor.update(testState, testContext); // Начинаем выполнять задачу
+        executor.update(testState, testContext); // Продолжаем выполнять задачу
 
         expect(canExecuteSpy).toHaveBeenCalledExactlyOnceWith(testState);
       });
@@ -41,8 +41,8 @@ describe('Executor', () => {
 
         // act
         const executor = new Executor([successTask, nextTask]);
-        executor.update(testState); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
-        executor.update(testState); // Должна начать выполняться следующая задача
+        executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
+        executor.update(testState, testContext); // Должна начать выполняться следующая задача
 
         // assert
         expect(canExecuteSpy).toHaveBeenCalledExactlyOnceWith(testState);
@@ -60,15 +60,15 @@ describe('Executor', () => {
 
         // act
         const executor = new Executor([successTask, nextTask]);
-        executor.update(testState); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
-        executor.update(testState); // Должна начать выполняться следующая задача
+        executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
+        executor.update(testState, testContext); // Должна начать выполняться следующая задача
 
         // assert
         expect(startSpy).not.toHaveBeenCalled();
         expect(updateSpy).not.toHaveBeenCalled();
       });
 
-      it('Если при прошлом вызове, задача завершила своё выполнение успешно и есть ещё задачи на выполнение, начинает выполнять следующую задачу из списка', () => {
+      it('Если при прошлом вызове, задача завершила своё выполнение успешно и есть ещё задачи на выполнение, начинает выполнять следующую задачу из списка с состоянием и контекстом', () => {
         // arrange
         const successTask = primitive('Success Task');
         vi.spyOn(successTask, 'start').mockReturnValue('success');
@@ -79,11 +79,11 @@ describe('Executor', () => {
 
         // act
         const executor = new Executor([successTask, nextTask]);
-        executor.update(testState); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
-        executor.update(testState); // Должна начать выполняться следующая задача
+        executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
+        executor.update(testState, testContext); // Должна начать выполняться следующая задача
 
         // assert
-        expect(startSpy).toHaveBeenCalledExactlyOnceWith(testState);
+        expect(startSpy).toHaveBeenCalledExactlyOnceWith(testState, testContext);
         expect(updateSpy).not.toHaveBeenCalled();
       });
 
@@ -93,8 +93,8 @@ describe('Executor', () => {
         vi.spyOn(task, 'update').mockReturnValue('success');
 
         const executor = new Executor([task]);
-        executor.update(testState);
-        const result = executor.update(testState);
+        executor.update(testState, testContext);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('success');
       });
@@ -105,7 +105,7 @@ describe('Executor', () => {
         vi.spyOn(task, 'update').mockReturnValue('running');
 
         const executor = new Executor([task]);
-        const result = executor.update(testState);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
       });
@@ -116,8 +116,8 @@ describe('Executor', () => {
         vi.spyOn(successTask, 'update').mockReturnValue('success');
 
         const executor = new Executor([successTask, primitive('Another Task')]);
-        executor.update(testState);
-        const result = executor.update(testState);
+        executor.update(testState, testContext);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
       });
@@ -128,8 +128,8 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'update').mockReturnValue('failed');
 
         const executor = new Executor([failedTask]);
-        executor.update(testState);
-        const result = executor.update(testState);
+        executor.update(testState, testContext);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });
@@ -140,8 +140,8 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'update').mockReturnValue('failed');
 
         const executor = new Executor([failedTask, primitive('Another Task')]);
-        executor.update(testState);
-        const result = executor.update(testState);
+        executor.update(testState, testContext);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });
@@ -154,8 +154,8 @@ describe('Executor', () => {
         vi.spyOn(failedTask, 'canExecute').mockReturnValue(false);
 
         const executor = new Executor([successTask, failedTask]);
-        executor.update(testState);
-        const result = executor.update(testState);
+        executor.update(testState, testContext);
+        const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
       });

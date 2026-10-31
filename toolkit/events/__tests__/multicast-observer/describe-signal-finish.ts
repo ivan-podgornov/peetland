@@ -2,12 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { MulticastObserver } from '../../src/multicast-observer';
 
-import {
-  callMethod,
-  createObserverWithMethod,
-  getDefaultMulticastOptions,
-  getDefaultObserveOptions,
-} from './helpers';
+import { callMethod, createObserverWithMethod, getDefaultObserveOptions } from './helpers';
 
 type DescribeSignalFinishOptions = {
   /** Метод для которого нужно проверить завершение сигнала */
@@ -21,7 +16,7 @@ export function describeSignalFinish(options: DescribeSignalFinishOptions) {
 
   describe(`Сигнал после вызова ${method}`, () => {
     it('Переходит в состояние aborted', () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       callMethod(multicast, method);
 
@@ -29,7 +24,7 @@ export function describeSignalFinish(options: DescribeSignalFinishOptions) {
     });
 
     it(`Причиной перехода сигнала в состояние aborted является ${String(reason)}`, () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       callMethod(multicast, method);
 
@@ -37,7 +32,7 @@ export function describeSignalFinish(options: DescribeSignalFinishOptions) {
     });
 
     it(`Обработчик ${method} наблюдателя вызывается раньше, чем сигнал переходит в состояние aborted`, () => {
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
       const implementation = vi.fn(() => multicast.signal.aborted);
       const observer = createObserverWithMethod({ method }, implementation);
 

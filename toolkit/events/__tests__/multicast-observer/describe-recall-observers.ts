@@ -7,12 +7,7 @@ import { MulticastObserver } from '../../src/multicast-observer';
 
 import type { CreateMockedObserverOptions } from './helpers';
 
-import {
-  callMethod,
-  createObserverWithMethod,
-  getDefaultMulticastOptions,
-  getDefaultObserveOptions,
-} from './helpers';
+import { callMethod, createObserverWithMethod, getDefaultObserveOptions } from './helpers';
 
 // Методы, после вызова которых вещание завершается и наблюдатели больше ничего не получают
 const FINISH_METHODS = ['complete', 'error'] as const;
@@ -35,7 +30,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const firstObserver = createObserverWithMethod(options, firstImplementation);
       const secondImplementation = vi.fn();
       const secondObserver = createObserverWithMethod(options, secondImplementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
@@ -50,7 +45,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const firstObserver = createObserverWithMethod(options, firstImplementation);
       const secondImplementation = vi.fn();
       const secondObserver = createObserverWithMethod(options, secondImplementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
@@ -62,7 +57,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
     it(`Вызывает ${methodName} с параметром переданным в multicastObserver.${method}`, () => {
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer, getDefaultObserveOptions());
       const params = callMethod(multicast, method);
@@ -74,7 +69,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const abortController = new AbortController();
       const observerThatWillBeAborted = createObserverWithMethod(options, () => {});
       const observer = createMockedObserver();
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer, getDefaultObserveOptions());
       multicast.add(observerThatWillBeAborted, {
@@ -92,7 +87,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const secondAbortController = new AbortController();
       const implementation = vi.fn();
       const observer = createObserverWithMethod(options, implementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       multicast.add(observer, {
         ...getDefaultObserveOptions(),
@@ -113,7 +108,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const controller = new AbortController();
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       // Нужен второй наблюдатель, который будет держать сигнал MulticastObserver в состоянии pending,
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
@@ -130,7 +125,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
     it(`Если сигнал наблюдателя изначально в состоянии aborted, ${methodName} не вызывается`, () => {
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
-      const multicast = new MulticastObserver(getDefaultMulticastOptions());
+      const multicast = new MulticastObserver();
 
       // Нужен второй наблюдатель, который будет держать сигнал MulticastObserver в состоянии pending,
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
@@ -146,7 +141,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       it(`${methodName} не вызывается`, () => {
         const methodImplementation = vi.fn();
         const observer = createObserverWithMethod(options, methodImplementation);
-        const multicast = new MulticastObserver(getDefaultMulticastOptions());
+        const multicast = new MulticastObserver();
 
         multicast.add(observer, getDefaultObserveOptions());
         callMethod(multicast, finishMethod);

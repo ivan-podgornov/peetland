@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createControlledObservable, createMockedObserver } from '../../../dev';
 import { getDefaultSubscribeOptions } from '../helpers';
@@ -60,6 +60,24 @@ describe('Observable', () => {
         inner.subscriber.error(new Error('inner error'));
 
         expect(source.subscriber.active).toBe(false);
+      });
+
+      it('Если observer.next выбросил исключение, вызывает reportError', () => {
+        const error = new Error('observer error');
+        const source = createControlledObservable();
+        const inner = createControlledObservable();
+        const observer = {
+          ...createMockedObserver(),
+          next: vi.fn().mockThrow(error),
+        };
+
+        source.observable
+          .switchMap(() => inner.observable)
+          .subscribe(observer, getDefaultSubscribeOptions());
+        source.subscriber.next('value');
+        inner.subscriber.next('inner value');
+
+        expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
       });
     });
   });

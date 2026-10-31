@@ -1,23 +1,12 @@
 import { Listeners } from './listeners';
 import type { EventMap, IEventTarget, Listener, ListenerOptions } from './types';
 
-type ErrorHandler = (error: unknown) => void;
-
-export type EventTargetOptions = {
-  onError?: ErrorHandler;
-};
-
 const DEFAULT_LISTENER_OPTIONS: ListenerOptions = {
   once: false,
 };
 
 export class EventTarget<Events extends EventMap<Events>> implements IEventTarget<Events> {
   private readonly listeners: Listeners<Events> = new Listeners();
-  private readonly onError: ErrorHandler;
-
-  constructor(options: EventTargetOptions = {}) {
-    this.onError = options.onError ?? (() => {});
-  }
 
   dispatchEvent<K extends keyof Events>(type: K, ...payload: Events[K]): void {
     this.listeners.forEach(type, (listener, options) => {
@@ -28,11 +17,7 @@ export class EventTarget<Events extends EventMap<Events>> implements IEventTarge
 
         listener(...payload);
       } catch (error) {
-        try {
-          this.onError(error);
-        } catch {
-          // должен быть пустым. Кто хотел ошибку обработать, тот обработает в onError
-        }
+        reportError(error);
       }
     });
   }

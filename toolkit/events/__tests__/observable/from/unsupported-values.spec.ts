@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import { Observable } from '../../../src/observable';
 
-import { getDefaultObservableOptions } from '../helpers';
-
 const unsupportedValues = [
   { description: 'число', value: 42 },
   { description: 'обычный объект', value: { key: 'value' } },
@@ -19,7 +17,7 @@ describe('Observable', () => {
         ({ value }) => {
           // Типы такие значения запрещают, но проверяется поведение в рантайме
           function callFrom() {
-            return Observable.from(value as never, getDefaultObservableOptions());
+            return Observable.from(value as never);
           }
 
           expect(callFrom).toThrow(TypeError);

@@ -3,13 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMockedObserver } from '../../../dev';
 import { Observable } from '../../../src/observable';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('.from', () => {
     describe('При передаче массива', () => {
       it('Вызывает observer.next с каждым элементом массива в порядке следования', () => {
-        const observable = Observable.from([1, 2], getDefaultObservableOptions());
+        const observable = Observable.from([1, 2]);
         const observer = createMockedObserver();
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -19,7 +19,7 @@ describe('Observable', () => {
       });
 
       it('Вызывает observer.complete после того, как выдал все элементы', () => {
-        const observable = Observable.from([1, 2], getDefaultObservableOptions());
+        const observable = Observable.from([1, 2]);
         const observer = createMockedObserver();
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -29,7 +29,7 @@ describe('Observable', () => {
       });
 
       it('Не вызывает observer.error', () => {
-        const observable = Observable.from([1, 2], getDefaultObservableOptions());
+        const observable = Observable.from([1, 2]);
         const observer = createMockedObserver();
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -38,7 +38,7 @@ describe('Observable', () => {
       });
 
       it('Если массив пуст, вызывает observer.complete и не вызывает observer.next', () => {
-        const observable = Observable.from([], getDefaultObservableOptions());
+        const observable = Observable.from([]);
         const observer = createMockedObserver();
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -49,7 +49,7 @@ describe('Observable', () => {
 
       it('Если массив изменён после вызова from, но до подписки, выдаёт элементы изменённого массива', () => {
         const values = [1];
-        const observable = Observable.from(values, getDefaultObservableOptions());
+        const observable = Observable.from(values);
         const observer = createMockedObserver();
 
         values.push(2);
@@ -59,7 +59,7 @@ describe('Observable', () => {
       });
 
       it('Если подписаться повторно после завершения, снова выдаёт все элементы', () => {
-        const observable = Observable.from([1, 2], getDefaultObservableOptions());
+        const observable = Observable.from([1, 2]);
         const observer = createMockedObserver();
 
         observable.subscribe(createMockedObserver(), getDefaultSubscribeOptions());
@@ -69,13 +69,9 @@ describe('Observable', () => {
         expect(observer.next).toHaveBeenNthCalledWith(2, 2);
       });
 
-      it('Если observer.next выбросил исключение, вызывает onError, переданный во втором параметре from', () => {
+      it('Если observer.next выбросил исключение, вызывает reportError', () => {
         const error = new Error('observer error');
-        const onError = vi.fn();
-        const observable = Observable.from([1], {
-          ...getDefaultObservableOptions(),
-          onError,
-        });
+        const observable = Observable.from([1]);
         const observer = {
           ...createMockedObserver(),
           next: vi.fn().mockThrow(error),
@@ -83,7 +79,7 @@ describe('Observable', () => {
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
 
-        expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+        expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
       });
     });
   });

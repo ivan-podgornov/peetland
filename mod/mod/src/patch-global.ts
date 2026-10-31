@@ -59,7 +59,7 @@ function runDueTimers(): void {
       timer.callback(...timer.args);
     } catch (error) {
       // Ошибка одного колбэка не должна останавливать остальные таймеры
-      print(`Ошибка в таймере: ${String(error)}`);
+      reportError(error);
     }
   }
 }
@@ -102,7 +102,19 @@ function clearTimer(timerId: number): void {
   timers.delete(timerId);
 }
 
+/** Печатает ошибку в лог MoonLoader: текст и, если есть, стек */
+function reportError(error: unknown): void {
+  const stack = error instanceof Error ? error.stack : undefined;
+
+  print(`Ошибка: ${String(error)}`);
+
+  if (stack) {
+    print(stack);
+  }
+}
+
 globalThis.setTimeout = setTimeout;
 globalThis.clearTimeout = clearTimer;
 globalThis.setInterval = setInterval;
 globalThis.clearInterval = clearTimer;
+globalThis.reportError = reportError;

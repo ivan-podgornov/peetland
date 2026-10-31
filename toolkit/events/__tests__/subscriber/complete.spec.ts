@@ -74,19 +74,15 @@ describe('Subscriber', () => {
         expect(() => subscriber.complete()).not.toThrow();
       });
 
-      it('Если observer.complete выбрасывает ошибку и в конструкторе задан onError, вызывается onError с ошибкой которую выбросил observer.complete', () => {
+      it('Если observer.complete выбрасывает ошибку, вызывается reportError с ошибкой, которую выбросил observer.complete', () => {
         const error = new Error();
         const throwsErrorComplete = vi.fn().mockThrow(error);
-        const constructorOnError = vi.fn();
         const observer = { ...createMockedObserver(), complete: throwsErrorComplete };
-        const subscriber = new Subscriber(observer, {
-          ...getDefaultConstructorOptions(),
-          onError: constructorOnError,
-        });
+        const subscriber = new Subscriber(observer);
 
         subscriber.complete();
 
-        expect(constructorOnError).toHaveBeenCalledWith(error);
+        expect(reportError).toHaveBeenCalledWith(error);
       });
     });
 

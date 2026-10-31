@@ -8,7 +8,7 @@ import { describeBehaviourOnErrorInObserver } from './describe-behaviour-on-erro
 import { describeBehaviourWhenMethodAbsent } from './describe-behaviour-when-method-absent';
 import { describeRecallObserver } from './describe-recall-observers';
 
-import { getDefaultMulticastOptions, getDefaultObserveOptions } from './helpers';
+import { getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#next', () => {
@@ -24,7 +24,7 @@ describe('MulticastObserver', () => {
     describe('Изменение набора наблюдателей во время рассылки', () => {
       describe('Если наблюдатель добавляет нового наблюдателя во время next', () => {
         it('Новый наблюдатель не получает текущее значение', () => {
-          const multicast = new MulticastObserver(getDefaultMulticastOptions());
+          const multicast = new MulticastObserver();
           const lateObserver = createMockedObserver();
 
           multicast.add(() => {
@@ -36,7 +36,7 @@ describe('MulticastObserver', () => {
         });
 
         it('Новый наблюдатель получает следующие значения', () => {
-          const multicast = new MulticastObserver(getDefaultMulticastOptions());
+          const multicast = new MulticastObserver();
           const lateObserver = createMockedObserver();
           // Добавляет нового наблюдателя только при первом вызове
           const addLateObserver = vi.fn().mockImplementationOnce(() => {
@@ -55,7 +55,7 @@ describe('MulticastObserver', () => {
         it('Отписанный наблюдатель не получает текущее значение', () => {
           const controller = new AbortController();
           const unsubscribedObserver = createMockedObserver();
-          const multicast = new MulticastObserver(getDefaultMulticastOptions());
+          const multicast = new MulticastObserver();
 
           multicast.add(() => controller.abort(), getDefaultObserveOptions());
           multicast.add(unsubscribedObserver, {
@@ -70,7 +70,7 @@ describe('MulticastObserver', () => {
         it('Остальные наблюдатели получают текущее значение', () => {
           const controller = new AbortController();
           const otherObserver = createMockedObserver();
-          const multicast = new MulticastObserver(getDefaultMulticastOptions());
+          const multicast = new MulticastObserver();
 
           multicast.add(() => controller.abort(), getDefaultObserveOptions());
           multicast.add(createMockedObserver(), {
@@ -88,7 +88,7 @@ describe('MulticastObserver', () => {
         it('Остальные наблюдатели получают текущее значение', () => {
           const controller = new AbortController();
           const otherObserver = createMockedObserver();
-          const multicast = new MulticastObserver(getDefaultMulticastOptions());
+          const multicast = new MulticastObserver();
 
           multicast.add(() => controller.abort(), {
             ...getDefaultObserveOptions(),

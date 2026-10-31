@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMockedObserver, createControlledObservable } from '../../../dev';
 import { Observable } from '../../../src/observable';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#subscribe', () => {
@@ -82,7 +82,7 @@ describe('Observable', () => {
           const observable = new Observable<number>((subscriber) => {
             subscriber.next(1);
             subscriber.next(2);
-          }, getDefaultObservableOptions());
+          });
           const observer = createMockedObserver();
 
           observable.subscribe(observer, getDefaultSubscribeOptions());
@@ -95,7 +95,7 @@ describe('Observable', () => {
           const observable = new Observable<number>((subscriber) => {
             subscriber.next(1);
             subscriber.complete();
-          }, getDefaultObservableOptions());
+          });
           const observer = createMockedObserver();
 
           observable.subscribe(observer, getDefaultSubscribeOptions());

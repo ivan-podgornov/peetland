@@ -19,7 +19,7 @@ describe('EventTarget', () => {
       });
 
       it('Если обработчик выбросил исключение, он всё равно снимается', () => {
-        const target = new EventTarget<TestEvents>({ onError: vi.fn() });
+        const target = new EventTarget<TestEvents>();
         const listener = vi.fn(() => {
           throw new Error('boom');
         });

@@ -1,8 +1,4 @@
-import type { ObservableOptions, SubscribeOptions } from '../../src/observable';
-
-export function getDefaultObservableOptions(): ObservableOptions {
-  return {};
-}
+import type { SubscribeOptions } from '../../src/observable';
 
 export function getDefaultSubscribeOptions(): SubscribeOptions {
   return {};

@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 
 import { Observable } from '../src';
-import type { ISubscriber, ObservableOptions } from '../src';
+import type { ISubscriber } from '../src';
 
 /** Ждёт, пока выполнятся все микрозадачи, запланированные к этому моменту */
 export function flushPromises(): Promise<void> {
@@ -9,13 +9,13 @@ export function flushPromises(): Promise<void> {
 }
 
 /** Создаёт Observable, который запоминает своих подписчиков, чтобы тест управлял ими */
-export function createControlledObservable(options: ObservableOptions = {}) {
+export function createControlledObservable() {
   const subscribers: Array<ISubscriber<unknown>> = [];
   const executor = vi.fn((subscriber: ISubscriber<unknown>) => {
     subscribers.push(subscriber);
   });
 
-  const observable = new Observable(executor, options);
+  const observable = new Observable(executor);
 
   function last() {
     const last = subscribers[subscribers.length - 1];

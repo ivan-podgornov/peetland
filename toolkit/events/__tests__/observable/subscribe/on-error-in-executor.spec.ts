@@ -3,52 +3,40 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMockedObserver } from '../../../dev';
 import { Observable } from '../../../src/observable';
 
-import { getDefaultObservableOptions, getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#subscribe', () => {
     describe('При ошибке в колбэк-executor', () => {
-      it('Если наблюдатель не имеет обработчика ошибок, onError переданный в конструкторе, вызывается с ошибкой, которую выбросил executor', () => {
+      it('Если наблюдатель не имеет обработчика ошибок, reportError вызывается с ошибкой, которую выбросил executor', () => {
         const error = new Error('executor failed');
-        const onError = vi.fn();
         const executor = vi.fn().mockThrow(error);
-        const observable = new Observable(executor, {
-          ...getDefaultObservableOptions(),
-          onError,
-        });
+        const observable = new Observable(executor);
 
         observable.subscribe({ next: vi.fn() }, getDefaultSubscribeOptions());
 
-        expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+        expect(reportError).toHaveBeenCalledExactlyOnceWith(error);
       });
 
-      it('onError переданный в конструкторе, вызывается по разу на каждого наблюдателя без обработчика ошибок', () => {
+      it('reportError вызывается по разу на каждого наблюдателя без обработчика ошибок', () => {
         const error = new Error('executor failed');
-        const onError = vi.fn();
         const executor = vi.fn().mockThrow(error);
-        const observable = new Observable(executor, {
-          ...getDefaultObservableOptions(),
-          onError,
-        });
+        const observable = new Observable(executor);
 
         observable.subscribe({ next: vi.fn() }, getDefaultSubscribeOptions());
         observable.subscribe({ next: vi.fn() }, getDefaultSubscribeOptions());
 
-        expect(onError).toHaveBeenCalledTimes(2);
+        expect(reportError).toHaveBeenCalledTimes(2);
       });
 
-      it('Если у наблюдателя есть обработчик ошибок, onError переданный в конструкторе, не вызывается', () => {
+      it('Если у наблюдателя есть обработчик ошибок, reportError не вызывается', () => {
         const error = new Error('executor failed');
-        const onError = vi.fn();
         const executor = vi.fn().mockThrow(error);
-        const observable = new Observable(executor, {
-          ...getDefaultObservableOptions(),
-          onError,
-        });
+        const observable = new Observable(executor);
 
         observable.subscribe(createMockedObserver(), getDefaultSubscribeOptions());
 
-        expect(onError).not.toHaveBeenCalled();
+        expect(reportError).not.toHaveBeenCalled();
       });
     });
   });

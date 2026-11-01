@@ -18,6 +18,8 @@ export type { RemoveItemTaskOptions } from './remove-item-task';
 export { RootTask } from './root-task';
 export type { RootTaskDeps, RootTaskOptions } from './root-task';
 export { RootTaskFactory } from './root-task-factory';
+export { BOTTLE_PRICE, SellBottlesTask } from './sell-bottles-task';
+export type { SellBottlesTaskDeps, SellBottlesTaskOptions } from './sell-bottles-task';
 export { TaskFactory } from './task-factory';
 export type { ITaskFactory, TaskFactoryDeps } from './task-factory';
 export { TRY_LUCK_PERIOD, TryLuckTask } from './try-luck-task';

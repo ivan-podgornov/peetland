@@ -20,6 +20,8 @@ import { PurchaseTask } from './purchase-task';
 import type { PurchaseTaskOptions } from './purchase-task';
 import { RemoveItemTask } from './remove-item-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
+import { SellBottlesTask } from './sell-bottles-task';
+import type { SellBottlesTaskOptions } from './sell-bottles-task';
 import { TryLuckTask } from './try-luck-task';
 import type { TryLuckTaskOptions } from './try-luck-task';
 
@@ -46,6 +48,8 @@ export interface ITaskFactory {
   buyBooze(options: BuyBoozeTaskOptions): NpcTask;
   /** Бухать в бомжарне (см. DrinkTask) */
   drink(options: DrinkTaskOptions): NpcTask;
+  /** Сдать бутылки в ближайшей приёмке (см. SellBottlesTask) */
+  sellBottles(options: SellBottlesTaskOptions): NpcTask;
 }
 
 export type TaskFactoryDeps = {
@@ -97,5 +101,9 @@ export class TaskFactory implements ITaskFactory {
 
   drink(options: DrinkTaskOptions): NpcTask {
     return new DrinkTask(options, { taskFactory: this });
+  }
+
+  sellBottles(options: SellBottlesTaskOptions): NpcTask {
+    return new SellBottlesTask(options, { taskFactory: this });
   }
 }

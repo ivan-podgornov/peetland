@@ -42,7 +42,8 @@ export class Planner<TState> implements IPlanner<TState> {
         continue;
       }
 
-      const decomposedSubtasks = this.decompose(method.tasks.concat(tail), state);
+      const subtasks = typeof method.tasks === 'function' ? method.tasks(state) : method.tasks;
+      const decomposedSubtasks = this.decompose(subtasks.concat(tail), state);
 
       if (decomposedSubtasks) {
         return decomposedSubtasks;

@@ -43,12 +43,24 @@ export interface CompoundTask<TState, TContext> {
 export type Task<TState, TContext> =
   PrimitiveTask<TState, TContext> | CompoundTask<TState, TContext>;
 
+/**
+ * Подзадачи метода: готовый список или функция, которая собирает список по состоянию мира, как
+ * методы в Pyhop. Функцию планировщик вызывает, только если предусловия метода подошли, и передаёт
+ * ей то же состояние, на котором проверялись предусловия
+ */
+export type MethodTasks<TState, TContext> =
+  Task<TState, TContext>[] | ((state: TState) => Task<TState, TContext>[]);
+
 export interface Method<TState, TContext> {
   /** Название метода выполнения составной задачи */
   name: string;
 
-  /** Задачи, которые нужно выполнить, чтобы реализовать метод */
-  tasks: Task<TState, TContext>[];
+  /**
+   * Задачи, которые нужно выполнить, чтобы реализовать метод. Если задачи зависят от состояния мира,
+   * например, нужно идти к ближайшему магазину, вместо списка передаётся функция, которая собирает
+   * задачи по состоянию (см. MethodTasks)
+   */
+  tasks: MethodTasks<TState, TContext>;
 
   /**
    * Проверяет, подходит ли метод для планирования, при текущем состоянии мира

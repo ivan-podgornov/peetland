@@ -5,4 +5,4 @@ export type { IHTN } from './htn';
 export { Planner } from './planner';
 export type { IPlanner } from './planner';
 
-export type { CompoundTask, Method, PrimitiveTask, Task, TaskResult } from './task';
+export type { CompoundTask, Method, MethodTasks, PrimitiveTask, Task, TaskResult } from './task';

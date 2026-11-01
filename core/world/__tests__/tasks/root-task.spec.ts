@@ -33,6 +33,15 @@ describe('RootTask', () => {
     expect(sellBottles).toHaveBeenCalledExactlyOnceWith({ places });
   });
 
+  it('Вызывает taskFactory.beg с местами', () => {
+    const beg = vi.fn(() => createStubTask('beg'));
+    const places = createMockedPlaces();
+
+    new RootTask({ places }, { taskFactory: createTaskFactory({ beg }) });
+
+    expect(beg).toHaveBeenCalledExactlyOnceWith({ places });
+  });
+
   it('Вызывает taskFactory.collectBottles с местами', () => {
     const collectBottles = vi.fn(() => createStubTask('collect-bottles'));
     const places = createMockedPlaces();
@@ -85,12 +94,12 @@ describe('RootTask', () => {
     expect(names).toStrictEqual(['buy-booze']);
   });
 
-  it('Если нельзя ни бухать, ни купить пойло, планирует сдать бутылки', () => {
+  it('Если нельзя ни бухать, ни купить пойло, а можно и сдать бутылки, и клянчить, планирует сдать бутылки', () => {
     const taskFactory = createTaskFactory({
       drink: () => createStubTask('drink', false),
       buyBooze: () => createStubTask('buy-booze', false),
       sellBottles: () => createStubTask('sell-bottles'),
-      collectBottles: () => createStubTask('collect-bottles'),
+      beg: () => createStubTask('beg'),
     });
 
     const names = planNames(
@@ -101,11 +110,29 @@ describe('RootTask', () => {
     expect(names).toStrictEqual(['sell-bottles']);
   });
 
-  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, планирует собирать бутылки', () => {
+  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, планирует клянчить', () => {
     const taskFactory = createTaskFactory({
       drink: () => createStubTask('drink', false),
       buyBooze: () => createStubTask('buy-booze', false),
       sellBottles: () => createStubTask('sell-bottles', false),
+      beg: () => createStubTask('beg'),
+      collectBottles: () => createStubTask('collect-bottles'),
+    });
+
+    const names = planNames(
+      new RootTask({ places: createMockedPlaces() }, { taskFactory }),
+      createNpcState()
+    );
+
+    expect(names).toStrictEqual(['beg']);
+  });
+
+  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, ни клянчить, планирует собирать бутылки', () => {
+    const taskFactory = createTaskFactory({
+      drink: () => createStubTask('drink', false),
+      buyBooze: () => createStubTask('buy-booze', false),
+      sellBottles: () => createStubTask('sell-bottles', false),
+      beg: () => createStubTask('beg', false),
       collectBottles: () => createStubTask('collect-bottles'),
     });
 
@@ -117,11 +144,12 @@ describe('RootTask', () => {
     expect(names).toStrictEqual(['collect-bottles']);
   });
 
-  it('Если нельзя ни бухать, ни купить пойло, ни сдать, ни собирать бутылки, план не составляется', () => {
+  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, ни клянчить, ни собирать бутылки, план не составляется', () => {
     const taskFactory = createTaskFactory({
       drink: () => createStubTask('drink', false),
       buyBooze: () => createStubTask('buy-booze', false),
       sellBottles: () => createStubTask('sell-bottles', false),
+      beg: () => createStubTask('beg', false),
       collectBottles: () => createStubTask('collect-bottles', false),
     });
 

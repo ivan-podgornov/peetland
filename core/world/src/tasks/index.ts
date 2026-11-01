@@ -4,7 +4,6 @@ export { AddItemTask } from './add-item-task';
 export type { AddItemTaskOptions } from './add-item-task';
 export {
   BEGGING_CHANCE,
-  BEGGING_GOAL,
   BEGGING_REWARD,
   BEGGING_SHAME_LIMIT,
   BegTask,

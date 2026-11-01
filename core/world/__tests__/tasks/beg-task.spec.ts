@@ -12,10 +12,11 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   BEGGING_CHANCE,
-  BEGGING_GOAL,
   BEGGING_REWARD,
   BEGGING_SHAME_LIMIT,
   BegTask,
+  BOOZE_PRICE,
+  BOTTLE_PRICE,
   PlaceType,
 } from '../../src';
 import type {
@@ -82,19 +83,61 @@ function createTaskFactoryWithTryLuckSpy() {
 }
 
 describe('BegTask', () => {
-  it('Планирует дойти до места, повернуться и клянчить, пока не наклянчит BEGGING_GOAL', () => {
+  it('Планирует дойти до места, повернуться и клянчить', () => {
     const task = createTask(createPlacesWithSpot());
+    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } });
 
-    const names = planNames(task, createNpcState());
-
-    expect(names).toStrictEqual([
+    expect(planNames(task, state)).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
-      ...Array.from({ length: BEGGING_GOAL / BEGGING_REWARD }, () => [
-        'parallel',
-        'add-item',
-      ]).flat(),
+      'parallel',
+      'add-item',
     ]);
+  });
+
+  it('Если ни денег, ни бутылок нет, клянчит на всё пойло', () => {
+    const { tryLuck, taskFactory } = createTaskFactoryWithTryLuckSpy();
+
+    plan(createTask(createPlacesWithSpot(), taskFactory), createNpcState({ inventory: {} }));
+
+    expect(tryLuck).toHaveBeenCalledTimes(BOOZE_PRICE / BEGGING_REWARD);
+  });
+
+  it('Клянчит столько, сколько не хватает на пойло вместе с деньгами и выручкой за бутылки', () => {
+    const { tryLuck, taskFactory } = createTaskFactoryWithTryLuckSpy();
+    const state = createNpcState({
+      inventory: {
+        [Item.Money]: 3 * BEGGING_REWARD,
+        [Item.Bottles]: 2,
+      },
+    });
+
+    plan(createTask(createPlacesWithSpot(), taskFactory), state);
+
+    expect(tryLuck).toHaveBeenCalledTimes(
+      (BOOZE_PRICE - 3 * BEGGING_REWARD - 2 * BOTTLE_PRICE) / BEGGING_REWARD
+    );
+  });
+
+  it('Если не хватает не кратно BEGGING_REWARD, клянчит с запасом до целой удачи', () => {
+    const { tryLuck, taskFactory } = createTaskFactoryWithTryLuckSpy();
+    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 } });
+
+    plan(createTask(createPlacesWithSpot(), taskFactory), state);
+
+    expect(tryLuck).toHaveBeenCalledTimes(2);
+  });
+
+  it('Если на пойло хватает денег и выручки за бутылки, план не составляется', () => {
+    const task = createTask(createPlacesWithSpot());
+    const state = createNpcState({
+      inventory: {
+        [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
+        [Item.Bottles]: 1,
+      },
+    });
+
+    expect(planNames(task, state)).toBeNull();
   });
 
   it('Ищет место для клянчанья, ближайшее к NPC', () => {
@@ -153,21 +196,41 @@ describe('BegTask', () => {
 
   it('За каждую удачу получает BEGGING_REWARD', () => {
     const task = createTask(createPlacesWithSpot());
-    const state = createNpcState({ inventory: { [Item.Money]: 5 } });
+    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD } });
 
     const after = applyPlanEffects(task, state);
 
-    expect(after.inventory).toStrictEqual({ [Item.Money]: 5 + BEGGING_GOAL });
+    expect(after.inventory).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
   });
 
-  it('Планирует только удачи, перед которыми стыд, по предсказанию, ещё не достиг BEGGING_SHAME_LIMIT', () => {
-    const { tryLuck, taskFactory } = createTaskFactoryWithTryLuckSpy();
+  describe('При 20 стыда за удачу, когда до BEGGING_SHAME_LIMIT успевают 3 удачи', () => {
     // 40 попыток на удачу по 0.5 стыда: перед удачами стыд 0, 20, 40, а перед четвёртой — уже 60
-    const task = createTask(createPlacesWithSpot(), taskFactory, createPsycheFactory(0.5));
 
-    plan(task, createStateWithShame(0));
+    it('Если нужно 3 удачи, планирует клянчить', () => {
+      const task = createTask(
+        createPlacesWithSpot(),
+        createTaskFactory(),
+        createPsycheFactory(0.5)
+      );
+      const state = createNpcState({
+        inventory: { [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD },
+      });
 
-    expect(tryLuck).toHaveBeenCalledTimes(3);
+      expect(planNames(task, state)).not.toBeNull();
+    });
+
+    it('Если нужно 4 удачи, план не составляется', () => {
+      const task = createTask(
+        createPlacesWithSpot(),
+        createTaskFactory(),
+        createPsycheFactory(0.5)
+      );
+      const state = createNpcState({
+        inventory: { [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD },
+      });
+
+      expect(planNames(task, state)).toBeNull();
+    });
   });
 
   it('Если стыд достиг BEGGING_SHAME_LIMIT, план не составляется', () => {
@@ -217,7 +280,7 @@ describe('BegTask', () => {
       const { tryLuck, taskFactory } = createTaskFactoryWithTryLuckSpy();
       plan(
         createTask(createPlacesWithSpot(), taskFactory, createPsycheFactory(0.5)),
-        createNpcState()
+        createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } })
       );
 
       const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(createStateWithShame(10));

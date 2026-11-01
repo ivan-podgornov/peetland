@@ -7,6 +7,8 @@ import type { NpcContext, NpcState } from '../npc';
 import { PlaceType } from '../places';
 import type { IPlaces } from '../places';
 
+import { BOOZE_PRICE } from './buy-booze-task';
+import { BOTTLE_PRICE } from './sell-bottles-task';
 import type { ITaskFactory } from './task-factory';
 
 /** Шанс выклянчить деньги за одну попытку, раз в секунду (см. TryLuckTask) */
@@ -15,14 +17,11 @@ export const BEGGING_CHANCE = 1 / 40;
 /** Сколько долларов NPC получает, когда удалось выклянчить */
 export const BEGGING_REWARD = 10;
 
-/** Сколько долларов NPC клянчит за один заход */
-export const BEGGING_GOAL = 100;
-
 /**
  * Стыд, при котором NPC перестаёт клянчить. Подобран вместе с приростом стыда за попытку (см.
  * совестливость в @peetland/psyche): при средней совестливости и нулевом стартовом стыде порог
- * достигается примерно за 600 попыток. На BEGGING_GOAL в среднем нужно 400 попыток, поэтому одной
- * сессии клянчанья хватает на пойло примерно в 93% случаев
+ * достигается примерно за 600 попыток. Чтобы с пустыми карманами наклянчить на пойло, в среднем
+ * нужно 400 попыток, поэтому одной сессии клянчанья хватает на пойло примерно в 93% случаев
  */
 export const BEGGING_SHAME_LIMIT = 60;
 
@@ -48,11 +47,14 @@ export type BegTaskDeps = {
 
 /**
  * Клянчить: один заход к ближайшему месту для клянчанья. NPC сидит с анимацией и раз в секунду с
- * шансом BEGGING_CHANCE получает BEGGING_REWARD, пока не наклянчит BEGGING_GOAL. Каждая попытка,
- * удачная или нет, — поступок Deed.Begging, от которого растёт стыд. Когда стыд достигает
- * BEGGING_SHAME_LIMIT, NPC перестаёт клянчить. При планировании стыд предсказывается так, будто на
- * каждую удачу уходит EXPECTED_BEGGING_ATTEMPTS попыток, и в план попадает столько удач, сколько
- * успеет случиться до порога стыда
+ * шансом BEGGING_CHANCE получает BEGGING_REWARD, пока не наклянчит столько, сколько ему не хватает
+ * на пойло вместе с деньгами и бутылками, которые у него есть. Каждая попытка, удачная или нет, —
+ * поступок Deed.Begging, от которого растёт стыд. Когда стыд достигает BEGGING_SHAME_LIMIT, NPC
+ * перестаёт клянчить.
+ *
+ * Клянчить NPC идёт, только если это окупится: по предсказанию, он успеет наклянчить на пойло до
+ * того, как стыд достигнет порога. Стыд предсказывается так, будто на каждую удачу уходит
+ * EXPECTED_BEGGING_ATTEMPTS попыток
  */
 export class BegTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'beg';
@@ -74,9 +76,18 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     ];
   }
 
-  /** Клянчить можно, если стыд ещё не достиг порога и есть место для клянчанья */
+  /**
+   * Клянчить стоит, если на пойло не хватает, до порога стыда NPC успеет наклянчить, сколько не
+   * хватает, и есть место для клянчанья
+   */
   private canBeg(state: NpcState): boolean {
-    return !this.isAshamed(state.psyche) && this.places.ofType(PlaceType.BeggingSpot).length > 0;
+    const rewards = this.countNeededRewards(state);
+
+    return (
+      rewards > 0 &&
+      this.countRewardsBeforeShame(state.psyche, rewards) === rewards &&
+      this.places.ofType(PlaceType.BeggingSpot).length > 0
+    );
   }
 
   /** Собирает задачи захода к ближайшему месту для клянчанья */
@@ -96,7 +107,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
       taskFactory.achieveAngle({ angle: spot.angle, tolerance: BEGGING_SPOT_FACING_TOLERANCE }),
     ];
 
-    for (let index = 0; index < this.countRewards(state.psyche); index++) {
+    for (let index = 0; index < this.countNeededRewards(state); index++) {
       tasks.push(
         taskFactory.parallel({
           main: taskFactory.tryLuck({
@@ -115,14 +126,26 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   /**
-   * Сколько удач попадёт в план: удача планируется, если перед ней стыд, по предсказанию, ещё не
-   * достиг порога. Не больше, чем нужно на BEGGING_GOAL
+   * Сколько удач нужно, чтобы вместе с деньгами и выручкой за бутылки хватило на пойло. Если уже
+   * хватает, возвращает 0
    */
-  private countRewards(psyche: PsycheState): number {
+  private countNeededRewards(state: NpcState): number {
+    const money = state.inventory[Item.Money] ?? 0;
+    const bottles = state.inventory[Item.Bottles] ?? 0;
+    const shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE;
+
+    return Math.max(0, Math.ceil(shortfall / BEGGING_REWARD));
+  }
+
+  /**
+   * Сколько удач, но не больше limit, успеет случиться, пока стыд, по предсказанию, не достиг
+   * порога: удача случается, если перед ней стыд ещё ниже порога
+   */
+  private countRewardsBeforeShame(psyche: PsycheState, limit: number): number {
     let rewards = 0;
     let current = psyche;
 
-    while (rewards < BEGGING_GOAL / BEGGING_REWARD && !this.isAshamed(current)) {
+    while (rewards < limit && !this.isAshamed(current)) {
       rewards++;
       current = this.predictReward(current);
     }

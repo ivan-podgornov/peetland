@@ -1,7 +1,6 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { InventoryCounts } from '@peetland/inventory';
-
-import type { NpcFeelings, NpcTraits } from './data';
+import type { PsycheState } from '@peetland/psyche';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
 export type NpcActorState = Readonly<{
@@ -11,13 +10,12 @@ export type NpcActorState = Readonly<{
 }>;
 
 /**
- * Состояние NPC, с которым HTN-агент планирует и исполняет задачи. Содержит только данные: слепок
- * актора и содержимое инвентаря. Эффекты задач меняют копию этих данных, а команды живым актору и
- * инвентарю задачи отдают через контекст (см. NpcContext)
+ * Состояние NPC, с которым HTN-агент планирует и исполняет задачи. Содержит только данные: слепки
+ * актора и психики и содержимое инвентаря. Эффекты задач меняют копию этих данных, а команды живым актору,
+ * инвентарю и психике задачи отдают через контекст (см. NpcContext)
  */
 export type NpcState = Readonly<{
   actor: NpcActorState;
   inventory: Readonly<InventoryCounts>;
-  traits: NpcTraits;
-  feelings: NpcFeelings;
+  psyche: PsycheState;
 }>;

@@ -1,5 +1,11 @@
 import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { Feeling, Psyche } from '@peetland/psyche';
+import {
+  createMockedPsycheFactory,
+  createPsycheDeps,
+  createPsycheState,
+} from '@peetland/psyche/dev';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -65,16 +71,19 @@ describe('Npc', () => {
       expect(state.actor.position).toStrictEqual({ x: 0, y: 0, z: 0 });
     });
 
-    it('Возвращает черты характера NPC', () => {
-      const npc = new Npc(createNpcData({ traits: { conscientiousness: 80 } }), createNpcDeps());
+    it('Возвращает слепок психики NPC', () => {
+      const psyche = new Psyche(
+        createPsycheState({
+          feelings: { [Feeling.Shame]: 30 },
+        }),
+        createPsycheDeps()
+      );
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ psycheFactory: createMockedPsycheFactory(psyche) })
+      );
 
-      expect(npc.getState().traits).toStrictEqual({ conscientiousness: 80 });
-    });
-
-    it('Возвращает чувства NPC', () => {
-      const npc = new Npc(createNpcData({ feelings: { shame: 30 } }), createNpcDeps());
-
-      expect(npc.getState().feelings).toStrictEqual({ shame: 30 });
+      expect(npc.getState().psyche).toStrictEqual(psyche.getState());
     });
   });
 });

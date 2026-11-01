@@ -2,11 +2,18 @@ import type { Task } from '@peetland/htn';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { Feeling, Psyche } from '@peetland/psyche';
+import {
+  createMockedPsycheFactory,
+  createPsycheDeps,
+  createPsycheState,
+} from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Npc } from '../../src';
 import type { NpcContext, NpcState } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
 import { createNpcData, createNpcDeps } from './helpers';
 
@@ -49,27 +56,47 @@ describe('Npc', () => {
       expect(npc.inventory).toBe(inventory);
     });
 
-    it('Берёт черты характера из данных', () => {
-      const data = createNpcData({ traits: { conscientiousness: 80 } });
+    it('Вызывает psycheFactory.create с начальным состоянием психики из данных', () => {
+      const psycheFactory = createMockedPsycheFactory();
+      const data = createNpcData({
+        psyche: createPsycheState({
+          feelings: { [Feeling.Shame]: 30 },
+        }),
+      });
 
-      const npc = new Npc(data, createNpcDeps());
+      new Npc(data, createNpcDeps({ psycheFactory }));
 
-      expect(npc.traits).toStrictEqual(data.traits);
+      expect(psycheFactory.create).toHaveBeenCalledExactlyOnceWith(data.psyche);
     });
 
-    it('Берёт начальные чувства из данных', () => {
-      const data = createNpcData({ feelings: { shame: 30 } });
+    it('Использует психику, которую вернула psycheFactory', () => {
+      const psyche = new Psyche(createPsycheState(), createPsycheDeps());
 
-      const npc = new Npc(data, createNpcDeps());
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ psycheFactory: createMockedPsycheFactory(psyche) })
+      );
 
-      expect(npc.feelings).toStrictEqual(data.feelings);
+      expect(npc.psyche).toBe(psyche);
     });
 
-    it('Создаёт HTN-агента с корневой задачей', () => {
+    it('Вызывает rootTaskFactory.create с местами из зависимостей', () => {
+      const rootTaskFactory = { create: vi.fn(() => ({ name: 'root', methods: [] })) };
+      const places = createMockedPlaces();
+
+      new Npc(createNpcData(), createNpcDeps({ rootTaskFactory, places }));
+
+      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith({ places });
+    });
+
+    it('Создаёт HTN-агента с корневой задачей, которую вернула rootTaskFactory', () => {
       const rootTask: Task<NpcState, NpcContext> = { name: 'root', methods: [] };
       const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
 
-      new Npc(createNpcData(), createNpcDeps({ htnFactory, rootTask }));
+      new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory, rootTaskFactory: { create: () => rootTask } })
+      );
 
       expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(rootTask);
     });

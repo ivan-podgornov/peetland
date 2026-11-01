@@ -15,6 +15,7 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
+import { ConscientiousnessFactory, LuckFactory, PsycheFactory, Trait } from '@peetland/psyche';
 import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
@@ -60,6 +61,12 @@ function main() {
     if (wasKeyPressed(VK_H)) {
       const game = new GtaGame();
       const { actorFactory, frames, geometry } = game;
+      const psycheFactory = new PsycheFactory({
+        traitFactories: {
+          [Trait.Conscientiousness]: new ConscientiousnessFactory(),
+          [Trait.Luck]: new LuckFactory(),
+        },
+      });
 
       new World({
         npcs: new InMemoryRepository(npcs),
@@ -70,8 +77,14 @@ function main() {
           htnFactory: new HTNFactory<NpcState, NpcContext>(),
           frames,
           inventoryFactory: new InventoryFactory(),
+          psycheFactory,
           rootTaskFactory: new RootTaskFactory({
-            taskFactory: new TaskFactory({ geometry, random: new Random(), timer: new Timer() }),
+            taskFactory: new TaskFactory({
+              geometry,
+              psycheFactory,
+              random: new Random(),
+              timer: new Timer(),
+            }),
           }),
         }),
       })

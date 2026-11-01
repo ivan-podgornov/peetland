@@ -11,6 +11,7 @@
       "@peetland/animation-manager": ["../../core/animation-manager/src/index.ts"],
       "@peetland/game": ["../../core/game/src/index.ts"],
       "@peetland/inventory": ["../../core/inventory/src/index.ts"],
+      "@peetland/psyche": ["../../core/psyche/src/index.ts"],
       "@peetland/world": ["../../core/world/src/index.ts"],
       "@peetland/gta-sa": ["../gta-sa/src/index.ts"],
       "@peetland/moonloader": ["../moonloader/src/index.ts"],

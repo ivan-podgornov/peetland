@@ -5,6 +5,7 @@ export { Feeling } from './feeling';
 export { MAX_FEELING, MIN_FEELING, Psyche } from './psyche';
 export type { IPsyche, PsycheDeps } from './psyche';
 export { Trait } from './trait';
+export { Luck, LuckFactory } from './traits';
 export type {
   FeelingsContribution,
   ITrait,

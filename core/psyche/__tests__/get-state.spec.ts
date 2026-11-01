@@ -1,21 +1,31 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  createPsycheDeps,
+  createPsycheState,
+  createMockedTrait,
+  createMockedTraitFactory,
+} from '../dev';
 import { Deed, Feeling, Psyche, Trait } from '../src';
-
-import { createPsycheDeps, createPsycheState, createTrait, createTraitFactory } from './helpers';
 
 describe('Psyche', () => {
   describe('#getState', () => {
-    it('Возвращает черты из начального состояния', () => {
+    it('Возвращает черты, с которыми создана психика', () => {
       const state = createPsycheState({
-        traits: { [Trait.Conscientiousness]: 70 },
+        traits: {
+          [Trait.Conscientiousness]: 70,
+          [Trait.Luck]: 20,
+        },
       });
       const psyche = new Psyche(state, createPsycheDeps());
 
-      expect(psyche.getState().traits).toStrictEqual({ [Trait.Conscientiousness]: 70 });
+      expect(psyche.getState().traits).toStrictEqual({
+        [Trait.Conscientiousness]: 70,
+        [Trait.Luck]: 20,
+      });
     });
 
-    it('Возвращает чувства из начального состояния', () => {
+    it('Если психика ещё не реагировала на поступки, возвращает чувства, с которыми она создана', () => {
       const state = createPsycheState({
         feelings: { [Feeling.Shame]: 30 },
       });
@@ -31,7 +41,9 @@ describe('Psyche', () => {
       const psyche = new Psyche(
         state,
         createPsycheDeps({
-          [Trait.Conscientiousness]: createTraitFactory(createTrait({ [Feeling.Shame]: 5 })),
+          [Trait.Conscientiousness]: createMockedTraitFactory(
+            createMockedTrait({ [Feeling.Shame]: 5 })
+          ),
         })
       );
       const snapshot = psyche.getState();

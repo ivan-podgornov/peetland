@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { createPsycheDeps, createPsycheState } from '../dev';
 import { Psyche, PsycheFactory } from '../src';
-
-import { createPsycheDeps, createPsycheState } from './helpers';
 
 describe('PsycheFactory', () => {
   describe('#create', () => {

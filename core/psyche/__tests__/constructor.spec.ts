@@ -1,20 +1,30 @@
 import { describe, expect, it } from 'vitest';
 
+import { createPsycheDeps, createPsycheState, createMockedTraitFactory } from '../dev';
 import { Feeling, Psyche, Trait } from '../src';
-
-import { createPsycheDeps, createPsycheState, createTraitFactory } from './helpers';
 
 describe('Psyche', () => {
   describe('#constructor', () => {
-    it('Создаёт черту фабрикой этой черты со значением из состояния', () => {
-      const conscientiousness = createTraitFactory();
+    it('Создаёт каждую черту фабрикой этой черты со значением из состояния', () => {
+      const conscientiousness = createMockedTraitFactory();
+      const luck = createMockedTraitFactory();
       const state = createPsycheState({
-        traits: { [Trait.Conscientiousness]: 70 },
+        traits: {
+          [Trait.Conscientiousness]: 70,
+          [Trait.Luck]: 20,
+        },
       });
 
-      new Psyche(state, createPsycheDeps({ [Trait.Conscientiousness]: conscientiousness }));
+      new Psyche(
+        state,
+        createPsycheDeps({
+          [Trait.Conscientiousness]: conscientiousness,
+          [Trait.Luck]: luck,
+        })
+      );
 
       expect(conscientiousness.create).toHaveBeenCalledExactlyOnceWith(70);
+      expect(luck.create).toHaveBeenCalledExactlyOnceWith(20);
     });
 
     it('Если чувство меньше MIN_FEELING, выбрасывает RangeError', () => {

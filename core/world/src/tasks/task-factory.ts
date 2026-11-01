@@ -1,6 +1,7 @@
 import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
-import type { PrimitiveTask, Task } from '@peetland/htn';
+import { ParallelTask } from '@peetland/htn';
+import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -11,6 +12,8 @@ import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
 import { BuyBoozeTask } from './buy-booze-task';
 import type { BuyBoozeTaskOptions } from './buy-booze-task';
+import { CollectBottlesTask } from './collect-bottles-task';
+import type { CollectBottlesTaskOptions } from './collect-bottles-task';
 import { DrinkTask } from './drink-task';
 import type { DrinkTaskOptions } from './drink-task';
 import { GoToCoordsTask } from './go-to-coords-task';
@@ -42,6 +45,8 @@ export interface ITaskFactory {
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
   /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
+  /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */
+  parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask;
   /** Купить предмет там, где NPC стоит (см. PurchaseTask) */
   purchase(options: PurchaseTaskOptions): NpcTask;
   /** Купить пойло в ближайшем магазине (см. BuyBoozeTask) */
@@ -50,6 +55,8 @@ export interface ITaskFactory {
   drink(options: DrinkTaskOptions): NpcTask;
   /** Сдать бутылки в ближайшей приёмке (см. SellBottlesTask) */
   sellBottles(options: SellBottlesTaskOptions): NpcTask;
+  /** Собрать бутылки в случайной мусорке (см. CollectBottlesTask) */
+  collectBottles(options: CollectBottlesTaskOptions): NpcTask;
 }
 
 export type TaskFactoryDeps = {
@@ -91,6 +98,10 @@ export class TaskFactory implements ITaskFactory {
     return new TryLuckTask(options, { random, timer });
   }
 
+  parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask {
+    return new ParallelTask(options);
+  }
+
   purchase(options: PurchaseTaskOptions): NpcTask {
     return new PurchaseTask(options, { taskFactory: this });
   }
@@ -105,5 +116,11 @@ export class TaskFactory implements ITaskFactory {
 
   sellBottles(options: SellBottlesTaskOptions): NpcTask {
     return new SellBottlesTask(options, { taskFactory: this });
+  }
+
+  collectBottles(options: CollectBottlesTaskOptions): NpcTask {
+    const { random } = this.deps;
+
+    return new CollectBottlesTask(options, { taskFactory: this, random });
   }
 }

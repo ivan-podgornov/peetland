@@ -4,6 +4,13 @@ export { AddItemTask } from './add-item-task';
 export type { AddItemTaskOptions } from './add-item-task';
 export { BOOZE_PRICE, BuyBoozeTask } from './buy-booze-task';
 export type { BuyBoozeTaskDeps, BuyBoozeTaskOptions } from './buy-booze-task';
+export {
+  BOTTLE_FIND_CHANCE,
+  CollectBottlesTask,
+  MAX_BOTTLES,
+  MAX_BOTTLES_PER_VISIT,
+} from './collect-bottles-task';
+export type { CollectBottlesTaskDeps, CollectBottlesTaskOptions } from './collect-bottles-task';
 export { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from './drink-task';
 export type { DrinkTaskDeps, DrinkTaskOptions } from './drink-task';
 export { GoToCoordsTask } from './go-to-coords-task';

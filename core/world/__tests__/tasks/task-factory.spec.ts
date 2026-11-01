@@ -1,3 +1,4 @@
+import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
@@ -5,6 +6,7 @@ import {
   AchieveAngleTask,
   AddItemTask,
   BuyBoozeTask,
+  CollectBottlesTask,
   DrinkTask,
   GoToCoordsTask,
   PlayAnimationTask,
@@ -79,6 +81,19 @@ describe('TaskFactory', () => {
     });
   });
 
+  describe('#parallel', () => {
+    it('Возвращает ParallelTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.parallel({
+        main: factory.tryLuck({ chance: 1 / 60 }),
+        background: factory.playAnimation({ animation: 'trash-search' }),
+      });
+
+      expect(task).toBeInstanceOf(ParallelTask);
+    });
+  });
+
   describe('#purchase', () => {
     it('Возвращает PurchaseTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
@@ -116,6 +131,16 @@ describe('TaskFactory', () => {
       const task = factory.sellBottles({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(SellBottlesTask);
+    });
+  });
+
+  describe('#collectBottles', () => {
+    it('Возвращает CollectBottlesTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.collectBottles({ places: createMockedPlaces() });
+
+      expect(task).toBeInstanceOf(CollectBottlesTask);
     });
   });
 });

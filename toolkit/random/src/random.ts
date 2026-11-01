@@ -14,4 +14,18 @@ export class Random implements IRandom {
     // Math.random возвращает число из [0, 1), поэтому при 0 шанс не выпадает никогда, а при 1 — всегда
     return Math.random() < probability;
   }
+
+  /**
+   * Выбрасывает RangeError, если список пустой
+   * @inheritdoc
+   */
+  pick<T>(items: readonly T[]): T {
+    const item = items[Math.floor(Math.random() * items.length)];
+
+    if (item === undefined) {
+      throw new RangeError('Нельзя выбрать из пустого списка');
+    }
+
+    return item;
+  }
 }

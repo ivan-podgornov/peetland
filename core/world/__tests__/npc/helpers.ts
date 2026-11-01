@@ -7,6 +7,7 @@ import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
 import type { NpcData, NpcDeps, NpcFactoryDeps } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -28,7 +29,8 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
-    rootTask: { name: 'root', methods: [] },
+    rootTaskFactory: { create: vi.fn(() => ({ name: 'root', methods: [] })) },
+    places: createMockedPlaces(),
     frames: createControlledObservable().observable,
     ...deps,
   };

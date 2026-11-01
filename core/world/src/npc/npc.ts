@@ -1,12 +1,15 @@
 import { AbortController } from '@peetland/events';
 import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
-import type { IHTN, IHTNFactory, Task } from '@peetland/htn';
+import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
+import type { IPlaces } from '../places';
+
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
+import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 
 export type NpcDeps = {
@@ -18,8 +21,10 @@ export type NpcDeps = {
   inventoryFactory: IInventoryFactory;
   /** Фабрика, которой NPC создаёт свою психику */
   psycheFactory: IPsycheFactory;
-  /** Корневая задача, которую планирует HTN-агент NPC */
-  rootTask: Task<NpcState, NpcContext>;
+  /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента */
+  rootTaskFactory: IRootTaskFactory;
+  /** Места мира, которыми пользуется NPC */
+  places: IPlaces;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
 };
@@ -41,7 +46,15 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTask } = deps;
+    const {
+      actorFactory,
+      frames,
+      htnFactory,
+      inventoryFactory,
+      places,
+      psycheFactory,
+      rootTaskFactory,
+    } = deps;
 
     this.id = data.id;
     this.inventory = inventoryFactory.create(data.inventory);
@@ -53,7 +66,7 @@ export class Npc {
       angle: data.spawnAngle,
     });
     this.context = { actor: this.actor, inventory: this.inventory, psyche: this.psyche };
-    this.htn = htnFactory.create(rootTask);
+    this.htn = htnFactory.create(rootTaskFactory.create({ places }));
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
       signal: this.lifetime.signal,

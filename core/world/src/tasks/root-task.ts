@@ -6,6 +6,7 @@ import type { PlaceData } from '../places';
 
 import { BuyBoozeTask } from './buy-booze-task';
 import { DrinkTask } from './drink-task';
+import type { ITaskFactory } from './task-factory';
 
 export type RootTaskOptions = {
   /** Места мира, которыми пользуются NPC */
@@ -14,6 +15,7 @@ export type RootTaskOptions = {
 
 export type RootTaskDeps = {
   geometry: IGeometry;
+  taskFactory: ITaskFactory;
 };
 
 /**
@@ -31,7 +33,7 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
       {
         name: 'drink',
         preconditions: () => true,
-        tasks: [new DrinkTask()],
+        tasks: [new DrinkTask(deps)],
       },
       {
         name: 'buy-booze',

@@ -6,9 +6,8 @@ import type { NpcContext, NpcState } from '../npc';
 import { PlaceType } from '../places';
 import type { PlaceData } from '../places';
 
-import { AchieveAngleTask } from './achieve-angle-task';
-import { GoToCoordsTask } from './go-to-coords-task';
 import { PurchaseTask } from './purchase-task';
+import type { ITaskFactory } from './task-factory';
 
 /** Цена бутылки пойла, в долларах */
 export const BOOZE_PRICE = 100;
@@ -26,6 +25,7 @@ export type BuyBoozeTaskOptions = {
 
 export type BuyBoozeTaskDeps = {
   geometry: IGeometry;
+  taskFactory: ITaskFactory;
 };
 
 /**
@@ -54,13 +54,13 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { geometry } = this.deps;
+    const { taskFactory } = this.deps;
     const shop = this.findNearestShop(state.actor.position);
 
     return [
-      new GoToCoordsTask({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
-      new AchieveAngleTask({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }, { geometry }),
-      new PurchaseTask({ item: Item.Booze, count: 1, price: BOOZE_PRICE }),
+      taskFactory.goToCoords({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
+      taskFactory.achieveAngle({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }),
+      new PurchaseTask({ item: Item.Booze, count: 1, price: BOOZE_PRICE }, { taskFactory }),
     ];
   }
 

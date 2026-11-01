@@ -1,42 +1,36 @@
 import { Item } from '@peetland/inventory';
-import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PickUpTask } from '../../src';
 
-import { applyPlanEffects, createNpcContext, createNpcState, plan, planNames } from './helpers';
+import { applyPlanEffects, createNpcState, createTaskFactory, planNames } from './helpers';
 
 describe('PickUpTask', () => {
   it('Планирует проиграть анимацию, а потом добавить предмет', () => {
-    const task = new PickUpTask({
-      item: Item.Bottles,
-      count: 1,
-      animation: 'trash-search-pocket',
-    });
+    const task = new PickUpTask(
+      { item: Item.Bottles, count: 1 },
+      { taskFactory: createTaskFactory() }
+    );
 
     const names = planNames(task, createNpcState());
 
     expect(names).toStrictEqual(['play-animation', 'add-item']);
   });
 
-  it('Берёт предмет с переданной анимацией', () => {
-    const actor = createActor();
-    const playAnimation = vi.spyOn(actor, 'playAnimation');
-    const task = new PickUpTask({
-      item: Item.Bottles,
-      count: 1,
-      animation: 'trash-search-pocket',
-    });
-    const state = createNpcState();
-    const [take] = plan(task, state) ?? [];
+  it('Берёт предмет с анимацией получения предмета', () => {
+    const taskFactory = createTaskFactory();
+    const playAnimation = vi.spyOn(taskFactory, 'playAnimation');
 
-    take?.start(state, createNpcContext(actor));
+    new PickUpTask({ item: Item.Bottles, count: 1 }, { taskFactory });
 
-    expect(playAnimation).toHaveBeenCalledExactlyOnceWith('trash-search-pocket', undefined);
+    expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-receive' });
   });
 
   it('По плану добавляет предмет и не трогает деньги', () => {
-    const task = new PickUpTask({ item: Item.Bottles, count: 2, animation: 'item-receive' });
+    const task = new PickUpTask(
+      { item: Item.Bottles, count: 2 },
+      { taskFactory: createTaskFactory() }
+    );
     const state = createNpcState({ inventory: { [Item.Money]: 10 } });
 
     const after = applyPlanEffects(task, state);

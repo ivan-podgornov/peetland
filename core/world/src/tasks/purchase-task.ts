@@ -3,9 +3,7 @@ import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
 
-import { AddItemTask } from './add-item-task';
-import { PlayAnimationTask } from './play-animation-task';
-import { RemoveItemTask } from './remove-item-task';
+import type { ITaskFactory } from './task-factory';
 
 export type PurchaseTaskOptions = {
   /** Какой предмет купить */
@@ -14,6 +12,10 @@ export type PurchaseTaskOptions = {
   count: number;
   /** Сколько заплатить, в долларах */
   price: number;
+};
+
+export type PurchaseTaskDeps = {
+  taskFactory: ITaskFactory;
 };
 
 /**
@@ -25,17 +27,18 @@ export class PurchaseTask implements CompoundTask<NpcState, NpcContext> {
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  constructor(options: PurchaseTaskOptions) {
+  constructor(options: PurchaseTaskOptions, deps: PurchaseTaskDeps) {
     const { item, count, price } = options;
+    const { taskFactory } = deps;
 
     this.methods = [
       {
         name: 'pay',
         preconditions: (state) => (state.inventory[Item.Money] ?? 0) >= price,
         tasks: [
-          new PlayAnimationTask({ animation: 'pay' }),
-          new RemoveItemTask({ item: Item.Money, count: price }),
-          new AddItemTask({ item, count }),
+          taskFactory.playAnimation({ animation: 'pay' }),
+          taskFactory.removeItem({ item: Item.Money, count: price }),
+          taskFactory.addItem({ item, count }),
         ],
       },
     ];

@@ -1,6 +1,7 @@
 import { Observable } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import type { IActor, IActorCommand } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
 import { Planner } from '@peetland/htn';
 import type { PrimitiveTask, Task } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
@@ -8,7 +9,7 @@ import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { PlaceType } from '../../src';
+import { PlaceType, TaskFactory } from '../../src';
 import type { NpcContext, NpcState, PlaceData } from '../../src';
 import { CommandTask } from '../../src/tasks/command-task';
 
@@ -107,4 +108,9 @@ export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcSta
   const tasks = plan(root, state) ?? [];
 
   return tasks.reduce((current, task) => task.applyEffects(current), state);
+}
+
+/** Создаёт настоящую фабрику задач. Тесты следят за её методами через vi.spyOn */
+export function createTaskFactory(): TaskFactory {
+  return new TaskFactory({ geometry: new Geometry() });
 }

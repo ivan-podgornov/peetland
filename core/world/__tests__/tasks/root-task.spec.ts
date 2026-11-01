@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { BOOZE_PRICE, RootTask } from '../../src';
 
-import { createNpcState, createPlace, planNames } from './helpers';
+import { createNpcState, createPlace, createTaskFactory, planNames } from './helpers';
 
 /** Задачи плана «бухать» */
 const DRINK = ['play-animation', 'remove-item'];
@@ -14,7 +14,10 @@ const BUY_BOOZE = ['go-to-coords', 'achieve-angle', 'play-animation', 'remove-it
 
 /** Создаёт корневую задачу с одним магазином */
 function createRootTask(): RootTask {
-  return new RootTask({ places: [createPlace()] }, { geometry: new Geometry() });
+  return new RootTask(
+    { places: [createPlace()] },
+    { geometry: new Geometry(), taskFactory: createTaskFactory() }
+  );
 }
 
 describe('RootTask', () => {

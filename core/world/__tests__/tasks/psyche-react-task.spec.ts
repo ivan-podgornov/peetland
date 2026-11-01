@@ -6,16 +6,16 @@ import {
 } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
-import { ReactTask } from '../../src';
+import { PsycheReactTask } from '../../src';
 
 import { createNpcContext, createNpcState } from './helpers';
 
-describe('ReactTask', () => {
+describe('PsycheReactTask', () => {
   describe('#start', () => {
     it('Сообщает психике из контекста о поступке', () => {
       const psyche = createMockedPsyche();
       const context = { ...createNpcContext(), psyche };
-      const task = new ReactTask(
+      const task = new PsycheReactTask(
         { deed: Deed.BottleFound },
         { psycheFactory: createMockedPsycheFactory() }
       );
@@ -26,7 +26,7 @@ describe('ReactTask', () => {
     });
 
     it("Возвращает 'success'", () => {
-      const task = new ReactTask(
+      const task = new PsycheReactTask(
         { deed: Deed.BottleFound },
         { psycheFactory: createMockedPsycheFactory() }
       );
@@ -45,7 +45,7 @@ describe('ReactTask', () => {
           feelings: { [Feeling.Shame]: 30 },
         }),
       });
-      const task = new ReactTask({ deed: Deed.BottleFound }, { psycheFactory });
+      const task = new PsycheReactTask({ deed: Deed.BottleFound }, { psycheFactory });
 
       task.applyEffects(state);
 
@@ -54,7 +54,7 @@ describe('ReactTask', () => {
 
     it('Сообщает собранной психике о поступке', () => {
       const psyche = createMockedPsyche();
-      const task = new ReactTask(
+      const task = new PsycheReactTask(
         { deed: Deed.BottleFound },
         { psycheFactory: createMockedPsycheFactory(psyche) }
       );
@@ -68,7 +68,7 @@ describe('ReactTask', () => {
       const after = createPsycheState({
         feelings: { [Feeling.Shame]: 28 },
       });
-      const task = new ReactTask(
+      const task = new PsycheReactTask(
         { deed: Deed.BottleFound },
         { psycheFactory: createMockedPsycheFactory(createMockedPsyche(after)) }
       );

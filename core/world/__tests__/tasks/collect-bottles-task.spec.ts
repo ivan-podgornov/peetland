@@ -41,7 +41,7 @@ describe('CollectBottlesTask', () => {
       'parallel',
       'play-animation',
       'add-item',
-      'react',
+      'psyche-react',
       'play-animation',
     ]);
   });
@@ -145,11 +145,11 @@ describe('CollectBottlesTask', () => {
       'parallel',
       'play-animation',
       'add-item',
-      'react',
+      'psyche-react',
       'parallel',
       'play-animation',
       'add-item',
-      'react',
+      'psyche-react',
     ]);
   });
 
@@ -163,12 +163,12 @@ describe('CollectBottlesTask', () => {
   });
 
   it('На каждую найденную бутылку реагирует поступком Deed.BottleFound', () => {
-    const react = vi.fn();
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ react }));
+    const psycheReact = vi.fn();
+    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ psycheReact }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
-    expect(react).toHaveBeenCalledExactlyOnceWith({ deed: Deed.BottleFound });
+    expect(psycheReact).toHaveBeenCalledExactlyOnceWith({ deed: Deed.BottleFound });
   });
 
   it('Если NPC унесёт много бутылок, за заход ищет MAX_BOTTLES_PER_VISIT', () => {

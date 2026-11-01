@@ -3,12 +3,12 @@ import type { Deed, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext, NpcState } from '../npc';
 
-export type ReactTaskOptions = {
+export type PsycheReactTaskOptions = {
   /** Поступок, о котором задача сообщает психике */
   deed: Deed;
 };
 
-export type ReactTaskDeps = {
+export type PsycheReactTaskDeps = {
   /** Фабрика, которой задача собирает психику из слепка, чтобы предсказать её реакцию */
   psycheFactory: IPsycheFactory;
 };
@@ -18,18 +18,18 @@ export type ReactTaskDeps = {
  * мгновенная: завершается прямо в start. О чертах задача не знает, как поступок меняет чувства,
  * решает психика
  */
-export class ReactTask implements PrimitiveTask<NpcState, NpcContext> {
-  readonly name = 'react';
+export class PsycheReactTask implements PrimitiveTask<NpcState, NpcContext> {
+  readonly name = 'psyche-react';
 
-  private readonly options: ReactTaskOptions;
-  private readonly deps: ReactTaskDeps;
+  private readonly options: PsycheReactTaskOptions;
+  private readonly deps: PsycheReactTaskDeps;
 
-  constructor(options: ReactTaskOptions, deps: ReactTaskDeps) {
+  constructor(options: PsycheReactTaskOptions, deps: PsycheReactTaskDeps) {
     this.options = options;
     this.deps = deps;
   }
 
-  canExecute(_state: NpcState): boolean {
+  canExecute(): boolean {
     return true;
   }
 
@@ -50,10 +50,10 @@ export class ReactTask implements PrimitiveTask<NpcState, NpcContext> {
   }
 
   /** Задача завершается в start, поэтому, если до update всё же дошло, возвращает 'failed' */
-  update(_state: NpcState, _context: NpcContext): TaskResult {
+  update(): TaskResult {
     return 'failed';
   }
 
   /** Задача мгновенная, останавливать нечего */
-  stop(_context: NpcContext): void {}
+  stop(): void {}
 }

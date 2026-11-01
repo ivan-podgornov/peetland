@@ -86,7 +86,7 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
         }),
         taskFactory.playAnimation({ animation: 'trash-search-pocket' }),
         taskFactory.addItem({ item: Item.Bottles, count: 1 }),
-        taskFactory.react({ deed: Deed.BottleFound })
+        taskFactory.psycheReact({ deed: Deed.BottleFound })
       );
     }
 

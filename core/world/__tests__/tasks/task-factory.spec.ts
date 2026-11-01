@@ -12,7 +12,7 @@ import {
   GoToCoordsTask,
   PlayAnimationTask,
   PurchaseTask,
-  ReactTask,
+  PsycheReactTask,
   RemoveItemTask,
   SellBottlesTask,
   TaskFactory,
@@ -73,13 +73,13 @@ describe('TaskFactory', () => {
     });
   });
 
-  describe('#react', () => {
-    it('Возвращает ReactTask', () => {
+  describe('#psycheReact', () => {
+    it('Возвращает PsycheReactTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.react({ deed: Deed.BottleFound });
+      const task = factory.psycheReact({ deed: Deed.BottleFound });
 
-      expect(task).toBeInstanceOf(ReactTask);
+      expect(task).toBeInstanceOf(PsycheReactTask);
     });
   });
 

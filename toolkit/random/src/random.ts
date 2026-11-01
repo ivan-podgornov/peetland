@@ -1,6 +1,6 @@
 import type { IRandom } from './types';
 
-/** Источник случайных чисел на Math.random, который в Lua становится math.random */
+/** Источник случайных чисел на Math.random */
 export class Random implements IRandom {
   /**
    * Выбрасывает RangeError, если probability не число от 0 до 1

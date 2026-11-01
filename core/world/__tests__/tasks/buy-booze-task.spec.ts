@@ -14,8 +14,8 @@ describe('BuyBoozeTask', () => {
     const names = planNames(task, state);
 
     expect(names).toEqual([
-      'go-to-nearest-place',
-      'achieve-nearest-place-angle',
+      'go-to-coords',
+      'achieve-angle',
       'play-animation',
       'remove-item',
       'add-item',

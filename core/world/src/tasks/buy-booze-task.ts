@@ -1,13 +1,14 @@
 import type { IGeometry } from '@peetland/geometry';
-import type { CompoundTask, Method } from '@peetland/htn';
+import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
+import { findNearestPlace } from '../places';
 import type { PlaceData } from '../places';
 
-import { AchieveNearestPlaceAngleTask } from './achieve-nearest-place-angle-task';
+import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';
-import { GoToNearestPlaceTask } from './go-to-nearest-place-task';
+import { GoToCoordsTask } from './go-to-coords-task';
 import { PlayAnimationTask } from './play-animation-task';
 import { RemoveItemTask } from './remove-item-task';
 
@@ -29,30 +30,46 @@ export type BuyBoozeTaskDeps = {
   geometry: IGeometry;
 };
 
-/** Купить пойло в ближайшем магазине. Деньги и пойло меняются, только когда NPC расплатился */
+/**
+ * Купить пойло в ближайшем магазине. Магазин выбирается при планировании по позиции NPC, один раз
+ * на весь план. Деньги и пойло меняются, только когда NPC расплатился
+ */
 export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'buy-booze';
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  constructor(options: BuyBoozeTaskOptions, deps: BuyBoozeTaskDeps) {
-    const { shops } = options;
+  private readonly options: BuyBoozeTaskOptions;
+  private readonly deps: BuyBoozeTaskDeps;
 
+  constructor(options: BuyBoozeTaskOptions, deps: BuyBoozeTaskDeps) {
+    this.options = options;
+    this.deps = deps;
     this.methods = [
       {
         name: 'buy-in-nearest-shop',
-        preconditions: () => true,
-        tasks: [
-          new GoToNearestPlaceTask({ places: shops, completeRadius: SHOP_COMPLETE_RADIUS }, deps),
-          new AchieveNearestPlaceAngleTask(
-            { places: shops, tolerance: SHOP_FACING_TOLERANCE },
-            deps
-          ),
-          new PlayAnimationTask({ animation: 'pay' }),
-          new RemoveItemTask({ item: Item.Money, count: BOOZE_PRICE }),
-          new AddItemTask({ item: Item.Booze, count: 1 }),
-        ],
+        preconditions: () => this.options.shops.length > 0,
+        tasks: (state) => this.buyInNearestShop(state),
       },
+    ];
+  }
+
+  /** Собирает задачи покупки в магазине, ближайшем к NPC */
+  private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
+    const { shops } = this.options;
+    const { geometry } = this.deps;
+    const shop = findNearestPlace(shops, state.actor.position, geometry);
+
+    if (!shop) {
+      throw new Error('Не из чего выбрать магазин');
+    }
+
+    return [
+      new GoToCoordsTask({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
+      new AchieveAngleTask({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }, { geometry }),
+      new PlayAnimationTask({ animation: 'pay' }),
+      new RemoveItemTask({ item: Item.Money, count: BOOZE_PRICE }),
+      new AddItemTask({ item: Item.Booze, count: 1 }),
     ];
   }
 }

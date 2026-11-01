@@ -14,7 +14,7 @@ import {
   setCharCoordinates,
 } from '@peetland/moonloader';
 import { InMemoryRepository } from '@peetland/repository';
-import { NpcFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
+import { NpcFactory, PlacesFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
 import type { NpcContext, NpcState } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
@@ -56,6 +56,7 @@ function main() {
       new World({
         npcs: new InMemoryRepository(npcs),
         places: new InMemoryRepository(places),
+        placesFactory: new PlacesFactory({ geometry }),
         npcFactory: new NpcFactory({
           actorFactory,
           htnFactory: new HTNFactory<NpcState, NpcContext>(),

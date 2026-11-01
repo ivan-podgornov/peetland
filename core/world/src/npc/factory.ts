@@ -3,7 +3,7 @@ import type { IActorFactory } from '@peetland/game';
 import type { IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory } from '@peetland/inventory';
 
-import type { PlaceData } from '../places';
+import type { IPlaces } from '../places';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
@@ -13,7 +13,7 @@ import type { NpcState } from './state';
 
 export type CreateNpcOptions = {
   /** Места мира, которыми пользуется NPC */
-  places: readonly PlaceData[];
+  places: IPlaces;
 };
 
 export interface INpcFactory {

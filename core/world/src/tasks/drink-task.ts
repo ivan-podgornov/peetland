@@ -1,10 +1,9 @@
-import type { IGeometry } from '@peetland/geometry';
 import type { CompoundTask, Method, PrimitiveTask, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
-import { findNearestPlace, PlaceType } from '../places';
-import type { PlaceData } from '../places';
+import { PlaceType } from '../places';
+import type { IPlaces } from '../places';
 
 import type { ITaskFactory } from './task-factory';
 
@@ -19,11 +18,10 @@ const HOMELESS_CAMP_COMPLETE_RADIUS = 0.5;
 
 export type DrinkTaskOptions = {
   /** Места мира. Пьёт NPC в местах типа PlaceType.HomelessCamp */
-  places: readonly PlaceData[];
+  places: IPlaces;
 };
 
 export type DrinkTaskDeps = {
-  geometry: IGeometry;
   taskFactory: ITaskFactory;
 };
 
@@ -36,7 +34,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  private readonly camps: readonly PlaceData[];
+  private readonly places: IPlaces;
   private readonly deps: DrinkTaskDeps;
 
   constructor(options: DrinkTaskOptions, deps: DrinkTaskDeps) {
@@ -47,7 +45,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
       taskFactory.addItem({ item: Item.Bottles, count: 1 }),
     ];
 
-    this.camps = options.places.filter((place) => place.type === PlaceType.HomelessCamp);
+    this.places = options.places;
     this.deps = deps;
     this.methods = [
       {
@@ -57,7 +55,8 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
       },
       {
         name: 'go-to-camp-and-drink',
-        preconditions: (state) => hasBooze(state) && this.camps.length > 0,
+        preconditions: (state) =>
+          hasBooze(state) && this.places.ofType(PlaceType.HomelessCamp).length > 0,
         tasks: (state) => [this.goToNearestCamp(state), ...drink],
       },
     ];
@@ -65,18 +64,13 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Находится ли NPC в радиусе HOMELESS_CAMP_RADIUS от какой-нибудь бомжарни */
   private isInCamp(state: NpcState): boolean {
-    const { geometry } = this.deps;
-    const { position } = state.actor;
-
-    return this.camps.some((camp) =>
-      geometry.isWithinRadius3d(position, camp.position, HOMELESS_CAMP_RADIUS)
-    );
+    return this.places.isNear(state.actor.position, PlaceType.HomelessCamp, HOMELESS_CAMP_RADIUS);
   }
 
   /** Создаёт задачу дойти до бомжарни, ближайшей к NPC. Вызывается, только если бомжарни есть */
   private goToNearestCamp(state: NpcState): Task<NpcState, NpcContext> {
-    const { geometry, taskFactory } = this.deps;
-    const camp = findNearestPlace(this.camps, state.actor.position, geometry);
+    const { taskFactory } = this.deps;
+    const camp = this.places.findNearest(state.actor.position, PlaceType.HomelessCamp);
 
     if (!camp) {
       throw new Error('Не из чего выбрать бомжарню');

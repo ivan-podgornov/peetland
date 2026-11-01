@@ -1,13 +1,13 @@
 import type { Task } from '@peetland/htn';
 
-import type { PlaceData } from '../places';
+import type { IPlaces } from '../places';
 
 import type { NpcContext } from './context';
 import type { NpcState } from './state';
 
 export type CreateRootTaskOptions = {
   /** Места мира, которыми пользуется NPC */
-  places: readonly PlaceData[];
+  places: IPlaces;
 };
 
 /**

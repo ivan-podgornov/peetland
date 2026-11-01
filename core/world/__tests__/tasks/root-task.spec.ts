@@ -1,19 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { RootTask } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
-import {
-  createNpcState,
-  createPlace,
-  createStubTask,
-  createTaskFactory,
-  planNames,
-} from './helpers';
+import { createNpcState, createStubTask, createTaskFactory, planNames } from './helpers';
 
 describe('RootTask', () => {
   it('Вызывает taskFactory.drink с местами', () => {
     const drink = vi.fn(() => createStubTask('drink'));
-    const places = [createPlace()];
+    const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ drink }) });
 
@@ -22,7 +17,7 @@ describe('RootTask', () => {
 
   it('Вызывает taskFactory.buyBooze с местами', () => {
     const buyBooze = vi.fn(() => createStubTask('buy-booze'));
-    const places = [createPlace()];
+    const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ buyBooze }) });
 
@@ -35,7 +30,10 @@ describe('RootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+    const names = planNames(
+      new RootTask({ places: createMockedPlaces() }, { taskFactory }),
+      createNpcState()
+    );
 
     expect(names).toStrictEqual(['drink']);
   });
@@ -46,7 +44,10 @@ describe('RootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+    const names = planNames(
+      new RootTask({ places: createMockedPlaces() }, { taskFactory }),
+      createNpcState()
+    );
 
     expect(names).toStrictEqual(['buy-booze']);
   });
@@ -57,7 +58,10 @@ describe('RootTask', () => {
       buyBooze: () => createStubTask('buy-booze', false),
     });
 
-    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+    const names = planNames(
+      new RootTask({ places: createMockedPlaces() }, { taskFactory }),
+      createNpcState()
+    );
 
     expect(names).toBeNull();
   });

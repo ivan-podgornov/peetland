@@ -1,10 +1,9 @@
-import type { IGeometry } from '@peetland/geometry';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
-import { findNearestPlace, PlaceType } from '../places';
-import type { PlaceData } from '../places';
+import { PlaceType } from '../places';
+import type { IPlaces } from '../places';
 
 import type { ITaskFactory } from './task-factory';
 
@@ -19,11 +18,10 @@ const SHOP_FACING_TOLERANCE = 15;
 
 export type BuyBoozeTaskOptions = {
   /** Места мира. Пойло покупается в местах типа PlaceType.Shop */
-  places: readonly PlaceData[];
+  places: IPlaces;
 };
 
 export type BuyBoozeTaskDeps = {
-  geometry: IGeometry;
   taskFactory: ITaskFactory;
 };
 
@@ -36,16 +34,16 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  private readonly shops: readonly PlaceData[];
+  private readonly places: IPlaces;
   private readonly deps: BuyBoozeTaskDeps;
 
   constructor(options: BuyBoozeTaskOptions, deps: BuyBoozeTaskDeps) {
-    this.shops = options.places.filter((place) => place.type === PlaceType.Shop);
+    this.places = options.places;
     this.deps = deps;
     this.methods = [
       {
         name: 'buy-in-nearest-shop',
-        preconditions: () => this.shops.length > 0,
+        preconditions: () => this.places.ofType(PlaceType.Shop).length > 0,
         tasks: (state) => this.buyInNearestShop(state),
       },
     ];
@@ -53,8 +51,8 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { geometry, taskFactory } = this.deps;
-    const shop = findNearestPlace(this.shops, state.actor.position, geometry);
+    const { taskFactory } = this.deps;
+    const shop = this.places.findNearest(state.actor.position, PlaceType.Shop);
 
     if (!shop) {
       throw new Error('Не из чего выбрать магазин');

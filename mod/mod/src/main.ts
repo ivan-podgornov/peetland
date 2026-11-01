@@ -6,6 +6,8 @@ import {
   getCharHeading,
   isGamePaused,
   isPlayerPlaying,
+  math,
+  os,
   print,
   wait,
   wasKeyPressed,
@@ -31,6 +33,10 @@ function isGameRunning(): boolean {
 }
 
 function main() {
+  // Без начального значения math.random при каждом запуске игры выдаёт одну и ту же
+  // последовательность, и шансы NPC выпадают одинаково
+  math.randomseed(os.time());
+
   // До загрузки игры (заставки, меню) скрипт ничего не трогает
   while (!isPlayerPlaying(PLAYER_HANDLE)) {
     wait(100);

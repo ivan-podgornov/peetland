@@ -17,6 +17,18 @@ interface LuaGlobal {
       thread: (...args: Args) => void
     ): LuaThread<Args>;
   };
+
+  /** Стандартная библиотека Lua math */
+  readonly math: {
+    /** Задаёт начальное значение генератору случайных чисел math.random */
+    randomseed(this: void, seed: number): void;
+  };
+
+  /** Стандартная библиотека Lua os */
+  readonly os: {
+    /** Возвращает текущее время в секундах */
+    time(this: void): number;
+  };
 }
 
 /** Класс для работы с Lua потоками в MoonLoader */
@@ -41,4 +53,4 @@ declare const _G: LuaGlobal;
 
 export { LuaThread };
 
-export const lua_thread = _G.lua_thread;
+export const { lua_thread, math, os } = _G;

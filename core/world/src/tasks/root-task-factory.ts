@@ -1,16 +1,9 @@
-import type { CompoundTask } from '@peetland/htn';
-
-import type { NpcContext, NpcState } from '../npc';
+import type { IRootTaskFactory } from '../npc';
 
 import { RootTask } from './root-task';
 import type { RootTaskDeps, RootTaskOptions } from './root-task';
 
-/** Создаёт корневые задачи NPC */
-export interface IRootTaskFactory {
-  /** Создаёт корневую задачу NPC (см. RootTask) */
-  create(options: RootTaskOptions): CompoundTask<NpcState, NpcContext>;
-}
-
+/** Создаёт корневые задачи NPC (см. RootTask) */
 export class RootTaskFactory implements IRootTaskFactory {
   private readonly deps: RootTaskDeps;
 

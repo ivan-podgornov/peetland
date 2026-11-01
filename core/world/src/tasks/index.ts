@@ -18,6 +18,5 @@ export type { RemoveItemTaskOptions } from './remove-item-task';
 export { RootTask } from './root-task';
 export type { RootTaskDeps, RootTaskOptions } from './root-task';
 export { RootTaskFactory } from './root-task-factory';
-export type { IRootTaskFactory } from './root-task-factory';
 export { TaskFactory } from './task-factory';
 export type { ITaskFactory, TaskFactoryDeps } from './task-factory';

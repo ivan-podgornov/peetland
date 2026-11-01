@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@peetland/gta-sa": "0.0.0",
+    "@peetland/htn": "0.0.0",
     "@peetland/inventory": "0.0.0",
     "@peetland/moonloader": "0.0.0",
     "@peetland/repository": "0.0.0",

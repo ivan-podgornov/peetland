@@ -1,37 +1,30 @@
-import { createControlledObservable } from '@peetland/events/dev';
-import type { IGame } from '@peetland/game';
-import { Geometry } from '@peetland/geometry';
 import { InMemoryRepository } from '@peetland/repository';
-import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
-import type { NpcData, PlaceData, WorldDeps } from '../../src';
+import type { INpcFactory, NpcData, PlaceData, WorldDeps } from '../../src';
+import { Npc } from '../../src';
+import { createNpcDeps } from '../npc/helpers';
 
-/** Создаёт игру. Части игры, которые не переданы, заполняются незначимыми моками */
-export function createGame(game: Partial<IGame> = {}): IGame {
-  return {
-    actorFactory: createMockedActorFactory(),
-    geometry: new Geometry(),
-    objectFactory: { create: vi.fn() },
-    frames: createControlledObservable().observable,
-    ...game,
-  };
+/** Создаёт фабрику NPC, которая создаёт NPC по данным с незначимыми зависимостями */
+export function createMockedNpcFactory(): Mocked<INpcFactory> {
+  return { create: vi.fn((data: NpcData) => new Npc(data, createNpcDeps())) };
 }
 
 export type CreateWorldDepsOptions = {
-  game?: IGame;
   npcs?: NpcData[];
   places?: PlaceData[];
+  npcFactory?: INpcFactory;
 };
 
 /**
  * Создаёт зависимости мира с репозиториями в памяти. То, что не передано, заполняется незначимыми
- * значениями: игра, в которой кадры не идут, NPC и мест нет
+ * значениями: NPC и мест нет, фабрика NPC — мок
  */
 export function createWorldDeps(options: CreateWorldDepsOptions = {}): WorldDeps {
   return {
-    game: options.game ?? createGame(),
     npcs: new InMemoryRepository(options.npcs ?? []),
     places: new InMemoryRepository(options.places ?? []),
+    npcFactory: options.npcFactory ?? createMockedNpcFactory(),
   };
 }

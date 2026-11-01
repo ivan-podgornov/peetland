@@ -1,4 +1,5 @@
 import { GtaGame } from '@peetland/gta-sa';
+import { HTNFactory } from '@peetland/htn';
 import {
   getCharCoordinates,
   getCharHeading,
@@ -12,7 +13,8 @@ import {
   setCharCoordinates,
 } from '@peetland/moonloader';
 import { InMemoryRepository } from '@peetland/repository';
-import { World } from '@peetland/world';
+import { NpcFactory, TaskFactory, World } from '@peetland/world';
+import type { NpcContext, NpcState } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
 
@@ -47,10 +49,19 @@ function main() {
     }
 
     if (wasKeyPressed(VK_H)) {
+      const game = new GtaGame();
+      const { actorFactory, frames, geometry } = game;
+
       new World({
-        game: new GtaGame(),
         npcs: new InMemoryRepository(npcs),
         places: new InMemoryRepository(places),
+        npcFactory: new NpcFactory({
+          actorFactory,
+          htnFactory: new HTNFactory<NpcState, NpcContext>(),
+          frames,
+          geometry,
+          taskFactory: new TaskFactory({ geometry }),
+        }),
       })
         .bigBang()
         .catch((error: unknown) => reportError(error));

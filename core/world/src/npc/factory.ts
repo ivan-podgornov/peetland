@@ -2,6 +2,7 @@ import type { Observable } from '@peetland/events';
 import type { IActorFactory } from '@peetland/game';
 import type { IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory } from '@peetland/inventory';
+import type { IPsycheFactory } from '@peetland/psyche';
 
 import type { IPlaces } from '../places';
 
@@ -28,6 +29,8 @@ export type NpcFactoryDeps = {
   htnFactory: IHTNFactory<NpcState, NpcContext>;
   /** Фабрика, которой NPC создают свои инвентари */
   inventoryFactory: IInventoryFactory;
+  /** Фабрика, которой NPC создают свои психики */
+  psycheFactory: IPsycheFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
   /** Фабрика корневых задач, которые планируют HTN-агенты NPC */
@@ -42,9 +45,17 @@ export class NpcFactory implements INpcFactory {
   }
 
   create(data: NpcData, options: CreateNpcOptions): Npc {
-    const { actorFactory, htnFactory, inventoryFactory, frames, rootTaskFactory } = this.deps;
+    const { actorFactory, htnFactory, inventoryFactory, psycheFactory, frames, rootTaskFactory } =
+      this.deps;
     const rootTask = rootTaskFactory.create({ places: options.places });
 
-    return new Npc(data, { actorFactory, htnFactory, inventoryFactory, frames, rootTask });
+    return new Npc(data, {
+      actorFactory,
+      htnFactory,
+      inventoryFactory,
+      psycheFactory,
+      frames,
+      rootTask,
+    });
   }
 }

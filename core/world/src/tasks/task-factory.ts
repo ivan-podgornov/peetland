@@ -2,6 +2,7 @@ import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import { ParallelTask } from '@peetland/htn';
 import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
+import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -61,6 +62,8 @@ export interface ITaskFactory {
 
 export type TaskFactoryDeps = {
   geometry: IGeometry;
+  /** Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах */
+  psycheFactory: IPsycheFactory;
   random: IRandom;
   timer: ITimer;
 };

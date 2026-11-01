@@ -61,6 +61,22 @@ describe('Npc', () => {
       );
     });
 
+    it('Вызывает htn.update с контекстом, в котором психика NPC', () => {
+      const frames = createControlledObservable();
+      const htn = createMockedHTN<NpcState, NpcContext>();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+      );
+
+      frames.subscriber.next(undefined);
+
+      expect(htn.update).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ psyche: npc.psyche })
+      );
+    });
+
     it('Вызывает htn.update на каждый кадр', () => {
       const frames = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();

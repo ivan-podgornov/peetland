@@ -3,9 +3,10 @@ import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory, Task } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
+import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
-import type { NpcData, NpcFeelings, NpcTraits } from './data';
+import type { NpcData } from './data';
 import type { NpcState } from './state';
 
 export type NpcDeps = {
@@ -15,6 +16,8 @@ export type NpcDeps = {
   htnFactory: IHTNFactory<NpcState, NpcContext>;
   /** Фабрика, которой NPC создаёт свой инвентарь */
   inventoryFactory: IInventoryFactory;
+  /** Фабрика, которой NPC создаёт свою психику */
+  psycheFactory: IPsycheFactory;
   /** Корневая задача, которую планирует HTN-агент NPC */
   rootTask: Task<NpcState, NpcContext>;
   /** Сообщает о каждом кадре игры */
@@ -25,8 +28,7 @@ export type NpcDeps = {
 export class Npc {
   readonly id: string;
   readonly inventory: Inventory;
-  readonly traits: NpcTraits;
-  readonly feelings: NpcFeelings;
+  readonly psyche: IPsyche;
 
   private readonly actor: IActor;
   private readonly context: NpcContext;
@@ -34,24 +36,23 @@ export class Npc {
   private readonly lifetime: AbortController;
 
   /**
-   * Создаёт актора и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
-   * контекст с актором и инвентарём
+   * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
+   * контекст с актором, инвентарём и психикой
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, inventoryFactory, rootTask } = deps;
+    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTask } = deps;
 
     this.id = data.id;
     this.inventory = inventoryFactory.create(data.inventory);
-    this.traits = data.traits;
-    this.feelings = data.feelings;
+    this.psyche = psycheFactory.create(data.psyche);
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({
       modelId: data.modelId,
       position: data.spawnPosition,
       angle: data.spawnAngle,
     });
-    this.context = { actor: this.actor, inventory: this.inventory };
+    this.context = { actor: this.actor, inventory: this.inventory, psyche: this.psyche };
     this.htn = htnFactory.create(rootTask);
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
@@ -59,13 +60,12 @@ export class Npc {
     });
   }
 
-  /** Возвращает состояние NPC со слепками актора и инвентаря (см. NpcState) */
+  /** Возвращает состояние NPC со слепками актора, инвентаря и психики (см. NpcState) */
   getState(): NpcState {
     return {
       actor: { position: this.actor.getPosition(), angle: this.actor.getAngle() },
       inventory: this.inventory.getAll(),
-      traits: this.traits,
-      feelings: this.feelings,
+      psyche: this.psyche.getState(),
     };
   }
 

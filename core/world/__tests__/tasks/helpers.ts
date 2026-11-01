@@ -5,6 +5,12 @@ import { Geometry } from '@peetland/geometry';
 import { Planner } from '@peetland/htn';
 import type { PrimitiveTask, Task } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
+import { Psyche } from '@peetland/psyche';
+import {
+  createMockedPsycheFactory,
+  createPsycheDeps,
+  createPsycheState,
+} from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
@@ -21,15 +27,18 @@ export function createNpcState(state: Partial<NpcState> = {}): NpcState {
   return {
     actor: { position: { x: 0, y: 0, z: 0 }, angle: 0 },
     inventory: {},
-    traits: { conscientiousness: 50 },
-    feelings: { shame: 0 },
+    psyche: createPsycheState(),
     ...state,
   };
 }
 
-/** Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор */
+/** Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют чувства */
 export function createNpcContext(actor: IActor = createActor()): NpcContext {
-  return { actor, inventory: new Inventory() };
+  return {
+    actor,
+    inventory: new Inventory(),
+    psyche: new Psyche(createPsycheState(), createPsycheDeps()),
+  };
 }
 
 /** Создаёт команду, завершением которой управляет тест */
@@ -115,7 +124,12 @@ export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcSta
 
 /** Создаёт зависимости фабрики задач. Удача в них никогда не выпадает, а время не идёт само */
 export function createTaskFactoryDeps(): TaskFactoryDeps {
-  return { geometry: new Geometry(), random: createMockedRandom(false), timer: new ManualTimer() };
+  return {
+    geometry: new Geometry(),
+    psycheFactory: createMockedPsycheFactory(),
+    random: createMockedRandom(false),
+    timer: new ManualTimer(),
+  };
 }
 
 /**

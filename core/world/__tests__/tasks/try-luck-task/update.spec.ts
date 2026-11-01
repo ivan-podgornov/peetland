@@ -1,3 +1,5 @@
+import { Feeling } from '@peetland/psyche';
+import { createPsycheState } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
@@ -37,14 +39,21 @@ describe('TryLuckTask', () => {
     it("Если не повезло, а условие остановки выполнилось, возвращает 'failed'", () => {
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen: (state) => state.feelings.shame >= 80 },
+        { chance: 1 / 60, stopWhen: (state) => state.psyche.feelings[Feeling.Shame] >= 80 },
         { random: createMockedRandom(false), timer }
       );
       const context = createNpcContext();
       task.start(createNpcState(), context);
 
       timer.advance(TRY_LUCK_PERIOD);
-      const result = task.update(createNpcState({ feelings: { shame: 80 } }), context);
+      const result = task.update(
+        createNpcState({
+          psyche: createPsycheState({
+            feelings: { [Feeling.Shame]: 80 },
+          }),
+        }),
+        context
+      );
 
       expect(result).toBe('failed');
     });

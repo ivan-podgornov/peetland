@@ -1,3 +1,4 @@
+export { createMockedPsycheFactory } from './factory';
 export {
   createMockedTrait,
   createMockedTraitFactory,

@@ -45,17 +45,9 @@ export class NpcFactory implements INpcFactory {
   }
 
   create(data: NpcData, options: CreateNpcOptions): Npc {
-    const { actorFactory, htnFactory, inventoryFactory, psycheFactory, frames, rootTaskFactory } =
-      this.deps;
+    const { rootTaskFactory } = this.deps;
     const rootTask = rootTaskFactory.create({ places: options.places });
 
-    return new Npc(data, {
-      actorFactory,
-      htnFactory,
-      inventoryFactory,
-      psycheFactory,
-      frames,
-      rootTask,
-    });
+    return new Npc(data, { ...this.deps, rootTask });
   }
 }

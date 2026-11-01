@@ -52,6 +52,18 @@ export function method(
   };
 }
 
+/** Метод, подзадачи которого собирает функция от состояния */
+export function dynamicMethod(
+  name: string,
+  tasks: (state: TestState) => Task<TestState, TestContext>[]
+): Method<TestState, TestContext> {
+  return {
+    name,
+    tasks,
+    preconditions: (state) => state.canExecute,
+  };
+}
+
 export function blockedMethod(
   name: string,
   ...tasks: Task<TestState, TestContext>[]

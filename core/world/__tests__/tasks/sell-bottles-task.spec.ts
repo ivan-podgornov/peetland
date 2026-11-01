@@ -1,7 +1,7 @@
 import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOTTLE_PRICE, PlaceType, SellBottlesTask } from '../../src';
+import { BOOZE_PRICE, BOTTLE_PRICE, PlaceType, SellBottlesTask } from '../../src';
 import type { IPlaces, ITaskFactory } from '../../src';
 import { createMockedPlaces } from '../places/helpers';
 
@@ -25,11 +25,17 @@ function createPlacesWithCollection(
   });
 }
 
+/** Сколько бутылок нужно сдать, чтобы хватило на пойло, если денег нет */
+const BOTTLES_FOR_BOOZE = BOOZE_PRICE / BOTTLE_PRICE;
+
 describe('SellBottlesTask', () => {
   it('Планирует дойти до приёмки, повернуться к приёмщику, отдать бутылки и получить деньги', () => {
     const task = createTask(createPlacesWithCollection());
 
-    const names = planNames(task, createNpcState({ inventory: { [Item.Bottles]: 3 } }));
+    const names = planNames(
+      task,
+      createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } })
+    );
 
     expect(names).toStrictEqual([
       'go-to-coords',
@@ -44,7 +50,7 @@ describe('SellBottlesTask', () => {
     const places = createPlacesWithCollection();
     const state = createNpcState({
       actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
-      inventory: { [Item.Bottles]: 1 },
+      inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE },
     });
 
     plan(createTask(places), state);
@@ -66,7 +72,7 @@ describe('SellBottlesTask', () => {
       createTaskFactory({ goToCoords })
     );
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: 1 } }));
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: { x: 50, y: 0, z: 0 },
@@ -82,7 +88,7 @@ describe('SellBottlesTask', () => {
       createTaskFactory({ achieveAngle })
     );
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: 1 } }));
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
   });
@@ -91,7 +97,7 @@ describe('SellBottlesTask', () => {
     const playAnimation = vi.fn();
     const task = createTask(createPlacesWithCollection(), createTaskFactory({ playAnimation }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: 1 } }));
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-give' });
   });
@@ -100,21 +106,61 @@ describe('SellBottlesTask', () => {
     const removeItem = vi.fn();
     const task = createTask(createPlacesWithCollection(), createTaskFactory({ removeItem }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: 3 } }));
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: 12 } }));
 
-    expect(removeItem).toHaveBeenCalledExactlyOnceWith({ item: Item.Bottles, count: 3 });
+    expect(removeItem).toHaveBeenCalledExactlyOnceWith({ item: Item.Bottles, count: 12 });
   });
 
   it('Получает BOTTLE_PRICE за каждую бутылку', () => {
     const addItem = vi.fn();
     const task = createTask(createPlacesWithCollection(), createTaskFactory({ addItem }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: 3 } }));
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: 12 } }));
 
     expect(addItem).toHaveBeenCalledExactlyOnceWith({
       item: Item.Money,
-      count: 3 * BOTTLE_PRICE,
+      count: 12 * BOTTLE_PRICE,
     });
+  });
+
+  it('Если бутылок ровно на пойло, а денег нет, планирует сдать бутылки', () => {
+    const task = createTask(createPlacesWithCollection());
+
+    const names = planNames(
+      task,
+      createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } })
+    );
+
+    expect(names).not.toBeNull();
+  });
+
+  it('Если бутылок не хватает на пойло, а денег нет, план не составляется', () => {
+    const task = createTask(createPlacesWithCollection());
+
+    const names = planNames(
+      task,
+      createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE - 1 } })
+    );
+
+    expect(names).toBeNull();
+  });
+
+  it('Если бутылок вместе с деньгами хватает на пойло, планирует сдать бутылки', () => {
+    const task = createTask(createPlacesWithCollection());
+    const state = createNpcState({
+      inventory: { [Item.Bottles]: 1, [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE },
+    });
+
+    expect(planNames(task, state)).not.toBeNull();
+  });
+
+  it('Если бутылок вместе с деньгами не хватает на пойло, план не составляется', () => {
+    const task = createTask(createPlacesWithCollection());
+    const state = createNpcState({
+      inventory: { [Item.Bottles]: 1, [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE - 1 },
+    });
+
+    expect(planNames(task, state)).toBeNull();
   });
 
   it('Если бутылок нет, план не составляется', () => {
@@ -128,7 +174,7 @@ describe('SellBottlesTask', () => {
 
     const names = planNames(
       createTask(places),
-      createNpcState({ inventory: { [Item.Bottles]: 1 } })
+      createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } })
     );
 
     expect(names).toBeNull();
@@ -137,7 +183,7 @@ describe('SellBottlesTask', () => {
   it('Спрашивает у places приёмки', () => {
     const places = createMockedPlaces();
 
-    plan(createTask(places), createNpcState({ inventory: { [Item.Bottles]: 1 } }));
+    plan(createTask(places), createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
     expect(places.ofType).toHaveBeenCalledWith(PlaceType.BottleCollection);
   });

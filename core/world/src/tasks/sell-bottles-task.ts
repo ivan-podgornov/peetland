@@ -5,6 +5,7 @@ import type { NpcContext, NpcState } from '../npc';
 import { PlaceType } from '../places';
 import type { IPlaces } from '../places';
 
+import { BOOZE_PRICE } from './buy-booze-task';
 import type { ITaskFactory } from './task-factory';
 
 /** Сколько платят за одну пустую бутылку, в долларах */
@@ -27,7 +28,8 @@ export type SellBottlesTaskDeps = {
 
 /**
  * Сдать бутылки в ближайшей приёмке: все бутылки, по BOTTLE_PRICE за штуку. Приёмка и количество
- * бутылок определяются при планировании, один раз на весь план. Сдать можно, если бутылки есть
+ * бутылок определяются при планировании, один раз на весь план. Сдавать идёт, только если после
+ * сдачи денег хватит на пойло
  */
 export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'sell-bottles';
@@ -43,11 +45,23 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
     this.methods = [
       {
         name: 'sell-in-nearest-collection',
-        preconditions: (state) =>
-          countBottles(state) > 0 && this.places.ofType(PlaceType.BottleCollection).length > 0,
+        preconditions: (state) => this.canSell(state),
         tasks: (state) => this.sellInNearestCollection(state),
       },
     ];
+  }
+
+  /**
+   * Сдавать бутылки есть смысл, только если на вырученные деньги вместе с теми, что уже есть, можно
+   * купить пойло. И если есть приёмка, где их сдать
+   */
+  private canSell(state: NpcState): boolean {
+    const money = state.inventory[Item.Money] ?? 0;
+    const revenue = this.countBottles(state) * BOTTLE_PRICE;
+
+    return (
+      money + revenue >= BOOZE_PRICE && this.places.ofType(PlaceType.BottleCollection).length > 0
+    );
   }
 
   /** Собирает задачи сдачи всех бутылок в приёмке, ближайшей к NPC */
@@ -59,7 +73,7 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
       throw new Error('Не из чего выбрать приёмку');
     }
 
-    const bottles = countBottles(state);
+    const bottles = this.countBottles(state);
 
     return [
       taskFactory.goToCoords({
@@ -75,9 +89,9 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
       taskFactory.addItem({ item: Item.Money, count: bottles * BOTTLE_PRICE }),
     ];
   }
-}
 
-/** Сколько у NPC бутылок */
-function countBottles(state: NpcState): number {
-  return state.inventory[Item.Bottles] ?? 0;
+  /** Сколько у NPC бутылок */
+  private countBottles(state: NpcState): number {
+    return state.inventory[Item.Bottles] ?? 0;
+  }
 }

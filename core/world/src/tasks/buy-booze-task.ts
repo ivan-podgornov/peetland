@@ -1,9 +1,9 @@
-import type { IGeometry, Vector3 } from '@peetland/geometry';
+import type { IGeometry } from '@peetland/geometry';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
-import { PlaceType } from '../places';
+import { findNearestPlace, PlaceType } from '../places';
 import type { PlaceData } from '../places';
 
 import { PurchaseTask } from './purchase-task';
@@ -54,33 +54,17 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { taskFactory } = this.deps;
-    const shop = this.findNearestShop(state.actor.position);
+    const { geometry, taskFactory } = this.deps;
+    const shop = findNearestPlace(this.shops, state.actor.position, geometry);
+
+    if (!shop) {
+      throw new Error('Не из чего выбрать магазин');
+    }
 
     return [
       taskFactory.goToCoords({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
       taskFactory.achieveAngle({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }),
       new PurchaseTask({ item: Item.Booze, count: 1, price: BOOZE_PRICE }, { taskFactory }),
     ];
-  }
-
-  /**
-   * Возвращает магазин, ближайший к позиции. Если ближайших несколько, возвращает первый из них.
-   * Вызывается, только если магазины есть
-   */
-  private findNearestShop(position: Vector3): PlaceData {
-    const { geometry } = this.deps;
-    const [first, ...rest] = this.shops;
-
-    if (!first) {
-      throw new Error('Не из чего выбрать магазин');
-    }
-
-    return rest.reduce((nearest, shop) => {
-      const distance = geometry.getDistance3d(position, shop.position);
-      const nearestDistance = geometry.getDistance3d(position, nearest.position);
-
-      return distance < nearestDistance ? shop : nearest;
-    }, first);
   }
 }

@@ -2,7 +2,9 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 
-import type { NpcData, NpcDeps } from '../../src';
+import { vi } from 'vitest';
+
+import type { NpcData, NpcDeps, NpcFactoryDeps } from '../../src';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -25,6 +27,17 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     htnFactory: createMockedHTNFactory(),
     rootTask: { name: 'root', methods: [] },
     frames: createControlledObservable().observable,
+    ...deps,
+  };
+}
+
+/** Создаёт зависимости фабрики NPC. Зависимости, которые не переданы, заполняются незначимыми моками */
+export function createNpcFactoryDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
+  return {
+    actorFactory: createMockedActorFactory(),
+    htnFactory: createMockedHTNFactory(),
+    frames: createControlledObservable().observable,
+    rootTaskFactory: { create: vi.fn(() => ({ name: 'root', methods: [] })) },
     ...deps,
   };
 }

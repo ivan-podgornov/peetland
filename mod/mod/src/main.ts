@@ -1,4 +1,5 @@
 import { GtaGame } from '@peetland/gta-sa';
+import { HTNFactory } from '@peetland/htn';
 import {
   getCharCoordinates,
   getCharHeading,
@@ -11,10 +12,14 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
-import { World } from '@peetland/world';
+import { InMemoryRepository } from '@peetland/repository';
+import { NpcFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
+import type { NpcContext, NpcState } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
 
+import { npcs } from './data/npcs';
+import { places } from './data/places';
 import { startTimers } from './patch-global';
 
 /** Можно ли сейчас что-то делать в игре: она загружена, игрок управляет персонажем и не на паузе */
@@ -44,11 +49,29 @@ function main() {
     }
 
     if (wasKeyPressed(VK_H)) {
-      new World({ game: new GtaGame() }).bigBang();
+      const game = new GtaGame();
+      const { actorFactory, frames, geometry } = game;
+
+      new World({
+        npcs: new InMemoryRepository(npcs),
+        places: new InMemoryRepository(places),
+        npcFactory: new NpcFactory({
+          actorFactory,
+          htnFactory: new HTNFactory<NpcState, NpcContext>(),
+          frames,
+          rootTaskFactory: new RootTaskFactory({
+            geometry,
+            taskFactory: new TaskFactory({ geometry }),
+          }),
+        }),
+      })
+        .bigBang()
+        .catch((error: unknown) => reportError(error));
     }
 
     if (wasKeyPressed(VK_J)) {
-      setCharCoordinates(PLAYER_PED, 2269.6, 65.66, 26.48);
+      // Рядом со входом в бомжарню, у которого спавнится бомж
+      setCharCoordinates(PLAYER_PED, 1267.41, 177.76, 19.44);
     }
   }
 }

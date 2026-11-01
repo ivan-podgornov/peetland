@@ -5,9 +5,9 @@ export const npcs: NpcData[] = [
   {
     id: 'peet',
     modelId: 230,
-    // Самый маленький трейлер
-    spawnPosition: { x: 1299.13, y: 140.64, z: 20.4 },
-    spawnAngle: 179,
+    // Вход в бомжарню (см. montgomery-homeless-camp в местах)
+    spawnPosition: { x: 1271.41, y: 181.76, z: 19.44 },
+    spawnAngle: 242,
     traits: {
       conscientiousness: 100,
     },

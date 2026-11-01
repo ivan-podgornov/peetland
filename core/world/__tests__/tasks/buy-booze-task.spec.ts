@@ -5,7 +5,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { BOOZE_PRICE, BuyBoozeTask, PlaceType } from '../../src';
 import type { ITaskFactory, PlaceData } from '../../src';
 
-import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
+import {
+  createNpcState,
+  createPlace,
+  createStubTask,
+  createTaskFactory,
+  plan,
+  planNames,
+} from './helpers';
 
 /** Создаёт задачу покупки пойла с настоящей фабрикой задач, если другая не передана */
 function createTask(
@@ -25,15 +32,29 @@ function createStateWithMoney(position = { x: 0, y: 0, z: 0 }) {
 
 describe('BuyBoozeTask', () => {
   it('Планирует дойти до магазина, повернуться к прилавку и купить пойло', () => {
-    const names = planNames(createTask([createPlace()]), createStateWithMoney());
+    const task = createTask(
+      [createPlace()],
+      createTaskFactory({ purchase: () => createStubTask('purchase') })
+    );
 
-    expect(names).toStrictEqual([
+    expect(planNames(task, createStateWithMoney())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
-      'play-animation',
-      'remove-item',
-      'add-item',
+      'purchase',
     ]);
+  });
+
+  it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {
+    const purchase = vi.fn(() => createStubTask('purchase'));
+    const task = createTask([createPlace()], createTaskFactory({ purchase }));
+
+    plan(task, createStateWithMoney());
+
+    expect(purchase).toHaveBeenCalledExactlyOnceWith({
+      item: Item.Booze,
+      count: 1,
+      price: BOOZE_PRICE,
+    });
   });
 
   it('Идёт к ближайшему магазину, а не к ближайшему месту другого типа', () => {
@@ -86,12 +107,6 @@ describe('BuyBoozeTask', () => {
     plan(task, createStateWithMoney());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
-  });
-
-  it('Если денег меньше 100 $, план не составляется', () => {
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - 1 } });
-
-    expect(planNames(createTask([createPlace()]), state)).toBeNull();
   });
 
   it('Если магазинов нет, план не составляется', () => {

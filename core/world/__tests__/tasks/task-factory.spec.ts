@@ -5,8 +5,11 @@ import { describe, expect, it } from 'vitest';
 import {
   AchieveAngleTask,
   AddItemTask,
+  BuyBoozeTask,
+  DrinkTask,
   GoToCoordsTask,
   PlayAnimationTask,
+  PurchaseTask,
   RemoveItemTask,
   TaskFactory,
 } from '../../src';
@@ -59,6 +62,36 @@ describe('TaskFactory', () => {
       const task = factory.removeItem({ item: Item.Booze, count: 1 });
 
       expect(task).toBeInstanceOf(RemoveItemTask);
+    });
+  });
+
+  describe('#purchase', () => {
+    it('Возвращает PurchaseTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
+
+      const task = factory.purchase({ item: Item.Booze, count: 1, price: 100 });
+
+      expect(task).toBeInstanceOf(PurchaseTask);
+    });
+  });
+
+  describe('#buyBooze', () => {
+    it('Возвращает BuyBoozeTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
+
+      const task = factory.buyBooze({ places: [] });
+
+      expect(task).toBeInstanceOf(BuyBoozeTask);
+    });
+  });
+
+  describe('#drink', () => {
+    it('Возвращает DrinkTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
+
+      const task = factory.drink({ places: [] });
+
+      expect(task).toBeInstanceOf(DrinkTask);
     });
   });
 });

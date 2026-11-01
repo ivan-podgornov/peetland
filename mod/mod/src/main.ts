@@ -1,5 +1,6 @@
 import { GtaGame } from '@peetland/gta-sa';
 import { HTNFactory } from '@peetland/htn';
+import { InventoryFactory } from '@peetland/inventory';
 import {
   getCharCoordinates,
   getCharHeading,
@@ -59,10 +60,8 @@ function main() {
           actorFactory,
           htnFactory: new HTNFactory<NpcState, NpcContext>(),
           frames,
-          rootTaskFactory: new RootTaskFactory({
-            geometry,
-            taskFactory: new TaskFactory({ geometry }),
-          }),
+          inventoryFactory: new InventoryFactory(),
+          rootTaskFactory: new RootTaskFactory({ taskFactory: new TaskFactory({ geometry }) }),
         }),
       })
         .bigBang()

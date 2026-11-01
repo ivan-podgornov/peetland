@@ -10,6 +10,7 @@ import {
   PlayAnimationTask,
   PurchaseTask,
   RemoveItemTask,
+  SellBottlesTask,
   TaskFactory,
   TryLuckTask,
 } from '../../src';
@@ -105,6 +106,16 @@ describe('TaskFactory', () => {
       const task = factory.drink({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(DrinkTask);
+    });
+  });
+
+  describe('#sellBottles', () => {
+    it('Возвращает SellBottlesTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.sellBottles({ places: createMockedPlaces() });
+
+      expect(task).toBeInstanceOf(SellBottlesTask);
     });
   });
 });

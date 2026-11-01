@@ -16,8 +16,9 @@ export type RootTaskDeps = {
 
 /**
  * Корневая задача NPC: жить. Методы перечислены по приоритету: бухать, а если не получается —
- * купить пойло. Когда что получается, решают предусловия самих задач: бухать можно, если есть
- * пойло, купить — если хватает денег
+ * купить пойло, а если и это не получается — сдать бутылки. Когда что получается, решают
+ * предусловия самих задач: бухать можно, если есть пойло, купить — если хватает денег, сдать —
+ * если есть бутылки
  */
 export class RootTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'live';
@@ -37,6 +38,11 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
         name: 'buy-booze',
         preconditions: () => true,
         tasks: [taskFactory.buyBooze({ places: options.places })],
+      },
+      {
+        name: 'sell-bottles',
+        preconditions: () => true,
+        tasks: [taskFactory.sellBottles({ places: options.places })],
       },
     ];
   }

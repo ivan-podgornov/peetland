@@ -132,6 +132,7 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
     tryLuck: (options) => real.tryLuck(options),
+    parallel: (options) => real.parallel(options),
     purchase: (options) => real.purchase(options),
     buyBooze: (options) => real.buyBooze(options),
     drink: (options) => real.drink(options),

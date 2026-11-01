@@ -9,7 +9,7 @@ import {
   MAX_BOTTLES_PER_VISIT,
   PlaceType,
 } from '../../src';
-import type { IPlaces, ITaskFactory } from '../../src';
+import type { IPlaces, ITaskFactory, TryLuckTaskOptions } from '../../src';
 import { createMockedPlaces } from '../places/helpers';
 
 import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
@@ -37,7 +37,7 @@ describe('CollectBottlesTask', () => {
       'go-to-coords',
       'achieve-angle',
       'play-animation',
-      'try-luck',
+      'parallel',
       'play-animation',
       'add-item',
       'play-animation',
@@ -98,18 +98,39 @@ describe('CollectBottlesTask', () => {
 
     expect(playAnimation.mock.calls).toStrictEqual([
       [{ animation: 'trash-search-start' }],
+      [{ animation: 'trash-search' }],
       [{ animation: 'trash-search-pocket' }],
       [{ animation: 'trash-search-end' }],
     ]);
   });
 
   it('Ищет каждую бутылку с шансом BOTTLE_FIND_CHANCE', () => {
-    const tryLuck = vi.fn();
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
     expect(tryLuck).toHaveBeenCalledExactlyOnceWith({ chance: BOTTLE_FIND_CHANCE });
+  });
+
+  it('Пока ищет бутылку, роется в мусорке с анимацией trash-search', () => {
+    const real = createTaskFactory();
+    const tryLuck = real.tryLuck({ chance: BOTTLE_FIND_CHANCE });
+    const searching = real.playAnimation({ animation: 'trash-search' });
+    const parallel = vi.fn();
+    const task = createTask(
+      createPlacesWithTrashBins(),
+      createTaskFactory({
+        tryLuck: () => tryLuck,
+        playAnimation: (options) =>
+          options.animation === 'trash-search' ? searching : real.playAnimation(options),
+        parallel,
+      })
+    );
+
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+
+    expect(parallel).toHaveBeenCalledExactlyOnceWith({ main: tryLuck, background: searching });
   });
 
   it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket и добавляет в инвентарь', () => {
@@ -119,10 +140,10 @@ describe('CollectBottlesTask', () => {
     const names = planNames(task, state);
 
     expect(names?.slice(3, -1)).toStrictEqual([
-      'try-luck',
+      'parallel',
       'play-animation',
       'add-item',
-      'try-luck',
+      'parallel',
       'play-animation',
       'add-item',
     ]);
@@ -138,7 +159,7 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Если NPC унесёт много бутылок, за заход ищет MAX_BOTTLES_PER_VISIT', () => {
-    const tryLuck = vi.fn();
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: {} }));
@@ -147,7 +168,7 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Если до MAX_BOTTLES осталось меньше MAX_BOTTLES_PER_VISIT, ищет столько, сколько осталось', () => {
-    const tryLuck = vi.fn();
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 3 } }));

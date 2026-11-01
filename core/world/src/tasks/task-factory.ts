@@ -1,6 +1,7 @@
 import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
-import type { PrimitiveTask, Task } from '@peetland/htn';
+import { ParallelTask } from '@peetland/htn';
+import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -44,6 +45,8 @@ export interface ITaskFactory {
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
   /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
+  /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */
+  parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask;
   /** Купить предмет там, где NPC стоит (см. PurchaseTask) */
   purchase(options: PurchaseTaskOptions): NpcTask;
   /** Купить пойло в ближайшем магазине (см. BuyBoozeTask) */
@@ -93,6 +96,10 @@ export class TaskFactory implements ITaskFactory {
     const { random, timer } = this.deps;
 
     return new TryLuckTask(options, { random, timer });
+  }
+
+  parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask {
+    return new ParallelTask(options);
   }
 
   purchase(options: PurchaseTaskOptions): NpcTask {

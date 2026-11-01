@@ -1,3 +1,4 @@
+import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
@@ -77,6 +78,19 @@ describe('TaskFactory', () => {
       const task = factory.tryLuck({ chance: 1 / 60 });
 
       expect(task).toBeInstanceOf(TryLuckTask);
+    });
+  });
+
+  describe('#parallel', () => {
+    it('Возвращает ParallelTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.parallel({
+        main: factory.tryLuck({ chance: 1 / 60 }),
+        background: factory.playAnimation({ animation: 'trash-search' }),
+      });
+
+      expect(task).toBeInstanceOf(ParallelTask);
     });
   });
 

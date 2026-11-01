@@ -34,7 +34,7 @@ export type CollectBottlesTaskDeps = {
 };
 
 /**
- * Собрать бутылки: один заход к случайной мусорке. NPC роется в ней, пока не найдёт
+ * Собрать бутылки: один заход к случайной мусорке. NPC роется в ней с анимацией, пока не найдёт
  * MAX_BOTTLES_PER_VISIT бутылок или пока не наберёт MAX_BOTTLES. Мусорка и сколько бутылок искать
  * определяются при планировании, один раз на весь план. Следующий заход — следующий план
  */
@@ -78,7 +78,10 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
     for (let index = 0; index < bottles; index++) {
       tasks.push(
-        taskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
+        taskFactory.parallel({
+          main: taskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
+          background: taskFactory.playAnimation({ animation: 'trash-search' }),
+        }),
         taskFactory.playAnimation({ animation: 'trash-search-pocket' }),
         taskFactory.addItem({ item: Item.Bottles, count: 1 })
       );

@@ -1,5 +1,6 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
+import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 
 import { vi } from 'vitest';
@@ -25,6 +26,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   return {
     actorFactory: createMockedActorFactory(),
     htnFactory: createMockedHTNFactory(),
+    inventoryFactory: createMockedInventoryFactory(),
     rootTask: { name: 'root', methods: [] },
     frames: createControlledObservable().observable,
     ...deps,
@@ -36,6 +38,7 @@ export function createNpcFactoryDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFac
   return {
     actorFactory: createMockedActorFactory(),
     htnFactory: createMockedHTNFactory(),
+    inventoryFactory: createMockedInventoryFactory(),
     frames: createControlledObservable().observable,
     rootTaskFactory: { create: vi.fn(() => ({ name: 'root', methods: [] })) },
     ...deps,

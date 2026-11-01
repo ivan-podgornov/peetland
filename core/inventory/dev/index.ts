@@ -1,0 +1,1 @@
+export { createMockedInventoryFactory } from './factory';

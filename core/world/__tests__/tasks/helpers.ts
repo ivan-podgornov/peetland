@@ -124,6 +124,28 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     playAnimation: (options) => real.playAnimation(options),
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
+    purchase: (options) => real.purchase(options),
+    buyBooze: (options) => real.buyBooze(options),
+    drink: (options) => real.drink(options),
     ...factory,
+  };
+}
+
+/**
+ * Создаёт заглушку задачи с названием. Если plannable — примитивная задача, которая всегда может
+ * выполниться и ничего не меняет, иначе — составная задача без методов, которую нельзя спланировать
+ */
+export function createStubTask(name: string, plannable = true): Task<NpcState, NpcContext> {
+  if (!plannable) {
+    return { name, methods: [] };
+  }
+
+  return {
+    name,
+    canExecute: () => true,
+    applyEffects: (state) => state,
+    start: () => 'success',
+    update: () => 'success',
+    stop: vi.fn(),
   };
 }

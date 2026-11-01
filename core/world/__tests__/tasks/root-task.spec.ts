@@ -1,47 +1,64 @@
-import { Geometry } from '@peetland/geometry';
-import { Item } from '@peetland/inventory';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, PlaceType, RootTask } from '../../src';
+import { RootTask } from '../../src';
 
-import { createNpcState, createPlace, createTaskFactory, planNames } from './helpers';
-
-/** Задачи плана «бухать» */
-const DRINK = ['play-animation', 'remove-item', 'add-item'];
-
-/** Задачи плана «купить пойло» */
-const BUY_BOOZE = ['go-to-coords', 'achieve-angle', 'play-animation', 'remove-item', 'add-item'];
-
-/** Создаёт корневую задачу с магазином и бомжарней там же, где NPC */
-function createRootTask(): RootTask {
-  return new RootTask(
-    { places: [createPlace(), createPlace({ id: 'camp', type: PlaceType.HomelessCamp })] },
-    { geometry: new Geometry(), taskFactory: createTaskFactory() }
-  );
-}
+import {
+  createNpcState,
+  createPlace,
+  createStubTask,
+  createTaskFactory,
+  planNames,
+} from './helpers';
 
 describe('RootTask', () => {
-  it('Если есть пойло, планирует бухать', () => {
-    const state = createNpcState({ inventory: { [Item.Booze]: 1 } });
+  it('Вызывает taskFactory.drink с местами', () => {
+    const drink = vi.fn(() => createStubTask('drink'));
+    const places = [createPlace()];
 
-    expect(planNames(createRootTask(), state)).toStrictEqual(DRINK);
+    new RootTask({ places }, { taskFactory: createTaskFactory({ drink }) });
+
+    expect(drink).toHaveBeenCalledExactlyOnceWith({ places });
   });
 
-  it('Если пойла нет, а денег хватает, планирует купить пойло', () => {
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE } });
+  it('Вызывает taskFactory.buyBooze с местами', () => {
+    const buyBooze = vi.fn(() => createStubTask('buy-booze'));
+    const places = [createPlace()];
 
-    expect(planNames(createRootTask(), state)).toStrictEqual(BUY_BOOZE);
+    new RootTask({ places }, { taskFactory: createTaskFactory({ buyBooze }) });
+
+    expect(buyBooze).toHaveBeenCalledExactlyOnceWith({ places });
   });
 
-  it('Если есть и пойло, и деньги, планирует сначала бухать', () => {
-    const state = createNpcState({ inventory: { [Item.Booze]: 1, [Item.Money]: BOOZE_PRICE } });
+  it('Если можно и бухать, и купить пойло, планирует бухать', () => {
+    const taskFactory = createTaskFactory({
+      drink: () => createStubTask('drink'),
+      buyBooze: () => createStubTask('buy-booze'),
+    });
 
-    expect(planNames(createRootTask(), state)).toStrictEqual(DRINK);
+    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+
+    expect(names).toStrictEqual(['drink']);
   });
 
-  it('Если нет ни пойла, ни денег на него, план не составляется', () => {
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - 1 } });
+  it('Если бухать нельзя, планирует купить пойло', () => {
+    const taskFactory = createTaskFactory({
+      drink: () => createStubTask('drink', false),
+      buyBooze: () => createStubTask('buy-booze'),
+    });
 
-    expect(planNames(createRootTask(), state)).toBeNull();
+    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+
+    expect(names).toStrictEqual(['buy-booze']);
+  });
+
+  it('Если нельзя ни бухать, ни купить пойло, план не составляется', () => {
+    const taskFactory = createTaskFactory({
+      drink: () => createStubTask('drink', false),
+      buyBooze: () => createStubTask('buy-booze', false),
+    });
+
+    const names = planNames(new RootTask({ places: [] }, { taskFactory }), createNpcState());
+
+    expect(names).toBeNull();
   });
 });

@@ -1,4 +1,5 @@
-import { Item } from '@peetland/inventory';
+import { Inventory, Item } from '@peetland/inventory';
+import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -9,13 +10,21 @@ import { createNpcData, createNpcDeps } from './helpers';
 describe('Npc', () => {
   describe('#getState', () => {
     it('Возвращает содержимое инвентаря NPC', () => {
-      const npc = new Npc(createNpcData({ inventory: { [Item.Money]: 150 } }), createNpcDeps());
+      const inventory = new Inventory({ [Item.Money]: 150 });
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
+      );
 
       expect(npc.getState().inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает слепок инвентаря, который не меняется, когда меняется инвентарь', () => {
-      const npc = new Npc(createNpcData({ inventory: { [Item.Money]: 150 } }), createNpcDeps());
+      const inventory = new Inventory({ [Item.Money]: 150 });
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
+      );
       const state = npc.getState();
 
       npc.inventory.add(Item.Money, 50);

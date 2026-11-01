@@ -6,7 +6,6 @@ import type { NpcContext, NpcState } from '../npc';
 import { findNearestPlace, PlaceType } from '../places';
 import type { PlaceData } from '../places';
 
-import { PurchaseTask } from './purchase-task';
 import type { ITaskFactory } from './task-factory';
 
 /** Цена бутылки пойла, в долларах */
@@ -64,7 +63,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
     return [
       taskFactory.goToCoords({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
       taskFactory.achieveAngle({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }),
-      new PurchaseTask({ item: Item.Booze, count: 1, price: BOOZE_PRICE }, { taskFactory }),
+      taskFactory.purchase({ item: Item.Booze, count: 1, price: BOOZE_PRICE }),
     ];
   }
 }

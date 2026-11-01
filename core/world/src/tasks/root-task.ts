@@ -1,11 +1,8 @@
-import type { IGeometry } from '@peetland/geometry';
 import type { CompoundTask, Method } from '@peetland/htn';
 
 import type { NpcContext, NpcState } from '../npc';
 import type { PlaceData } from '../places';
 
-import { BuyBoozeTask } from './buy-booze-task';
-import { DrinkTask } from './drink-task';
 import type { ITaskFactory } from './task-factory';
 
 export type RootTaskOptions = {
@@ -14,7 +11,6 @@ export type RootTaskOptions = {
 };
 
 export type RootTaskDeps = {
-  geometry: IGeometry;
   taskFactory: ITaskFactory;
 };
 
@@ -29,16 +25,18 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
   readonly methods: Method<NpcState, NpcContext>[];
 
   constructor(options: RootTaskOptions, deps: RootTaskDeps) {
+    const { taskFactory } = deps;
+
     this.methods = [
       {
         name: 'drink',
         preconditions: () => true,
-        tasks: [new DrinkTask({ places: options.places }, deps)],
+        tasks: [taskFactory.drink({ places: options.places })],
       },
       {
         name: 'buy-booze',
         preconditions: () => true,
-        tasks: [new BuyBoozeTask({ places: options.places }, deps)],
+        tasks: [taskFactory.buyBooze({ places: options.places })],
       },
     ];
   }

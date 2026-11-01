@@ -1,6 +1,7 @@
 import type { Task } from '@peetland/htn';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
+import { Inventory, Item } from '@peetland/inventory';
+import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -28,12 +29,24 @@ describe('Npc', () => {
       });
     });
 
-    it('Заполняет инвентарь начальным содержимым из данных', () => {
+    it('Вызывает inventoryFactory.create с начальным содержимым инвентаря из данных', () => {
+      const inventoryFactory = createMockedInventoryFactory();
       const data = createNpcData({ inventory: { [Item.Money]: 150 } });
 
-      const npc = new Npc(data, createNpcDeps());
+      new Npc(data, createNpcDeps({ inventoryFactory }));
 
-      expect(npc.inventory.getAll()).toStrictEqual(data.inventory);
+      expect(inventoryFactory.create).toHaveBeenCalledExactlyOnceWith(data.inventory);
+    });
+
+    it('Использует инвентарь, который вернула inventoryFactory', () => {
+      const inventory = new Inventory();
+
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
+      );
+
+      expect(npc.inventory).toBe(inventory);
     });
 
     it('Берёт черты характера из данных', () => {

@@ -2,7 +2,7 @@ import { AbortController } from '@peetland/events';
 import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory, Task } from '@peetland/htn';
-import { Inventory } from '@peetland/inventory';
+import type { IInventoryFactory, Inventory } from '@peetland/inventory';
 
 import type { NpcContext } from './context';
 import type { NpcData, NpcFeelings, NpcTraits } from './data';
@@ -13,6 +13,8 @@ export type NpcDeps = {
   actorFactory: IActorFactory;
   /** Фабрика, которой NPC создаёт своего HTN-агента. Агент сам планирует и перепланирует задачи */
   htnFactory: IHTNFactory<NpcState, NpcContext>;
+  /** Фабрика, которой NPC создаёт свой инвентарь */
+  inventoryFactory: IInventoryFactory;
   /** Корневая задача, которую планирует HTN-агент NPC */
   rootTask: Task<NpcState, NpcContext>;
   /** Сообщает о каждом кадре игры */
@@ -37,10 +39,10 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, rootTask } = deps;
+    const { actorFactory, frames, htnFactory, inventoryFactory, rootTask } = deps;
 
     this.id = data.id;
-    this.inventory = new Inventory(data.inventory);
+    this.inventory = inventoryFactory.create(data.inventory);
     this.traits = data.traits;
     this.feelings = data.feelings;
     this.lifetime = new AbortController();

@@ -1,5 +1,18 @@
 export { AchieveAngleTask } from './achieve-angle-task';
 export type { AchieveAngleTaskDeps } from './achieve-angle-task';
+export { AchieveNearestPlaceAngleTask } from './achieve-nearest-place-angle-task';
+export type { AchieveNearestPlaceAngleTaskOptions } from './achieve-nearest-place-angle-task';
+export { AddItemTask } from './add-item-task';
+export { BOOZE_PRICE, BuyBoozeTask } from './buy-booze-task';
+export type { BuyBoozeTaskDeps, BuyBoozeTaskOptions } from './buy-booze-task';
+export { DRINK_DURATION, DrinkTask } from './drink-task';
 export { GoToCoordsTask } from './go-to-coords-task';
+export { GoToNearestPlaceTask } from './go-to-nearest-place-task';
+export type { GoToNearestPlaceTaskOptions } from './go-to-nearest-place-task';
+export type { InventoryTaskOptions } from './inventory-task';
+export type { NearestPlaceTaskDeps } from './nearest-place-task';
 export { PlayAnimationTask } from './play-animation-task';
 export type { PlayAnimationTaskOptions } from './play-animation-task';
+export { RemoveItemTask } from './remove-item-task';
+export { RootTask } from './root-task';
+export type { RootTaskDeps, RootTaskOptions } from './root-task';

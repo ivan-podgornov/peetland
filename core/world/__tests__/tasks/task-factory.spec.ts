@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import {
   AchieveAngleTask,
   AddItemTask,
+  BegTask,
   BuyBoozeTask,
   CollectBottlesTask,
   DrinkTask,
@@ -153,6 +154,16 @@ describe('TaskFactory', () => {
       const task = factory.collectBottles({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(CollectBottlesTask);
+    });
+  });
+
+  describe('#beg', () => {
+    it('Возвращает BegTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.beg({ places: createMockedPlaces() });
+
+      expect(task).toBeInstanceOf(BegTask);
     });
   });
 });

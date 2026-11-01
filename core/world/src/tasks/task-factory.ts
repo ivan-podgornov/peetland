@@ -11,6 +11,8 @@ import type { NpcContext, NpcState } from '../npc';
 import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
+import { BegTask } from './beg-task';
+import type { BegTaskOptions } from './beg-task';
 import { BuyBoozeTask } from './buy-booze-task';
 import type { BuyBoozeTaskOptions } from './buy-booze-task';
 import { CollectBottlesTask } from './collect-bottles-task';
@@ -62,6 +64,8 @@ export interface ITaskFactory {
   sellBottles(options: SellBottlesTaskOptions): NpcTask;
   /** Собрать бутылки в случайной мусорке (см. CollectBottlesTask) */
   collectBottles(options: CollectBottlesTaskOptions): NpcTask;
+  /** Клянчить у ближайшего места для клянчанья (см. BegTask) */
+  beg(options: BegTaskOptions): NpcTask;
 }
 
 export type TaskFactoryDeps = {
@@ -135,5 +139,11 @@ export class TaskFactory implements ITaskFactory {
     const { random } = this.deps;
 
     return new CollectBottlesTask(options, { taskFactory: this, random });
+  }
+
+  beg(options: BegTaskOptions): NpcTask {
+    const { psycheFactory } = this.deps;
+
+    return new BegTask(options, { taskFactory: this, psycheFactory });
   }
 }

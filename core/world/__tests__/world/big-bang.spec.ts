@@ -37,14 +37,5 @@ describe('World', () => {
 
       expect(npcFactory.create).not.toHaveBeenCalled();
     });
-
-    it('Возвращает NPC, которых создала npcFactory', async () => {
-      const npcFactory = createMockedNpcFactory();
-      const world = new World(createWorldDeps({ npcs: [createNpcData()], npcFactory }));
-
-      const npcs = await world.bigBang();
-
-      expect(npcs).toStrictEqual(npcFactory.create.mock.results.map(({ value }) => value));
-    });
   });
 });

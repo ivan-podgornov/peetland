@@ -13,7 +13,7 @@ import {
   setCharCoordinates,
 } from '@peetland/moonloader';
 import { InMemoryRepository } from '@peetland/repository';
-import { NpcFactory, TaskFactory, World } from '@peetland/world';
+import { NpcFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
 import type { NpcContext, NpcState } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
@@ -59,8 +59,10 @@ function main() {
           actorFactory,
           htnFactory: new HTNFactory<NpcState, NpcContext>(),
           frames,
-          geometry,
-          taskFactory: new TaskFactory({ geometry }),
+          rootTaskFactory: new RootTaskFactory({
+            geometry,
+            taskFactory: new TaskFactory({ geometry }),
+          }),
         }),
       })
         .bigBang()

@@ -1,6 +1,6 @@
 import type { IRepository } from '@peetland/repository';
 
-import type { INpcFactory, Npc, NpcData } from './npc';
+import type { INpcFactory, NpcData } from './npc';
 import type { PlaceData } from './places';
 
 export type WorldDeps = {
@@ -22,12 +22,13 @@ export class World {
   /**
    * Запускает жизнедеятельность мира: на каждую запись из репозитория NPC создаёт NPC, который
    * живёт среди мест из репозитория мест
-   * @returns промис с созданными NPC
    */
-  async bigBang(): Promise<Npc[]> {
+  async bigBang(): Promise<void> {
     const { npcs, places, npcFactory } = this.deps;
     const [npcsData, placesData] = await Promise.all([npcs.getAll(), places.getAll()]);
 
-    return npcsData.map((data) => npcFactory.create(data, { places: placesData }));
+    for (const data of npcsData) {
+      npcFactory.create(data, { places: placesData });
+    }
   }
 }

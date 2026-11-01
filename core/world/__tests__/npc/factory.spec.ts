@@ -1,24 +1,11 @@
-import type { IHTNFactory, Task } from '@peetland/htn';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, Npc, NpcFactory, RootTask } from '../../src';
+import { Npc, NpcFactory } from '../../src';
 import type { NpcContext, NpcState } from '../../src';
-import { createNpcState, createPlace, planNames } from '../tasks/helpers';
+import { createPlace } from '../tasks/helpers';
 
 import { createNpcData, createNpcFactoryDeps } from './helpers';
-
-/** Возвращает корневую задачу, с которой фабрика создала HTN-агента */
-function getRootTask(htnFactory: IHTNFactory<NpcState, NpcContext>): Task<NpcState, NpcContext> {
-  const root = vi.mocked(htnFactory.create).mock.calls[0]?.[0];
-
-  if (!root) {
-    throw new Error('HTN-агент не создавался');
-  }
-
-  return root;
-}
 
 describe('NpcFactory', () => {
   describe('#create', () => {
@@ -30,33 +17,26 @@ describe('NpcFactory', () => {
       expect(npc).toBeInstanceOf(Npc);
     });
 
-    it('Создаёт HTN-агента NPC с корневой задачей RootTask', () => {
+    it('Вызывает rootTaskFactory.create с переданными местами', () => {
+      const rootTaskFactory = { create: vi.fn(() => ({ name: 'root', methods: [] })) };
+      const places = [createPlace()];
+      const factory = new NpcFactory(createNpcFactoryDeps({ rootTaskFactory }));
+
+      factory.create(createNpcData(), { places });
+
+      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith({ places });
+    });
+
+    it('Создаёт HTN-агента NPC с корневой задачей, которую вернула rootTaskFactory', () => {
+      const rootTask = { name: 'root', methods: [] };
       const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
-      const factory = new NpcFactory(createNpcFactoryDeps({ htnFactory }));
+      const factory = new NpcFactory(
+        createNpcFactoryDeps({ htnFactory, rootTaskFactory: { create: () => rootTask } })
+      );
 
       factory.create(createNpcData(), { places: [] });
 
-      expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(expect.any(RootTask));
-    });
-
-    it('Если среди переданных мест есть магазин, корневая задача планирует купить в нём пойло', () => {
-      const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
-      const factory = new NpcFactory(createNpcFactoryDeps({ htnFactory }));
-      const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE } });
-
-      factory.create(createNpcData(), { places: [createPlace()] });
-
-      expect(planNames(getRootTask(htnFactory), state)).toContain('go-to-coords');
-    });
-
-    it('Если мест не передано, корневая задача не планирует купить пойло', () => {
-      const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
-      const factory = new NpcFactory(createNpcFactoryDeps({ htnFactory }));
-      const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE } });
-
-      factory.create(createNpcData(), { places: [] });
-
-      expect(planNames(getRootTask(htnFactory), state)).toBeNull();
+      expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(rootTask);
     });
   });
 });

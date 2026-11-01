@@ -22,6 +22,8 @@ import { PlayAnimationTask } from './play-animation-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import { PurchaseTask } from './purchase-task';
 import type { PurchaseTaskOptions } from './purchase-task';
+import { ReactTask } from './react-task';
+import type { ReactTaskOptions } from './react-task';
 import { RemoveItemTask } from './remove-item-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
 import { SellBottlesTask } from './sell-bottles-task';
@@ -44,6 +46,8 @@ export interface ITaskFactory {
   addItem(options: AddItemTaskOptions): NpcPrimitiveTask;
   /** Отнять предмет из инвентаря (см. RemoveItemTask) */
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
+  /** Сообщить психике о поступке (см. ReactTask) */
+  react(options: ReactTaskOptions): NpcPrimitiveTask;
   /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
   /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */
@@ -93,6 +97,12 @@ export class TaskFactory implements ITaskFactory {
 
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask {
     return new RemoveItemTask(options);
+  }
+
+  react(options: ReactTaskOptions): NpcPrimitiveTask {
+    const { psycheFactory } = this.deps;
+
+    return new ReactTask(options, { psycheFactory });
   }
 
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask {

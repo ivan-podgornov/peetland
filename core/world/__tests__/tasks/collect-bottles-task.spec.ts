@@ -1,4 +1,5 @@
 import { Item } from '@peetland/inventory';
+import { Deed } from '@peetland/psyche';
 import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -40,6 +41,7 @@ describe('CollectBottlesTask', () => {
       'parallel',
       'play-animation',
       'add-item',
+      'react',
       'play-animation',
     ]);
   });
@@ -133,7 +135,7 @@ describe('CollectBottlesTask', () => {
     expect(parallel).toHaveBeenCalledExactlyOnceWith({ main: tryLuck, background: searching });
   });
 
-  it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket и добавляет в инвентарь', () => {
+  it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket, добавляет в инвентарь и реагирует на находку', () => {
     const task = createTask(createPlacesWithTrashBins());
     const state = createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 2 } });
 
@@ -143,9 +145,11 @@ describe('CollectBottlesTask', () => {
       'parallel',
       'play-animation',
       'add-item',
+      'react',
       'parallel',
       'play-animation',
       'add-item',
+      'react',
     ]);
   });
 
@@ -156,6 +160,15 @@ describe('CollectBottlesTask', () => {
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
     expect(addItem).toHaveBeenCalledExactlyOnceWith({ item: Item.Bottles, count: 1 });
+  });
+
+  it('На каждую найденную бутылку реагирует поступком Deed.BottleFound', () => {
+    const react = vi.fn();
+    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ react }));
+
+    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+
+    expect(react).toHaveBeenCalledExactlyOnceWith({ deed: Deed.BottleFound });
   });
 
   it('Если NPC унесёт много бутылок, за заход ищет MAX_BOTTLES_PER_VISIT', () => {

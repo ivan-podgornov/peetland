@@ -2,6 +2,15 @@ export { AchieveAngleTask } from './achieve-angle-task';
 export type { AchieveAngleTaskDeps } from './achieve-angle-task';
 export { AddItemTask } from './add-item-task';
 export type { AddItemTaskOptions } from './add-item-task';
+export {
+  BEGGING_CHANCE,
+  BEGGING_GOAL,
+  BEGGING_REWARD,
+  BEGGING_SHAME_LIMIT,
+  BegTask,
+  EXPECTED_BEGGING_ATTEMPTS,
+} from './beg-task';
+export type { BegTaskDeps, BegTaskOptions } from './beg-task';
 export { BOOZE_PRICE, BuyBoozeTask } from './buy-booze-task';
 export type { BuyBoozeTaskDeps, BuyBoozeTaskOptions } from './buy-booze-task';
 export {

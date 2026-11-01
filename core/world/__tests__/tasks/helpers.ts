@@ -136,6 +136,7 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     buyBooze: (options) => real.buyBooze(options),
     drink: (options) => real.drink(options),
     sellBottles: (options) => real.sellBottles(options),
+    collectBottles: (options) => real.collectBottles(options),
     ...factory,
   };
 }

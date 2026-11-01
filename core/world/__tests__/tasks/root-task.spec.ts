@@ -33,6 +33,15 @@ describe('RootTask', () => {
     expect(sellBottles).toHaveBeenCalledExactlyOnceWith({ places });
   });
 
+  it('Вызывает taskFactory.collectBottles с местами', () => {
+    const collectBottles = vi.fn(() => createStubTask('collect-bottles'));
+    const places = createMockedPlaces();
+
+    new RootTask({ places }, { taskFactory: createTaskFactory({ collectBottles }) });
+
+    expect(collectBottles).toHaveBeenCalledExactlyOnceWith({ places });
+  });
+
   it('Если можно и бухать, и купить пойло, планирует бухать', () => {
     const taskFactory = createTaskFactory({
       drink: () => createStubTask('drink'),
@@ -81,6 +90,7 @@ describe('RootTask', () => {
       drink: () => createStubTask('drink', false),
       buyBooze: () => createStubTask('buy-booze', false),
       sellBottles: () => createStubTask('sell-bottles'),
+      collectBottles: () => createStubTask('collect-bottles'),
     });
 
     const names = planNames(
@@ -91,11 +101,28 @@ describe('RootTask', () => {
     expect(names).toStrictEqual(['sell-bottles']);
   });
 
-  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, план не составляется', () => {
+  it('Если нельзя ни бухать, ни купить пойло, ни сдать бутылки, планирует собирать бутылки', () => {
     const taskFactory = createTaskFactory({
       drink: () => createStubTask('drink', false),
       buyBooze: () => createStubTask('buy-booze', false),
       sellBottles: () => createStubTask('sell-bottles', false),
+      collectBottles: () => createStubTask('collect-bottles'),
+    });
+
+    const names = planNames(
+      new RootTask({ places: createMockedPlaces() }, { taskFactory }),
+      createNpcState()
+    );
+
+    expect(names).toStrictEqual(['collect-bottles']);
+  });
+
+  it('Если нельзя ни бухать, ни купить пойло, ни сдать, ни собирать бутылки, план не составляется', () => {
+    const taskFactory = createTaskFactory({
+      drink: () => createStubTask('drink', false),
+      buyBooze: () => createStubTask('buy-booze', false),
+      sellBottles: () => createStubTask('sell-bottles', false),
+      collectBottles: () => createStubTask('collect-bottles', false),
     });
 
     const names = planNames(

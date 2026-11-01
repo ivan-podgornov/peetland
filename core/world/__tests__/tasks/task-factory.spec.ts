@@ -5,6 +5,7 @@ import {
   AchieveAngleTask,
   AddItemTask,
   BuyBoozeTask,
+  CollectBottlesTask,
   DrinkTask,
   GoToCoordsTask,
   PlayAnimationTask,
@@ -116,6 +117,16 @@ describe('TaskFactory', () => {
       const task = factory.sellBottles({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(SellBottlesTask);
+    });
+  });
+
+  describe('#collectBottles', () => {
+    it('Возвращает CollectBottlesTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.collectBottles({ places: createMockedPlaces() });
+
+      expect(task).toBeInstanceOf(CollectBottlesTask);
     });
   });
 });

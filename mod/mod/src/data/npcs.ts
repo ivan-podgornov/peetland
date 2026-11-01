@@ -1,4 +1,3 @@
-import { Item } from '@peetland/inventory';
 import type { NpcData } from '@peetland/world';
 
 export const npcs: NpcData[] = [
@@ -14,8 +13,7 @@ export const npcs: NpcData[] = [
     feelings: {
       shame: 0,
     },
-    inventory: {
-      [Item.Money]: 150,
-    },
+    // Без денег и пойла: так бомж сразу идёт собирать бутылки
+    inventory: {},
   },
 ];

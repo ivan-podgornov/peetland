@@ -4,11 +4,11 @@ import type { IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory } from '@peetland/inventory';
 
 import type { PlaceData } from '../places';
-import type { IRootTaskFactory } from '../tasks';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import { Npc } from './npc';
+import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 
 export type CreateNpcOptions = {

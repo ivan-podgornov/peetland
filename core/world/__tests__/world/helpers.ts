@@ -13,6 +13,7 @@ export function createGame(game: Partial<IGame> = {}): IGame {
     actorFactory: createMockedActorFactory(),
     geometry: new Geometry(),
     objectFactory: { create: vi.fn() },
+    frames: createControlledObservable().observable,
     ...game,
   };
 }
@@ -21,18 +22,16 @@ export type CreateWorldDepsOptions = {
   game?: IGame;
   npcs?: NpcData[];
   places?: PlaceData[];
-  frames?: WorldDeps['frames'];
 };
 
 /**
  * Создаёт зависимости мира с репозиториями в памяти. То, что не передано, заполняется незначимыми
- * значениями: NPC и мест нет, кадры не идут
+ * значениями: игра, в которой кадры не идут, NPC и мест нет
  */
 export function createWorldDeps(options: CreateWorldDepsOptions = {}): WorldDeps {
   return {
     game: options.game ?? createGame(),
     npcs: new InMemoryRepository(options.npcs ?? []),
     places: new InMemoryRepository(options.places ?? []),
-    frames: options.frames ?? createControlledObservable().observable,
   };
 }

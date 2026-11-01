@@ -1,4 +1,3 @@
-import type { Observable } from '@peetland/events';
 import type { IGame } from '@peetland/game';
 import { HTNFactory } from '@peetland/htn';
 import type { IRepository } from '@peetland/repository';
@@ -14,8 +13,6 @@ export type WorldDeps = {
   npcs: IRepository<NpcData>;
   /** Места мира, которыми пользуются NPC */
   places: IRepository<PlaceData>;
-  /** Сообщает о каждом кадре игры */
-  frames: Observable<unknown>;
 };
 
 export class World {
@@ -31,7 +28,7 @@ export class World {
    * @returns промис с созданными NPC
    */
   async bigBang(): Promise<Npc[]> {
-    const { game, npcs, places, frames } = this.deps;
+    const { game, npcs, places } = this.deps;
     const [npcsData, placesData] = await Promise.all([npcs.getAll(), places.getAll()]);
     const { geometry } = game;
     const taskFactory = new TaskFactory({ geometry });
@@ -39,7 +36,7 @@ export class World {
       actorFactory: game.actorFactory,
       htnFactory: new HTNFactory<NpcState, NpcContext>(),
       rootTask: new RootTask({ places: placesData }, { geometry, taskFactory }),
-      frames,
+      frames: game.frames,
     });
 
     return npcsData.map((data) => npcFactory.create(data));

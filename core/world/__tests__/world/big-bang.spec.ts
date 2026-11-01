@@ -65,10 +65,12 @@ describe('World', () => {
       const goToCoords = vi.spyOn(actor, 'goToCoords');
       const world = new World(
         createWorldDeps({
-          game: createGame({ actorFactory: createMockedActorFactory(actor) }),
+          game: createGame({
+            actorFactory: createMockedActorFactory(actor),
+            frames: frames.observable,
+          }),
           npcs: [createNpcData({ inventory: { [Item.Money]: BOOZE_PRICE } })],
           places: [createPlace({ position: { x: 10, y: 20, z: 0 } })],
-          frames: frames.observable,
         })
       );
 
@@ -84,9 +86,11 @@ describe('World', () => {
       const goToCoords = vi.spyOn(actor, 'goToCoords');
       const world = new World(
         createWorldDeps({
-          game: createGame({ actorFactory: createMockedActorFactory(actor) }),
+          game: createGame({
+            actorFactory: createMockedActorFactory(actor),
+            frames: frames.observable,
+          }),
           npcs: [createNpcData({ inventory: { [Item.Money]: BOOZE_PRICE } })],
-          frames: frames.observable,
         })
       );
 

@@ -5,7 +5,16 @@ export { Feeling } from './feeling';
 export { MAX_FEELING, MIN_FEELING, Psyche } from './psyche';
 export type { IPsyche, PsycheDeps } from './psyche';
 export { Trait } from './trait';
-export { Luck, LuckFactory } from './traits';
+export {
+  BEGGING_SHAME,
+  BOTTLE_FOUND_SHAME_RELIEF,
+  Conscientiousness,
+  ConscientiousnessFactory,
+  Luck,
+  LuckFactory,
+  MAX_CONSCIENTIOUSNESS,
+  MIN_CONSCIENTIOUSNESS,
+} from './traits';
 export type {
   FeelingsContribution,
   ITrait,

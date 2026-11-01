@@ -1,5 +1,6 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import { Deed } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -11,6 +12,7 @@ import {
   GoToCoordsTask,
   PlayAnimationTask,
   PurchaseTask,
+  PsycheReactTask,
   RemoveItemTask,
   SellBottlesTask,
   TaskFactory,
@@ -68,6 +70,16 @@ describe('TaskFactory', () => {
       const task = factory.removeItem({ item: Item.Booze, count: 1 });
 
       expect(task).toBeInstanceOf(RemoveItemTask);
+    });
+  });
+
+  describe('#psycheReact', () => {
+    it('Возвращает PsycheReactTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.psycheReact({ deed: Deed.BottleFound });
+
+      expect(task).toBeInstanceOf(PsycheReactTask);
     });
   });
 

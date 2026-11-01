@@ -20,6 +20,8 @@ export { PlayAnimationTask } from './play-animation-task';
 export type { PlayAnimationTaskOptions } from './play-animation-task';
 export { PurchaseTask } from './purchase-task';
 export type { PurchaseTaskDeps, PurchaseTaskOptions } from './purchase-task';
+export { PsycheReactTask } from './psyche-react-task';
+export type { PsycheReactTaskDeps, PsycheReactTaskOptions } from './psyche-react-task';
 export { RemoveItemTask } from './remove-item-task';
 export type { RemoveItemTaskOptions } from './remove-item-task';
 export { RootTask } from './root-task';

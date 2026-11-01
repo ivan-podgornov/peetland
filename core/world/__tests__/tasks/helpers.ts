@@ -145,6 +145,7 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     playAnimation: (options) => real.playAnimation(options),
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
+    psycheReact: (options) => real.psycheReact(options),
     tryLuck: (options) => real.tryLuck(options),
     parallel: (options) => real.parallel(options),
     purchase: (options) => real.purchase(options),

@@ -1,5 +1,6 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import { Deed } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 
 import type { NpcContext, NpcState } from '../npc';
@@ -35,7 +36,8 @@ export type CollectBottlesTaskDeps = {
 
 /**
  * Собрать бутылки: один заход к случайной мусорке. NPC роется в ней с анимацией, пока не найдёт
- * MAX_BOTTLES_PER_VISIT бутылок или пока не наберёт MAX_BOTTLES. Мусорка и сколько бутылок искать
+ * MAX_BOTTLES_PER_VISIT бутылок или пока не наберёт MAX_BOTTLES. Каждая найденная бутылка — поступок
+ * Deed.BottleFound: бомж сам зарабатывает и не попрошайничает, и стыд от этого падает. Мусорка и сколько бутылок искать
  * определяются при планировании, один раз на весь план. Следующий заход — следующий план
  */
 export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
@@ -83,7 +85,8 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
           background: taskFactory.playAnimation({ animation: 'trash-search' }),
         }),
         taskFactory.playAnimation({ animation: 'trash-search-pocket' }),
-        taskFactory.addItem({ item: Item.Bottles, count: 1 })
+        taskFactory.addItem({ item: Item.Bottles, count: 1 }),
+        taskFactory.psycheReact({ deed: Deed.BottleFound })
       );
     }
 

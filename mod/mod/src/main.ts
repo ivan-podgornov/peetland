@@ -70,8 +70,8 @@ function main() {
     }
 
     if (wasKeyPressed(VK_J)) {
-      // К трейлеру, у которого спавнится бомж
-      setCharCoordinates(PLAYER_PED, 1295.13, 135.64, 20.4);
+      // Рядом со входом в бомжарню, у которого спавнится бомж
+      setCharCoordinates(PLAYER_PED, 1267.41, 177.76, 19.44);
     }
   }
 }

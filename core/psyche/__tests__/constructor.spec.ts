@@ -1,49 +1,44 @@
 import { describe, expect, it } from 'vitest';
 
-import { Psyche } from '../src';
+import { Feeling, Psyche, Trait } from '../src';
 
-import { createPsycheState, createTraitFactory } from './helpers';
+import { createPsycheDeps, createPsycheState, createTraitFactory } from './helpers';
 
 describe('Psyche', () => {
   describe('#constructor', () => {
     it('Создаёт черту фабрикой этой черты со значением из состояния', () => {
-      const pride = createTraitFactory();
+      const conscientiousness = createTraitFactory();
+      const state = createPsycheState({
+        traits: { [Trait.Conscientiousness]: 70 },
+      });
 
-      new Psyche(createPsycheState({ traits: { pride: 70 } }), { traitFactories: { pride } });
+      new Psyche(state, createPsycheDeps({ [Trait.Conscientiousness]: conscientiousness }));
 
-      expect(pride.create).toHaveBeenCalledExactlyOnceWith(70);
-    });
-
-    it('Не создаёт черты, которых нет в состоянии', () => {
-      const pride = createTraitFactory();
-
-      new Psyche(createPsycheState({ traits: {} }), { traitFactories: { pride } });
-
-      expect(pride.create).not.toHaveBeenCalled();
-    });
-
-    it('Если для черты нет фабрики, выбрасывает Error', () => {
-      const state = createPsycheState({ traits: { pride: 70 } });
-
-      expect(() => new Psyche(state, { traitFactories: {} })).toThrow(Error);
+      expect(conscientiousness.create).toHaveBeenCalledExactlyOnceWith(70);
     });
 
     it('Если чувство меньше MIN_FEELING, выбрасывает RangeError', () => {
-      const state = createPsycheState({ feelings: { shame: -1 } });
+      const state = createPsycheState({
+        feelings: { [Feeling.Shame]: -1 },
+      });
 
-      expect(() => new Psyche(state, { traitFactories: {} })).toThrow(RangeError);
+      expect(() => new Psyche(state, createPsycheDeps())).toThrow(RangeError);
     });
 
     it('Если чувство больше MAX_FEELING, выбрасывает RangeError', () => {
-      const state = createPsycheState({ feelings: { shame: 101 } });
+      const state = createPsycheState({
+        feelings: { [Feeling.Shame]: 101 },
+      });
 
-      expect(() => new Psyche(state, { traitFactories: {} })).toThrow(RangeError);
+      expect(() => new Psyche(state, createPsycheDeps())).toThrow(RangeError);
     });
 
     it('Если чувство не число, выбрасывает RangeError', () => {
-      const state = createPsycheState({ feelings: { shame: NaN } });
+      const state = createPsycheState({
+        feelings: { [Feeling.Shame]: NaN },
+      });
 
-      expect(() => new Psyche(state, { traitFactories: {} })).toThrow(RangeError);
+      expect(() => new Psyche(state, createPsycheDeps())).toThrow(RangeError);
     });
   });
 });

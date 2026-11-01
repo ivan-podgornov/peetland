@@ -1,6 +1,8 @@
+import type { Deed } from './deed';
+import { Feeling } from './feeling';
+import { Trait } from './trait';
 import type {
-  Deed,
-  FeelingName,
+  FeelingsContribution,
   ITrait,
   PsycheFeelings,
   PsycheState,
@@ -33,77 +35,68 @@ export type PsycheDeps = {
  */
 export class Psyche implements IPsyche {
   private readonly traitValues: PsycheTraits;
-  private readonly traits: ITrait[] = [];
-  private readonly feelings = new Map<FeelingName, number>();
+  private readonly traits: ITrait[];
+  private feelings: PsycheFeelings;
 
   /**
-   * Создаёт черты фабриками из зависимостей. Если для черты нет фабрики, выбрасывает Error. Если
-   * чувство не конечное число или вне пределов, выбрасывает RangeError
+   * Создаёт черты фабриками из зависимостей. Если чувство не конечное число или вне пределов,
+   * выбрасывает RangeError
    * @param state - начальное состояние, например слепок другой психики
    */
   constructor(state: PsycheState, deps: PsycheDeps) {
     const { traitFactories } = deps;
 
-    this.traitValues = { ...state.traits };
-    Object.entries(state.traits).forEach(([name, value]) => {
-      const factory = traitFactories[name];
-      if (!factory) {
-        throw new Error(`Нет фабрики для черты ${name}`);
-      }
+    Object.values(Feeling).forEach((feeling) =>
+      this.assertFeeling(feeling, state.feelings[feeling])
+    );
 
-      this.traits.push(factory.create(value));
-    });
-    Object.entries(state.feelings).forEach(([name, value]) => {
-      assertFeeling(name, value);
-      this.feelings.set(name, value);
-    });
+    this.traitValues = state.traits;
+    this.feelings = state.feelings;
+    this.traits = Object.values(Trait).map((trait) =>
+      traitFactories[trait].create(state.traits[trait])
+    );
   }
 
   getState(): PsycheState {
-    return { traits: { ...this.traitValues }, feelings: this.getFeelings() };
+    return { traits: this.traitValues, feelings: this.feelings };
   }
 
   /**
-   * Чувство, которого ещё нет, начинается с MIN_FEELING. Пределы применяются к сумме вкладов, а
-   * не к каждому вкладу отдельно. Если вклад не конечное число, выбрасывает RangeError и чувства
-   * не меняет
+   * Пределы применяются к сумме вкладов, а не к каждому вкладу отдельно. Если вклад не конечное
+   * число, выбрасывает RangeError и чувства не меняет
    */
   react(deed: Deed): void {
-    const changes = new Map<FeelingName, number>();
+    const contributions = this.traits.map((trait) => trait.react(deed));
 
-    this.traits.forEach((trait) => {
-      Object.entries(trait.react(deed)).forEach(([name, change]) => {
-        if (change === undefined) {
-          return;
-        }
+    this.feelings = Object.values(Feeling).reduce<PsycheFeelings>((feelings, feeling) => {
+      const change = contributions.reduce(
+        (sum, contribution) => sum + this.getChange(contribution, feeling),
+        0
+      );
 
-        if (!Number.isFinite(change)) {
-          throw new RangeError(`Вклад в чувство ${name} должен быть конечным числом: ${change}`);
-        }
-
-        changes.set(name, (changes.get(name) ?? 0) + change);
-      });
-    });
-
-    changes.forEach((change, name) => {
-      const value = (this.feelings.get(name) ?? MIN_FEELING) + change;
-      this.feelings.set(name, Math.min(MAX_FEELING, Math.max(MIN_FEELING, value)));
-    });
+      return { ...feelings, [feeling]: this.clampFeeling(feelings[feeling] + change) };
+    }, this.feelings);
   }
 
-  private getFeelings(): PsycheFeelings {
-    const feelings: Record<FeelingName, number> = {};
-    this.feelings.forEach((value, name) => {
-      feelings[name] = value;
-    });
-    return feelings;
-  }
-}
+  /** Возвращает, на сколько вклад меняет чувство. Если вклад не конечное число, выбрасывает RangeError */
+  private getChange(contribution: FeelingsContribution, feeling: Feeling): number {
+    const change = contribution[feeling] ?? 0;
+    if (!Number.isFinite(change)) {
+      throw new RangeError(`Вклад в чувство ${feeling} должен быть конечным числом: ${change}`);
+    }
 
-function assertFeeling(name: FeelingName, value: number): void {
-  if (!Number.isFinite(value) || value < MIN_FEELING || value > MAX_FEELING) {
-    throw new RangeError(
-      `Чувство ${name} должно быть числом от ${MIN_FEELING} до ${MAX_FEELING}, получено ${value}`
-    );
+    return change;
+  }
+
+  private clampFeeling(value: number): number {
+    return Math.min(MAX_FEELING, Math.max(MIN_FEELING, value));
+  }
+
+  private assertFeeling(feeling: Feeling, value: number): void {
+    if (!Number.isFinite(value) || value < MIN_FEELING || value > MAX_FEELING) {
+      throw new RangeError(
+        `Чувство ${feeling} должно быть числом от ${MIN_FEELING} до ${MAX_FEELING}, получено ${value}`
+      );
+    }
   }
 }

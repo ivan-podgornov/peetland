@@ -1,20 +1,15 @@
-/** Название черты характера, например 'conscientiousness' */
-export type TraitName = string;
-
-/** Название чувства, например 'shame' */
-export type FeelingName = string;
-
-/** Название поступка, на который реагирует психика, например 'begging' */
-export type Deed = string;
+import type { Deed } from './deed';
+import type { Feeling } from './feeling';
+import type { Trait } from './trait';
 
 /** Значение каждой черты характера. Черты не меняются со временем */
-export type PsycheTraits = Readonly<Record<TraitName, number>>;
+export type PsycheTraits = Readonly<Record<Trait, number>>;
 
 /** Значение каждого чувства от MIN_FEELING до MAX_FEELING */
-export type PsycheFeelings = Readonly<Record<FeelingName, number>>;
+export type PsycheFeelings = Readonly<Record<Feeling, number>>;
 
 /** Вклад черты в чувства: на сколько изменить каждое чувство. Чувств без изменений в объекте нет */
-export type FeelingsContribution = Readonly<Partial<Record<FeelingName, number>>>;
+export type FeelingsContribution = Readonly<Partial<Record<Feeling, number>>>;
 
 /** Состояние психики. Содержит только данные и полностью описывает психику */
 export type PsycheState = Readonly<{
@@ -33,5 +28,5 @@ export interface ITraitFactory {
   create(value: number): ITrait;
 }
 
-/** Фабрики черт по их названиям */
-export type TraitFactories = Readonly<Record<TraitName, ITraitFactory>>;
+/** Фабрика каждой черты */
+export type TraitFactories = Readonly<Record<Trait, ITraitFactory>>;

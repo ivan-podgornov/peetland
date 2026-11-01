@@ -18,6 +18,7 @@
       "@peetland/events": ["../../toolkit/events/src/index.ts"],
       "@peetland/geometry": ["../../toolkit/geometry/src/index.ts"],
       "@peetland/htn": ["../../toolkit/htn/src/index.ts"],
+      "@peetland/random": ["../../toolkit/random/src/index.ts"],
       "@peetland/repository": ["../../toolkit/repository/src/index.ts"],
       "@peetland/timings": ["../../toolkit/timings/src/index.ts"]
     }

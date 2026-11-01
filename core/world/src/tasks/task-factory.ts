@@ -1,6 +1,8 @@
 import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import type { PrimitiveTask, Task } from '@peetland/htn';
+import type { IRandom } from '@peetland/random';
+import type { ITimer } from '@peetland/timings';
 
 import type { NpcContext, NpcState } from '../npc';
 
@@ -18,6 +20,8 @@ import { PurchaseTask } from './purchase-task';
 import type { PurchaseTaskOptions } from './purchase-task';
 import { RemoveItemTask } from './remove-item-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
+import { TryLuckTask } from './try-luck-task';
+import type { TryLuckTaskOptions } from './try-luck-task';
 
 type NpcPrimitiveTask = PrimitiveTask<NpcState, NpcContext>;
 type NpcTask = Task<NpcState, NpcContext>;
@@ -34,6 +38,8 @@ export interface ITaskFactory {
   addItem(options: AddItemTaskOptions): NpcPrimitiveTask;
   /** Отнять предмет из инвентаря (см. RemoveItemTask) */
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
+  /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
+  tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
   /** Купить предмет там, где NPC стоит (см. PurchaseTask) */
   purchase(options: PurchaseTaskOptions): NpcTask;
   /** Купить пойло в ближайшем магазине (см. BuyBoozeTask) */
@@ -44,6 +50,8 @@ export interface ITaskFactory {
 
 export type TaskFactoryDeps = {
   geometry: IGeometry;
+  random: IRandom;
+  timer: ITimer;
 };
 
 export class TaskFactory implements ITaskFactory {
@@ -71,6 +79,12 @@ export class TaskFactory implements ITaskFactory {
 
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask {
     return new RemoveItemTask(options);
+  }
+
+  tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask {
+    const { random, timer } = this.deps;
+
+    return new TryLuckTask(options, { random, timer });
   }
 
   purchase(options: PurchaseTaskOptions): NpcTask {

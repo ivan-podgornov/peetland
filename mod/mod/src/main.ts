@@ -6,6 +6,8 @@ import {
   getCharHeading,
   isGamePaused,
   isPlayerPlaying,
+  math,
+  os,
   print,
   wait,
   wasKeyPressed,
@@ -13,7 +15,9 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
+import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
+import { Timer } from '@peetland/timings';
 import { NpcFactory, PlacesFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
 import type { NpcContext, NpcState } from '@peetland/world';
 
@@ -29,6 +33,10 @@ function isGameRunning(): boolean {
 }
 
 function main() {
+  // Без начального значения math.random при каждом запуске игры выдаёт одну и ту же
+  // последовательность, и шансы NPC выпадают одинаково
+  math.randomseed(os.time());
+
   // До загрузки игры (заставки, меню) скрипт ничего не трогает
   while (!isPlayerPlaying(PLAYER_HANDLE)) {
     wait(100);
@@ -62,7 +70,9 @@ function main() {
           htnFactory: new HTNFactory<NpcState, NpcContext>(),
           frames,
           inventoryFactory: new InventoryFactory(),
-          rootTaskFactory: new RootTaskFactory({ taskFactory: new TaskFactory({ geometry }) }),
+          rootTaskFactory: new RootTaskFactory({
+            taskFactory: new TaskFactory({ geometry, random: new Random(), timer: new Timer() }),
+          }),
         }),
       })
         .bigBang()

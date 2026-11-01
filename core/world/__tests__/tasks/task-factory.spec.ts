@@ -1,4 +1,3 @@
-import { Geometry } from '@peetland/geometry';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
@@ -12,13 +11,16 @@ import {
   PurchaseTask,
   RemoveItemTask,
   TaskFactory,
+  TryLuckTask,
 } from '../../src';
 import { createMockedPlaces } from '../places/helpers';
+
+import { createTaskFactoryDeps } from './helpers';
 
 describe('TaskFactory', () => {
   describe('#goToCoords', () => {
     it('Возвращает GoToCoordsTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.goToCoords({ coords: { x: 0, y: 0, z: 0 }, completeRadius: 1 });
 
@@ -28,7 +30,7 @@ describe('TaskFactory', () => {
 
   describe('#achieveAngle', () => {
     it('Возвращает AchieveAngleTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.achieveAngle({ angle: 0, tolerance: 1 });
 
@@ -38,7 +40,7 @@ describe('TaskFactory', () => {
 
   describe('#playAnimation', () => {
     it('Возвращает PlayAnimationTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.playAnimation({ animation: 'pay' });
 
@@ -48,7 +50,7 @@ describe('TaskFactory', () => {
 
   describe('#addItem', () => {
     it('Возвращает AddItemTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.addItem({ item: Item.Booze, count: 1 });
 
@@ -58,7 +60,7 @@ describe('TaskFactory', () => {
 
   describe('#removeItem', () => {
     it('Возвращает RemoveItemTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.removeItem({ item: Item.Booze, count: 1 });
 
@@ -66,9 +68,19 @@ describe('TaskFactory', () => {
     });
   });
 
+  describe('#tryLuck', () => {
+    it('Возвращает TryLuckTask', () => {
+      const factory = new TaskFactory(createTaskFactoryDeps());
+
+      const task = factory.tryLuck({ chance: 1 / 60 });
+
+      expect(task).toBeInstanceOf(TryLuckTask);
+    });
+  });
+
   describe('#purchase', () => {
     it('Возвращает PurchaseTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.purchase({ item: Item.Booze, count: 1, price: 100 });
 
@@ -78,7 +90,7 @@ describe('TaskFactory', () => {
 
   describe('#buyBooze', () => {
     it('Возвращает BuyBoozeTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.buyBooze({ places: createMockedPlaces() });
 
@@ -88,7 +100,7 @@ describe('TaskFactory', () => {
 
   describe('#drink', () => {
     it('Возвращает DrinkTask', () => {
-      const factory = new TaskFactory({ geometry: new Geometry() });
+      const factory = new TaskFactory(createTaskFactoryDeps());
 
       const task = factory.drink({ places: createMockedPlaces() });
 

@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { Conscientiousness, Deed, Feeling } from '../../../src';
 import {
   BEGGING_SHAME,
-  Conscientiousness,
-  Deed,
-  Feeling,
   MAX_CONSCIENTIOUSNESS,
   MIN_CONSCIENTIOUSNESS,
-} from '../../../src';
+} from '../../../src/traits/conscientiousness';
 
 describe('Conscientiousness', () => {
   describe('#react', () => {

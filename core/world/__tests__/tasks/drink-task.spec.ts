@@ -6,12 +6,12 @@ import { DrinkTask } from '../../src';
 import { applyPlanEffects, createNpcState, planNames } from './helpers';
 
 describe('DrinkTask', () => {
-  it('Планирует проиграть анимацию питья, а потом отнять пойло', () => {
+  it('Если есть пойло, планирует проиграть анимацию питья, а потом отнять пойло', () => {
     const state = createNpcState({ inventory: { [Item.Booze]: 1 } });
 
     const names = planNames(new DrinkTask(), state);
 
-    expect(names).toEqual(['play-animation', 'remove-item']);
+    expect(names).toStrictEqual(['play-animation', 'remove-item']);
   });
 
   it('По плану отнимает одну бутылку пойла', () => {
@@ -19,7 +19,7 @@ describe('DrinkTask', () => {
 
     const after = applyPlanEffects(new DrinkTask(), state);
 
-    expect(after.inventory).toEqual({ [Item.Booze]: 2 });
+    expect(after.inventory).toStrictEqual({ [Item.Booze]: 2 });
   });
 
   it('Если пойла нет, план не составляется', () => {

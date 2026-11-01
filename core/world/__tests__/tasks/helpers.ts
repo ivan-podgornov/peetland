@@ -2,7 +2,7 @@ import { Observable } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import type { IActor, IActorCommand } from '@peetland/game';
 import { Planner } from '@peetland/htn';
-import type { Task } from '@peetland/htn';
+import type { PrimitiveTask, Task } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
@@ -87,16 +87,24 @@ export function createPlace(place: Partial<PlaceData> = {}): PlaceData {
   };
 }
 
+/** Составляет план корневой задачи */
+export function plan(
+  root: Task<NpcState, NpcContext>,
+  state: NpcState
+): PrimitiveTask<NpcState, NpcContext>[] | null {
+  return new Planner<NpcState>().plan(root, state);
+}
+
 /** Возвращает названия задач плана или null, если план составить нельзя */
 export function planNames(root: Task<NpcState, NpcContext>, state: NpcState): string[] | null {
-  const plan = new Planner<NpcState>().plan(root, state);
+  const tasks = plan(root, state);
 
-  return plan && plan.map((task) => task.name);
+  return tasks && tasks.map((task) => task.name);
 }
 
 /** Применяет к состоянию эффекты всех задач плана по очереди */
 export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcState): NpcState {
-  const plan = new Planner<NpcState>().plan(root, state) ?? [];
+  const tasks = plan(root, state) ?? [];
 
-  return plan.reduce((current, task) => task.applyEffects(current), state);
+  return tasks.reduce((current, task) => task.applyEffects(current), state);
 }

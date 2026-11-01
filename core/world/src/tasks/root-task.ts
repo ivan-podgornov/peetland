@@ -1,16 +1,15 @@
 import type { IGeometry } from '@peetland/geometry';
 import type { CompoundTask, Method } from '@peetland/htn';
-import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '../npc';
 import type { PlaceData } from '../places';
 
-import { BOOZE_PRICE, BuyBoozeTask } from './buy-booze-task';
+import { BuyBoozeTask } from './buy-booze-task';
 import { DrinkTask } from './drink-task';
 
 export type RootTaskOptions = {
-  /** Магазины, в которых NPC покупают пойло */
-  shops: readonly PlaceData[];
+  /** Места мира, которыми пользуются NPC */
+  places: readonly PlaceData[];
 };
 
 export type RootTaskDeps = {
@@ -18,8 +17,9 @@ export type RootTaskDeps = {
 };
 
 /**
- * Корневая задача NPC: жить. Методы перечислены по приоритету: есть пойло — бухать, хватает денег —
- * купить пойло
+ * Корневая задача NPC: жить. Методы перечислены по приоритету: бухать, а если не получается —
+ * купить пойло. Когда что получается, решают предусловия самих задач: бухать можно, если есть
+ * пойло, купить — если хватает денег
  */
 export class RootTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'live';
@@ -30,13 +30,13 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
     this.methods = [
       {
         name: 'drink',
-        preconditions: (state) => (state.inventory[Item.Booze] ?? 0) > 0,
+        preconditions: () => true,
         tasks: [new DrinkTask()],
       },
       {
         name: 'buy-booze',
-        preconditions: (state) => (state.inventory[Item.Money] ?? 0) >= BOOZE_PRICE,
-        tasks: [new BuyBoozeTask({ shops: options.shops }, deps)],
+        preconditions: () => true,
+        tasks: [new BuyBoozeTask({ places: options.places }, deps)],
       },
     ];
   }

@@ -32,7 +32,7 @@ describe('AddItemTask', () => {
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Booze]: 2 } }));
 
-      expect(state.inventory).toEqual({ [Item.Booze]: 3 });
+      expect(state.inventory).toStrictEqual({ [Item.Booze]: 3 });
     });
 
     it('Если предмета в состоянии не было, добавляет его', () => {
@@ -40,7 +40,7 @@ describe('AddItemTask', () => {
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Money]: 5 } }));
 
-      expect(state.inventory).toEqual({ [Item.Money]: 5, [Item.Booze]: 1 });
+      expect(state.inventory).toStrictEqual({ [Item.Money]: 5, [Item.Booze]: 1 });
     });
   });
 });

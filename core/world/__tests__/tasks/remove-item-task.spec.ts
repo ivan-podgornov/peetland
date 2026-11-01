@@ -58,7 +58,7 @@ describe('RemoveItemTask', () => {
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Money]: 150 } }));
 
-      expect(state.inventory).toEqual({ [Item.Money]: 50 });
+      expect(state.inventory).toStrictEqual({ [Item.Money]: 50 });
     });
 
     it('Если предмета не осталось, убирает его из состояния', () => {
@@ -66,7 +66,7 @@ describe('RemoveItemTask', () => {
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Booze]: 1 } }));
 
-      expect(state.inventory).toEqual({});
+      expect(state.inventory).toStrictEqual({});
     });
   });
 });

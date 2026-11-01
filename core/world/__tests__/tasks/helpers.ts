@@ -5,12 +5,14 @@ import { Geometry } from '@peetland/geometry';
 import { Planner } from '@peetland/htn';
 import type { PrimitiveTask, Task } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
+import { createMockedRandom } from '@peetland/random/dev';
+import { ManualTimer } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { PlaceType, TaskFactory } from '../../src';
-import type { ITaskFactory } from '../../src';
+import type { ITaskFactory, TaskFactoryDeps } from '../../src';
 import type { NpcContext, NpcState, PlaceData } from '../../src';
 import { CommandTask } from '../../src/tasks/command-task';
 
@@ -111,12 +113,17 @@ export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcSta
   return tasks.reduce((current, task) => task.applyEffects(current), state);
 }
 
+/** Создаёт зависимости фабрики задач. Удача в них никогда не выпадает, а время не идёт само */
+export function createTaskFactoryDeps(): TaskFactoryDeps {
+  return { geometry: new Geometry(), random: createMockedRandom(false), timer: new ManualTimer() };
+}
+
 /**
  * Создаёт фабрику задач. Методы, которые не переданы, создают настоящие задачи. Значимые для теста
  * методы передаются моками, чтобы проверить, с какими параметрами их вызвали
  */
 export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFactory {
-  const real = new TaskFactory({ geometry: new Geometry() });
+  const real = new TaskFactory(createTaskFactoryDeps());
 
   return {
     goToCoords: (options) => real.goToCoords(options),
@@ -124,6 +131,7 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     playAnimation: (options) => real.playAnimation(options),
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
+    tryLuck: (options) => real.tryLuck(options),
     purchase: (options) => real.purchase(options),
     buyBooze: (options) => real.buyBooze(options),
     drink: (options) => real.drink(options),

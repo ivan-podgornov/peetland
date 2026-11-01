@@ -20,3 +20,5 @@ export type { RootTaskDeps, RootTaskOptions } from './root-task';
 export { RootTaskFactory } from './root-task-factory';
 export { TaskFactory } from './task-factory';
 export type { ITaskFactory, TaskFactoryDeps } from './task-factory';
+export { TRY_LUCK_PERIOD, TryLuckTask } from './try-luck-task';
+export type { TryLuckTaskDeps, TryLuckTaskOptions } from './try-luck-task';

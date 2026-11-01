@@ -13,7 +13,9 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
+import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
+import { Timer } from '@peetland/timings';
 import { NpcFactory, PlacesFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
 import type { NpcContext, NpcState } from '@peetland/world';
 
@@ -62,7 +64,9 @@ function main() {
           htnFactory: new HTNFactory<NpcState, NpcContext>(),
           frames,
           inventoryFactory: new InventoryFactory(),
-          rootTaskFactory: new RootTaskFactory({ taskFactory: new TaskFactory({ geometry }) }),
+          rootTaskFactory: new RootTaskFactory({
+            taskFactory: new TaskFactory({ geometry, random: new Random(), timer: new Timer() }),
+          }),
         }),
       })
         .bigBang()

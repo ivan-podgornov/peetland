@@ -11,11 +11,18 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
+import { InMemoryRepository } from '@peetland/repository';
+import { Timer } from '@peetland/timings';
 import { World } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
 
+import { npcs } from './data/npcs';
+import { places } from './data/places';
 import { startTimers } from './patch-global';
+
+/** Как часто NPC получают кадр, в миллисекундах. 0 — на каждой итерации потока таймеров */
+const FRAME_PERIOD = 0;
 
 /** Можно ли сейчас что-то делать в игре: она загружена, игрок управляет персонажем и не на паузе */
 function isGameRunning(): boolean {
@@ -44,11 +51,19 @@ function main() {
     }
 
     if (wasKeyPressed(VK_H)) {
-      new World({ game: new GtaGame() }).bigBang();
+      new World({
+        game: new GtaGame(),
+        npcs: new InMemoryRepository(npcs),
+        places: new InMemoryRepository(places),
+        frames: new Timer().interval(FRAME_PERIOD),
+      })
+        .bigBang()
+        .catch((error: unknown) => reportError(error));
     }
 
     if (wasKeyPressed(VK_J)) {
-      setCharCoordinates(PLAYER_PED, 2269.6, 65.66, 26.48);
+      // К трейлеру, у которого спавнится бомж
+      setCharCoordinates(PLAYER_PED, 1295.13, 135.64, 20.4);
     }
   }
 }

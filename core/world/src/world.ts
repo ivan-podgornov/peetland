@@ -1,10 +1,21 @@
+import type { Observable } from '@peetland/events';
 import type { IGame } from '@peetland/game';
+import { HTNFactory } from '@peetland/htn';
+import type { IRepository } from '@peetland/repository';
 
-/** Насколько актор может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
-const TRASH_FACING_TOLERANCE = 15;
+import { NpcFactory } from './npc';
+import type { Npc, NpcContext, NpcData, NpcState } from './npc';
+import type { PlaceData } from './places';
+import { RootTask, TaskFactory } from './tasks';
 
 export type WorldDeps = {
   game: IGame;
+  /** NPC, которые живут в мире */
+  npcs: IRepository<NpcData>;
+  /** Места мира, которыми пользуются NPC */
+  places: IRepository<PlaceData>;
+  /** Сообщает о каждом кадре игры */
+  frames: Observable<unknown>;
 };
 
 export class World {
@@ -14,31 +25,23 @@ export class World {
     this.deps = deps;
   }
 
-  /** Запускает жизнедеятельность мира */
-  bigBang() {
-    const { game } = this.deps;
-    const actor = game.actorFactory.create({
-      modelId: 230, // Бомж в капюшончике
-      position: { x: 2269.6, y: 65.66, z: 26.48 }, // Подворотня в Palomino Creek
-      angle: 0,
+  /**
+   * Запускает жизнедеятельность мира: на каждую запись из репозитория NPC создаёт NPC, который
+   * живёт среди мест из репозитория мест
+   * @returns промис с созданными NPC
+   */
+  async bigBang(): Promise<Npc[]> {
+    const { game, npcs, places, frames } = this.deps;
+    const [npcsData, placesData] = await Promise.all([npcs.getAll(), places.getAll()]);
+    const { geometry } = game;
+    const taskFactory = new TaskFactory({ geometry });
+    const npcFactory = new NpcFactory({
+      actorFactory: game.actorFactory,
+      htnFactory: new HTNFactory<NpcState, NpcContext>(),
+      rootTask: new RootTask({ places: placesData }, { geometry, taskFactory }),
+      frames,
     });
 
-    // Мусорка в Palomino Creek: где встать и куда смотреть, чтобы быть лицом к ней
-    const trashBin = { position: { x: 2320.08, y: 14.22, z: 26.48 }, angle: 276.6 };
-    actor
-      .goToCoords(trashBin.position, 0.5)
-      .execute()
-      .subscribe({
-        complete: () => {
-          actor
-            .achieveAngle(trashBin.angle, TRASH_FACING_TOLERANCE)
-            .execute()
-            .subscribe({
-              complete: () => {
-                actor.playAnimation('trash-search', 100000).execute().subscribe();
-              },
-            });
-        },
-      });
+    return npcsData.map((data) => npcFactory.create(data));
   }
 }

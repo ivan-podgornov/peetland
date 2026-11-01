@@ -33,7 +33,7 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
       {
         name: 'drink',
         preconditions: () => true,
-        tasks: [new DrinkTask(deps)],
+        tasks: [new DrinkTask({ places: options.places }, deps)],
       },
       {
         name: 'buy-booze',

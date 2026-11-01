@@ -2,7 +2,7 @@ import { Geometry } from '@peetland/geometry';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
-import { BOOZE_PRICE, RootTask } from '../../src';
+import { BOOZE_PRICE, PlaceType, RootTask } from '../../src';
 
 import { createNpcState, createPlace, createTaskFactory, planNames } from './helpers';
 
@@ -12,10 +12,10 @@ const DRINK = ['play-animation', 'remove-item', 'add-item'];
 /** Задачи плана «купить пойло» */
 const BUY_BOOZE = ['go-to-coords', 'achieve-angle', 'play-animation', 'remove-item', 'add-item'];
 
-/** Создаёт корневую задачу с одним магазином */
+/** Создаёт корневую задачу с магазином и бомжарней там же, где NPC */
 function createRootTask(): RootTask {
   return new RootTask(
-    { places: [createPlace()] },
+    { places: [createPlace(), createPlace({ id: 'camp', type: PlaceType.HomelessCamp })] },
     { geometry: new Geometry(), taskFactory: createTaskFactory() }
   );
 }

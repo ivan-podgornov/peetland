@@ -1,10 +1,9 @@
-import { Geometry } from '@peetland/geometry';
-import type { Vector3 } from '@peetland/geometry';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS, PlaceType } from '../../src';
-import type { ITaskFactory, NpcState, PlaceData } from '../../src';
+import type { IPlaces, ITaskFactory, NpcState } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
 import {
   applyPlanEffects,
@@ -18,55 +17,76 @@ import {
 /** Задачи плана «выпить» */
 const DRINK = ['play-animation', 'remove-item', 'add-item'];
 
-/** Создаёт бомжарню. Поля, которые не переданы, заполняются незначимыми значениями */
-function createCamp(place: Partial<PlaceData> = {}): PlaceData {
-  return createPlace({ id: 'camp', type: PlaceType.HomelessCamp, ...place });
-}
-
 /** Создаёт задачу «бухать» с настоящей фабрикой задач, если другая не передана */
-function createTask(
-  places: readonly PlaceData[],
-  taskFactory: ITaskFactory = createTaskFactory()
-): DrinkTask {
-  return new DrinkTask({ places }, { geometry: new Geometry(), taskFactory });
+function createTask(places: IPlaces, taskFactory: ITaskFactory = createTaskFactory()): DrinkTask {
+  return new DrinkTask({ places }, { taskFactory });
 }
 
-/** Состояние NPC с пойлом в переданной позиции */
-function createStateWithBooze(position: Vector3 = { x: 0, y: 0, z: 0 }, booze = 1): NpcState {
-  return createNpcState({ actor: { position, angle: 0 }, inventory: { [Item.Booze]: booze } });
+/** Создаёт мок мест, в которых есть бомжарня. NPC в ней, если inCamp */
+function createPlacesWithCamp(
+  inCamp: boolean,
+  camp = createPlace({ type: PlaceType.HomelessCamp })
+) {
+  return createMockedPlaces({
+    ofType: vi.fn(() => [camp]),
+    findNearest: vi.fn(() => camp),
+    isNear: vi.fn(() => inCamp),
+  });
+}
+
+/** Состояние NPC с пойлом */
+function createStateWithBooze(booze = 1): NpcState {
+  return createNpcState({ inventory: { [Item.Booze]: booze } });
 }
 
 describe('DrinkTask', () => {
   it('Если NPC в бомжарне, планирует проиграть анимацию питья, отнять пойло и добавить пустую бутылку', () => {
-    const task = createTask([createCamp()]);
+    const task = createTask(createPlacesWithCamp(true));
 
     expect(planNames(task, createStateWithBooze())).toStrictEqual(DRINK);
   });
 
-  it('Если NPC на границе радиуса бомжарни, планирует пить на месте', () => {
-    const task = createTask([createCamp()]);
-    const state = createStateWithBooze({ x: HOMELESS_CAMP_RADIUS, y: 0, z: 0 });
-
-    expect(planNames(task, state)).toStrictEqual(DRINK);
-  });
-
   it('Если NPC не в бомжарне, планирует сначала дойти до бомжарни, а потом выпить', () => {
-    const task = createTask([createCamp()]);
-    const state = createStateWithBooze({ x: HOMELESS_CAMP_RADIUS + 1, y: 0, z: 0 });
+    const task = createTask(createPlacesWithCamp(false));
 
-    expect(planNames(task, state)).toStrictEqual(['go-to-coords', ...DRINK]);
+    expect(planNames(task, createStateWithBooze())).toStrictEqual(['go-to-coords', ...DRINK]);
   });
 
-  it('Идёт к ближайшей бомжарне, а не к ближайшему месту другого типа', () => {
-    const goToCoords = vi.fn();
-    const task = createTask(
-      [
-        createPlace({ id: 'shop', type: PlaceType.Shop, position: { x: 10, y: 0, z: 0 } }),
-        createCamp({ id: 'far-camp', position: { x: 100, y: 0, z: 0 } }),
-        createCamp({ id: 'near-camp', position: { x: 50, y: 0, z: 0 } }),
-      ],
-      createTaskFactory({ goToCoords })
+  it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
+    const places = createPlacesWithCamp(true);
+    const state = createNpcState({
+      actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
+      inventory: { [Item.Booze]: 1 },
+    });
+
+    plan(createTask(places), state);
+
+    expect(places.isNear).toHaveBeenCalledWith(
+      { x: 8, y: 0, z: 0 },
+      PlaceType.HomelessCamp,
+      HOMELESS_CAMP_RADIUS
     );
+  });
+
+  it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {
+    const places = createPlacesWithCamp(false);
+    const state = createNpcState({
+      actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
+      inventory: { [Item.Booze]: 1 },
+    });
+
+    plan(createTask(places), state);
+
+    expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
+      { x: 8, y: 0, z: 0 },
+      PlaceType.HomelessCamp
+    );
+  });
+
+  it('Идёт к бомжарне, которую вернул places.findNearest', () => {
+    const goToCoords = vi.fn();
+    const camp = createPlace({ type: PlaceType.HomelessCamp, position: { x: 50, y: 0, z: 0 } });
+    const task = createTask(createPlacesWithCamp(false, camp), createTaskFactory({ goToCoords }));
 
     plan(task, createStateWithBooze());
 
@@ -79,7 +99,7 @@ describe('DrinkTask', () => {
   it('Пьёт стоя в течение DRINK_DURATION', () => {
     const playAnimation = vi.fn();
 
-    createTask([createCamp()], createTaskFactory({ playAnimation }));
+    createTask(createMockedPlaces(), createTaskFactory({ playAnimation }));
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({
       animation: 'drink-standing-1',
@@ -88,21 +108,21 @@ describe('DrinkTask', () => {
   });
 
   it('По плану отнимает бутылку пойла и добавляет пустую бутылку', () => {
-    const task = createTask([createCamp()]);
+    const task = createTask(createPlacesWithCamp(true));
 
-    const after = applyPlanEffects(task, createStateWithBooze(undefined, 3));
+    const after = applyPlanEffects(task, createStateWithBooze(3));
 
     expect(after.inventory).toStrictEqual({ [Item.Booze]: 2, [Item.Bottles]: 1 });
   });
 
   it('Если пойла нет, план не составляется', () => {
-    const task = createTask([createCamp()]);
+    const task = createTask(createPlacesWithCamp(true));
 
     expect(planNames(task, createNpcState({ inventory: {} }))).toBeNull();
   });
 
   it('Если бомжарен нет, план не составляется', () => {
-    const task = createTask([createPlace({ type: PlaceType.Shop })]);
+    const task = createTask(createMockedPlaces());
 
     expect(planNames(task, createStateWithBooze())).toBeNull();
   });

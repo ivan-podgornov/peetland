@@ -13,6 +13,7 @@ import {
   RemoveItemTask,
   TaskFactory,
 } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
 describe('TaskFactory', () => {
   describe('#goToCoords', () => {
@@ -79,7 +80,7 @@ describe('TaskFactory', () => {
     it('Возвращает BuyBoozeTask', () => {
       const factory = new TaskFactory({ geometry: new Geometry() });
 
-      const task = factory.buyBooze({ places: [] });
+      const task = factory.buyBooze({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(BuyBoozeTask);
     });
@@ -89,7 +90,7 @@ describe('TaskFactory', () => {
     it('Возвращает DrinkTask', () => {
       const factory = new TaskFactory({ geometry: new Geometry() });
 
-      const task = factory.drink({ places: [] });
+      const task = factory.drink({ places: createMockedPlaces() });
 
       expect(task).toBeInstanceOf(DrinkTask);
     });

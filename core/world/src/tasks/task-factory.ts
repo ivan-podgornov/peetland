@@ -78,14 +78,10 @@ export class TaskFactory implements ITaskFactory {
   }
 
   buyBooze(options: BuyBoozeTaskOptions): NpcTask {
-    const { geometry } = this.deps;
-
-    return new BuyBoozeTask(options, { geometry, taskFactory: this });
+    return new BuyBoozeTask(options, { taskFactory: this });
   }
 
   drink(options: DrinkTaskOptions): NpcTask {
-    const { geometry } = this.deps;
-
-    return new DrinkTask(options, { geometry, taskFactory: this });
+    return new DrinkTask(options, { taskFactory: this });
   }
 }

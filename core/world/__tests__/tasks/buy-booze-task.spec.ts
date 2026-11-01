@@ -1,9 +1,9 @@
-import { Geometry } from '@peetland/geometry';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BOOZE_PRICE, BuyBoozeTask, PlaceType } from '../../src';
-import type { ITaskFactory, PlaceData } from '../../src';
+import type { IPlaces, ITaskFactory } from '../../src';
+import { createMockedPlaces } from '../places/helpers';
 
 import {
   createNpcState,
@@ -16,39 +16,71 @@ import {
 
 /** Создаёт задачу покупки пойла с настоящей фабрикой задач, если другая не передана */
 function createTask(
-  places: readonly PlaceData[],
+  places: IPlaces,
   taskFactory: ITaskFactory = createTaskFactory()
 ): BuyBoozeTask {
-  return new BuyBoozeTask({ places }, { geometry: new Geometry(), taskFactory });
+  return new BuyBoozeTask({ places }, { taskFactory });
 }
 
-/** Состояние NPC, у которого хватает денег на пойло */
-function createStateWithMoney(position = { x: 0, y: 0, z: 0 }) {
-  return createNpcState({
-    actor: { position, angle: 0 },
-    inventory: { [Item.Money]: BOOZE_PRICE },
-  });
+/** Создаёт мок мест, в которых есть переданный магазин, и он же ближайший */
+function createPlacesWithShop(shop = createPlace()) {
+  return createMockedPlaces({ ofType: vi.fn(() => [shop]), findNearest: vi.fn(() => shop) });
 }
 
 describe('BuyBoozeTask', () => {
   it('Планирует дойти до магазина, повернуться к прилавку и купить пойло', () => {
     const task = createTask(
-      [createPlace()],
+      createPlacesWithShop(),
       createTaskFactory({ purchase: () => createStubTask('purchase') })
     );
 
-    expect(planNames(task, createStateWithMoney())).toStrictEqual([
+    expect(planNames(task, createNpcState())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
       'purchase',
     ]);
   });
 
+  it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
+    const places = createPlacesWithShop();
+    const state = createNpcState({ actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 } });
+
+    plan(createTask(places), state);
+
+    expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
+      { x: 8, y: 0, z: 0 },
+      PlaceType.Shop
+    );
+  });
+
+  it('Идёт к магазину, который вернул places.findNearest', () => {
+    const goToCoords = vi.fn();
+    const shop = createPlace({ position: { x: 50, y: 0, z: 0 } });
+    const task = createTask(createPlacesWithShop(shop), createTaskFactory({ goToCoords }));
+
+    plan(task, createNpcState());
+
+    expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
+      coords: { x: 50, y: 0, z: 0 },
+      completeRadius: 0.5,
+    });
+  });
+
+  it('Поворачивается лицом к прилавку магазина, который вернул places.findNearest', () => {
+    const achieveAngle = vi.fn();
+    const shop = createPlace({ angle: 90 });
+    const task = createTask(createPlacesWithShop(shop), createTaskFactory({ achieveAngle }));
+
+    plan(task, createNpcState());
+
+    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
+  });
+
   it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {
     const purchase = vi.fn(() => createStubTask('purchase'));
-    const task = createTask([createPlace()], createTaskFactory({ purchase }));
+    const task = createTask(createPlacesWithShop(), createTaskFactory({ purchase }));
 
-    plan(task, createStateWithMoney());
+    plan(task, createNpcState());
 
     expect(purchase).toHaveBeenCalledExactlyOnceWith({
       item: Item.Booze,
@@ -57,61 +89,17 @@ describe('BuyBoozeTask', () => {
     });
   });
 
-  it('Идёт к ближайшему магазину, а не к ближайшему месту другого типа', () => {
-    const goToCoords = vi.fn();
-    const task = createTask(
-      [
-        createPlace({ id: 'trash', type: PlaceType.TrashBin, position: { x: 1, y: 0, z: 0 } }),
-        createPlace({ id: 'far-shop', position: { x: 100, y: 0, z: 0 } }),
-        createPlace({ id: 'near-shop', position: { x: 50, y: 0, z: 0 } }),
-      ],
-      createTaskFactory({ goToCoords })
-    );
-
-    plan(task, createStateWithMoney());
-
-    expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
-      completeRadius: 0.5,
-    });
-  });
-
-  it('Выбирает магазин, ближайший к позиции NPC из состояния', () => {
-    const goToCoords = vi.fn();
-    const task = createTask(
-      [
-        createPlace({ id: 'west', position: { x: -10, y: 0, z: 0 } }),
-        createPlace({ id: 'east', position: { x: 10, y: 0, z: 0 } }),
-      ],
-      createTaskFactory({ goToCoords })
-    );
-
-    plan(task, createStateWithMoney({ x: 8, y: 0, z: 0 }));
-
-    expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 10, y: 0, z: 0 },
-      completeRadius: 0.5,
-    });
-  });
-
-  it('Поворачивается лицом к прилавку ближайшего магазина', () => {
-    const achieveAngle = vi.fn();
-    const task = createTask(
-      [
-        createPlace({ id: 'far-shop', position: { x: 100, y: 0, z: 0 }, angle: 10 }),
-        createPlace({ id: 'near-shop', position: { x: 50, y: 0, z: 0 }, angle: 90 }),
-      ],
-      createTaskFactory({ achieveAngle })
-    );
-
-    plan(task, createStateWithMoney());
-
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
-  });
-
   it('Если магазинов нет, план не составляется', () => {
-    const task = createTask([createPlace({ type: PlaceType.TrashBin })]);
+    const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-    expect(planNames(task, createStateWithMoney())).toBeNull();
+    expect(planNames(createTask(places), createNpcState())).toBeNull();
+  });
+
+  it('Спрашивает у places магазины', () => {
+    const places = createMockedPlaces();
+
+    plan(createTask(places), createNpcState());
+
+    expect(places.ofType).toHaveBeenCalledWith(PlaceType.Shop);
   });
 });

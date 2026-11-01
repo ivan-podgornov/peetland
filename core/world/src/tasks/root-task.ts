@@ -1,13 +1,13 @@
 import type { CompoundTask, Method } from '@peetland/htn';
 
 import type { NpcContext, NpcState } from '../npc';
-import type { PlaceData } from '../places';
+import type { IPlaces } from '../places';
 
 import type { ITaskFactory } from './task-factory';
 
 export type RootTaskOptions = {
   /** Места мира, которыми пользуются NPC */
-  places: readonly PlaceData[];
+  places: IPlaces;
 };
 
 export type RootTaskDeps = {

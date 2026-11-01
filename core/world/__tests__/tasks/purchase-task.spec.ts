@@ -19,10 +19,12 @@ describe('PurchaseTask', () => {
   });
 
   it('Платит с анимацией оплаты', () => {
-    const taskFactory = createTaskFactory();
-    const playAnimation = vi.spyOn(taskFactory, 'playAnimation');
+    const playAnimation = vi.fn();
 
-    new PurchaseTask({ item: Item.Booze, count: 1, price: 100 }, { taskFactory });
+    new PurchaseTask(
+      { item: Item.Booze, count: 1, price: 100 },
+      { taskFactory: createTaskFactory({ playAnimation }) }
+    );
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'pay' });
   });

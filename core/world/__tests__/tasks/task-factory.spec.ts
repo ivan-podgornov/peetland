@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
@@ -7,41 +8,57 @@ import {
   GoToCoordsTask,
   PlayAnimationTask,
   RemoveItemTask,
+  TaskFactory,
 } from '../../src';
 
-import { createTaskFactory } from './helpers';
-
 describe('TaskFactory', () => {
-  it('#goToCoords возвращает GoToCoordsTask', () => {
-    const task = createTaskFactory().goToCoords({
-      coords: { x: 0, y: 0, z: 0 },
-      completeRadius: 1,
+  describe('#goToCoords', () => {
+    it('Возвращает GoToCoordsTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
+
+      const task = factory.goToCoords({ coords: { x: 0, y: 0, z: 0 }, completeRadius: 1 });
+
+      expect(task).toBeInstanceOf(GoToCoordsTask);
     });
-
-    expect(task).toBeInstanceOf(GoToCoordsTask);
   });
 
-  it('#achieveAngle возвращает AchieveAngleTask', () => {
-    const task = createTaskFactory().achieveAngle({ angle: 0, tolerance: 1 });
+  describe('#achieveAngle', () => {
+    it('Возвращает AchieveAngleTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
 
-    expect(task).toBeInstanceOf(AchieveAngleTask);
+      const task = factory.achieveAngle({ angle: 0, tolerance: 1 });
+
+      expect(task).toBeInstanceOf(AchieveAngleTask);
+    });
   });
 
-  it('#playAnimation возвращает PlayAnimationTask', () => {
-    const task = createTaskFactory().playAnimation({ animation: 'pay' });
+  describe('#playAnimation', () => {
+    it('Возвращает PlayAnimationTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
 
-    expect(task).toBeInstanceOf(PlayAnimationTask);
+      const task = factory.playAnimation({ animation: 'pay' });
+
+      expect(task).toBeInstanceOf(PlayAnimationTask);
+    });
   });
 
-  it('#addItem возвращает AddItemTask', () => {
-    const task = createTaskFactory().addItem({ item: Item.Booze, count: 1 });
+  describe('#addItem', () => {
+    it('Возвращает AddItemTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
 
-    expect(task).toBeInstanceOf(AddItemTask);
+      const task = factory.addItem({ item: Item.Booze, count: 1 });
+
+      expect(task).toBeInstanceOf(AddItemTask);
+    });
   });
 
-  it('#removeItem возвращает RemoveItemTask', () => {
-    const task = createTaskFactory().removeItem({ item: Item.Booze, count: 1 });
+  describe('#removeItem', () => {
+    it('Возвращает RemoveItemTask', () => {
+      const factory = new TaskFactory({ geometry: new Geometry() });
 
-    expect(task).toBeInstanceOf(RemoveItemTask);
+      const task = factory.removeItem({ item: Item.Booze, count: 1 });
+
+      expect(task).toBeInstanceOf(RemoveItemTask);
+    });
   });
 });

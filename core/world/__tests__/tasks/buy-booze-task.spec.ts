@@ -3,14 +3,14 @@ import { Item } from '@peetland/inventory';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BOOZE_PRICE, BuyBoozeTask, PlaceType } from '../../src';
-import type { PlaceData, TaskFactory } from '../../src';
+import type { ITaskFactory, PlaceData } from '../../src';
 
 import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
 
 /** Создаёт задачу покупки пойла с настоящей фабрикой задач, если другая не передана */
 function createTask(
   places: readonly PlaceData[],
-  taskFactory: TaskFactory = createTaskFactory()
+  taskFactory: ITaskFactory = createTaskFactory()
 ): BuyBoozeTask {
   return new BuyBoozeTask({ places }, { geometry: new Geometry(), taskFactory });
 }
@@ -37,15 +37,14 @@ describe('BuyBoozeTask', () => {
   });
 
   it('Идёт к ближайшему магазину, а не к ближайшему месту другого типа', () => {
-    const taskFactory = createTaskFactory();
-    const goToCoords = vi.spyOn(taskFactory, 'goToCoords');
+    const goToCoords = vi.fn();
     const task = createTask(
       [
         createPlace({ id: 'trash', type: PlaceType.TrashBin, position: { x: 1, y: 0, z: 0 } }),
         createPlace({ id: 'far-shop', position: { x: 100, y: 0, z: 0 } }),
         createPlace({ id: 'near-shop', position: { x: 50, y: 0, z: 0 } }),
       ],
-      taskFactory
+      createTaskFactory({ goToCoords })
     );
 
     plan(task, createStateWithMoney());
@@ -57,14 +56,13 @@ describe('BuyBoozeTask', () => {
   });
 
   it('Выбирает магазин, ближайший к позиции NPC из состояния', () => {
-    const taskFactory = createTaskFactory();
-    const goToCoords = vi.spyOn(taskFactory, 'goToCoords');
+    const goToCoords = vi.fn();
     const task = createTask(
       [
         createPlace({ id: 'west', position: { x: -10, y: 0, z: 0 } }),
         createPlace({ id: 'east', position: { x: 10, y: 0, z: 0 } }),
       ],
-      taskFactory
+      createTaskFactory({ goToCoords })
     );
 
     plan(task, createStateWithMoney({ x: 8, y: 0, z: 0 }));
@@ -76,14 +74,13 @@ describe('BuyBoozeTask', () => {
   });
 
   it('Поворачивается лицом к прилавку ближайшего магазина', () => {
-    const taskFactory = createTaskFactory();
-    const achieveAngle = vi.spyOn(taskFactory, 'achieveAngle');
+    const achieveAngle = vi.fn();
     const task = createTask(
       [
         createPlace({ id: 'far-shop', position: { x: 100, y: 0, z: 0 }, angle: 10 }),
         createPlace({ id: 'near-shop', position: { x: 50, y: 0, z: 0 }, angle: 90 }),
       ],
-      taskFactory
+      createTaskFactory({ achieveAngle })
     );
 
     plan(task, createStateWithMoney());

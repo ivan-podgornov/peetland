@@ -7,7 +7,7 @@ import { BOOZE_PRICE, RootTask } from '../../src';
 import { createNpcState, createPlace, createTaskFactory, planNames } from './helpers';
 
 /** Задачи плана «бухать» */
-const DRINK = ['play-animation', 'remove-item'];
+const DRINK = ['play-animation', 'remove-item', 'add-item'];
 
 /** Задачи плана «купить пойло» */
 const BUY_BOOZE = ['go-to-coords', 'achieve-angle', 'play-animation', 'remove-item', 'add-item'];

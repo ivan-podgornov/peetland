@@ -12,7 +12,10 @@ export type DrinkTaskDeps = {
   taskFactory: ITaskFactory;
 };
 
-/** Бухать: выпить бутылку пойла, если оно есть. Пойло отнимается, только когда NPC допил */
+/**
+ * Бухать: выпить бутылку пойла, если оно есть. Когда NPC допил, пойло отнимается, а пустая бутылка
+ * остаётся в инвентаре
+ */
 export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'drink';
 
@@ -28,6 +31,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
         tasks: [
           taskFactory.playAnimation({ animation: 'drink-standing-1', duration: DRINK_DURATION }),
           taskFactory.removeItem({ item: Item.Booze, count: 1 }),
+          taskFactory.addItem({ item: Item.Bottles, count: 1 }),
         ],
       },
     ];

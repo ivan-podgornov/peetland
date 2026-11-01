@@ -18,10 +18,12 @@ describe('PickUpTask', () => {
   });
 
   it('Берёт предмет с анимацией получения предмета', () => {
-    const taskFactory = createTaskFactory();
-    const playAnimation = vi.spyOn(taskFactory, 'playAnimation');
+    const playAnimation = vi.fn();
 
-    new PickUpTask({ item: Item.Bottles, count: 1 }, { taskFactory });
+    new PickUpTask(
+      { item: Item.Bottles, count: 1 },
+      { taskFactory: createTaskFactory({ playAnimation }) }
+    );
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-receive' });
   });

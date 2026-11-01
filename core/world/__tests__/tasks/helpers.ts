@@ -10,6 +10,7 @@ import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { PlaceType, TaskFactory } from '../../src';
+import type { ITaskFactory } from '../../src';
 import type { NpcContext, NpcState, PlaceData } from '../../src';
 import { CommandTask } from '../../src/tasks/command-task';
 
@@ -110,7 +111,19 @@ export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcSta
   return tasks.reduce((current, task) => task.applyEffects(current), state);
 }
 
-/** Создаёт настоящую фабрику задач. Тесты следят за её методами через vi.spyOn */
-export function createTaskFactory(): TaskFactory {
-  return new TaskFactory({ geometry: new Geometry() });
+/**
+ * Создаёт фабрику задач. Методы, которые не переданы, создают настоящие задачи. Значимые для теста
+ * методы передаются моками, чтобы проверить, с какими параметрами их вызвали
+ */
+export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFactory {
+  const real = new TaskFactory({ geometry: new Geometry() });
+
+  return {
+    goToCoords: (options) => real.goToCoords(options),
+    achieveAngle: (options) => real.achieveAngle(options),
+    playAnimation: (options) => real.playAnimation(options),
+    addItem: (options) => real.addItem(options),
+    removeItem: (options) => real.removeItem(options),
+    ...factory,
+  };
 }

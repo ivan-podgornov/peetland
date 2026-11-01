@@ -6,7 +6,8 @@ import {
   createMockedTrait,
   createMockedTraitFactory,
 } from '../dev';
-import { Deed, Feeling, MAX_FEELING, MIN_FEELING, Psyche, Trait } from '../src';
+import { Deed, Feeling, Psyche, Trait } from '../src';
+import { MAX_FEELING, MIN_FEELING } from '../src/psyche';
 
 describe('Psyche', () => {
   describe('#react', () => {

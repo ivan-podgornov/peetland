@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { Conscientiousness, MAX_CONSCIENTIOUSNESS, MIN_CONSCIENTIOUSNESS } from '../../../src';
+import { Conscientiousness } from '../../../src';
+import {
+  MAX_CONSCIENTIOUSNESS,
+  MIN_CONSCIENTIOUSNESS,
+} from '../../../src/traits/conscientiousness';
 
 describe('Conscientiousness', () => {
   describe('#constructor', () => {

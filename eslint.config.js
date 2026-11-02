@@ -84,6 +84,12 @@ export default defineConfig([
       ],
       '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
       '@typescript-eslint/parameter-properties': 'error',
+      // Промисы (см. #126)
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/return-await': ['error', 'always'],
 
       // Core rules
       'func-style': ['error', 'declaration'],

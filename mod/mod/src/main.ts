@@ -52,7 +52,7 @@ async function bigBang(): Promise<void> {
     places: await new InMemoryRepository(places).getAll(),
   });
 
-  return new World({
+  await new World({
     npcs: new InMemoryRepository(npcs),
     npcFactory: new NpcFactory({
       actorFactory,

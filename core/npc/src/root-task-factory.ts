@@ -18,26 +18,3 @@ export interface IKindRootTaskFactory {
   /** Создаёт корневую задачу NPC */
   create(): Task<NpcState, NpcContext>;
 }
-
-/** Фабрика корневой задачи для каждого типа NPC */
-export type KindRootTaskFactories = Readonly<Record<NpcKind, IKindRootTaskFactory>>;
-
-export type RootTaskFactoryDeps = {
-  /** Фабрики, которыми создаются корневые задачи NPC каждого типа */
-  kindFactories: KindRootTaskFactories;
-};
-
-/** Создаёт корневую задачу NPC фабрикой его типа */
-export class RootTaskFactory implements IRootTaskFactory {
-  private readonly deps: RootTaskFactoryDeps;
-
-  constructor(deps: RootTaskFactoryDeps) {
-    this.deps = deps;
-  }
-
-  create(kind: NpcKind): Task<NpcState, NpcContext> {
-    const { kindFactories } = this.deps;
-
-    return kindFactories[kind].create();
-  }
-}

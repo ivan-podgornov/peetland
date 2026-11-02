@@ -1,6 +1,6 @@
 export { Deed } from './deed';
 export { PsycheFactory } from './factory';
-export type { IPsycheFactory } from './factory';
+export type { IPsycheFactory, PsycheFactoryDeps } from './factory';
 export { Feeling } from './feeling';
 export { Psyche } from './psyche';
 export type { IPsyche, PsycheDeps } from './psyche';

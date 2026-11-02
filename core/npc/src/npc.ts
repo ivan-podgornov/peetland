@@ -7,7 +7,7 @@ import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
-import type { RootTaskFactories } from './root-task-factory';
+import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 
 export type NpcDeps = {
@@ -19,8 +19,8 @@ export type NpcDeps = {
   inventoryFactory: IInventoryFactory;
   /** Фабрика, которой NPC создаёт свою психику */
   psycheFactory: IPsycheFactory;
-  /** Фабрики корневых задач по типам NPC. NPC создаёт корневую задачу своего HTN-агента фабрикой своего типа */
-  rootTaskFactories: RootTaskFactories;
+  /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
+  rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
 };
@@ -42,7 +42,7 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTaskFactories } =
+    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTaskFactory } =
       deps;
 
     this.id = data.id;
@@ -59,7 +59,7 @@ export class Npc {
       inventory: this.inventory,
       psyche: this.psyche,
     };
-    this.htn = htnFactory.create(rootTaskFactories[data.kind].create());
+    this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
       signal: this.lifetime.signal,

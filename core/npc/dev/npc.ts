@@ -34,13 +34,11 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
-    rootTaskFactories: {
-      [NpcKind.Homeless]: {
-        create: vi.fn(() => ({
-          name: 'root',
-          methods: [],
-        })),
-      },
+    rootTaskFactory: {
+      create: vi.fn(() => ({
+        name: 'root',
+        methods: [],
+      })),
     },
     frames: createControlledObservable().observable,
     ...deps,

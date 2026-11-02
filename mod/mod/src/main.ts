@@ -16,7 +16,7 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
-import { NpcFactory, NpcKind } from '@peetland/npc';
+import { NpcFactory, NpcKind, RootTaskFactory } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcTaskFactory } from '@peetland/npc-tasks';
 import { PlacesFactory } from '@peetland/places';
@@ -60,21 +60,23 @@ async function bigBang(): Promise<void> {
       frames,
       inventoryFactory: new InventoryFactory(),
       psycheFactory,
-      rootTaskFactories: {
-        [NpcKind.Homeless]: new HomelessRootTaskFactory({
-          homelessTaskFactory: new HomelessTaskFactory({
-            npcTaskFactory: new NpcTaskFactory({
-              geometry,
+      rootTaskFactory: new RootTaskFactory({
+        kindFactories: {
+          [NpcKind.Homeless]: new HomelessRootTaskFactory({
+            homelessTaskFactory: new HomelessTaskFactory({
+              npcTaskFactory: new NpcTaskFactory({
+                geometry,
+                psycheFactory,
+                random,
+                timer: new Timer(),
+              }),
+              places: worldPlaces,
               psycheFactory,
               random,
-              timer: new Timer(),
             }),
-            places: worldPlaces,
-            psycheFactory,
-            random,
           }),
-        }),
-      },
+        },
+      }),
     }),
   }).bigBang();
 }

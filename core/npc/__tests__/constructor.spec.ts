@@ -82,23 +82,20 @@ describe('Npc', () => {
       expect(npc.psyche).toBe(psyche);
     });
 
-    it('Вызывает create у фабрики корневой задачи своего типа', () => {
-      const homelessRootTaskFactory = {
+    it('Вызывает rootTaskFactory.create с типом NPC из данных', () => {
+      const rootTaskFactory = {
         create: vi.fn(() => ({
           name: 'root',
           methods: [],
         })),
       };
 
-      new Npc(
-        createNpcData({ kind: NpcKind.Homeless }),
-        createNpcDeps({ rootTaskFactories: { [NpcKind.Homeless]: homelessRootTaskFactory } })
-      );
+      new Npc(createNpcData({ kind: NpcKind.Homeless }), createNpcDeps({ rootTaskFactory }));
 
-      expect(homelessRootTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
+      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
     });
 
-    it('Создаёт HTN-агента с корневой задачей, которую вернула фабрика своего типа', () => {
+    it('Создаёт HTN-агента с корневой задачей, которую вернула rootTaskFactory', () => {
       const rootTask: Task<NpcState, NpcContext> = {
         name: 'root',
         methods: [],
@@ -106,10 +103,10 @@ describe('Npc', () => {
       const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
 
       new Npc(
-        createNpcData({ kind: NpcKind.Homeless }),
+        createNpcData(),
         createNpcDeps({
           htnFactory,
-          rootTaskFactories: { [NpcKind.Homeless]: { create: () => rootTask } },
+          rootTaskFactory: { create: () => rootTask },
         })
       );
 

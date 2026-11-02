@@ -47,10 +47,10 @@ export class RemoveItemTask implements PrimitiveTask<NpcState, NpcContext> {
   }
 
   /** Задача завершается в start, поэтому, если до update всё же дошло, возвращает 'failed' */
-  update(_state: NpcState, _context: NpcContext): TaskResult {
+  update(): TaskResult {
     return 'failed';
   }
 
   /** Задача мгновенная, останавливать нечего */
-  stop(_context: NpcContext): void {}
+  stop(): void {}
 }

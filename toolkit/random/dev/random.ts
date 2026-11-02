@@ -10,7 +10,7 @@ import type { IRandom } from '../src';
  */
 export function createMockedRandom(isLucky: boolean) {
   return {
-    chance: vi.fn((_probability: number) => isLucky),
+    chance: vi.fn(() => isLucky),
     // Мок vitest теряет параметр типа, поэтому его сигнатуру возвращаем пересечением с IRandom['pick']
     pick: vi.fn((items: readonly unknown[]) => items[0]) as Mock<
       (items: readonly unknown[]) => unknown

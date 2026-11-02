@@ -20,7 +20,7 @@ export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext>
 
   private readonly executions = new Map<IActor, Execution>();
 
-  canExecute(_state: NpcState): boolean {
+  canExecute(): boolean {
     return true;
   }
 

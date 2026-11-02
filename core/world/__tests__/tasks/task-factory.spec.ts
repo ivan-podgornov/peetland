@@ -1,8 +1,10 @@
+import { createStubPrimitiveTask } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import { createMockedNpcTaskFactory, createStubPrimitiveTask } from '@peetland/npc-tasks/dev';
+import type { NpcContext, NpcState } from '@peetland/npc';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { Deed } from '@peetland/psyche';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   BegTask,
@@ -19,7 +21,8 @@ import { createTaskFactoryDeps } from './helpers';
 describe('TaskFactory', () => {
   describe('#goToCoords', () => {
     it('Вызывает npcTaskFactory.goToCoords с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const goToCoords = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('go-to-coords'));
+      const npcTaskFactory = createNpcTaskFactory({ goToCoords });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = {
         coords: {
@@ -32,11 +35,12 @@ describe('TaskFactory', () => {
 
       factory.goToCoords(options);
 
-      expect(npcTaskFactory.goToCoords).toHaveBeenCalledExactlyOnceWith(options);
+      expect(goToCoords).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.goToCoords', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('go-to-coords');
+      const npcTaskFactory = createNpcTaskFactory({ goToCoords: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.goToCoords({
@@ -48,13 +52,16 @@ describe('TaskFactory', () => {
         completeRadius: 1,
       });
 
-      expect(task).toBe(npcTaskFactory.goToCoords.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#achieveAngle', () => {
     it('Вызывает npcTaskFactory.achieveAngle с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const achieveAngle = vi.fn(() =>
+        createStubPrimitiveTask<NpcState, NpcContext>('achieve-angle')
+      );
+      const npcTaskFactory = createNpcTaskFactory({ achieveAngle });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = {
         angle: 0,
@@ -63,11 +70,12 @@ describe('TaskFactory', () => {
 
       factory.achieveAngle(options);
 
-      expect(npcTaskFactory.achieveAngle).toHaveBeenCalledExactlyOnceWith(options);
+      expect(achieveAngle).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.achieveAngle', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('achieve-angle');
+      const npcTaskFactory = createNpcTaskFactory({ achieveAngle: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.achieveAngle({
@@ -75,34 +83,39 @@ describe('TaskFactory', () => {
         tolerance: 1,
       });
 
-      expect(task).toBe(npcTaskFactory.achieveAngle.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#playAnimation', () => {
     it('Вызывает npcTaskFactory.playAnimation с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const playAnimation = vi.fn(() =>
+        createStubPrimitiveTask<NpcState, NpcContext>('play-animation')
+      );
+      const npcTaskFactory = createNpcTaskFactory({ playAnimation });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = { animation: 'pay' as const };
 
       factory.playAnimation(options);
 
-      expect(npcTaskFactory.playAnimation).toHaveBeenCalledExactlyOnceWith(options);
+      expect(playAnimation).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.playAnimation', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('play-animation');
+      const npcTaskFactory = createNpcTaskFactory({ playAnimation: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.playAnimation({ animation: 'pay' });
 
-      expect(task).toBe(npcTaskFactory.playAnimation.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#addItem', () => {
     it('Вызывает npcTaskFactory.addItem с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const addItem = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('add-item'));
+      const npcTaskFactory = createNpcTaskFactory({ addItem });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = {
         item: Item.Booze,
@@ -111,11 +124,12 @@ describe('TaskFactory', () => {
 
       factory.addItem(options);
 
-      expect(npcTaskFactory.addItem).toHaveBeenCalledExactlyOnceWith(options);
+      expect(addItem).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.addItem', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('add-item');
+      const npcTaskFactory = createNpcTaskFactory({ addItem: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.addItem({
@@ -123,13 +137,14 @@ describe('TaskFactory', () => {
         count: 1,
       });
 
-      expect(task).toBe(npcTaskFactory.addItem.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#removeItem', () => {
     it('Вызывает npcTaskFactory.removeItem с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const removeItem = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('remove-item'));
+      const npcTaskFactory = createNpcTaskFactory({ removeItem });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = {
         item: Item.Booze,
@@ -138,11 +153,12 @@ describe('TaskFactory', () => {
 
       factory.removeItem(options);
 
-      expect(npcTaskFactory.removeItem).toHaveBeenCalledExactlyOnceWith(options);
+      expect(removeItem).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.removeItem', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('remove-item');
+      const npcTaskFactory = createNpcTaskFactory({ removeItem: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.removeItem({
@@ -150,76 +166,84 @@ describe('TaskFactory', () => {
         count: 1,
       });
 
-      expect(task).toBe(npcTaskFactory.removeItem.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#psycheReact', () => {
     it('Вызывает npcTaskFactory.psycheReact с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const psycheReact = vi.fn(() =>
+        createStubPrimitiveTask<NpcState, NpcContext>('psyche-react')
+      );
+      const npcTaskFactory = createNpcTaskFactory({ psycheReact });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = { deed: Deed.BottleFound };
 
       factory.psycheReact(options);
 
-      expect(npcTaskFactory.psycheReact).toHaveBeenCalledExactlyOnceWith(options);
+      expect(psycheReact).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.psycheReact', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('psyche-react');
+      const npcTaskFactory = createNpcTaskFactory({ psycheReact: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.psycheReact({ deed: Deed.BottleFound });
 
-      expect(task).toBe(npcTaskFactory.psycheReact.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#tryLuck', () => {
     it('Вызывает npcTaskFactory.tryLuck с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const tryLuck = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('try-luck'));
+      const npcTaskFactory = createNpcTaskFactory({ tryLuck });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = { chance: 1 / 60 };
 
       factory.tryLuck(options);
 
-      expect(npcTaskFactory.tryLuck).toHaveBeenCalledExactlyOnceWith(options);
+      expect(tryLuck).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.tryLuck', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('try-luck');
+      const npcTaskFactory = createNpcTaskFactory({ tryLuck: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.tryLuck({ chance: 1 / 60 });
 
-      expect(task).toBe(npcTaskFactory.tryLuck.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 
   describe('#parallel', () => {
     it('Вызывает npcTaskFactory.parallel с параметрами', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const parallel = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('parallel'));
+      const npcTaskFactory = createNpcTaskFactory({ parallel });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
       const options = {
-        main: createStubPrimitiveTask('main'),
-        background: createStubPrimitiveTask('background'),
+        main: createStubPrimitiveTask<NpcState, NpcContext>('main'),
+        background: createStubPrimitiveTask<NpcState, NpcContext>('background'),
       };
 
       factory.parallel(options);
 
-      expect(npcTaskFactory.parallel).toHaveBeenCalledExactlyOnceWith(options);
+      expect(parallel).toHaveBeenCalledExactlyOnceWith(options);
     });
 
     it('Возвращает задачу, которую создала npcTaskFactory.parallel', () => {
-      const npcTaskFactory = createMockedNpcTaskFactory();
+      const primitive = createStubPrimitiveTask<NpcState, NpcContext>('parallel');
+      const npcTaskFactory = createNpcTaskFactory({ parallel: () => primitive });
       const factory = new TaskFactory(createTaskFactoryDeps({ npcTaskFactory }));
 
       const task = factory.parallel({
-        main: createStubPrimitiveTask('main'),
-        background: createStubPrimitiveTask('background'),
+        main: createStubPrimitiveTask<NpcState, NpcContext>('main'),
+        background: createStubPrimitiveTask<NpcState, NpcContext>('background'),
       });
 
-      expect(task).toBe(npcTaskFactory.parallel.mock.results[0]?.value);
+      expect(task).toBe(primitive);
     });
   });
 

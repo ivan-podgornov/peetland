@@ -7,7 +7,7 @@ import { TaskFactory } from '../../src';
 import type { ITaskFactory, TaskFactoryDeps } from '../../src';
 
 export { createNpcContext, createNpcState } from '@peetland/npc/dev';
-export { applyPlanEffects, createStubTask, plan, planNames } from '@peetland/npc-tasks/dev';
+export { applyPlanEffects, createStubTask, plan, planNames } from '@peetland/htn/dev';
 export { createPlace } from '@peetland/places/dev';
 
 /**

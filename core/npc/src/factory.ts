@@ -14,12 +14,12 @@ export interface INpcFactory {
 }
 
 /**
- * Зависимости фабрики NPC. Снаружи нужны игра, часы и корневые задачи, а остальное фабрика собирает
+ * Зависимости фабрики NPC. Снаружи нужны игра, знание о мире и корневые задачи, а остальное фабрика собирает
  * сама, если его не передали
  */
 export type NpcFactoryDeps = Pick<
   NpcDeps,
-  'actorFactory' | 'clock' | 'frames' | 'rootTaskFactory'
+  'actorFactory' | 'frames' | 'rootTaskFactory' | 'worldKnowledge'
 > &
   Partial<Pick<NpcDeps, 'htnFactory' | 'inventoryFactory' | 'psycheFactory'>>;
 
@@ -29,9 +29,9 @@ export class NpcFactory implements INpcFactory {
   constructor(deps: NpcFactoryDeps) {
     const {
       actorFactory,
-      clock,
       frames,
       rootTaskFactory,
+      worldKnowledge,
       htnFactory = new HTNFactory<NpcState, NpcContext>(),
       inventoryFactory = new InventoryFactory(),
       psycheFactory = new PsycheFactory(),
@@ -39,12 +39,12 @@ export class NpcFactory implements INpcFactory {
 
     this.deps = {
       actorFactory,
-      clock,
       frames,
       htnFactory,
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
+      worldKnowledge,
     };
   }
 

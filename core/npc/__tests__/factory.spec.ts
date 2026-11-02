@@ -5,11 +5,10 @@ import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
-import { ManualClock } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc, NpcFactory } from '../src';
 import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 
@@ -17,7 +16,6 @@ import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
   return {
     actorFactory: createMockedActorFactory(),
-    clock: new ManualClock(),
     frames: createControlledObservable().observable,
     rootTaskFactory: {
       create: vi.fn(() => ({
@@ -25,6 +23,7 @@ function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps 
         methods: [],
       })),
     },
+    worldKnowledge: createMockedNpcWorldKnowledge(),
     ...deps,
   };
 }
@@ -66,13 +65,13 @@ describe('NpcFactory', () => {
       expect(psycheFactory.create).toHaveBeenCalledOnce();
     });
 
-    it('NPC узнаёт время суток по часам clock из зависимостей', () => {
-      const clock = new ManualClock(20, 15);
-      const factory = new NpcFactory(createRequiredDeps({ clock }));
+    it('NPC узнаёт о мире через worldKnowledge из зависимостей', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 });
+      const factory = new NpcFactory(createRequiredDeps({ worldKnowledge }));
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.getState().world.time).toBe(20 * 60 + 15);
+      expect(npc.getState().world).toStrictEqual({ time: 20 * 60 + 15 });
     });
 
     it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {

@@ -18,7 +18,7 @@ export type NpcSelfState = Readonly<{
 
 /** Что NPC знает о мире на момент сбора состояния */
 export type NpcWorldState = Readonly<{
-  /** Время суток в минутах от полуночи, от 0 до 1439 (см. IClock.minutesSinceMidnight) */
+  /** Время суток в минутах от полуночи, от 0 до 1439 */
   time: number;
 }>;
 

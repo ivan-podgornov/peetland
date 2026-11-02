@@ -2,7 +2,6 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
-import { ManualClock } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
@@ -10,6 +9,8 @@ import type { Mocked } from 'vitest';
 import { Npc, NpcKind } from '../src';
 import type { INpcFactory, NpcData } from '../src';
 import type { NpcDeps } from '../src/npc';
+
+import { createMockedNpcWorldKnowledge } from './world-knowledge';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -33,7 +34,6 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
 export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   return {
     actorFactory: createMockedActorFactory(),
-    clock: new ManualClock(),
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
@@ -44,6 +44,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
       })),
     },
     frames: createControlledObservable().observable,
+    worldKnowledge: createMockedNpcWorldKnowledge(),
     ...deps,
   };
 }

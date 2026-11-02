@@ -6,3 +6,4 @@ export { NpcKind } from './kind';
 export { Npc } from './npc';
 export type { IKindRootTaskFactory, IRootTaskFactory } from './root-task-factory';
 export type { NpcActorState, NpcSelfState, NpcState, NpcWorldState } from './state';
+export type { INpcWorldKnowledge } from './world-knowledge';

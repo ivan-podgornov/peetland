@@ -1,6 +1,6 @@
 import type { IGame } from '@peetland/game';
 import { NpcFactory } from '@peetland/npc';
-import type { INpcFactory, IRootTaskFactory, NpcData } from '@peetland/npc';
+import type { INpcFactory, INpcWorldKnowledge, IRootTaskFactory, NpcData } from '@peetland/npc';
 import { PlacesFactory } from '@peetland/places';
 import type { IPlacesFactory, PlaceData } from '@peetland/places';
 import { PsycheFactory } from '@peetland/psyche';
@@ -11,6 +11,7 @@ import type { IRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
 import type { ITimer } from '@peetland/timings';
 
+import { NpcWorldKnowledge } from './npc-world-knowledge';
 import { RootTaskFactory } from './root-task-factory';
 
 export type WorldOptions = {
@@ -38,6 +39,8 @@ export type WorldDeps = {
   placesFactory: IPlacesFactory;
   /** Фабрика, которой NPC создают корневые задачи по своему типу */
   rootTaskFactory: IRootTaskFactory;
+  /** То, что NPC знают о мире. Одно на всех, потому что все NPC знают о мире одно и то же */
+  worldKnowledge: INpcWorldKnowledge;
   /** Фабрика, которой мир создаёт NPC */
   npcFactory: INpcFactory;
 };
@@ -63,6 +66,7 @@ export class World {
       timer = new Timer(),
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry }),
+      worldKnowledge = new NpcWorldKnowledge({ clock }),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
     const {
@@ -75,10 +79,10 @@ export class World {
       }),
       npcFactory = new NpcFactory({
         actorFactory,
-        clock,
         frames,
         psycheFactory,
         rootTaskFactory,
+        worldKnowledge,
       }),
     } = this.deps;
 

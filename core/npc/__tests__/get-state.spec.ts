@@ -6,11 +6,10 @@ import {
   createPsycheDeps,
   createPsycheState,
 } from '@peetland/psyche/dev';
-import { ManualClock } from '@peetland/timings';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc } from '../src';
 
 describe('Npc', () => {
@@ -106,21 +105,11 @@ describe('Npc', () => {
       expect(npc.getState().self.psyche).toStrictEqual(psyche.getState());
     });
 
-    it('Возвращает время суток по часам в минутах от полуночи', () => {
-      const clock = new ManualClock(20, 15);
-      const npc = new Npc(createNpcData(), createNpcDeps({ clock }));
+    it('Возвращает состояние мира, которое вернуло знание о мире', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 });
+      const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      expect(npc.getState().world.time).toBe(20 * 60 + 15);
-    });
-
-    it('Возвращает слепок мира, который не меняется, когда идут часы', () => {
-      const clock = new ManualClock(20, 15);
-      const npc = new Npc(createNpcData(), createNpcDeps({ clock }));
-      const state = npc.getState();
-
-      clock.set(21, 0);
-
-      expect(state.world.time).toBe(20 * 60 + 15);
+      expect(npc.getState().world).toStrictEqual({ time: 20 * 60 + 15 });
     });
   });
 });

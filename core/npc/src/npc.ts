@@ -4,12 +4,12 @@ import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
-import type { IClock } from '@peetland/timings';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
+import type { INpcWorldKnowledge } from './world-knowledge';
 
 export type NpcDeps = {
   /** Фабрика, которой NPC создаёт своего актора */
@@ -24,8 +24,8 @@ export type NpcDeps = {
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
-  /** Часы, по которым NPC знает время суток */
-  clock: IClock;
+  /** То, что NPC знает о мире */
+  worldKnowledge: INpcWorldKnowledge;
 };
 
 /** NPC склеивает свои данные, актора и HTN-агента */
@@ -35,10 +35,10 @@ export class Npc {
   readonly psyche: IPsyche;
 
   private readonly actor: IActor;
-  private readonly clock: IClock;
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
   private readonly lifetime: AbortController;
+  private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
    * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
@@ -48,16 +48,16 @@ export class Npc {
   constructor(data: NpcData, deps: NpcDeps) {
     const {
       actorFactory,
-      clock,
       frames,
       htnFactory,
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
+      worldKnowledge,
     } = deps;
 
     this.id = data.id;
-    this.clock = clock;
+    this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
     this.lifetime = new AbortController();
@@ -89,7 +89,7 @@ export class Npc {
         inventory: this.inventory.getAll(),
         psyche: this.psyche.getState(),
       },
-      world: { time: this.clock.minutesSinceMidnight },
+      world: this.worldKnowledge.getState(),
     };
   }
 

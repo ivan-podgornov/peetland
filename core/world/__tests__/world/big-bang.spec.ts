@@ -2,7 +2,11 @@ import { createControlledObservable } from '@peetland/events/dev';
 import type { Task } from '@peetland/htn';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import { createMockedNpcFactory, createNpcData } from '@peetland/npc/dev';
+import {
+  createMockedNpcFactory,
+  createMockedNpcWorldKnowledge,
+  createNpcData,
+} from '@peetland/npc/dev';
 import { createMockedPlaces, createPlace } from '@peetland/places/dev';
 import { Feeling } from '@peetland/psyche';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
@@ -105,7 +109,38 @@ describe('World', () => {
         expect(preconditions).toHaveBeenCalled();
       });
 
-      it('NPC планирует с временем суток по часам игры', async () => {
+      it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
+        const frames = createControlledObservable();
+        const preconditions = vi.fn(() => false);
+        const world = new World(
+          createWorldOptions({
+            game: createGame({ frames: frames.observable }),
+            npcs: [createNpcData()],
+          }),
+          {
+            worldKnowledge: createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 }),
+            rootTaskFactory: createMockedRootTaskFactory({
+              name: 'root',
+              methods: [
+                {
+                  name: 'never',
+                  preconditions,
+                  tasks: [],
+                },
+              ],
+            }),
+          }
+        );
+        await world.bigBang();
+
+        frames.subscriber.next(undefined);
+
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({ world: { time: 20 * 60 + 15 } })
+        );
+      });
+
+      it('Если worldKnowledge не передано, NPC планирует с временем суток по часам игры', async () => {
         const frames = createControlledObservable();
         const preconditions = vi.fn(() => false);
         const world = new World(

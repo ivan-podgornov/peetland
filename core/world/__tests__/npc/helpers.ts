@@ -1,13 +1,13 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 
 import { vi } from 'vitest';
 
 import type { NpcData, NpcDeps, NpcFactoryDeps } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {

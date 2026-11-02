@@ -1,7 +1,7 @@
+import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { RootTask, RootTaskFactory } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
 
 import { createTaskFactory } from './helpers';
 

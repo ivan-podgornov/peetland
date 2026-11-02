@@ -17,10 +17,12 @@ import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { PlaceType, TaskFactory } from '../../src';
+import { TaskFactory } from '../../src';
 import type { ITaskFactory, TaskFactoryDeps } from '../../src';
-import type { NpcContext, NpcState, PlaceData } from '../../src';
+import type { NpcContext, NpcState } from '../../src';
 import { CommandTask } from '../../src/tasks/command-task';
+
+export { createPlace } from '@peetland/places/dev';
 
 /** Создаёт состояние NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcState(state: Partial<NpcState> = {}): NpcState {
@@ -97,21 +99,6 @@ export class TestCommandTask extends CommandTask {
   protected createCommand(): IActorCommand {
     return this.command();
   }
-}
-
-/** Создаёт место. Поля, которые не переданы, заполняются незначимыми значениями */
-export function createPlace(place: Partial<PlaceData> = {}): PlaceData {
-  return {
-    id: 'shop',
-    type: PlaceType.Shop,
-    position: {
-      x: 0,
-      y: 0,
-      z: 0,
-    },
-    angle: 0,
-    ...place,
-  };
 }
 
 /** Составляет план корневой задачи */

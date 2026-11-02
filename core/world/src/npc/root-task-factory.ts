@@ -1,6 +1,6 @@
 import type { Task } from '@peetland/htn';
 
-import type { IPlaces } from '../places';
+import type { IPlaces } from '@peetland/places';
 
 import type { NpcContext } from './context';
 import type { NpcState } from './state';

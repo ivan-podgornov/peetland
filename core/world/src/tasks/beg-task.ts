@@ -1,11 +1,11 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import { PlaceType } from '@peetland/places';
+import type { IPlaces } from '@peetland/places';
 import { Deed, Feeling } from '@peetland/psyche';
 import type { IPsycheFactory, PsycheState } from '@peetland/psyche';
 
 import type { NpcContext, NpcState } from '../npc';
-import { PlaceType } from '../places';
-import type { IPlaces } from '../places';
 
 import { BOOZE_PRICE } from './buy-booze-task';
 import { BOTTLE_PRICE } from './sell-bottles-task';

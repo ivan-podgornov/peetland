@@ -1,7 +1,8 @@
 import type { CompoundTask, Method } from '@peetland/htn';
 
+import type { IPlaces } from '@peetland/places';
+
 import type { NpcContext, NpcState } from '../npc';
-import type { IPlaces } from '../places';
 
 import type { ITaskFactory } from './task-factory';
 

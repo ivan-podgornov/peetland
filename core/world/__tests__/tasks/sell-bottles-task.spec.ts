@@ -1,9 +1,11 @@
 import { Item } from '@peetland/inventory';
+import { PlaceType } from '@peetland/places';
+import type { IPlaces } from '@peetland/places';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, BOTTLE_PRICE, PlaceType, SellBottlesTask } from '../../src';
-import type { IPlaces, ITaskFactory } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
+import { BOOZE_PRICE, BOTTLE_PRICE, SellBottlesTask } from '../../src';
+import type { ITaskFactory } from '../../src';
 
 import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
 

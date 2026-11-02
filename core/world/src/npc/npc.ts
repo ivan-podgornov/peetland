@@ -3,9 +3,8 @@ import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
+import type { IPlaces } from '@peetland/places';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
-
-import type { IPlaces } from '../places';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';

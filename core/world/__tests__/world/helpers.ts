@@ -1,11 +1,12 @@
+import type { IPlacesFactory, PlaceData } from '@peetland/places';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { InMemoryRepository } from '@peetland/repository';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { INpcFactory, IPlacesFactory, NpcData, PlaceData, WorldDeps } from '../../src';
+import type { INpcFactory, NpcData, WorldDeps } from '../../src';
 import { Npc } from '../../src';
 import { createNpcDeps } from '../npc/helpers';
-import { createMockedPlaces } from '../places/helpers';
 
 /** Создаёт фабрику NPC, которая создаёт NPC по данным с незначимыми зависимостями */
 export function createMockedNpcFactory(): Mocked<INpcFactory> {

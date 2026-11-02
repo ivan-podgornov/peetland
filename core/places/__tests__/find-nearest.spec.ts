@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { PlaceType } from '../../src';
-import { createPlace } from '../tasks/helpers';
+import { createPlace } from '../dev';
+import { PlaceType } from '../src';
 
 import { createPlaces } from './helpers';
 

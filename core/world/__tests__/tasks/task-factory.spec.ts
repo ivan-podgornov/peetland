@@ -1,5 +1,6 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { Deed } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
 
@@ -19,7 +20,6 @@ import {
   TaskFactory,
   TryLuckTask,
 } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
 
 import { createTaskFactoryDeps } from './helpers';
 

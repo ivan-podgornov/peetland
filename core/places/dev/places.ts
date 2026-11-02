@@ -1,13 +1,22 @@
-import { Geometry } from '@peetland/geometry';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { Places } from '../../src';
-import type { IPlaces, PlaceData } from '../../src';
+import { PlaceType } from '../src';
+import type { IPlaces, PlaceData } from '../src';
 
-/** Создаёт места с настоящей геометрией */
-export function createPlaces(places: readonly PlaceData[]): Places {
-  return new Places({ places }, { geometry: new Geometry() });
+/** Создаёт место. Поля, которые не переданы, заполняются незначимыми значениями */
+export function createPlace(place: Partial<PlaceData> = {}): PlaceData {
+  return {
+    id: 'shop',
+    type: PlaceType.Shop,
+    position: {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
+    angle: 0,
+    ...place,
+  };
 }
 
 /**

@@ -40,7 +40,7 @@ function createPlacesWithTrashBins(bins = [createPlace({ type: PlaceType.TrashBi
 describe('CollectBottlesTask', () => {
   it('Планирует дойти до мусорки, повернуться к ней, начать рыться, найти бутылки и перестать рыться', () => {
     const task = createTask(createPlacesWithTrashBins());
-    const state = createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } });
+    const state = createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } });
 
     expect(planNames(task, state)).toStrictEqual([
       'go-to-coords',
@@ -131,7 +131,7 @@ describe('CollectBottlesTask', () => {
     const playAnimation = vi.fn();
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ playAnimation }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } }));
 
     expect(playAnimation.mock.calls).toStrictEqual([
       [{ animation: 'trash-search-start' }],
@@ -145,7 +145,7 @@ describe('CollectBottlesTask', () => {
     const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } }));
 
     expect(tryLuck).toHaveBeenCalledExactlyOnceWith({ chance: BOTTLE_FIND_CHANCE });
   });
@@ -165,7 +165,7 @@ describe('CollectBottlesTask', () => {
       })
     );
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } }));
 
     expect(parallel).toHaveBeenCalledExactlyOnceWith({
       main: tryLuck,
@@ -175,7 +175,7 @@ describe('CollectBottlesTask', () => {
 
   it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket, добавляет в инвентарь и реагирует на находку', () => {
     const task = createTask(createPlacesWithTrashBins());
-    const state = createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 2 } });
+    const state = createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 2 } } });
 
     const names = planNames(task, state);
 
@@ -195,7 +195,7 @@ describe('CollectBottlesTask', () => {
     const addItem = vi.fn();
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ addItem }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } }));
 
     expect(addItem).toHaveBeenCalledExactlyOnceWith({
       item: Item.Bottles,
@@ -207,7 +207,7 @@ describe('CollectBottlesTask', () => {
     const psycheReact = vi.fn();
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ psycheReact }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } } }));
 
     expect(psycheReact).toHaveBeenCalledExactlyOnceWith({ deed: Deed.BottleFound });
   });
@@ -216,7 +216,7 @@ describe('CollectBottlesTask', () => {
     const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
-    plan(task, createNpcState({ inventory: {} }));
+    plan(task, createNpcState({ self: { inventory: {} } }));
 
     expect(tryLuck).toHaveBeenCalledTimes(MAX_BOTTLES_PER_VISIT);
   });
@@ -225,7 +225,7 @@ describe('CollectBottlesTask', () => {
     const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
     const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
-    plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 3 } }));
+    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES - 3 } } }));
 
     expect(tryLuck).toHaveBeenCalledTimes(3);
   });
@@ -233,7 +233,10 @@ describe('CollectBottlesTask', () => {
   it('Если у NPC MAX_BOTTLES бутылок, план не составляется', () => {
     const task = createTask(createPlacesWithTrashBins());
 
-    const names = planNames(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES } }));
+    const names = planNames(
+      task,
+      createNpcState({ self: { inventory: { [Item.Bottles]: MAX_BOTTLES } } })
+    );
 
     expect(names).toBeNull();
   });

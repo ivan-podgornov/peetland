@@ -33,7 +33,7 @@ export class PurchaseTask implements CompoundTask<NpcState, NpcContext> {
     this.methods = [
       {
         name: 'pay',
-        preconditions: (state) => (state.inventory[Item.Money] ?? 0) >= price,
+        preconditions: (state) => (state.self.inventory[Item.Money] ?? 0) >= price,
         tasks: [
           npcTaskFactory.playAnimation({ animation: 'pay' }),
           npcTaskFactory.removeItem({

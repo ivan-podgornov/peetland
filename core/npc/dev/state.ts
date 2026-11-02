@@ -4,22 +4,36 @@ import { Psyche } from '@peetland/psyche';
 import { createPsycheDeps, createPsycheState } from '@peetland/psyche/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
 
-import type { NpcContext, NpcState } from '../src';
+import type { NpcContext, NpcSelfState, NpcState, NpcWorldState } from '../src';
 
-/** Создаёт состояние NPC. Поля, которые не переданы, заполняются незначимыми значениями */
-export function createNpcState(state: Partial<NpcState> = {}): NpcState {
+export type CreateNpcStateOptions = {
+  self?: Partial<NpcSelfState>;
+  world?: Partial<NpcWorldState>;
+};
+
+/**
+ * Создаёт состояние NPC. Поля себя и мира, которые не переданы, заполняются незначимыми
+ * значениями: NPC стоит в начале координат с пустым инвентарём, а в мире полночь
+ */
+export function createNpcState(state: CreateNpcStateOptions = {}): NpcState {
   return {
-    actor: {
-      position: {
-        x: 0,
-        y: 0,
-        z: 0,
+    self: {
+      actor: {
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
       },
-      angle: 0,
+      inventory: {},
+      psyche: createPsycheState(),
+      ...state.self,
     },
-    inventory: {},
-    psyche: createPsycheState(),
-    ...state,
+    world: {
+      time: 0,
+      ...state.world,
+    },
   };
 }
 

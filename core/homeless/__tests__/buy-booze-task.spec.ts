@@ -50,13 +50,15 @@ describe('BuyBoozeTask', () => {
   it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
     const places = createPlacesWithShop();
     const state = createNpcState({
-      actor: {
-        position: {
-          x: 8,
-          y: 0,
-          z: 0,
+      self: {
+        actor: {
+          position: {
+            x: 8,
+            y: 0,
+            z: 0,
+          },
+          angle: 0,
         },
-        angle: 0,
       },
     });
 

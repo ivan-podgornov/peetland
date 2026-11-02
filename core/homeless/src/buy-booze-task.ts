@@ -52,7 +52,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
     const { homelessTaskFactory, npcTaskFactory } = this.deps;
-    const shop = this.places.findNearest(state.actor.position, PlaceType.Shop);
+    const shop = this.places.findNearest(state.self.actor.position, PlaceType.Shop);
 
     if (!shop) {
       throw new Error('Не из чего выбрать магазин');

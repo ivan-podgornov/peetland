@@ -81,7 +81,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
 
     return (
       rewards > 0 &&
-      this.countRewardsBeforeShame(state.psyche, rewards) === rewards &&
+      this.countRewardsBeforeShame(state.self.psyche, rewards) === rewards &&
       this.places.ofType(PlaceType.BeggingSpot).length > 0
     );
   }
@@ -89,7 +89,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   /** Собирает задачи захода к ближайшему месту для клянчанья */
   private begAtNearestSpot(state: NpcState): Task<NpcState, NpcContext>[] {
     const { npcTaskFactory } = this.deps;
-    const spot = this.places.findNearest(state.actor.position, PlaceType.BeggingSpot);
+    const spot = this.places.findNearest(state.self.actor.position, PlaceType.BeggingSpot);
 
     if (!spot) {
       throw new Error('Не из чего выбрать место для клянчанья');
@@ -111,11 +111,14 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
         npcTaskFactory.parallel({
           main: npcTaskFactory.tryLuck({
             chance: BEGGING_CHANCE,
-            stopWhen: (current) => this.isAshamed(current.psyche),
+            stopWhen: (current) => this.isAshamed(current.self.psyche),
             onAttempt: (context) => context.psyche.react(Deed.Begging),
             applyEffects: (current) => ({
               ...current,
-              psyche: this.predictReward(current.psyche),
+              self: {
+                ...current.self,
+                psyche: this.predictReward(current.self.psyche),
+              },
             }),
           }),
           background: npcTaskFactory.playAnimation({ animation: 'beg-sitting' }),
@@ -135,8 +138,8 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
    * хватает, возвращает 0
    */
   private countNeededRewards(state: NpcState): number {
-    const money = state.inventory[Item.Money] ?? 0;
-    const bottles = state.inventory[Item.Bottles] ?? 0;
+    const money = state.self.inventory[Item.Money] ?? 0;
+    const bottles = state.self.inventory[Item.Bottles] ?? 0;
     const shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE;
 
     return Math.max(0, Math.ceil(shortfall / BEGGING_REWARD));

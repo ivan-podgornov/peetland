@@ -4,6 +4,7 @@ import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
+import type { IClock } from '@peetland/timings';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
@@ -23,6 +24,8 @@ export type NpcDeps = {
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
+  /** Часы, по которым NPC знает время суток */
+  clock: IClock;
 };
 
 /** NPC склеивает свои данные, актора и HTN-агента */
@@ -32,6 +35,7 @@ export class Npc {
   readonly psyche: IPsyche;
 
   private readonly actor: IActor;
+  private readonly clock: IClock;
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
   private readonly lifetime: AbortController;
@@ -42,10 +46,18 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTaskFactory } =
-      deps;
+    const {
+      actorFactory,
+      clock,
+      frames,
+      htnFactory,
+      inventoryFactory,
+      psycheFactory,
+      rootTaskFactory,
+    } = deps;
 
     this.id = data.id;
+    this.clock = clock;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
     this.lifetime = new AbortController();
@@ -66,15 +78,18 @@ export class Npc {
     });
   }
 
-  /** Возвращает состояние NPC со слепками актора, инвентаря и психики (см. NpcState) */
+  /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */
   getState(): NpcState {
     return {
-      actor: {
-        position: this.actor.getPosition(),
-        angle: this.actor.getAngle(),
+      self: {
+        actor: {
+          position: this.actor.getPosition(),
+          angle: this.actor.getAngle(),
+        },
+        inventory: this.inventory.getAll(),
+        psyche: this.psyche.getState(),
       },
-      inventory: this.inventory.getAll(),
-      psyche: this.psyche.getState(),
+      world: { time: this.clock.minutesSinceMidnight },
     };
   }
 

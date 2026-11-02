@@ -102,16 +102,18 @@ describe('NpcTaskFactory', () => {
 
       const state = task.applyEffects(
         createNpcState({
-          psyche: createPsycheState({
-            traits: {
-              [Trait.Conscientiousness]: 100,
-              [Trait.Luck]: 50,
-            },
-          }),
+          self: {
+            psyche: createPsycheState({
+              traits: {
+                [Trait.Conscientiousness]: 100,
+                [Trait.Luck]: 50,
+              },
+            }),
+          },
         })
       );
 
-      expect(state.psyche.feelings[Feeling.Shame]).toBeGreaterThan(0);
+      expect(state.self.psyche.feelings[Feeling.Shame]).toBeGreaterThan(0);
     });
   });
 

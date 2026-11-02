@@ -4,15 +4,17 @@ import { Geometry } from '@peetland/geometry';
 import type { NpcData } from '@peetland/npc';
 import type { PlaceData } from '@peetland/places';
 import { InMemoryRepository } from '@peetland/repository';
+import { ManualClock } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
 import type { WorldOptions } from '../../src';
 
-/** Создаёт игру с виртуальными акторами. Кадры не идут, а объекты создавать нельзя */
+/** Создаёт игру с виртуальными акторами и ручными часами. Кадры не идут, а объекты создавать нельзя */
 export function createGame(game: Partial<IGame> = {}): IGame {
   return {
     actorFactory: createMockedActorFactory(),
+    clock: new ManualClock(),
     geometry: new Geometry(),
     objectFactory: {
       create: vi.fn(() => {

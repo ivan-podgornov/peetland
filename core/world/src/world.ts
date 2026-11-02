@@ -57,7 +57,7 @@ export class World {
    */
   async bigBang(): Promise<void> {
     const { game, npcs, places } = this.options;
-    const { actorFactory, frames, geometry } = game;
+    const { actorFactory, clock, frames, geometry } = game;
     const {
       random = new Random(),
       timer = new Timer(),
@@ -75,6 +75,7 @@ export class World {
       }),
       npcFactory = new NpcFactory({
         actorFactory,
+        clock,
         frames,
         psycheFactory,
         rootTaskFactory,

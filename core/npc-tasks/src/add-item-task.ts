@@ -28,12 +28,15 @@ export class AddItemTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Количество предмета в состоянии растёт */
   applyEffects(state: NpcState): NpcState {
     const { item, count } = this.options;
-    const inventory = new Inventory(state.inventory);
+    const inventory = new Inventory(state.self.inventory);
     inventory.add(item, count);
 
     return {
       ...state,
-      inventory: inventory.getAll(),
+      self: {
+        ...state.self,
+        inventory: inventory.getAll(),
+      },
     };
   }
 

@@ -5,6 +5,7 @@ import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
+import { ManualClock } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -16,6 +17,7 @@ import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
   return {
     actorFactory: createMockedActorFactory(),
+    clock: new ManualClock(),
     frames: createControlledObservable().observable,
     rootTaskFactory: {
       create: vi.fn(() => ({
@@ -62,6 +64,15 @@ describe('NpcFactory', () => {
       factory.create(createNpcData());
 
       expect(psycheFactory.create).toHaveBeenCalledOnce();
+    });
+
+    it('NPC узнаёт время суток по часам clock из зависимостей', () => {
+      const clock = new ManualClock(20, 15);
+      const factory = new NpcFactory(createRequiredDeps({ clock }));
+
+      const npc = factory.create(createNpcData());
+
+      expect(npc.getState().world.time).toBe(20 * 60 + 15);
     });
 
     it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {

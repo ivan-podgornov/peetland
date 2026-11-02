@@ -69,13 +69,17 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Находится ли NPC в радиусе HOMELESS_CAMP_RADIUS от какой-нибудь бомжарни */
   private isInCamp(state: NpcState): boolean {
-    return this.places.isNear(state.actor.position, PlaceType.HomelessCamp, HOMELESS_CAMP_RADIUS);
+    return this.places.isNear(
+      state.self.actor.position,
+      PlaceType.HomelessCamp,
+      HOMELESS_CAMP_RADIUS
+    );
   }
 
   /** Создаёт задачу дойти до бомжарни, ближайшей к NPC. Вызывается, только если бомжарни есть */
   private goToNearestCamp(state: NpcState): Task<NpcState, NpcContext> {
     const { npcTaskFactory } = this.deps;
-    const camp = this.places.findNearest(state.actor.position, PlaceType.HomelessCamp);
+    const camp = this.places.findNearest(state.self.actor.position, PlaceType.HomelessCamp);
 
     if (!camp) {
       throw new Error('Не из чего выбрать бомжарню');
@@ -90,5 +94,5 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
 /** Есть ли у NPC пойло */
 function hasBooze(state: NpcState): boolean {
-  return (state.inventory[Item.Booze] ?? 0) > 0;
+  return (state.self.inventory[Item.Booze] ?? 0) > 0;
 }

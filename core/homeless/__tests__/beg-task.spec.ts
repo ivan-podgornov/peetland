@@ -58,9 +58,11 @@ function createPlacesWithSpot(spot: PlaceData = createPlace({ type: PlaceType.Be
 /** Создаёт состояние NPC с переданным стыдом */
 function createStateWithShame(shame: number) {
   return createNpcState({
-    psyche: createPsycheState({
-      feelings: { [Feeling.Shame]: shame },
-    }),
+    self: {
+      psyche: createPsycheState({
+        feelings: { [Feeling.Shame]: shame },
+      }),
+    },
   });
 }
 
@@ -77,7 +79,9 @@ function createTaskFactoryWithTryLuckSpy() {
 describe('BegTask', () => {
   it('Планирует дойти до места, повернуться и клянчить', () => {
     const task = createTask(createPlacesWithSpot());
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } });
+    const state = createNpcState({
+      self: { inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } },
+    });
 
     expect(planNames(task, state)).toStrictEqual([
       'go-to-coords',
@@ -90,7 +94,10 @@ describe('BegTask', () => {
   it('Если ни денег, ни бутылок нет, клянчит на всё пойло', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
 
-    plan(createTask(createPlacesWithSpot(), npcTaskFactory), createNpcState({ inventory: {} }));
+    plan(
+      createTask(createPlacesWithSpot(), npcTaskFactory),
+      createNpcState({ self: { inventory: {} } })
+    );
 
     expect(tryLuck).toHaveBeenCalledTimes(BOOZE_PRICE / BEGGING_REWARD);
   });
@@ -98,9 +105,11 @@ describe('BegTask', () => {
   it('Клянчит столько, сколько не хватает на пойло вместе с деньгами и выручкой за бутылки', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
     const state = createNpcState({
-      inventory: {
-        [Item.Money]: 3 * BEGGING_REWARD,
-        [Item.Bottles]: 2,
+      self: {
+        inventory: {
+          [Item.Money]: 3 * BEGGING_REWARD,
+          [Item.Bottles]: 2,
+        },
       },
     });
 
@@ -113,7 +122,9 @@ describe('BegTask', () => {
 
   it('Если не хватает не кратно BEGGING_REWARD, клянчит с запасом до целой удачи', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 } });
+    const state = createNpcState({
+      self: { inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 } },
+    });
 
     plan(createTask(createPlacesWithSpot(), npcTaskFactory), state);
 
@@ -123,9 +134,11 @@ describe('BegTask', () => {
   it('Если на пойло хватает денег и выручки за бутылки, план не составляется', () => {
     const task = createTask(createPlacesWithSpot());
     const state = createNpcState({
-      inventory: {
-        [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
-        [Item.Bottles]: 1,
+      self: {
+        inventory: {
+          [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
+          [Item.Bottles]: 1,
+        },
       },
     });
 
@@ -135,13 +148,15 @@ describe('BegTask', () => {
   it('Ищет место для клянчанья, ближайшее к NPC', () => {
     const places = createPlacesWithSpot();
     const state = createNpcState({
-      actor: {
-        position: {
-          x: 1,
-          y: 2,
-          z: 3,
+      self: {
+        actor: {
+          position: {
+            x: 1,
+            y: 2,
+            z: 3,
+          },
+          angle: 0,
         },
-        angle: 0,
       },
     });
 
@@ -218,11 +233,13 @@ describe('BegTask', () => {
 
   it('За каждую удачу получает BEGGING_REWARD', () => {
     const task = createTask(createPlacesWithSpot());
-    const state = createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD } });
+    const state = createNpcState({
+      self: { inventory: { [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD } },
+    });
 
     const after = applyPlanEffects(task, state);
 
-    expect(after.inventory).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
+    expect(after.self.inventory).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
   });
 
   describe('При 20 стыда за удачу, когда до BEGGING_SHAME_LIMIT успевают 3 удачи', () => {
@@ -235,7 +252,9 @@ describe('BegTask', () => {
         createPsycheFactory(0.5)
       );
       const state = createNpcState({
-        inventory: { [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD },
+        self: {
+          inventory: { [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD },
+        },
       });
 
       expect(planNames(task, state)).not.toBeNull();
@@ -248,7 +267,9 @@ describe('BegTask', () => {
         createPsycheFactory(0.5)
       );
       const state = createNpcState({
-        inventory: { [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD },
+        self: {
+          inventory: { [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD },
+        },
       });
 
       expect(planNames(task, state)).toBeNull();
@@ -305,13 +326,24 @@ describe('BegTask', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
       plan(
         createTask(createPlacesWithSpot(), npcTaskFactory, createPsycheFactory(0.5)),
-        createNpcState({ inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } })
+        createNpcState({ self: { inventory: { [Item.Money]: BOOZE_PRICE - BEGGING_REWARD } } })
       );
 
       const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(createStateWithShame(10));
 
       // 10 + 40 попыток по 0.5
-      expect(after?.psyche.feelings).toStrictEqual({ [Feeling.Shame]: 30 });
+      expect(after?.self.psyche.feelings).toStrictEqual({ [Feeling.Shame]: 30 });
+    });
+
+    it('Предсказание стыда не меняет то, что NPC знает о мире', () => {
+      const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
+      plan(createTask(createPlacesWithSpot(), npcTaskFactory), createNpcState());
+
+      const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(
+        createNpcState({ world: { time: 20 * 60 } })
+      );
+
+      expect(after?.world).toStrictEqual({ time: 20 * 60 });
     });
   });
 });

@@ -6,6 +6,7 @@ import { createMockedNpcFactory, createNpcData } from '@peetland/npc/dev';
 import { createMockedPlaces, createPlace } from '@peetland/places/dev';
 import { Feeling } from '@peetland/psyche';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
+import { ManualClock } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -102,6 +103,39 @@ describe('World', () => {
         frames.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalled();
+      });
+
+      it('NPC планирует с временем суток по часам игры', async () => {
+        const frames = createControlledObservable();
+        const preconditions = vi.fn(() => false);
+        const world = new World(
+          createWorldOptions({
+            game: createGame({
+              clock: new ManualClock(20, 15),
+              frames: frames.observable,
+            }),
+            npcs: [createNpcData()],
+          }),
+          {
+            rootTaskFactory: createMockedRootTaskFactory({
+              name: 'root',
+              methods: [
+                {
+                  name: 'never',
+                  preconditions,
+                  tasks: [],
+                },
+              ],
+            }),
+          }
+        );
+        await world.bigBang();
+
+        frames.subscriber.next(undefined);
+
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({ world: { time: 20 * 60 + 15 } })
+        );
       });
 
       it('NPC создаёт психику фабрикой psycheFactory', async () => {

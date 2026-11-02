@@ -27,18 +27,21 @@ export class RemoveItemTask implements PrimitiveTask<NpcState, NpcContext> {
   canExecute(state: NpcState): boolean {
     const { item, count } = this.options;
 
-    return (state.inventory[item] ?? 0) >= count;
+    return (state.self.inventory[item] ?? 0) >= count;
   }
 
   /** Количество предмета в состоянии уменьшается */
   applyEffects(state: NpcState): NpcState {
     const { item, count } = this.options;
-    const inventory = new Inventory(state.inventory);
+    const inventory = new Inventory(state.self.inventory);
     inventory.remove(item, count);
 
     return {
       ...state,
-      inventory: inventory.getAll(),
+      self: {
+        ...state.self,
+        inventory: inventory.getAll(),
+      },
     };
   }
 

@@ -32,15 +32,26 @@ describe('AddItemTask', () => {
   });
 
   describe('#applyEffects', () => {
+    it('Не меняет то, что NPC знает о мире', () => {
+      const task = new AddItemTask({
+        item: Item.Booze,
+        count: 1,
+      });
+
+      const state = task.applyEffects(createNpcState({ world: { time: 20 * 60 } }));
+
+      expect(state.world).toStrictEqual({ time: 20 * 60 });
+    });
+
     it('Увеличивает количество предмета в состоянии', () => {
       const task = new AddItemTask({
         item: Item.Booze,
         count: 1,
       });
 
-      const state = task.applyEffects(createNpcState({ inventory: { [Item.Booze]: 2 } }));
+      const state = task.applyEffects(createNpcState({ self: { inventory: { [Item.Booze]: 2 } } }));
 
-      expect(state.inventory).toStrictEqual({ [Item.Booze]: 3 });
+      expect(state.self.inventory).toStrictEqual({ [Item.Booze]: 3 });
     });
 
     it('Если предмета в состоянии не было, добавляет его', () => {
@@ -49,9 +60,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(createNpcState({ inventory: { [Item.Money]: 5 } }));
+      const state = task.applyEffects(createNpcState({ self: { inventory: { [Item.Money]: 5 } } }));
 
-      expect(state.inventory).toStrictEqual({
+      expect(state.self.inventory).toStrictEqual({
         [Item.Money]: 5,
         [Item.Booze]: 1,
       });

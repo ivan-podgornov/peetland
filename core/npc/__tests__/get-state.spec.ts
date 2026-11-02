@@ -6,6 +6,7 @@ import {
   createPsycheDeps,
   createPsycheState,
 } from '@peetland/psyche/dev';
+import { ManualClock } from '@peetland/timings';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -21,7 +22,7 @@ describe('Npc', () => {
         createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
       );
 
-      expect(npc.getState().inventory).toStrictEqual({ [Item.Money]: 150 });
+      expect(npc.getState().self.inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает слепок инвентаря, который не меняется, когда меняется инвентарь', () => {
@@ -34,7 +35,7 @@ describe('Npc', () => {
 
       npc.inventory.add(Item.Money, 50);
 
-      expect(state.inventory).toStrictEqual({ [Item.Money]: 150 });
+      expect(state.self.inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает позицию актора', () => {
@@ -50,7 +51,7 @@ describe('Npc', () => {
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
       );
 
-      expect(npc.getState().actor.position).toStrictEqual(actor.getPosition());
+      expect(npc.getState().self.actor.position).toStrictEqual(actor.getPosition());
     });
 
     it('Возвращает угол актора', () => {
@@ -60,7 +61,7 @@ describe('Npc', () => {
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
       );
 
-      expect(npc.getState().actor.angle).toBe(actor.getAngle());
+      expect(npc.getState().self.actor.angle).toBe(actor.getAngle());
     });
 
     it('Возвращает слепок актора, который не меняется, когда актор двигается', () => {
@@ -83,7 +84,7 @@ describe('Npc', () => {
         z: 5,
       });
 
-      expect(state.actor.position).toStrictEqual({
+      expect(state.self.actor.position).toStrictEqual({
         x: 0,
         y: 0,
         z: 0,
@@ -102,7 +103,24 @@ describe('Npc', () => {
         createNpcDeps({ psycheFactory: createMockedPsycheFactory(psyche) })
       );
 
-      expect(npc.getState().psyche).toStrictEqual(psyche.getState());
+      expect(npc.getState().self.psyche).toStrictEqual(psyche.getState());
+    });
+
+    it('Возвращает время суток по часам в минутах от полуночи', () => {
+      const clock = new ManualClock(20, 15);
+      const npc = new Npc(createNpcData(), createNpcDeps({ clock }));
+
+      expect(npc.getState().world.time).toBe(20 * 60 + 15);
+    });
+
+    it('Возвращает слепок мира, который не меняется, когда идут часы', () => {
+      const clock = new ManualClock(20, 15);
+      const npc = new Npc(createNpcData(), createNpcDeps({ clock }));
+      const state = npc.getState();
+
+      clock.set(21, 0);
+
+      expect(state.world.time).toBe(20 * 60 + 15);
     });
   });
 });

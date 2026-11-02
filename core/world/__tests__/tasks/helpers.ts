@@ -1,103 +1,25 @@
-import { Observable } from '@peetland/events';
-import { createControlledObservable } from '@peetland/events/dev';
-import type { IActorCommand } from '@peetland/game';
-import { Geometry } from '@peetland/geometry';
-import { Planner } from '@peetland/htn';
-import type { PrimitiveTask, Task } from '@peetland/htn';
-import type { NpcContext, NpcState } from '@peetland/npc';
+import { NpcTaskFactory } from '@peetland/npc-tasks';
+import { createNpcTaskFactory, createNpcTaskFactoryDeps } from '@peetland/npc-tasks/dev';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
-import { ManualTimer } from '@peetland/timings';
-import { vi } from 'vitest';
-import type { Mocked } from 'vitest';
 
 import { TaskFactory } from '../../src';
 import type { ITaskFactory, TaskFactoryDeps } from '../../src';
-import { CommandTask } from '../../src/tasks/command-task';
 
 export { createNpcContext, createNpcState } from '@peetland/npc/dev';
+export { applyPlanEffects, createStubTask, plan, planNames } from '@peetland/npc-tasks/dev';
 export { createPlace } from '@peetland/places/dev';
 
-/** Создаёт команду, завершением которой управляет тест */
-export function createControlledCommand() {
-  const { observable, subscriber } = createControlledObservable();
-  const command: Mocked<IActorCommand> = {
-    name: 'controlled',
-    execute: vi.fn(() => observable),
-    cancel: vi.fn((reason: unknown) => subscriber.error(reason)),
-  };
-
+/**
+ * Создаёт зависимости фабрики задач. Примитивы создаёт настоящая фабрика примитивов, удача в
+ * зависимостях никогда не выпадает, а время не идёт само
+ */
+export function createTaskFactoryDeps(deps: Partial<TaskFactoryDeps> = {}): TaskFactoryDeps {
   return {
-    command,
-    subscriber,
-  };
-}
-
-/** Создаёт команду, Observable которой завершается сразу при подписке */
-export function createImmediateCommand(finish: 'complete' | 'error'): IActorCommand {
-  return {
-    name: 'immediate',
-    execute: () =>
-      new Observable((subscriber) => {
-        if (finish === 'complete') {
-          subscriber.complete();
-        } else {
-          subscriber.error(new Error('Не выполнена'));
-        }
-      }),
-    cancel: vi.fn(),
-  };
-}
-
-/** Задача, которая отдаёт актору переданную команду. Нужна, чтобы проверить общее поведение задач-команд */
-export class TestCommandTask extends CommandTask {
-  readonly name = 'test';
-
-  private readonly command: () => IActorCommand;
-
-  constructor(command: () => IActorCommand) {
-    super();
-    this.command = command;
-  }
-
-  applyEffects(state: NpcState): NpcState {
-    return state;
-  }
-
-  protected createCommand(): IActorCommand {
-    return this.command();
-  }
-}
-
-/** Составляет план корневой задачи */
-export function plan(
-  root: Task<NpcState, NpcContext>,
-  state: NpcState
-): PrimitiveTask<NpcState, NpcContext>[] | null {
-  return new Planner<NpcState>().plan(root, state);
-}
-
-/** Возвращает названия задач плана или null, если план составить нельзя */
-export function planNames(root: Task<NpcState, NpcContext>, state: NpcState): string[] | null {
-  const tasks = plan(root, state);
-
-  return tasks && tasks.map((task) => task.name);
-}
-
-/** Применяет к состоянию эффекты всех задач плана по очереди */
-export function applyPlanEffects(root: Task<NpcState, NpcContext>, state: NpcState): NpcState {
-  const tasks = plan(root, state) ?? [];
-
-  return tasks.reduce((current, task) => task.applyEffects(current), state);
-}
-
-/** Создаёт зависимости фабрики задач. Удача в них никогда не выпадает, а время не идёт само */
-export function createTaskFactoryDeps(): TaskFactoryDeps {
-  return {
-    geometry: new Geometry(),
+    npcTaskFactory: new NpcTaskFactory(createNpcTaskFactoryDeps()),
     psycheFactory: createMockedPsycheFactory(),
     random: createMockedRandom(false),
-    timer: new ManualTimer(),
+    ...deps,
   };
 }
 
@@ -109,14 +31,7 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
   const real = new TaskFactory(createTaskFactoryDeps());
 
   return {
-    goToCoords: (options) => real.goToCoords(options),
-    achieveAngle: (options) => real.achieveAngle(options),
-    playAnimation: (options) => real.playAnimation(options),
-    addItem: (options) => real.addItem(options),
-    removeItem: (options) => real.removeItem(options),
-    psycheReact: (options) => real.psycheReact(options),
-    tryLuck: (options) => real.tryLuck(options),
-    parallel: (options) => real.parallel(options),
+    ...createNpcTaskFactory(),
     purchase: (options) => real.purchase(options),
     buyBooze: (options) => real.buyBooze(options),
     drink: (options) => real.drink(options),
@@ -124,27 +39,5 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
     collectBottles: (options) => real.collectBottles(options),
     beg: (options) => real.beg(options),
     ...factory,
-  };
-}
-
-/**
- * Создаёт заглушку задачи с названием. Если plannable — примитивная задача, которая всегда может
- * выполниться и ничего не меняет, иначе — составная задача без методов, которую нельзя спланировать
- */
-export function createStubTask(name: string, plannable = true): Task<NpcState, NpcContext> {
-  if (!plannable) {
-    return {
-      name,
-      methods: [],
-    };
-  }
-
-  return {
-    name,
-    canExecute: () => true,
-    applyEffects: (state) => state,
-    start: () => 'success',
-    update: () => 'success',
-    stop: vi.fn(),
   };
 }

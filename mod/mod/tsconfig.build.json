@@ -12,6 +12,7 @@
       "@peetland/game": ["../../core/game/src/index.ts"],
       "@peetland/inventory": ["../../core/inventory/src/index.ts"],
       "@peetland/npc": ["../../core/npc/src/index.ts"],
+      "@peetland/npc-tasks": ["../../core/npc-tasks/src/index.ts"],
       "@peetland/places": ["../../core/places/src/index.ts"],
       "@peetland/psyche": ["../../core/psyche/src/index.ts"],
       "@peetland/world": ["../../core/world/src/index.ts"],

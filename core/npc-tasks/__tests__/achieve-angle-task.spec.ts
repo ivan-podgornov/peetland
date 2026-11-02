@@ -1,10 +1,9 @@
 import { Geometry } from '@peetland/geometry';
+import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AchieveAngleTask } from '../../src';
-
-import { createNpcContext, createNpcState } from './helpers';
+import { AchieveAngleTask } from '../src';
 
 describe('AchieveAngleTask', () => {
   describe('#start', () => {

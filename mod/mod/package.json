@@ -12,6 +12,7 @@
     "@peetland/inventory": "0.0.0",
     "@peetland/moonloader": "0.0.0",
     "@peetland/npc": "0.0.0",
+    "@peetland/npc-tasks": "0.0.0",
     "@peetland/places": "0.0.0",
     "@peetland/psyche": "0.0.0",
     "@peetland/random": "0.0.0",

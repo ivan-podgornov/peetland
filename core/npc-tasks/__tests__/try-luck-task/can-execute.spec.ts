@@ -1,9 +1,9 @@
+import { createNpcState } from '@peetland/npc/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { TryLuckTask } from '../../../src';
-import { createNpcState } from '../helpers';
+import { TryLuckTask } from '../../src';
 
 describe('TryLuckTask', () => {
   describe('#canExecute', () => {

@@ -1,4 +1,5 @@
 import { Item } from '@peetland/inventory';
+import type { PlayAnimationTaskOptions, TryLuckTaskOptions } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces, PlaceData } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -21,7 +22,7 @@ import {
   BOOZE_PRICE,
   BOTTLE_PRICE,
 } from '../../src';
-import type { ITaskFactory, PlayAnimationTaskOptions, TryLuckTaskOptions } from '../../src';
+import type { ITaskFactory } from '../../src';
 
 import {
   applyPlanEffects,

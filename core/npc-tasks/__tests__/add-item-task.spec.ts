@@ -1,9 +1,8 @@
 import { Item } from '@peetland/inventory';
+import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
-import { AddItemTask } from '../../src';
-
-import { createNpcContext, createNpcState } from './helpers';
+import { AddItemTask } from '../src';
 
 describe('AddItemTask', () => {
   describe('#start', () => {

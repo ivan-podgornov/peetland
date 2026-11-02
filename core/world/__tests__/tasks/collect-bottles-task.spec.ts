@@ -1,4 +1,5 @@
 import { Item } from '@peetland/inventory';
+import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -13,7 +14,7 @@ import {
   MAX_BOTTLES_PER_VISIT,
 } from '../../src';
 
-import type { ITaskFactory, TryLuckTaskOptions } from '../../src';
+import type { ITaskFactory } from '../../src';
 
 import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
 

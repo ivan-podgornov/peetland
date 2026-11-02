@@ -17,8 +17,6 @@ export {
 export type { CollectBottlesTaskDeps, CollectBottlesTaskOptions } from './collect-bottles-task';
 export { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from './drink-task';
 export type { DrinkTaskDeps, DrinkTaskOptions } from './drink-task';
-export { PickUpTask } from './pick-up-task';
-export type { PickUpTaskDeps, PickUpTaskOptions } from './pick-up-task';
 export { PurchaseTask } from './purchase-task';
 export type { PurchaseTaskDeps, PurchaseTaskOptions } from './purchase-task';
 export { RootTask } from './root-task';

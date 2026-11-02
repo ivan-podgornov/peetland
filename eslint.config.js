@@ -84,6 +84,12 @@ export default defineConfig([
       ],
       '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
       '@typescript-eslint/parameter-properties': 'error',
+      // Промисы (см. #126)
+      '@typescript-eslint/await-thenable': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/return-await': ['error', 'in-try-catch'],
 
       // Core rules
       'func-style': ['error', 'declaration'],
@@ -134,6 +140,13 @@ export default defineConfig([
       'no-restricted-syntax': [
         'error',
         ...restrictedSyntax,
+        // await последним выражением функции ничего не даёт: промис можно вернуть. В тестах правило не
+        // действует: там последним выражением обычно стоит проверка вида await expect(...).rejects
+        {
+          selector:
+            ':function[async=true] > BlockStatement > ExpressionStatement:last-child > AwaitExpression',
+          message: 'Не ждите промис последним выражением функции: верните его через return',
+        },
         {
           selector: 'CallExpression > MemberExpression.callee[property.name=/^(bind|call|apply)$/]',
           message:

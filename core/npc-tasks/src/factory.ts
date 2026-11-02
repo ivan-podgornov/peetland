@@ -3,6 +3,7 @@ import type { IGeometry } from '@peetland/geometry';
 import { ParallelTask } from '@peetland/htn';
 import type { ParallelTaskOptions, PrimitiveTask } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { PsycheFactory } from '@peetland/psyche';
 import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
@@ -44,17 +45,27 @@ export interface INpcTaskFactory {
 
 export type NpcTaskFactoryDeps = {
   geometry: IGeometry;
-  /** Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах */
-  psycheFactory: IPsycheFactory;
+  /**
+   * Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах. По
+   * умолчанию — PsycheFactory
+   */
+  psycheFactory?: IPsycheFactory;
   random: IRandom;
   timer: ITimer;
 };
 
 export class NpcTaskFactory implements INpcTaskFactory {
-  private readonly deps: NpcTaskFactoryDeps;
+  private readonly deps: Required<NpcTaskFactoryDeps>;
 
   constructor(deps: NpcTaskFactoryDeps) {
-    this.deps = deps;
+    const { geometry, psycheFactory = new PsycheFactory(), random, timer } = deps;
+
+    this.deps = {
+      geometry,
+      psycheFactory,
+      random,
+      timer,
+    };
   }
 
   goToCoords(options: GoToCoordsOptions): NpcPrimitiveTask {

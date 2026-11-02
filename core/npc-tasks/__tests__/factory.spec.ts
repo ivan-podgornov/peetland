@@ -1,6 +1,8 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
-import { Deed } from '@peetland/psyche';
+import { createNpcState } from '@peetland/npc/dev';
+import { Deed, Feeling, Trait } from '@peetland/psyche';
+import { createPsycheState } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createNpcTaskFactoryDeps } from '../dev';
@@ -89,6 +91,29 @@ describe('NpcTaskFactory', () => {
       const task = factory.psycheReact({ deed: Deed.BottleFound });
 
       expect(task).toBeInstanceOf(PsycheReactTask);
+    });
+
+    it('Если psycheFactory не передана, эффекты задачи меняют чувства по чертам психики', () => {
+      const { geometry, random, timer } = createNpcTaskFactoryDeps();
+      const factory = new NpcTaskFactory({
+        geometry,
+        random,
+        timer,
+      });
+      const task = factory.psycheReact({ deed: Deed.Begging });
+
+      const state = task.applyEffects(
+        createNpcState({
+          psyche: createPsycheState({
+            traits: {
+              [Trait.Conscientiousness]: 100,
+              [Trait.Luck]: 50,
+            },
+          }),
+        })
+      );
+
+      expect(state.psyche.feelings[Feeling.Shame]).toBeGreaterThan(0);
     });
   });
 

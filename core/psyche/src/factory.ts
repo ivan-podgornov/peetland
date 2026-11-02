@@ -1,17 +1,35 @@
 import { Psyche } from './psyche';
 import type { IPsyche, PsycheDeps } from './psyche';
-import type { PsycheState } from './types';
+import { Trait } from './trait';
+import { ConscientiousnessFactory, LuckFactory } from './traits';
+import type { PsycheState, TraitFactories } from './types';
 
 export interface IPsycheFactory {
   /** Собирает психику из состояния (см. Psyche) */
   create(state: PsycheState): IPsyche;
 }
 
+export type PsycheFactoryDeps = {
+  /**
+   * Фабрики черт, которые заменяют фабрики по умолчанию. По умолчанию у каждой черты своя фабрика
+   * из этого пакета
+   */
+  traitFactories?: Partial<TraitFactories>;
+};
+
 export class PsycheFactory implements IPsycheFactory {
   private readonly deps: PsycheDeps;
 
-  constructor(deps: PsycheDeps) {
-    this.deps = deps;
+  constructor(deps: PsycheFactoryDeps = {}) {
+    const { traitFactories = {} } = deps;
+
+    this.deps = {
+      traitFactories: {
+        [Trait.Conscientiousness]:
+          traitFactories[Trait.Conscientiousness] ?? new ConscientiousnessFactory(),
+        [Trait.Luck]: traitFactories[Trait.Luck] ?? new LuckFactory(),
+      },
+    };
   }
 
   create(state: PsycheState): IPsyche {

@@ -1,9 +1,5 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { HomelessRootTask } from '@peetland/homeless';
 import type { Task } from '@peetland/htn';
-import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
-import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedNpcFactory, createNpcData } from '@peetland/npc/dev';
@@ -80,37 +76,32 @@ describe('World', () => {
         );
       });
 
-      it('NPC обновляет HTN-агента на кадрах игры', async () => {
+      it('NPC на кадре игры планирует корневую задачу, которую вернула rootTaskFactory', async () => {
         const frames = createControlledObservable();
-        const htn = createMockedHTN<NpcState, NpcContext>();
+        const preconditions = vi.fn(() => false);
         const world = new World(
           createWorldOptions({
             game: createGame({ frames: frames.observable }),
             npcs: [createNpcData()],
           }),
           {
-            htnFactory: createMockedHTNFactory(htn),
-            rootTaskFactory: createMockedRootTaskFactory(),
+            rootTaskFactory: createMockedRootTaskFactory({
+              name: 'root',
+              methods: [
+                {
+                  name: 'never',
+                  preconditions,
+                  tasks: [],
+                },
+              ],
+            }),
           }
         );
         await world.bigBang();
 
         frames.subscriber.next(undefined);
 
-        expect(htn.update).toHaveBeenCalledOnce();
-      });
-
-      it('NPC создаёт инвентарь фабрикой inventoryFactory', async () => {
-        const inventoryFactory = createMockedInventoryFactory();
-        const data = createNpcData({ inventory: { [Item.Money]: 150 } });
-        const world = new World(createWorldOptions({ npcs: [data] }), {
-          inventoryFactory,
-          rootTaskFactory: createMockedRootTaskFactory(),
-        });
-
-        await world.bigBang();
-
-        expect(inventoryFactory.create).toHaveBeenCalledExactlyOnceWith(data.inventory);
+        expect(preconditions).toHaveBeenCalled();
       });
 
       it('NPC создаёт психику фабрикой psycheFactory', async () => {
@@ -140,32 +131,21 @@ describe('World', () => {
         expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
       });
 
-      it('NPC создаёт HTN-агента фабрикой htnFactory с задачей, которую вернула rootTaskFactory', async () => {
-        const rootTask: Task<NpcState, NpcContext> = {
-          name: 'root',
-          methods: [],
-        };
-        const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
-        const world = new World(createWorldOptions({ npcs: [createNpcData()] }), {
-          htnFactory,
-          rootTaskFactory: createMockedRootTaskFactory(rootTask),
-        });
-
-        await world.bigBang();
-
-        expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(rootTask);
-      });
-
-      it('Если rootTaskFactory не передана, бомж получает корневую задачу бомжа', async () => {
-        const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
+      it('Если rootTaskFactory не передана, задачи бомжа получают места из placesFactory', async () => {
+        const frames = createControlledObservable();
+        const worldPlaces = createMockedPlaces();
         const world = new World(
-          createWorldOptions({ npcs: [createNpcData({ kind: NpcKind.Homeless })] }),
-          { htnFactory }
+          createWorldOptions({
+            game: createGame({ frames: frames.observable }),
+            npcs: [createNpcData({ kind: NpcKind.Homeless })],
+          }),
+          { placesFactory: { create: () => worldPlaces } }
         );
-
         await world.bigBang();
 
-        expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(expect.any(HomelessRootTask));
+        frames.subscriber.next(undefined);
+
+        expect(worldPlaces.ofType).toHaveBeenCalled();
       });
     });
   });

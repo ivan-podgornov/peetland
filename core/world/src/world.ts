@@ -1,13 +1,9 @@
 import type { IGame } from '@peetland/game';
-import { HTNFactory } from '@peetland/htn';
-import type { IHTNFactory } from '@peetland/htn';
-import { InventoryFactory } from '@peetland/inventory';
-import type { IInventoryFactory } from '@peetland/inventory';
 import { NpcFactory } from '@peetland/npc';
-import type { INpcFactory, IRootTaskFactory, NpcContext, NpcData, NpcState } from '@peetland/npc';
+import type { INpcFactory, IRootTaskFactory, NpcData } from '@peetland/npc';
 import { PlacesFactory } from '@peetland/places';
 import type { IPlacesFactory, PlaceData } from '@peetland/places';
-import { ConscientiousnessFactory, LuckFactory, PsycheFactory, Trait } from '@peetland/psyche';
+import { PsycheFactory } from '@peetland/psyche';
 import type { IPsycheFactory } from '@peetland/psyche';
 import { Random } from '@peetland/random';
 import type { IRandom } from '@peetland/random';
@@ -33,11 +29,10 @@ export type WorldOptions = {
 export type WorldDeps = {
   random: IRandom;
   timer: ITimer;
-  /** Фабрика, которой NPC создают своих HTN-агентов */
-  htnFactory: IHTNFactory<NpcState, NpcContext>;
-  /** Фабрика, которой NPC создают свои инвентари */
-  inventoryFactory: IInventoryFactory;
-  /** Фабрика, которой NPC создают свои психики, а задачи предсказывают реакцию психики */
+  /**
+   * Фабрика, которой задачи предсказывают реакцию психики, а NPC создают свои психики. Одна на
+   * всех, чтобы задачи предсказывали реакцию такой же психики, как у NPC
+   */
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой мир создаёт запросы к загруженным местам */
   placesFactory: IPlacesFactory;
@@ -66,14 +61,7 @@ export class World {
     const {
       random = new Random(),
       timer = new Timer(),
-      htnFactory = new HTNFactory<NpcState, NpcContext>(),
-      inventoryFactory = new InventoryFactory(),
-      psycheFactory = new PsycheFactory({
-        traitFactories: {
-          [Trait.Conscientiousness]: new ConscientiousnessFactory(),
-          [Trait.Luck]: new LuckFactory(),
-        },
-      }),
+      psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry }),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
@@ -88,8 +76,6 @@ export class World {
       npcFactory = new NpcFactory({
         actorFactory,
         frames,
-        htnFactory,
-        inventoryFactory,
         psycheFactory,
         rootTaskFactory,
       }),

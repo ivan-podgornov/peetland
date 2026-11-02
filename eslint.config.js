@@ -89,7 +89,7 @@ export default defineConfig([
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/require-await': 'error',
-      '@typescript-eslint/return-await': ['error', 'in-try-catch'],
+      '@typescript-eslint/return-await': ['error', 'always'],
 
       // Core rules
       'func-style': ['error', 'declaration'],

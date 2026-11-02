@@ -17,12 +17,9 @@ const BOTTLE_COLLECTION_COMPLETE_RADIUS = 0.5;
 /** Насколько NPC может быть отвёрнут от приёмщика, чтобы сдать бутылки, в градусах */
 const BOTTLE_COLLECTION_FACING_TOLERANCE = 15;
 
-export type SellBottlesTaskOptions = {
+export type SellBottlesTaskDeps = {
   /** Места мира. Бутылки сдаются в местах типа PlaceType.BottleCollection */
   places: IPlaces;
-};
-
-export type SellBottlesTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
 };
 
@@ -39,8 +36,8 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   private readonly places: IPlaces;
   private readonly deps: SellBottlesTaskDeps;
 
-  constructor(options: SellBottlesTaskOptions, deps: SellBottlesTaskDeps) {
-    this.places = options.places;
+  constructor(deps: SellBottlesTaskDeps) {
+    this.places = deps.places;
     this.deps = deps;
     this.methods = [
       {

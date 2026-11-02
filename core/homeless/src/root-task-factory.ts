@@ -1,7 +1,7 @@
 import type { IRootTaskFactory } from '@peetland/npc';
 
 import { HomelessRootTask } from './root-task';
-import type { HomelessRootTaskDeps, HomelessRootTaskOptions } from './root-task';
+import type { HomelessRootTaskDeps } from './root-task';
 
 /** Создаёт корневые задачи бомжа (см. HomelessRootTask) */
 export class HomelessRootTaskFactory implements IRootTaskFactory {
@@ -11,7 +11,7 @@ export class HomelessRootTaskFactory implements IRootTaskFactory {
     this.deps = deps;
   }
 
-  create(options: HomelessRootTaskOptions): HomelessRootTask {
-    return new HomelessRootTask(options, this.deps);
+  create(): HomelessRootTask {
+    return new HomelessRootTask(this.deps);
   }
 }

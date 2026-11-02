@@ -1,4 +1,3 @@
-import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { HomelessRootTask, HomelessRootTaskFactory } from '../src';
@@ -12,7 +11,7 @@ describe('HomelessRootTaskFactory', () => {
         homelessTaskFactory: createHomelessTaskFactory(),
       });
 
-      const task = factory.create({ places: createMockedPlaces() });
+      const task = factory.create();
 
       expect(task).toBeInstanceOf(HomelessRootTask);
     });

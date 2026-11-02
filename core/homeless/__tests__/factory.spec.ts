@@ -1,5 +1,4 @@
 import { Item } from '@peetland/inventory';
-import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -33,7 +32,7 @@ describe('HomelessTaskFactory', () => {
     it('Возвращает BuyBoozeTask', () => {
       const factory = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
-      const task = factory.buyBooze({ places: createMockedPlaces() });
+      const task = factory.buyBooze();
 
       expect(task).toBeInstanceOf(BuyBoozeTask);
     });
@@ -43,7 +42,7 @@ describe('HomelessTaskFactory', () => {
     it('Возвращает DrinkTask', () => {
       const factory = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
-      const task = factory.drink({ places: createMockedPlaces() });
+      const task = factory.drink();
 
       expect(task).toBeInstanceOf(DrinkTask);
     });
@@ -53,7 +52,7 @@ describe('HomelessTaskFactory', () => {
     it('Возвращает SellBottlesTask', () => {
       const factory = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
-      const task = factory.sellBottles({ places: createMockedPlaces() });
+      const task = factory.sellBottles();
 
       expect(task).toBeInstanceOf(SellBottlesTask);
     });
@@ -63,7 +62,7 @@ describe('HomelessTaskFactory', () => {
     it('Возвращает CollectBottlesTask', () => {
       const factory = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
-      const task = factory.collectBottles({ places: createMockedPlaces() });
+      const task = factory.collectBottles();
 
       expect(task).toBeInstanceOf(CollectBottlesTask);
     });
@@ -73,7 +72,7 @@ describe('HomelessTaskFactory', () => {
     it('Возвращает BegTask', () => {
       const factory = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
-      const task = factory.beg({ places: createMockedPlaces() });
+      const task = factory.beg();
 
       expect(task).toBeInstanceOf(BegTask);
     });

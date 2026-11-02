@@ -1,5 +1,6 @@
 import { NpcTaskFactory } from '@peetland/npc-tasks';
 import { createNpcTaskFactoryDeps } from '@peetland/npc-tasks/dev';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 
@@ -15,6 +16,7 @@ export function createHomelessTaskFactoryDeps(
 ): HomelessTaskFactoryDeps {
   return {
     npcTaskFactory: new NpcTaskFactory(createNpcTaskFactoryDeps()),
+    places: createMockedPlaces(),
     psycheFactory: createMockedPsycheFactory(),
     random: createMockedRandom(false),
     ...deps,
@@ -32,11 +34,11 @@ export function createHomelessTaskFactory(
 
   return {
     purchase: (options) => real.purchase(options),
-    buyBooze: (options) => real.buyBooze(options),
-    drink: (options) => real.drink(options),
-    sellBottles: (options) => real.sellBottles(options),
-    collectBottles: (options) => real.collectBottles(options),
-    beg: (options) => real.beg(options),
+    buyBooze: () => real.buyBooze(),
+    drink: () => real.drink(),
+    sellBottles: () => real.sellBottles(),
+    collectBottles: () => real.collectBottles(),
+    beg: () => real.beg(),
     ...factory,
   };
 }

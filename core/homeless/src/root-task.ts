@@ -1,14 +1,8 @@
 import type { CompoundTask, Method } from '@peetland/htn';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
-import type { IPlaces } from '@peetland/places';
 
 import type { IHomelessTaskFactory } from './factory';
-
-export type HomelessRootTaskOptions = {
-  /** Места мира, которыми пользуются NPC */
-  places: IPlaces;
-};
 
 export type HomelessRootTaskDeps = {
   homelessTaskFactory: IHomelessTaskFactory;
@@ -26,34 +20,34 @@ export class HomelessRootTask implements CompoundTask<NpcState, NpcContext> {
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  constructor(options: HomelessRootTaskOptions, deps: HomelessRootTaskDeps) {
+  constructor(deps: HomelessRootTaskDeps) {
     const { homelessTaskFactory } = deps;
 
     this.methods = [
       {
         name: 'drink',
         preconditions: () => true,
-        tasks: [homelessTaskFactory.drink({ places: options.places })],
+        tasks: [homelessTaskFactory.drink()],
       },
       {
         name: 'buy-booze',
         preconditions: () => true,
-        tasks: [homelessTaskFactory.buyBooze({ places: options.places })],
+        tasks: [homelessTaskFactory.buyBooze()],
       },
       {
         name: 'sell-bottles',
         preconditions: () => true,
-        tasks: [homelessTaskFactory.sellBottles({ places: options.places })],
+        tasks: [homelessTaskFactory.sellBottles()],
       },
       {
         name: 'beg',
         preconditions: () => true,
-        tasks: [homelessTaskFactory.beg({ places: options.places })],
+        tasks: [homelessTaskFactory.beg()],
       },
       {
         name: 'collect-bottles',
         preconditions: () => true,
-        tasks: [homelessTaskFactory.collectBottles({ places: options.places })],
+        tasks: [homelessTaskFactory.collectBottles()],
       },
     ];
   }

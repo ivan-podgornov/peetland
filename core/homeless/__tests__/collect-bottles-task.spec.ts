@@ -20,13 +20,11 @@ function createTask(
   npcTaskFactory: INpcTaskFactory = createNpcTaskFactory(),
   random = createMockedRandom(false)
 ): CollectBottlesTask {
-  return new CollectBottlesTask(
-    { places },
-    {
-      npcTaskFactory,
-      random,
-    }
-  );
+  return new CollectBottlesTask({
+    npcTaskFactory,
+    places,
+    random,
+  });
 }
 
 /** Создаёт мок мест, в которых есть переданные мусорки */

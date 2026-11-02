@@ -2,7 +2,6 @@ import type { Task } from '@peetland/htn';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
-import { createMockedPlaces } from '@peetland/places/dev';
 import { Feeling, Psyche } from '@peetland/psyche';
 import {
   createMockedPsycheFactory,
@@ -83,24 +82,17 @@ describe('Npc', () => {
       expect(npc.psyche).toBe(psyche);
     });
 
-    it('Вызывает rootTaskFactory.create с местами из зависимостей', () => {
+    it('Вызывает rootTaskFactory.create', () => {
       const rootTaskFactory = {
         create: vi.fn(() => ({
           name: 'root',
           methods: [],
         })),
       };
-      const places = createMockedPlaces();
 
-      new Npc(
-        createNpcData(),
-        createNpcDeps({
-          rootTaskFactory,
-          places,
-        })
-      );
+      new Npc(createNpcData(), createNpcDeps({ rootTaskFactory }));
 
-      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith({ places });
+      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
     });
 
     it('Создаёт HTN-агента с корневой задачей, которую вернула rootTaskFactory', () => {

@@ -37,6 +37,46 @@ function isGameRunning(): boolean {
   return isPlayerPlaying(PLAYER_HANDLE) && !isGamePaused();
 }
 
+/** Загружает места мира, собирает зависимости и запускает жизнь в мире */
+async function bigBang(): Promise<void> {
+  const game = new GtaGame();
+  const { actorFactory, frames, geometry } = game;
+  const random = new Random();
+  const psycheFactory = new PsycheFactory({
+    traitFactories: {
+      [Trait.Conscientiousness]: new ConscientiousnessFactory(),
+      [Trait.Luck]: new LuckFactory(),
+    },
+  });
+  const worldPlaces = new PlacesFactory({ geometry }).create({
+    places: await new InMemoryRepository(places).getAll(),
+  });
+
+  await new World({
+    npcs: new InMemoryRepository(npcs),
+    npcFactory: new NpcFactory({
+      actorFactory,
+      htnFactory: new HTNFactory<NpcState, NpcContext>(),
+      frames,
+      inventoryFactory: new InventoryFactory(),
+      psycheFactory,
+      rootTaskFactory: new HomelessRootTaskFactory({
+        homelessTaskFactory: new HomelessTaskFactory({
+          npcTaskFactory: new NpcTaskFactory({
+            geometry,
+            psycheFactory,
+            random,
+            timer: new Timer(),
+          }),
+          places: worldPlaces,
+          psycheFactory,
+          random,
+        }),
+      }),
+    }),
+  }).bigBang();
+}
+
 function main() {
   // Без начального значения math.random при каждом запуске игры выдаёт одну и ту же
   // последовательность, и шансы NPC выпадают одинаково
@@ -63,42 +103,7 @@ function main() {
     }
 
     if (wasKeyPressed(VK_H)) {
-      const game = new GtaGame();
-      const { actorFactory, frames, geometry } = game;
-      const random = new Random();
-      const psycheFactory = new PsycheFactory({
-        traitFactories: {
-          [Trait.Conscientiousness]: new ConscientiousnessFactory(),
-          [Trait.Luck]: new LuckFactory(),
-        },
-      });
-
-      new World({
-        npcs: new InMemoryRepository(npcs),
-        places: new InMemoryRepository(places),
-        placesFactory: new PlacesFactory({ geometry }),
-        npcFactory: new NpcFactory({
-          actorFactory,
-          htnFactory: new HTNFactory<NpcState, NpcContext>(),
-          frames,
-          inventoryFactory: new InventoryFactory(),
-          psycheFactory,
-          rootTaskFactory: new HomelessRootTaskFactory({
-            homelessTaskFactory: new HomelessTaskFactory({
-              npcTaskFactory: new NpcTaskFactory({
-                geometry,
-                psycheFactory,
-                random,
-                timer: new Timer(),
-              }),
-              psycheFactory,
-              random,
-            }),
-          }),
-        }),
-      })
-        .bigBang()
-        .catch((error: unknown) => reportError(error));
+      bigBang().catch((error: unknown) => reportError(error));
     }
 
     if (wasKeyPressed(VK_J)) {

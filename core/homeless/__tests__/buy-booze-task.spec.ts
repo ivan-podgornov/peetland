@@ -16,14 +16,12 @@ import { createHomelessTaskFactory } from './helpers';
 
 /** Создаёт задачу покупки пойла с настоящими фабриками задач, если другие не переданы */
 function createTask(places: IPlaces, deps: Partial<BuyBoozeTaskDeps> = {}): BuyBoozeTask {
-  return new BuyBoozeTask(
-    { places },
-    {
-      npcTaskFactory: createNpcTaskFactory(),
-      homelessTaskFactory: createHomelessTaskFactory(),
-      ...deps,
-    }
-  );
+  return new BuyBoozeTask({
+    npcTaskFactory: createNpcTaskFactory(),
+    homelessTaskFactory: createHomelessTaskFactory(),
+    places,
+    ...deps,
+  });
 }
 
 /** Создаёт мок мест, в которых есть переданный магазин, и он же ближайший */

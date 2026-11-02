@@ -1,21 +1,17 @@
 import type { Task } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
+import type { IPlaces } from '@peetland/places';
 import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 
 import { BegTask } from './beg-task';
-import type { BegTaskOptions } from './beg-task';
 import { BuyBoozeTask } from './buy-booze-task';
-import type { BuyBoozeTaskOptions } from './buy-booze-task';
 import { CollectBottlesTask } from './collect-bottles-task';
-import type { CollectBottlesTaskOptions } from './collect-bottles-task';
 import { DrinkTask } from './drink-task';
-import type { DrinkTaskOptions } from './drink-task';
 import { PurchaseTask } from './purchase-task';
 import type { PurchaseTaskOptions } from './purchase-task';
 import { SellBottlesTask } from './sell-bottles-task';
-import type { SellBottlesTaskOptions } from './sell-bottles-task';
 
 type NpcTask = Task<NpcState, NpcContext>;
 
@@ -27,20 +23,22 @@ export interface IHomelessTaskFactory {
   /** Купить предмет там, где NPC стоит (см. PurchaseTask) */
   purchase(options: PurchaseTaskOptions): NpcTask;
   /** Купить пойло в ближайшем магазине (см. BuyBoozeTask) */
-  buyBooze(options: BuyBoozeTaskOptions): NpcTask;
+  buyBooze(): NpcTask;
   /** Бухать в бомжарне (см. DrinkTask) */
-  drink(options: DrinkTaskOptions): NpcTask;
+  drink(): NpcTask;
   /** Сдать бутылки в ближайшей приёмке (см. SellBottlesTask) */
-  sellBottles(options: SellBottlesTaskOptions): NpcTask;
+  sellBottles(): NpcTask;
   /** Собрать бутылки в случайной мусорке (см. CollectBottlesTask) */
-  collectBottles(options: CollectBottlesTaskOptions): NpcTask;
+  collectBottles(): NpcTask;
   /** Клянчить у ближайшего места для клянчанья (см. BegTask) */
-  beg(options: BegTaskOptions): NpcTask;
+  beg(): NpcTask;
 }
 
 export type HomelessTaskFactoryDeps = {
   /** Фабрика примитивов, которую получают создаваемые задачи */
   npcTaskFactory: INpcTaskFactory;
+  /** Места мира, которые получают создаваемые задачи */
+  places: IPlaces;
   /** Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах */
   psycheFactory: IPsycheFactory;
   random: IRandom;
@@ -59,41 +57,50 @@ export class HomelessTaskFactory implements IHomelessTaskFactory {
     return new PurchaseTask(options, { npcTaskFactory });
   }
 
-  buyBooze(options: BuyBoozeTaskOptions): NpcTask {
-    const { npcTaskFactory } = this.deps;
+  buyBooze(): NpcTask {
+    const { npcTaskFactory, places } = this.deps;
 
-    return new BuyBoozeTask(options, {
+    return new BuyBoozeTask({
       npcTaskFactory,
       homelessTaskFactory: this,
+      places,
     });
   }
 
-  drink(options: DrinkTaskOptions): NpcTask {
-    const { npcTaskFactory } = this.deps;
+  drink(): NpcTask {
+    const { npcTaskFactory, places } = this.deps;
 
-    return new DrinkTask(options, { npcTaskFactory });
-  }
-
-  sellBottles(options: SellBottlesTaskOptions): NpcTask {
-    const { npcTaskFactory } = this.deps;
-
-    return new SellBottlesTask(options, { npcTaskFactory });
-  }
-
-  collectBottles(options: CollectBottlesTaskOptions): NpcTask {
-    const { npcTaskFactory, random } = this.deps;
-
-    return new CollectBottlesTask(options, {
+    return new DrinkTask({
       npcTaskFactory,
+      places,
+    });
+  }
+
+  sellBottles(): NpcTask {
+    const { npcTaskFactory, places } = this.deps;
+
+    return new SellBottlesTask({
+      npcTaskFactory,
+      places,
+    });
+  }
+
+  collectBottles(): NpcTask {
+    const { npcTaskFactory, places, random } = this.deps;
+
+    return new CollectBottlesTask({
+      npcTaskFactory,
+      places,
       random,
     });
   }
 
-  beg(options: BegTaskOptions): NpcTask {
-    const { npcTaskFactory, psycheFactory } = this.deps;
+  beg(): NpcTask {
+    const { npcTaskFactory, places, psycheFactory } = this.deps;
 
-    return new BegTask(options, {
+    return new BegTask({
       npcTaskFactory,
+      places,
       psycheFactory,
     });
   }

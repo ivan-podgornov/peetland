@@ -17,12 +17,9 @@ const SHOP_COMPLETE_RADIUS = 0.5;
 /** Насколько NPC может быть отвёрнут от прилавка, чтобы купить пойло, в градусах */
 const SHOP_FACING_TOLERANCE = 15;
 
-export type BuyBoozeTaskOptions = {
+export type BuyBoozeTaskDeps = {
   /** Места мира. Пойло покупается в местах типа PlaceType.Shop */
   places: IPlaces;
-};
-
-export type BuyBoozeTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Фабрика, которой создаётся покупка в магазине */
   homelessTaskFactory: IHomelessTaskFactory;
@@ -40,8 +37,8 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
   private readonly places: IPlaces;
   private readonly deps: BuyBoozeTaskDeps;
 
-  constructor(options: BuyBoozeTaskOptions, deps: BuyBoozeTaskDeps) {
-    this.places = options.places;
+  constructor(deps: BuyBoozeTaskDeps) {
+    this.places = deps.places;
     this.deps = deps;
     this.methods = [
       {

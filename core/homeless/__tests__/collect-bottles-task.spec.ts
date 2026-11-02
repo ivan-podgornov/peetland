@@ -12,7 +12,12 @@ import { Deed } from '@peetland/psyche';
 import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOTTLE_FIND_CHANCE, CollectBottlesTask, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from '../src';
+import {
+  BOTTLE_FIND_CHANCE,
+  CollectBottlesTask,
+  MAX_BOTTLES,
+  MAX_BOTTLES_PER_VISIT,
+} from '../src/collect-bottles-task';
 
 /** Создаёт задачу сбора бутылок с настоящей фабрикой примитивов, если другая не передана */
 function createTask(

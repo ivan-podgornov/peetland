@@ -7,7 +7,8 @@ import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { Npc, NpcKind } from '../src';
-import type { INpcFactory, NpcData, NpcDeps } from '../src';
+import type { INpcFactory, NpcData } from '../src';
+import type { NpcDeps } from '../src/npc';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {

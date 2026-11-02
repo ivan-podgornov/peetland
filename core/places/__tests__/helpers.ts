@@ -1,7 +1,7 @@
 import { Geometry } from '@peetland/geometry';
 
-import { Places } from '../src';
 import type { PlaceData } from '../src';
+import { Places } from '../src/places';
 
 /** Создаёт места с настоящей геометрией */
 export function createPlaces(places: readonly PlaceData[]): Places {

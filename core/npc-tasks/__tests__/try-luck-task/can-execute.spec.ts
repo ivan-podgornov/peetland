@@ -3,7 +3,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { TryLuckTask } from '../../src';
+import { TryLuckTask } from '../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#canExecute', () => {

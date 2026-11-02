@@ -10,7 +10,7 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from '../src';
+import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from '../src/drink-task';
 
 /** Задачи плана «выпить» */
 const DRINK = ['play-animation', 'remove-item', 'add-item'];

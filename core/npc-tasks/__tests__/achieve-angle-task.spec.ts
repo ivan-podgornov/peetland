@@ -3,7 +3,7 @@ import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { AchieveAngleTask } from '../src';
+import { AchieveAngleTask } from '../src/achieve-angle-task';
 
 describe('AchieveAngleTask', () => {
   describe('#start', () => {

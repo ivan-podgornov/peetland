@@ -1,7 +1,8 @@
 import { Geometry } from '@peetland/geometry';
 import { describe, expect, it } from 'vitest';
 
-import { Places, PlacesFactory } from '../src';
+import { PlacesFactory } from '../src';
+import { Places } from '../src/places';
 
 describe('PlacesFactory', () => {
   describe('#create', () => {

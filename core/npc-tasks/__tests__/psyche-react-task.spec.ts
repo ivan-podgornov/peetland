@@ -7,7 +7,7 @@ import {
 } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
-import { PsycheReactTask } from '../src';
+import { PsycheReactTask } from '../src/psyche-react-task';
 
 describe('PsycheReactTask', () => {
   describe('#start', () => {

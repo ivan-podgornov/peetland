@@ -5,7 +5,7 @@ import type { NpcState } from '@peetland/npc';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { CommandTask } from '../src';
+import { CommandTask } from '../src/command-task';
 
 /** Создаёт команду, завершением которой управляет тест */
 export function createControlledCommand() {

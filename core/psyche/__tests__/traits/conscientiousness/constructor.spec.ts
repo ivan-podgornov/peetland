@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Conscientiousness } from '../../../src';
+import { Conscientiousness } from '../../../src/traits';
 import {
   MAX_CONSCIENTIOUSNESS,
   MIN_CONSCIENTIOUSNESS,

@@ -2,7 +2,7 @@ import { Item } from '@peetland/inventory';
 import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
-import { RemoveItemTask } from '../src';
+import { RemoveItemTask } from '../src/remove-item-task';
 
 describe('RemoveItemTask', () => {
   describe('#canExecute', () => {

@@ -9,8 +9,8 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, BuyBoozeTask } from '../src';
-import type { BuyBoozeTaskDeps } from '../src';
+import { BOOZE_PRICE, BuyBoozeTask } from '../src/buy-booze-task';
+import type { BuyBoozeTaskDeps } from '../src/buy-booze-task';
 
 import { createHomelessTaskFactory } from './helpers';
 

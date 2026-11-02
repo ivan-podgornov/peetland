@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { Deed, Luck } from '../../../src';
+import { Deed } from '../../../src';
 import type { ITrait } from '../../../src';
+import { Luck } from '../../../src/traits';
 
 describe('Luck', () => {
   describe('#react', () => {

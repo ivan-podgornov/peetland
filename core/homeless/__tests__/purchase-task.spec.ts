@@ -4,7 +4,7 @@ import { createNpcState } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PurchaseTask } from '../src';
+import { PurchaseTask } from '../src/purchase-task';
 
 describe('PurchaseTask', () => {
   it('Если денег хватает, планирует заплатить, отнять деньги и добавить предмет', () => {

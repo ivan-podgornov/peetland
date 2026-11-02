@@ -140,13 +140,6 @@ export default defineConfig([
       'no-restricted-syntax': [
         'error',
         ...restrictedSyntax,
-        // await последним выражением функции ничего не даёт: промис можно вернуть. В тестах правило не
-        // действует: там последним выражением обычно стоит проверка вида await expect(...).rejects
-        {
-          selector:
-            ':function[async=true] > BlockStatement > ExpressionStatement:last-child > AwaitExpression',
-          message: 'Не ждите промис последним выражением функции: верните его через return',
-        },
         {
           selector: 'CallExpression > MemberExpression.callee[property.name=/^(bind|call|apply)$/]',
           message:

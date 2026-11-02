@@ -9,3 +9,13 @@ export interface ITimer {
    */
   interval(period: number): Observable<number>;
 }
+
+/** Часы, которые показывают время суток */
+export interface IClock {
+  /** Часы текущего времени суток, от 0 до 23 */
+  readonly hours: number;
+  /** Минуты текущего часа, от 0 до 59 */
+  readonly minutes: number;
+  /** Сколько минут прошло с полуночи, от 0 до 1439 */
+  readonly minutesSinceMidnight: number;
+}

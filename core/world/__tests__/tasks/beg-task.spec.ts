@@ -1,4 +1,7 @@
 import { Item } from '@peetland/inventory';
+import { PlaceType } from '@peetland/places';
+import type { IPlaces, PlaceData } from '@peetland/places';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { Deed, Feeling, PsycheFactory, Trait } from '@peetland/psyche';
 import type { IPsycheFactory } from '@peetland/psyche';
 import {
@@ -17,16 +20,8 @@ import {
   BegTask,
   BOOZE_PRICE,
   BOTTLE_PRICE,
-  PlaceType,
 } from '../../src';
-import type {
-  IPlaces,
-  ITaskFactory,
-  PlaceData,
-  PlayAnimationTaskOptions,
-  TryLuckTaskOptions,
-} from '../../src';
-import { createMockedPlaces } from '../places/helpers';
+import type { ITaskFactory, PlayAnimationTaskOptions, TryLuckTaskOptions } from '../../src';
 
 import {
   applyPlanEffects,

@@ -15,11 +15,12 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
+import { PlacesFactory } from '@peetland/places';
 import { ConscientiousnessFactory, LuckFactory, PsycheFactory, Trait } from '@peetland/psyche';
 import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
-import { NpcFactory, PlacesFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
+import { NpcFactory, RootTaskFactory, TaskFactory, World } from '@peetland/world';
 import type { NpcContext, NpcState } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';

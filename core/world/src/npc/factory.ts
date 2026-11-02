@@ -1,4 +1,4 @@
-import type { IPlaces } from '../places';
+import type { IPlaces } from '@peetland/places';
 
 import type { NpcData } from './data';
 import { Npc } from './npc';

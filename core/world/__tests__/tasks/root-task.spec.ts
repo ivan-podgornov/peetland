@@ -1,7 +1,7 @@
+import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RootTask } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
 
 import { createNpcState, createStubTask, createTaskFactory, planNames } from './helpers';
 

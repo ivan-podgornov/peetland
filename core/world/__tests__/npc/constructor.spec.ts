@@ -2,6 +2,7 @@ import type { Task } from '@peetland/htn';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { Feeling, Psyche } from '@peetland/psyche';
 import {
   createMockedPsycheFactory,
@@ -13,7 +14,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Npc } from '../../src';
 import type { NpcContext, NpcState } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
 
 import { createNpcData, createNpcDeps } from './helpers';
 

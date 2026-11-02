@@ -1,5 +1,5 @@
-import type { PlaceData } from '@peetland/world';
-import { PlaceType } from '@peetland/world';
+import type { PlaceData } from '@peetland/places';
+import { PlaceType } from '@peetland/places';
 
 export const places: PlaceData[] = [
   {

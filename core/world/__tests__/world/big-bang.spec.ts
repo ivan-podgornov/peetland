@@ -1,8 +1,8 @@
+import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { World } from '../../src';
 import { createNpcData } from '../npc/helpers';
-import { createMockedPlaces } from '../places/helpers';
 import { createPlace } from '../tasks/helpers';
 
 import { createMockedNpcFactory, createMockedPlacesFactory, createWorldDeps } from './helpers';

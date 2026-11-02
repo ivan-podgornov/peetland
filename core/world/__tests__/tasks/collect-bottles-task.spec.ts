@@ -1,4 +1,7 @@
 import { Item } from '@peetland/inventory';
+import { PlaceType } from '@peetland/places';
+import type { IPlaces } from '@peetland/places';
+import { createMockedPlaces } from '@peetland/places/dev';
 import { Deed } from '@peetland/psyche';
 import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -8,10 +11,9 @@ import {
   CollectBottlesTask,
   MAX_BOTTLES,
   MAX_BOTTLES_PER_VISIT,
-  PlaceType,
 } from '../../src';
-import type { IPlaces, ITaskFactory, TryLuckTaskOptions } from '../../src';
-import { createMockedPlaces } from '../places/helpers';
+
+import type { ITaskFactory, TryLuckTaskOptions } from '../../src';
 
 import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
 

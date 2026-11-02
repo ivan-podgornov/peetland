@@ -33,12 +33,9 @@ const BEGGING_SPOT_COMPLETE_RADIUS = 0.5;
 /** Насколько NPC может быть отвёрнут от нужного направления, чтобы клянчить, в градусах */
 const BEGGING_SPOT_FACING_TOLERANCE = 15;
 
-export type BegTaskOptions = {
+export type BegTaskDeps = {
   /** Места мира. Клянчат в местах типа PlaceType.BeggingSpot */
   places: IPlaces;
-};
-
-export type BegTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Фабрика, которой задача собирает психику из слепка, чтобы предсказать стыд */
   psycheFactory: IPsycheFactory;
@@ -63,8 +60,8 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   private readonly places: IPlaces;
   private readonly deps: BegTaskDeps;
 
-  constructor(options: BegTaskOptions, deps: BegTaskDeps) {
-    this.places = options.places;
+  constructor(deps: BegTaskDeps) {
+    this.places = deps.places;
     this.deps = deps;
     this.methods = [
       {

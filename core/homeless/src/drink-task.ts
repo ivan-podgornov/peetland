@@ -15,12 +15,9 @@ export const HOMELESS_CAMP_RADIUS = 3;
 /** На каком расстоянии от бомжарни можно считать, что NPC до неё дошёл, в метрах */
 const HOMELESS_CAMP_COMPLETE_RADIUS = 0.5;
 
-export type DrinkTaskOptions = {
+export type DrinkTaskDeps = {
   /** Места мира. Пьёт NPC в местах типа PlaceType.HomelessCamp */
   places: IPlaces;
-};
-
-export type DrinkTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
 };
 
@@ -36,7 +33,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
   private readonly places: IPlaces;
   private readonly deps: DrinkTaskDeps;
 
-  constructor(options: DrinkTaskOptions, deps: DrinkTaskDeps) {
+  constructor(deps: DrinkTaskDeps) {
     const { npcTaskFactory } = deps;
     const drink: PrimitiveTask<NpcState, NpcContext>[] = [
       npcTaskFactory.playAnimation({
@@ -53,7 +50,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
       }),
     ];
 
-    this.places = options.places;
+    this.places = deps.places;
     this.deps = deps;
     this.methods = [
       {

@@ -16,7 +16,10 @@ function createTask(
   places: IPlaces,
   npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
 ): SellBottlesTask {
-  return new SellBottlesTask({ places }, { npcTaskFactory });
+  return new SellBottlesTask({
+    npcTaskFactory,
+    places,
+  });
 }
 
 /** Создаёт мок мест, в которых есть переданная приёмка, и она же ближайшая */

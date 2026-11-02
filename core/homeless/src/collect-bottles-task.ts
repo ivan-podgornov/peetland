@@ -22,12 +22,9 @@ const TRASH_BIN_COMPLETE_RADIUS = 0.5;
 /** Насколько NPC может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
 const TRASH_BIN_FACING_TOLERANCE = 15;
 
-export type CollectBottlesTaskOptions = {
+export type CollectBottlesTaskDeps = {
   /** Места мира. Бутылки собираются в местах типа PlaceType.TrashBin */
   places: IPlaces;
-};
-
-export type CollectBottlesTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   random: IRandom;
 };
@@ -46,8 +43,8 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
   private readonly places: IPlaces;
   private readonly deps: CollectBottlesTaskDeps;
 
-  constructor(options: CollectBottlesTaskOptions, deps: CollectBottlesTaskDeps) {
-    this.places = options.places;
+  constructor(deps: CollectBottlesTaskDeps) {
+    this.places = deps.places;
     this.deps = deps;
     this.methods = [
       {

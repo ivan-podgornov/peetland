@@ -1,7 +1,6 @@
 import { createStubTask, planNames } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createNpcState } from '@peetland/npc/dev';
-import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { HomelessRootTask } from '../src';
@@ -9,58 +8,44 @@ import { HomelessRootTask } from '../src';
 import { createHomelessTaskFactory } from './helpers';
 
 describe('HomelessRootTask', () => {
-  it('Вызывает homelessTaskFactory.drink с местами', () => {
+  it('Вызывает homelessTaskFactory.drink', () => {
     const drink = vi.fn(() => createStubTask<NpcState, NpcContext>('drink'));
-    const places = createMockedPlaces();
 
-    new HomelessRootTask({ places }, { homelessTaskFactory: createHomelessTaskFactory({ drink }) });
+    new HomelessRootTask({ homelessTaskFactory: createHomelessTaskFactory({ drink }) });
 
-    expect(drink).toHaveBeenCalledExactlyOnceWith({ places });
+    expect(drink).toHaveBeenCalledExactlyOnceWith();
   });
 
-  it('Вызывает homelessTaskFactory.buyBooze с местами', () => {
+  it('Вызывает homelessTaskFactory.buyBooze', () => {
     const buyBooze = vi.fn(() => createStubTask<NpcState, NpcContext>('buy-booze'));
-    const places = createMockedPlaces();
 
-    new HomelessRootTask(
-      { places },
-      { homelessTaskFactory: createHomelessTaskFactory({ buyBooze }) }
-    );
+    new HomelessRootTask({ homelessTaskFactory: createHomelessTaskFactory({ buyBooze }) });
 
-    expect(buyBooze).toHaveBeenCalledExactlyOnceWith({ places });
+    expect(buyBooze).toHaveBeenCalledExactlyOnceWith();
   });
 
-  it('Вызывает homelessTaskFactory.sellBottles с местами', () => {
+  it('Вызывает homelessTaskFactory.sellBottles', () => {
     const sellBottles = vi.fn(() => createStubTask<NpcState, NpcContext>('sell-bottles'));
-    const places = createMockedPlaces();
 
-    new HomelessRootTask(
-      { places },
-      { homelessTaskFactory: createHomelessTaskFactory({ sellBottles }) }
-    );
+    new HomelessRootTask({ homelessTaskFactory: createHomelessTaskFactory({ sellBottles }) });
 
-    expect(sellBottles).toHaveBeenCalledExactlyOnceWith({ places });
+    expect(sellBottles).toHaveBeenCalledExactlyOnceWith();
   });
 
-  it('Вызывает homelessTaskFactory.beg с местами', () => {
+  it('Вызывает homelessTaskFactory.beg', () => {
     const beg = vi.fn(() => createStubTask<NpcState, NpcContext>('beg'));
-    const places = createMockedPlaces();
 
-    new HomelessRootTask({ places }, { homelessTaskFactory: createHomelessTaskFactory({ beg }) });
+    new HomelessRootTask({ homelessTaskFactory: createHomelessTaskFactory({ beg }) });
 
-    expect(beg).toHaveBeenCalledExactlyOnceWith({ places });
+    expect(beg).toHaveBeenCalledExactlyOnceWith();
   });
 
-  it('Вызывает homelessTaskFactory.collectBottles с местами', () => {
+  it('Вызывает homelessTaskFactory.collectBottles', () => {
     const collectBottles = vi.fn(() => createStubTask<NpcState, NpcContext>('collect-bottles'));
-    const places = createMockedPlaces();
 
-    new HomelessRootTask(
-      { places },
-      { homelessTaskFactory: createHomelessTaskFactory({ collectBottles }) }
-    );
+    new HomelessRootTask({ homelessTaskFactory: createHomelessTaskFactory({ collectBottles }) });
 
-    expect(collectBottles).toHaveBeenCalledExactlyOnceWith({ places });
+    expect(collectBottles).toHaveBeenCalledExactlyOnceWith();
   });
 
   it('Если можно и бухать, и купить пойло, планирует бухать', () => {
@@ -69,10 +54,7 @@ describe('HomelessRootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['drink']);
   });
@@ -83,10 +65,7 @@ describe('HomelessRootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['buy-booze']);
   });
@@ -98,10 +77,7 @@ describe('HomelessRootTask', () => {
       sellBottles: () => createStubTask('sell-bottles'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['buy-booze']);
   });
@@ -114,10 +90,7 @@ describe('HomelessRootTask', () => {
       beg: () => createStubTask('beg'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['sell-bottles']);
   });
@@ -131,10 +104,7 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['beg']);
   });
@@ -148,10 +118,7 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles'),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toStrictEqual(['collect-bottles']);
   });
@@ -165,10 +132,7 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles', false),
     });
 
-    const names = planNames(
-      new HomelessRootTask({ places: createMockedPlaces() }, { homelessTaskFactory }),
-      createNpcState()
-    );
+    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
 
     expect(names).toBeNull();
   });

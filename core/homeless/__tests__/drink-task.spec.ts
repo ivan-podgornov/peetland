@@ -20,7 +20,10 @@ function createTask(
   places: IPlaces,
   npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
 ): DrinkTask {
-  return new DrinkTask({ places }, { npcTaskFactory });
+  return new DrinkTask({
+    npcTaskFactory,
+    places,
+  });
 }
 
 /** Создаёт мок мест, в которых есть бомжарня. NPC в ней, если inCamp */

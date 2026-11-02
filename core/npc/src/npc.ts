@@ -3,7 +3,6 @@ import type { Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
-import type { IPlaces } from '@peetland/places';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
@@ -22,8 +21,6 @@ export type NpcDeps = {
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента */
   rootTaskFactory: IRootTaskFactory;
-  /** Места мира, которыми пользуется NPC */
-  places: IPlaces;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
 };
@@ -45,15 +42,8 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const {
-      actorFactory,
-      frames,
-      htnFactory,
-      inventoryFactory,
-      places,
-      psycheFactory,
-      rootTaskFactory,
-    } = deps;
+    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTaskFactory } =
+      deps;
 
     this.id = data.id;
     this.inventory = inventoryFactory.create(data.inventory);
@@ -69,7 +59,7 @@ export class Npc {
       inventory: this.inventory,
       psyche: this.psyche,
     };
-    this.htn = htnFactory.create(rootTaskFactory.create({ places }));
+    this.htn = htnFactory.create(rootTaskFactory.create());
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
       signal: this.lifetime.signal,

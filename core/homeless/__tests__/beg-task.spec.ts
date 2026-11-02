@@ -45,13 +45,11 @@ function createTask(
   npcTaskFactory: INpcTaskFactory = createNpcTaskFactory(),
   psycheFactory: IPsycheFactory = createPsycheFactory()
 ): BegTask {
-  return new BegTask(
-    { places },
-    {
-      npcTaskFactory,
-      psycheFactory,
-    }
-  );
+  return new BegTask({
+    npcTaskFactory,
+    places,
+    psycheFactory,
+  });
 }
 
 /** Создаёт мок мест, в которых ближайшее место для клянчанья — переданное */

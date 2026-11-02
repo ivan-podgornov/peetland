@@ -13,7 +13,10 @@ describe('TryLuckTask', () => {
       const timer = new ManualTimer();
       const task = new TryLuckTask(
         { chance: 1 / 60 },
-        { random: createMockedRandom(false), timer }
+        {
+          random: createMockedRandom(false),
+          timer,
+        }
       );
       const context = createNpcContext();
       task.start(createNpcState(), context);
@@ -26,7 +29,13 @@ describe('TryLuckTask', () => {
 
     it("Если повезло, возвращает 'success'", () => {
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random: createMockedRandom(true), timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random: createMockedRandom(true),
+          timer,
+        }
+      );
       const context = createNpcContext();
       task.start(createNpcState(), context);
 
@@ -39,8 +48,14 @@ describe('TryLuckTask', () => {
     it("Если не повезло, а условие остановки выполнилось, возвращает 'failed'", () => {
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen: (state) => state.psyche.feelings[Feeling.Shame] >= 80 },
-        { random: createMockedRandom(false), timer }
+        {
+          chance: 1 / 60,
+          stopWhen: (state) => state.psyche.feelings[Feeling.Shame] >= 80,
+        },
+        {
+          random: createMockedRandom(false),
+          timer,
+        }
       );
       const context = createNpcContext();
       task.start(createNpcState(), context);
@@ -61,7 +76,16 @@ describe('TryLuckTask', () => {
     it('Если выполнилось условие остановки, больше не бросает шанс', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60, stopWhen: () => true }, { random, timer });
+      const task = new TryLuckTask(
+        {
+          chance: 1 / 60,
+          stopWhen: () => true,
+        },
+        {
+          random,
+          timer,
+        }
+      );
       const context = createNpcContext();
       task.start(createNpcState(), context);
 
@@ -74,8 +98,14 @@ describe('TryLuckTask', () => {
     it("Если повезло, а условие остановки выполнилось, возвращает 'success'", () => {
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen: () => true },
-        { random: createMockedRandom(true), timer }
+        {
+          chance: 1 / 60,
+          stopWhen: () => true,
+        },
+        {
+          random: createMockedRandom(true),
+          timer,
+        }
       );
       const context = createNpcContext();
       task.start(createNpcState(), context);
@@ -89,7 +119,10 @@ describe('TryLuckTask', () => {
     it("Если задачу этим актором не начинали, возвращает 'failed'", () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
-        { random: createMockedRandom(true), timer: new ManualTimer() }
+        {
+          random: createMockedRandom(true),
+          timer: new ManualTimer(),
+        }
       );
 
       const result = task.update(createNpcState(), createNpcContext());
@@ -100,7 +133,13 @@ describe('TryLuckTask', () => {
     it('Возвращает результат попыток того актора, который в контексте', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random, timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random,
+          timer,
+        }
+      );
       const firstContext = createNpcContext();
       const secondContext = createNpcContext();
       task.start(createNpcState(), firstContext);
@@ -115,7 +154,13 @@ describe('TryLuckTask', () => {
 
     it("После того как вернула 'success', возвращает 'failed'", () => {
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random: createMockedRandom(true), timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random: createMockedRandom(true),
+          timer,
+        }
+      );
       const context = createNpcContext();
       task.start(createNpcState(), context);
       timer.advance(TRY_LUCK_PERIOD);

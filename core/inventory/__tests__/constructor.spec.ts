@@ -11,9 +11,15 @@ describe('Inventory', () => {
     });
 
     it('Устанавливает переданное количество предметов', () => {
-      const inventory = new Inventory({ [Item.Money]: 5, [Item.Booze]: 0.5 });
+      const inventory = new Inventory({
+        [Item.Money]: 5,
+        [Item.Booze]: 0.5,
+      });
 
-      expect(inventory.getAll()).toStrictEqual({ [Item.Money]: 5, [Item.Booze]: 0.5 });
+      expect(inventory.getAll()).toStrictEqual({
+        [Item.Money]: 5,
+        [Item.Booze]: 0.5,
+      });
     });
 
     it('Не добавляет предметы с нулевым количеством', () => {

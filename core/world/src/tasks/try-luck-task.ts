@@ -68,7 +68,10 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
     const { random, timer } = this.deps;
     const { chance, onAttempt } = this.options;
     const { actor } = context;
-    const attempts: Attempts = { lifetime: new AbortController(), isLucky: false };
+    const attempts: Attempts = {
+      lifetime: new AbortController(),
+      isLucky: false,
+    };
     this.stopAttempts(actor);
     this.attempts.set(actor, attempts);
 

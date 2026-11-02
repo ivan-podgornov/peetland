@@ -14,9 +14,21 @@ describe('VirtualActorFactory', () => {
         timer: new ManualTimer(),
       });
 
-      const actor = factory.create({ modelId: 230, position: { x: 1, y: 2, z: 3 }, angle: 0 });
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 1,
+          y: 2,
+          z: 3,
+        },
+        angle: 0,
+      });
 
-      expect(actor.getPosition()).toStrictEqual({ x: 1, y: 2, z: 3 });
+      expect(actor.getPosition()).toStrictEqual({
+        x: 1,
+        y: 2,
+        z: 3,
+      });
     });
 
     it('Создаёт актора, повёрнутого на переданный угол', () => {
@@ -26,7 +38,15 @@ describe('VirtualActorFactory', () => {
         timer: new ManualTimer(),
       });
 
-      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 180 });
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 180,
+      });
 
       expect(actor.getAngle()).toBe(180);
     });
@@ -38,8 +58,26 @@ describe('VirtualActorFactory', () => {
         geometry: new Geometry(),
         timer,
       });
-      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe();
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      });
+      actor
+        .goToCoords(
+          {
+            x: 10,
+            y: 0,
+            z: 0,
+          },
+          1
+        )
+        .execute()
+        .subscribe();
 
       timer.advance(1000);
 
@@ -49,11 +87,22 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, анимации которого длятся по таблице переданного менеджера анимаций', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory({
-        animations: createAnimationManager({ ...VIRTUAL_ANIMATIONS, pay: { duration: 3000 } }),
+        animations: createAnimationManager({
+          ...VIRTUAL_ANIMATIONS,
+          pay: { duration: 3000 },
+        }),
         geometry: new Geometry(),
         timer,
       });
-      const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      });
       const complete = vi.fn();
       actor.playAnimation('pay').execute().subscribe({ complete });
 

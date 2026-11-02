@@ -6,7 +6,10 @@ import type { Vector2, Vector3 } from '../src';
 describe('Geometry', () => {
   describe('#getDistance2d', () => {
     it('Возвращает 0, если точки совпадают', () => {
-      const point: Vector2 = { x: 5, y: -3 };
+      const point: Vector2 = {
+        x: 5,
+        y: -3,
+      };
       const geometry = new Geometry();
 
       const distance = geometry.getDistance2d(point, point);
@@ -15,8 +18,14 @@ describe('Geometry', () => {
     });
 
     it('Возвращает расстояние по прямой между точками', () => {
-      const a: Vector2 = { x: 0, y: 0 };
-      const b: Vector2 = { x: 3, y: 4 };
+      const a: Vector2 = {
+        x: 0,
+        y: 0,
+      };
+      const b: Vector2 = {
+        x: 3,
+        y: 4,
+      };
       const geometry = new Geometry();
 
       const distance = geometry.getDistance2d(a, b);
@@ -25,8 +34,14 @@ describe('Geometry', () => {
     });
 
     it('Возвращает одинаковый результат независимо от порядка точек', () => {
-      const a: Vector2 = { x: 1, y: 2 };
-      const b: Vector2 = { x: 3, y: 4 };
+      const a: Vector2 = {
+        x: 1,
+        y: 2,
+      };
+      const b: Vector2 = {
+        x: 3,
+        y: 4,
+      };
       const geometry = new Geometry();
 
       const distanceFromAtoB = geometry.getDistance2d(a, b);
@@ -36,8 +51,14 @@ describe('Geometry', () => {
     });
 
     it('Если координаты отрицательные, возвращает положительное расстояние', () => {
-      const a: Vector2 = { x: -3, y: -4 };
-      const b: Vector2 = { x: 0, y: 0 };
+      const a: Vector2 = {
+        x: -3,
+        y: -4,
+      };
+      const b: Vector2 = {
+        x: 0,
+        y: 0,
+      };
       const geometry = new Geometry();
 
       const distance = geometry.getDistance2d(a, b);
@@ -46,8 +67,16 @@ describe('Geometry', () => {
     });
 
     it('Если у точки есть высота, не учитывает её', () => {
-      const a: Vector3 = { x: 0, y: 0, z: 0 };
-      const b: Vector3 = { x: 3, y: 4, z: 100 };
+      const a: Vector3 = {
+        x: 0,
+        y: 0,
+        z: 0,
+      };
+      const b: Vector3 = {
+        x: 3,
+        y: 4,
+        z: 100,
+      };
       const geometry = new Geometry();
 
       const distance = geometry.getDistance2d(a, b);

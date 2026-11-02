@@ -24,7 +24,10 @@ export type GtaPlayAnimationCommandDeps = CommandDeps & {
 };
 
 /** Команда проверяет, закончилась ли анимация, раз в 100 миллисекунд */
-const PLAY_ANIMATION = { name: 'play-animation', updatePeriod: 100 };
+const PLAY_ANIMATION = {
+  name: 'play-animation',
+  updatePeriod: 100,
+};
 
 /** Скорость перехода в анимацию из текущей позы. 4 — обычное значение для анимаций в игре */
 const BLEND_SPEED = 4;

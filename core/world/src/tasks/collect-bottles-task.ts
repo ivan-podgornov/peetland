@@ -73,8 +73,14 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
     const bin = random.pick(this.places.ofType(PlaceType.TrashBin));
     const bottles = Math.min(MAX_BOTTLES_PER_VISIT, MAX_BOTTLES - this.countBottles(state));
     const tasks: Task<NpcState, NpcContext>[] = [
-      taskFactory.goToCoords({ coords: bin.position, completeRadius: TRASH_BIN_COMPLETE_RADIUS }),
-      taskFactory.achieveAngle({ angle: bin.angle, tolerance: TRASH_BIN_FACING_TOLERANCE }),
+      taskFactory.goToCoords({
+        coords: bin.position,
+        completeRadius: TRASH_BIN_COMPLETE_RADIUS,
+      }),
+      taskFactory.achieveAngle({
+        angle: bin.angle,
+        tolerance: TRASH_BIN_FACING_TOLERANCE,
+      }),
       taskFactory.playAnimation({ animation: 'trash-search-start' }),
     ];
 
@@ -85,7 +91,10 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
           background: taskFactory.playAnimation({ animation: 'trash-search' }),
         }),
         taskFactory.playAnimation({ animation: 'trash-search-pocket' }),
-        taskFactory.addItem({ item: Item.Bottles, count: 1 }),
+        taskFactory.addItem({
+          item: Item.Bottles,
+          count: 1,
+        }),
         taskFactory.psycheReact({ deed: Deed.BottleFound })
       );
     }

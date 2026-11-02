@@ -12,14 +12,32 @@ import { getDefaultObserveOptions } from './helpers';
 
 describe('MulticastObserver', () => {
   describe('#next', () => {
-    describeRecallObserver({ method: 'next', observerAsFunction: true });
-    describeRecallObserver({ method: 'next', observerAsFunction: false });
+    describeRecallObserver({
+      method: 'next',
+      observerAsFunction: true,
+    });
+    describeRecallObserver({
+      method: 'next',
+      observerAsFunction: false,
+    });
 
-    describeBehaviourOnErrorInObserver({ method: 'next', observerAsFunction: true });
-    describeBehaviourOnErrorInObserver({ method: 'next', observerAsFunction: false });
+    describeBehaviourOnErrorInObserver({
+      method: 'next',
+      observerAsFunction: true,
+    });
+    describeBehaviourOnErrorInObserver({
+      method: 'next',
+      observerAsFunction: false,
+    });
 
-    describeBehaviourWhenMethodAbsent({ method: 'next', observerAsFunction: true });
-    describeBehaviourWhenMethodAbsent({ method: 'next', observerAsFunction: false });
+    describeBehaviourWhenMethodAbsent({
+      method: 'next',
+      observerAsFunction: true,
+    });
+    describeBehaviourWhenMethodAbsent({
+      method: 'next',
+      observerAsFunction: false,
+    });
 
     describe('Изменение набора наблюдателей во время рассылки', () => {
       describe('Если наблюдатель добавляет нового наблюдателя во время next', () => {

@@ -9,7 +9,10 @@ describe('VirtualActor', () => {
   describe('#playAnimation', () => {
     it('Завершает Observable, когда проходит длительность анимации из таблицы', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ timer, animations: VIRTUAL_ANIMATIONS });
+      const actor = createActor({
+        timer,
+        animations: VIRTUAL_ANIMATIONS,
+      });
       const complete = vi.fn();
       actor.playAnimation('pay').execute().subscribe({ complete });
 
@@ -20,7 +23,10 @@ describe('VirtualActor', () => {
 
     it('Не завершает Observable, пока длительность анимации из таблицы не прошла', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ timer, animations: VIRTUAL_ANIMATIONS });
+      const actor = createActor({
+        timer,
+        animations: VIRTUAL_ANIMATIONS,
+      });
       const complete = vi.fn();
       actor.playAnimation('pay').execute().subscribe({ complete });
 
@@ -38,7 +44,10 @@ describe('VirtualActor', () => {
     });
 
     it('Если для анимации не задана длительность, выбрасывает ошибку', () => {
-      const animations = { ...VIRTUAL_ANIMATIONS, pay: {} } as VirtualAnimations;
+      const animations = {
+        ...VIRTUAL_ANIMATIONS,
+        pay: {},
+      } as VirtualAnimations;
       const actor = createActor({ animations });
 
       expect(() => actor.playAnimation('pay')).toThrow(Error);

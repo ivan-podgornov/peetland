@@ -33,7 +33,11 @@ export class ManualTimer implements ITimer {
     }
 
     return new Observable((subscriber) => {
-      const interval: ManualInterval = { period, nextAt: this.now + period, subscriber };
+      const interval: ManualInterval = {
+        period,
+        nextAt: this.now + period,
+        subscriber,
+      };
 
       this.intervals.add(interval);
       subscriber.addTeardown(() => this.intervals.delete(interval));

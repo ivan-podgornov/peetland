@@ -16,7 +16,10 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       frames.subscriber.next(undefined);
@@ -50,7 +53,10 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       frames.subscriber.next(undefined);
@@ -66,7 +72,10 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       frames.subscriber.next(undefined);
@@ -82,7 +91,10 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       frames.subscriber.next(undefined);
@@ -99,7 +111,10 @@ describe('Npc', () => {
       });
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       frames.subscriber.next(undefined);

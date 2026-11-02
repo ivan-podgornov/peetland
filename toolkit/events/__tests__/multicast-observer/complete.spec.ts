@@ -9,8 +9,17 @@ describe('MulticastObserver', () => {
   describe('#complete', () => {
     describeRecallObserver({ method: 'complete' });
     describeBehaviourOnErrorInObserver({ method: 'complete' });
-    describeBehaviourWhenMethodAbsent({ method: 'complete', observerAsFunction: false });
-    describeBehaviourWhenMethodAbsent({ method: 'complete', observerAsFunction: true });
-    describeSignalFinish({ method: 'complete', reason: 'subscriber success' });
+    describeBehaviourWhenMethodAbsent({
+      method: 'complete',
+      observerAsFunction: false,
+    });
+    describeBehaviourWhenMethodAbsent({
+      method: 'complete',
+      observerAsFunction: true,
+    });
+    describeSignalFinish({
+      method: 'complete',
+      reason: 'subscriber success',
+    });
   });
 });

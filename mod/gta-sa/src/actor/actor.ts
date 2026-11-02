@@ -61,7 +61,11 @@ export class GtaActor implements IActor {
   getPosition(): Vector3 {
     const [x, y, z] = getCharCoordinates(this.handle);
 
-    return { x, y, z };
+    return {
+      x,
+      y,
+      z,
+    };
   }
 
   getAngle(): number {
@@ -85,8 +89,15 @@ export class GtaActor implements IActor {
 
     return new GtaAchieveAngleCommand(
       this,
-      { handle: this.handle, angle, tolerance },
-      { geometry, timer }
+      {
+        handle: this.handle,
+        angle,
+        tolerance,
+      },
+      {
+        geometry,
+        timer,
+      }
     );
   }
 
@@ -95,8 +106,16 @@ export class GtaActor implements IActor {
 
     return new GtaGoToCoordsCommand(
       this,
-      { handle: this.handle, coords, completeRadius },
-      { geometry, objectFactory, timer }
+      {
+        handle: this.handle,
+        coords,
+        completeRadius,
+      },
+      {
+        geometry,
+        objectFactory,
+        timer,
+      }
     );
   }
 
@@ -110,8 +129,15 @@ export class GtaActor implements IActor {
 
     return new GtaPlayAnimationCommand(
       this,
-      { handle: this.handle, animation, playbackDuration },
-      { animations, timer }
+      {
+        handle: this.handle,
+        animation,
+        playbackDuration,
+      },
+      {
+        animations,
+        timer,
+      }
     );
   }
 

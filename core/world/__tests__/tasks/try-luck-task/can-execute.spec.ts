@@ -10,7 +10,10 @@ describe('TryLuckTask', () => {
     it('Если условие остановки не передано, возвращает true', () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
 
       expect(task.canExecute(createNpcState())).toBe(true);
@@ -18,8 +21,14 @@ describe('TryLuckTask', () => {
 
     it('Если условие остановки не выполнилось, возвращает true', () => {
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen: () => false },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          chance: 1 / 60,
+          stopWhen: () => false,
+        },
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
 
       expect(task.canExecute(createNpcState())).toBe(true);
@@ -27,8 +36,14 @@ describe('TryLuckTask', () => {
 
     it('Если условие остановки выполнилось, возвращает false', () => {
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen: () => true },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          chance: 1 / 60,
+          stopWhen: () => true,
+        },
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
 
       expect(task.canExecute(createNpcState())).toBe(false);
@@ -37,8 +52,14 @@ describe('TryLuckTask', () => {
     it('Проверяет условие остановки на переданном состоянии', () => {
       const stopWhen = vi.fn(() => false);
       const task = new TryLuckTask(
-        { chance: 1 / 60, stopWhen },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          chance: 1 / 60,
+          stopWhen,
+        },
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
       const state = createNpcState();
 

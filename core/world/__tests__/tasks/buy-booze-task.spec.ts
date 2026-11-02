@@ -24,7 +24,10 @@ function createTask(
 
 /** Создаёт мок мест, в которых есть переданный магазин, и он же ближайший */
 function createPlacesWithShop(shop = createPlace()) {
-  return createMockedPlaces({ ofType: vi.fn(() => [shop]), findNearest: vi.fn(() => shop) });
+  return createMockedPlaces({
+    ofType: vi.fn(() => [shop]),
+    findNearest: vi.fn(() => shop),
+  });
 }
 
 describe('BuyBoozeTask', () => {
@@ -43,25 +46,48 @@ describe('BuyBoozeTask', () => {
 
   it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
     const places = createPlacesWithShop();
-    const state = createNpcState({ actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 } });
+    const state = createNpcState({
+      actor: {
+        position: {
+          x: 8,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      },
+    });
 
     plan(createTask(places), state);
 
     expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
-      { x: 8, y: 0, z: 0 },
+      {
+        x: 8,
+        y: 0,
+        z: 0,
+      },
       PlaceType.Shop
     );
   });
 
   it('Идёт к магазину, который вернул places.findNearest', () => {
     const goToCoords = vi.fn();
-    const shop = createPlace({ position: { x: 50, y: 0, z: 0 } });
+    const shop = createPlace({
+      position: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
+    });
     const task = createTask(createPlacesWithShop(shop), createTaskFactory({ goToCoords }));
 
     plan(task, createNpcState());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
+      coords: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
       completeRadius: 0.5,
     });
   });
@@ -73,7 +99,10 @@ describe('BuyBoozeTask', () => {
 
     plan(task, createNpcState());
 
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
+    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
+      angle: 90,
+      tolerance: 15,
+    });
   });
 
   it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {

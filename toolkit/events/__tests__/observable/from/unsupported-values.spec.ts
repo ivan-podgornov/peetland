@@ -3,10 +3,22 @@ import { describe, expect, it } from 'vitest';
 import { Observable } from '../../../src/observable';
 
 const unsupportedValues = [
-  { description: 'число', value: 42 },
-  { description: 'обычный объект', value: { key: 'value' } },
-  { description: 'null', value: null },
-  { description: 'undefined', value: undefined },
+  {
+    description: 'число',
+    value: 42,
+  },
+  {
+    description: 'обычный объект',
+    value: { key: 'value' },
+  },
+  {
+    description: 'null',
+    value: null,
+  },
+  {
+    description: 'undefined',
+    value: undefined,
+  },
 ];
 
 describe('Observable', () => {

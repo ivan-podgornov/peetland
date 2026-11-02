@@ -14,7 +14,11 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
   return {
     id: 'peet',
     modelId: 230,
-    spawnPosition: { x: 0, y: 0, z: 0 },
+    spawnPosition: {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
     spawnAngle: 0,
     psyche: createPsycheState(),
     inventory: {},
@@ -29,7 +33,12 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
-    rootTaskFactory: { create: vi.fn(() => ({ name: 'root', methods: [] })) },
+    rootTaskFactory: {
+      create: vi.fn(() => ({
+        name: 'root',
+        methods: [],
+      })),
+    },
     places: createMockedPlaces(),
     frames: createControlledObservable().observable,
     ...deps,
@@ -44,7 +53,12 @@ export function createNpcFactoryDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFac
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
     frames: createControlledObservable().observable,
-    rootTaskFactory: { create: vi.fn(() => ({ name: 'root', methods: [] })) },
+    rootTaskFactory: {
+      create: vi.fn(() => ({
+        name: 'root',
+        methods: [],
+      })),
+    },
     ...deps,
   };
 }

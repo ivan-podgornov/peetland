@@ -11,7 +11,10 @@ describe('Planner', () => {
     describe('Эффекты', () => {
       it('Примитив учитывает эффекты соседнего примитива, идущего перед ним', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const reader = spyPrimitive('Reader');
         const root = compound('Compound', method('Method', setter, reader));
@@ -24,7 +27,10 @@ describe('Planner', () => {
 
       it('Примитив-ребёнок составной задачи учитывает эффекты детей соседней составной, идущего перед его родителем', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const reader = spyPrimitive('Reader');
         const root = compound(
@@ -44,7 +50,10 @@ describe('Planner', () => {
 
       it('Примитив учитывает эффекты детей соседней составной, идущей прямо перед ним', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const reader = spyPrimitive('Reader');
         const root = compound(
@@ -60,7 +69,10 @@ describe('Planner', () => {
 
       it('Методы составной задачи учитывают эффекты соседнего примитива, идущего перед ней', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const readerMethod = spyMethod('Reader method', spyPrimitive('Primitive'));
         const root = compound(
@@ -76,7 +88,10 @@ describe('Planner', () => {
 
       it('Методы составной задачи учитывают эффекты детей соседней составной, идущей перед ней', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const readerMethod = spyMethod('Reader method', spyPrimitive('Primitive'));
         const root = compound(
@@ -96,7 +111,10 @@ describe('Planner', () => {
 
       it('Предусловия метода не учитывает эффекты его детей-задач', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const testedMethod = spyMethod('Method', setter);
         const root = compound('Compound', testedMethod);
@@ -109,7 +127,10 @@ describe('Planner', () => {
 
       it('Следующий метод не учитывает эффекты метода-соседа, который не удалось выполнить', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const nextMethod = spyMethod('Next method', spyPrimitive('Primitive'));
         const root = compound(
@@ -126,7 +147,10 @@ describe('Planner', () => {
 
       it('Примитив метода не учитывает эффекты метода-соседа, который не удалось выполнить', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const setter = spyPrimitive('Setter', afterSetter);
         const nextPrimitive = spyPrimitive('Primitive');
         const root = compound(

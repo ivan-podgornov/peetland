@@ -18,7 +18,10 @@ export type GtaGoToCoordsCommandDeps = CommandDeps & {
 };
 
 /** Команда проверяет, пришёл ли персонаж, раз в секунду */
-const GO_TO_COORDS = { name: 'go-to-coords', updatePeriod: 1000 };
+const GO_TO_COORDS = {
+  name: 'go-to-coords',
+  updatePeriod: 1000,
+};
 
 /** Id модели конуса, к которому идёт персонаж */
 const TARGET_MODEL_ID = 3283;

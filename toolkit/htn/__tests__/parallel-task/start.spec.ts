@@ -9,7 +9,10 @@ describe('ParallelTask', () => {
   describe('#start', () => {
     it('Начинает основную задачу с состоянием и контекстом', () => {
       const main = createMockedPrimitive();
-      const task = new ParallelTask({ main, background: createMockedPrimitive() });
+      const task = new ParallelTask({
+        main,
+        background: createMockedPrimitive(),
+      });
       const context = createContext();
 
       task.start(testState, context);
@@ -19,7 +22,10 @@ describe('ParallelTask', () => {
 
     it('Начинает фоновую задачу с состоянием и контекстом', () => {
       const background = createMockedPrimitive();
-      const task = new ParallelTask({ main: createMockedPrimitive(), background });
+      const task = new ParallelTask({
+        main: createMockedPrimitive(),
+        background,
+      });
       const context = createContext();
 
       task.start(testState, context);

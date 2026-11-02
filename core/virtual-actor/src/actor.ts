@@ -63,13 +63,33 @@ export class VirtualActor implements IActor {
   achieveAngle(angle: number, tolerance: number): IActorCommand<number> {
     const { geometry, timer } = this.deps;
 
-    return new VirtualAchieveAngleCommand(this, { angle, tolerance }, { geometry, timer });
+    return new VirtualAchieveAngleCommand(
+      this,
+      {
+        angle,
+        tolerance,
+      },
+      {
+        geometry,
+        timer,
+      }
+    );
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
     const { geometry, timer } = this.deps;
 
-    return new VirtualGoToCoordsCommand(this, { coords, completeRadius }, { geometry, timer });
+    return new VirtualGoToCoordsCommand(
+      this,
+      {
+        coords,
+        completeRadius,
+      },
+      {
+        geometry,
+        timer,
+      }
+    );
   }
 
   /**
@@ -83,8 +103,14 @@ export class VirtualActor implements IActor {
 
     return new VirtualPlayAnimationCommand(
       this,
-      { animation, playbackDuration },
-      { animations, timer }
+      {
+        animation,
+        playbackDuration,
+      },
+      {
+        animations,
+        timer,
+      }
     );
   }
 

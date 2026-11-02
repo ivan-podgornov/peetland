@@ -88,7 +88,10 @@ describe('Subscriber', () => {
 
       it('Если observer.error выбрасывает ошибку, она не выбрасывается из метода subscriber.error', () => {
         const throwsError = vi.fn().mockThrow(new Error());
-        const observer = { ...createMockedObserver(), error: throwsError };
+        const observer = {
+          ...createMockedObserver(),
+          error: throwsError,
+        };
         const subscriber = new Subscriber(observer, getDefaultConstructorOptions());
 
         expect(() => subscriber.error()).not.toThrow();
@@ -97,7 +100,10 @@ describe('Subscriber', () => {
       it('Если observer.error выбрасывает ошибку, вызывается reportError с ошибкой, которую выбросил observer.error', () => {
         const error = new Error();
         const throwsError = vi.fn().mockThrow(error);
-        const observer = { ...createMockedObserver(), error: throwsError };
+        const observer = {
+          ...createMockedObserver(),
+          error: throwsError,
+        };
         const subscriber = new Subscriber(observer);
 
         subscriber.error();

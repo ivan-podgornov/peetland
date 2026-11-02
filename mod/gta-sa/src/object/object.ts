@@ -44,7 +44,11 @@ export class GtaObject implements IGtaObject {
 
   getPosition(): Vector3 {
     const [x, y, z] = getObjectCoordinates(this.handle);
-    return { x, y, z };
+    return {
+      x,
+      y,
+      z,
+    };
   }
 
   setCollisionEnabled(enabled: boolean): void {

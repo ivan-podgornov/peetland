@@ -10,7 +10,10 @@ describe('TryLuckTask', () => {
     it('Если эффекты не переданы, возвращает то же состояние', () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
       const state = createNpcState();
 
@@ -20,8 +23,14 @@ describe('TryLuckTask', () => {
     it('Возвращает состояние, которое вернули переданные эффекты', () => {
       const effected = createNpcState({ inventory: { bottles: 1 } });
       const task = new TryLuckTask(
-        { chance: 1 / 60, applyEffects: () => effected },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          chance: 1 / 60,
+          applyEffects: () => effected,
+        },
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
 
       expect(task.applyEffects(createNpcState())).toBe(effected);
@@ -30,8 +39,14 @@ describe('TryLuckTask', () => {
     it('Применяет переданные эффекты к переданному состоянию', () => {
       const applyEffects = vi.fn((state) => state);
       const task = new TryLuckTask(
-        { chance: 1 / 60, applyEffects },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          chance: 1 / 60,
+          applyEffects,
+        },
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
       const state = createNpcState();
 

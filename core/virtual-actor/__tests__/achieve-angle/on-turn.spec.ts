@@ -8,7 +8,10 @@ describe('VirtualActor', () => {
     describe('До того как прошла секунда', () => {
       it('Не меняет угол актора', () => {
         const timer = new ManualTimer();
-        const actor = createActor({ angle: 0, timer });
+        const actor = createActor({
+          angle: 0,
+          timer,
+        });
         actor.achieveAngle(90, 15).execute().subscribe();
 
         timer.advance(999);
@@ -18,7 +21,10 @@ describe('VirtualActor', () => {
 
       it('Не завершает команду', () => {
         const timer = new ManualTimer();
-        const actor = createActor({ angle: 0, timer });
+        const actor = createActor({
+          angle: 0,
+          timer,
+        });
         const complete = vi.fn();
         actor.achieveAngle(90, 15).execute().subscribe({ complete });
 
@@ -29,7 +35,10 @@ describe('VirtualActor', () => {
 
       it('Если команду прервали, угол актора не меняется', () => {
         const timer = new ManualTimer();
-        const actor = createActor({ angle: 0, timer });
+        const actor = createActor({
+          angle: 0,
+          timer,
+        });
         const command = actor.achieveAngle(90, 15);
         command.execute().subscribe({ error: () => {} });
 

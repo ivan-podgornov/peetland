@@ -6,7 +6,11 @@ export const npcs: NpcData[] = [
     id: 'peet',
     modelId: 230,
     // Вход в бомжарню (см. montgomery-homeless-camp в местах)
-    spawnPosition: { x: 1271.41, y: 181.76, z: 19.44 },
+    spawnPosition: {
+      x: 1271.41,
+      y: 181.76,
+      z: 19.44,
+    },
     spawnAngle: 242,
     psyche: {
       traits: {

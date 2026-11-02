@@ -33,7 +33,10 @@ function getCasesWithObserverNext() {
       createObserver: (next: IObserverFunction<unknown>) => {
         const observer = createMockedObserver() satisfies IObserver<unknown>;
 
-        return { ...observer, next };
+        return {
+          ...observer,
+          next,
+        };
       },
     },
     {

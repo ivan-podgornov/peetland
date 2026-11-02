@@ -8,7 +8,10 @@ import { createPsycheDeps, createPsycheState } from './psyche';
 
 /** Создаёт психику, которая ничего не делает на поступки и всегда возвращает переданное состояние */
 export function createMockedPsyche(state: PsycheState = createPsycheState()): Mocked<IPsyche> {
-  return { getState: vi.fn(() => state), react: vi.fn() };
+  return {
+    getState: vi.fn(() => state),
+    react: vi.fn(),
+  };
 }
 
 /** Создаёт фабрику, которая всегда возвращает переданную психику */

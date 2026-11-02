@@ -40,9 +40,18 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
   constructor(options: DrinkTaskOptions, deps: DrinkTaskDeps) {
     const { taskFactory } = deps;
     const drink: PrimitiveTask<NpcState, NpcContext>[] = [
-      taskFactory.playAnimation({ animation: 'drink-standing-1', duration: DRINK_DURATION }),
-      taskFactory.removeItem({ item: Item.Booze, count: 1 }),
-      taskFactory.addItem({ item: Item.Bottles, count: 1 }),
+      taskFactory.playAnimation({
+        animation: 'drink-standing-1',
+        duration: DRINK_DURATION,
+      }),
+      taskFactory.removeItem({
+        item: Item.Booze,
+        count: 1,
+      }),
+      taskFactory.addItem({
+        item: Item.Bottles,
+        count: 1,
+      }),
     ];
 
     this.places = options.places;

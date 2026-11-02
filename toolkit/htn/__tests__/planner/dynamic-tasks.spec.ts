@@ -32,7 +32,10 @@ describe('Planner', () => {
 
       it('Передаёт функции состояние с эффектами задач, которые идут перед методом', () => {
         const planner = new Planner<TestState>();
-        const afterSetter: TestState = { ...testState, counter: 1 };
+        const afterSetter: TestState = {
+          ...testState,
+          counter: 1,
+        };
         const tasks = vi.fn<Parameters<typeof dynamicMethod>[1]>(() => [primitive('Primitive')]);
         const root = compound(
           'Compound',
@@ -53,7 +56,10 @@ describe('Planner', () => {
         const tasks = vi.fn(() => [primitive('Primitive')]);
         const root = compound('Compound', dynamicMethod('Method', tasks));
 
-        planner.plan(root, { ...testState, canExecute: false });
+        planner.plan(root, {
+          ...testState,
+          canExecute: false,
+        });
 
         expect(tasks).not.toHaveBeenCalled();
       });

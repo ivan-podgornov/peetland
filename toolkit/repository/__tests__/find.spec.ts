@@ -9,8 +9,16 @@ import type { Place } from './helpers';
 describe('InMemoryRepository', () => {
   describe('#find', () => {
     it('Возвращает записи, у которых поле строго равно значению eq', async () => {
-      const trashBin = createPlace({ ...mockedPlace, id: 'trash-bin', type: PlaceType.TrashBin });
-      const shop = createPlace({ ...mockedPlace, id: 'shop', type: PlaceType.Shop });
+      const trashBin = createPlace({
+        ...mockedPlace,
+        id: 'trash-bin',
+        type: PlaceType.TrashBin,
+      });
+      const shop = createPlace({
+        ...mockedPlace,
+        id: 'shop',
+        type: PlaceType.Shop,
+      });
       const repository = new InMemoryRepository([trashBin, shop]);
 
       const places = await repository.find({ type: { eq: PlaceType.TrashBin } });
@@ -19,7 +27,10 @@ describe('InMemoryRepository', () => {
     });
 
     it('Не приводит типы при сравнении через eq', async () => {
-      const entity: { id: string; count: number | string } = { id: 'entity', count: 0 };
+      const entity: { id: string; count: number | string } = {
+        id: 'entity',
+        count: 0,
+      };
       const repository = new InMemoryRepository([entity]);
 
       const entities = await repository.find({ count: { eq: '0' } });
@@ -58,7 +69,10 @@ describe('InMemoryRepository', () => {
 
     it('Если ни одна запись не подходит, возвращает пустой массив', async () => {
       const repository = new InMemoryRepository([
-        createPlace({ ...mockedPlace, type: PlaceType.Shop }),
+        createPlace({
+          ...mockedPlace,
+          type: PlaceType.Shop,
+        }),
       ]);
 
       const places = await repository.find({ type: { eq: PlaceType.TrashBin } });
@@ -67,8 +81,14 @@ describe('InMemoryRepository', () => {
     });
 
     it('Если критерии пустые, возвращает все записи', async () => {
-      const first = createPlace({ ...mockedPlace, id: 'first' });
-      const second = createPlace({ ...mockedPlace, id: 'second' });
+      const first = createPlace({
+        ...mockedPlace,
+        id: 'first',
+      });
+      const second = createPlace({
+        ...mockedPlace,
+        id: 'second',
+      });
       const repository = new InMemoryRepository([first, second]);
 
       const places = await repository.find({});

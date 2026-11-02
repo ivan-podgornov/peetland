@@ -104,7 +104,10 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
         coords: spot.position,
         completeRadius: BEGGING_SPOT_COMPLETE_RADIUS,
       }),
-      taskFactory.achieveAngle({ angle: spot.angle, tolerance: BEGGING_SPOT_FACING_TOLERANCE }),
+      taskFactory.achieveAngle({
+        angle: spot.angle,
+        tolerance: BEGGING_SPOT_FACING_TOLERANCE,
+      }),
     ];
 
     for (let index = 0; index < this.countNeededRewards(state); index++) {
@@ -114,11 +117,17 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
             chance: BEGGING_CHANCE,
             stopWhen: (current) => this.isAshamed(current.psyche),
             onAttempt: (context) => context.psyche.react(Deed.Begging),
-            applyEffects: (current) => ({ ...current, psyche: this.predictReward(current.psyche) }),
+            applyEffects: (current) => ({
+              ...current,
+              psyche: this.predictReward(current.psyche),
+            }),
           }),
           background: taskFactory.playAnimation({ animation: 'beg-sitting' }),
         }),
-        taskFactory.addItem({ item: Item.Money, count: BEGGING_REWARD })
+        taskFactory.addItem({
+          item: Item.Money,
+          count: BEGGING_REWARD,
+        })
       );
     }
 

@@ -39,7 +39,13 @@ describe('Npc', () => {
     });
 
     it('Возвращает позицию актора', () => {
-      const actor = createActor({ position: { x: 1, y: 2, z: 3 } });
+      const actor = createActor({
+        position: {
+          x: 1,
+          y: 2,
+          z: 3,
+        },
+      });
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
@@ -59,16 +65,30 @@ describe('Npc', () => {
     });
 
     it('Возвращает слепок актора, который не меняется, когда актор двигается', () => {
-      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
+      const actor = createActor({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      });
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
       );
       const state = npc.getState();
 
-      actor.setPosition({ x: 5, y: 5, z: 5 });
+      actor.setPosition({
+        x: 5,
+        y: 5,
+        z: 5,
+      });
 
-      expect(state.actor.position).toStrictEqual({ x: 0, y: 0, z: 0 });
+      expect(state.actor.position).toStrictEqual({
+        x: 0,
+        y: 0,
+        z: 0,
+      });
     });
 
     it('Возвращает слепок психики NPC', () => {

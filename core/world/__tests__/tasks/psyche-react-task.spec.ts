@@ -14,7 +14,10 @@ describe('PsycheReactTask', () => {
   describe('#start', () => {
     it('Сообщает психике из контекста о поступке', () => {
       const psyche = createMockedPsyche();
-      const context = { ...createNpcContext(), psyche };
+      const context = {
+        ...createNpcContext(),
+        psyche,
+      };
       const task = new PsycheReactTask(
         { deed: Deed.BottleFound },
         { psycheFactory: createMockedPsycheFactory() }

@@ -16,7 +16,10 @@ describe('HTN', () => {
       it('Если при предыдущем вызове задачи не начали выполняться, перепланирует root задачу с состоянием, с которым вызвался update', () => {
         const root = primitive('Primitive Task');
         const planner = getDummyPlanner(null);
-        const htn = new HTN(root, { ...getDefaultDeps(), plannerFactory: () => planner });
+        const htn = new HTN(root, {
+          ...getDefaultDeps(),
+          plannerFactory: () => planner,
+        });
 
         htn.update(testState, testContext); // Первый вызов, задачи выполняться не начали
         htn.update(testState, testContext); // Второй вызов, должна произойти новая попытка планирования

@@ -12,7 +12,10 @@ describe('PlayAnimationTask', () => {
     it('Отдаёт актору команду проиграть анимацию', () => {
       const actor = createActor();
       const playAnimation = vi.spyOn(actor, 'playAnimation');
-      const task = new PlayAnimationTask({ animation: 'drink-standing-1', duration: 5000 });
+      const task = new PlayAnimationTask({
+        animation: 'drink-standing-1',
+        duration: 5000,
+      });
 
       task.start(createNpcState(), createNpcContext(actor));
 

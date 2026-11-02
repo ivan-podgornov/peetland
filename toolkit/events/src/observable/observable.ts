@@ -69,7 +69,10 @@ export class Observable<T> extends ObservableFactory {
    */
   inspect(inspector: Inspector<T> = {}): Observable<T> {
     return new Observable<T>((subscriber) => {
-      const observer = new InspectObserver({ subscriber, inspector });
+      const observer = new InspectObserver({
+        subscriber,
+        inspector,
+      });
 
       observer.observe(this);
     });

@@ -7,9 +7,15 @@ import { createPlace, mockedPlace } from './helpers';
 describe('InMemoryRepository', () => {
   describe('#getById', () => {
     it('Возвращает запись с указанным id', async () => {
-      const target = createPlace({ ...mockedPlace, id: 'target' });
+      const target = createPlace({
+        ...mockedPlace,
+        id: 'target',
+      });
       const repository = new InMemoryRepository([
-        createPlace({ ...mockedPlace, id: 'other' }),
+        createPlace({
+          ...mockedPlace,
+          id: 'other',
+        }),
         target,
       ]);
 
@@ -19,7 +25,12 @@ describe('InMemoryRepository', () => {
     });
 
     it('Если записи с указанным id нет, возвращает undefined', async () => {
-      const repository = new InMemoryRepository([createPlace({ ...mockedPlace, id: 'other' })]);
+      const repository = new InMemoryRepository([
+        createPlace({
+          ...mockedPlace,
+          id: 'other',
+        }),
+      ]);
 
       const place = await repository.getById('target');
 

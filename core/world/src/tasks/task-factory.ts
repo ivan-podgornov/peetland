@@ -112,7 +112,10 @@ export class TaskFactory implements ITaskFactory {
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask {
     const { random, timer } = this.deps;
 
-    return new TryLuckTask(options, { random, timer });
+    return new TryLuckTask(options, {
+      random,
+      timer,
+    });
   }
 
   parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask {
@@ -138,12 +141,18 @@ export class TaskFactory implements ITaskFactory {
   collectBottles(options: CollectBottlesTaskOptions): NpcTask {
     const { random } = this.deps;
 
-    return new CollectBottlesTask(options, { taskFactory: this, random });
+    return new CollectBottlesTask(options, {
+      taskFactory: this,
+      random,
+    });
   }
 
   beg(options: BegTaskOptions): NpcTask {
     const { psycheFactory } = this.deps;
 
-    return new BegTask(options, { taskFactory: this, psycheFactory });
+    return new BegTask(options, {
+      taskFactory: this,
+      psycheFactory,
+    });
   }
 }

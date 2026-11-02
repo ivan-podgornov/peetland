@@ -1,9 +1,11 @@
+import { NpcKind } from '@peetland/npc';
 import type { NpcData } from '@peetland/npc';
 import { Feeling, Trait } from '@peetland/psyche';
 
 export const npcs: NpcData[] = [
   {
     id: 'peet',
+    kind: NpcKind.Homeless,
     modelId: 230,
     // Вход в бомжарню (см. montgomery-homeless-camp в местах)
     spawnPosition: {

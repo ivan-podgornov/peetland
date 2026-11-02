@@ -12,7 +12,7 @@ import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
-import { Npc } from '../src';
+import { Npc, NpcKind } from '../src';
 import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
@@ -82,20 +82,23 @@ describe('Npc', () => {
       expect(npc.psyche).toBe(psyche);
     });
 
-    it('Вызывает rootTaskFactory.create', () => {
-      const rootTaskFactory = {
+    it('Вызывает create у фабрики корневой задачи своего типа', () => {
+      const homelessRootTaskFactory = {
         create: vi.fn(() => ({
           name: 'root',
           methods: [],
         })),
       };
 
-      new Npc(createNpcData(), createNpcDeps({ rootTaskFactory }));
+      new Npc(
+        createNpcData({ kind: NpcKind.Homeless }),
+        createNpcDeps({ rootTaskFactories: { [NpcKind.Homeless]: homelessRootTaskFactory } })
+      );
 
-      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
+      expect(homelessRootTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
     });
 
-    it('Создаёт HTN-агента с корневой задачей, которую вернула rootTaskFactory', () => {
+    it('Создаёт HTN-агента с корневой задачей, которую вернула фабрика своего типа', () => {
       const rootTask: Task<NpcState, NpcContext> = {
         name: 'root',
         methods: [],
@@ -103,10 +106,10 @@ describe('Npc', () => {
       const htnFactory = createMockedHTNFactory<NpcState, NpcContext>();
 
       new Npc(
-        createNpcData(),
+        createNpcData({ kind: NpcKind.Homeless }),
         createNpcDeps({
           htnFactory,
-          rootTaskFactory: { create: () => rootTask },
+          rootTaskFactories: { [NpcKind.Homeless]: { create: () => rootTask } },
         })
       );
 

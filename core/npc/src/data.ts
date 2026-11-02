@@ -2,9 +2,13 @@ import type { Vector3 } from '@peetland/geometry';
 import type { InventoryCounts } from '@peetland/inventory';
 import type { PsycheState } from '@peetland/psyche';
 
+import type { NpcKind } from './kind';
+
 /** Данные NPC, которые хранятся в репозитории */
 export type NpcData = Readonly<{
   id: string;
+  /** Тип NPC, от него зависит корневая задача */
+  kind: NpcKind;
   /** ID игровой модели */
   modelId: number;
   /** Позиция, на которой спавнится NPC */

@@ -6,13 +6,14 @@ import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { Npc } from '../src';
+import { Npc, NpcKind } from '../src';
 import type { INpcFactory, NpcData, NpcDeps } from '../src';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
   return {
     id: 'peet',
+    kind: NpcKind.Homeless,
     modelId: 230,
     spawnPosition: {
       x: 0,
@@ -33,11 +34,13 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
-    rootTaskFactory: {
-      create: vi.fn(() => ({
-        name: 'root',
-        methods: [],
-      })),
+    rootTaskFactories: {
+      [NpcKind.Homeless]: {
+        create: vi.fn(() => ({
+          name: 'root',
+          methods: [],
+        })),
+      },
     },
     frames: createControlledObservable().observable,
     ...deps,

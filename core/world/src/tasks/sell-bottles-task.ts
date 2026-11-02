@@ -85,8 +85,14 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
         tolerance: BOTTLE_COLLECTION_FACING_TOLERANCE,
       }),
       taskFactory.playAnimation({ animation: 'item-give' }),
-      taskFactory.removeItem({ item: Item.Bottles, count: bottles }),
-      taskFactory.addItem({ item: Item.Money, count: bottles * BOTTLE_PRICE }),
+      taskFactory.removeItem({
+        item: Item.Bottles,
+        count: bottles,
+      }),
+      taskFactory.addItem({
+        item: Item.Money,
+        count: bottles * BOTTLE_PRICE,
+      }),
     ];
   }
 

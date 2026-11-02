@@ -36,7 +36,10 @@ export class RemoveItemTask implements PrimitiveTask<NpcState, NpcContext> {
     const inventory = new Inventory(state.inventory);
     inventory.remove(item, count);
 
-    return { ...state, inventory: inventory.getAll() };
+    return {
+      ...state,
+      inventory: inventory.getAll(),
+    };
   }
 
   /** Отнимает предмет из инвентаря. Если предмета не хватило, возвращает 'failed' */

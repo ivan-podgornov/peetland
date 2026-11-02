@@ -20,7 +20,10 @@ describe('Planner', () => {
     describe('Примитивные задачи', () => {
       it('Возвращает null, если задачу выполнить невозможно', () => {
         const planner = new Planner<TestState>();
-        const result = planner.plan(primitive('Primitive'), { ...testState, canExecute: false });
+        const result = planner.plan(primitive('Primitive'), {
+          ...testState,
+          canExecute: false,
+        });
 
         expect(result).toBeNull();
       });
@@ -28,7 +31,10 @@ describe('Planner', () => {
       it('Возвращает исходную задачу, если её можно выполнить при указанном состоянии', () => {
         const planner = new Planner<TestState>();
         const task = primitive('Primitive');
-        const result = planner.plan(task, { ...testState, canExecute: true });
+        const result = planner.plan(task, {
+          ...testState,
+          canExecute: true,
+        });
 
         expect(result).toStrictEqual([task]);
       });
@@ -43,7 +49,10 @@ describe('Planner', () => {
           blockedMethod('Method-2', primitive('Primitive'))
         );
 
-        const result = planner.plan(root, { ...testState, canExecute: true });
+        const result = planner.plan(root, {
+          ...testState,
+          canExecute: true,
+        });
 
         expect(result).toBeNull();
       });
@@ -58,7 +67,10 @@ describe('Planner', () => {
           )
         );
 
-        const result = planner.plan(root, { ...testState, canExecute: true });
+        const result = planner.plan(root, {
+          ...testState,
+          canExecute: true,
+        });
 
         expect(result).toBeNull();
       });
@@ -76,7 +88,10 @@ describe('Planner', () => {
           )
         );
 
-        const result = planner.plan(root, { ...testState, canExecute: true });
+        const result = planner.plan(root, {
+          ...testState,
+          canExecute: true,
+        });
 
         expect(result).toBeNull();
       });
@@ -91,7 +106,10 @@ describe('Planner', () => {
           )
         );
 
-        const result = planner.plan(root, { ...testState, canExecute: true });
+        const result = planner.plan(root, {
+          ...testState,
+          canExecute: true,
+        });
 
         expect(result).toBeNull();
       });
@@ -115,7 +133,10 @@ describe('Planner', () => {
           method('Unreachable method', primitive('Unreachable primitive'))
         );
 
-        const tasks = planner.plan(root, { ...testState, canExecute: true });
+        const tasks = planner.plan(root, {
+          ...testState,
+          canExecute: true,
+        });
         const names = getNames(tasks as Task<TestState, TestContext>[]);
 
         expect(names).toStrictEqual([

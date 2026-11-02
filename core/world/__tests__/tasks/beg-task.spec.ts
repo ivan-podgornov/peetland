@@ -55,7 +55,13 @@ function createTask(
   taskFactory: ITaskFactory = createTaskFactory(),
   psycheFactory: IPsycheFactory = createPsycheFactory()
 ): BegTask {
-  return new BegTask({ places }, { taskFactory, psycheFactory });
+  return new BegTask(
+    { places },
+    {
+      taskFactory,
+      psycheFactory,
+    }
+  );
 }
 
 /** Создаёт мок мест, в которых ближайшее место для клянчанья — переданное */
@@ -79,7 +85,10 @@ function createStateWithShame(shame: number) {
 function createTaskFactoryWithTryLuckSpy() {
   const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
 
-  return { tryLuck, taskFactory: createTaskFactory({ tryLuck }) };
+  return {
+    tryLuck,
+    taskFactory: createTaskFactory({ tryLuck }),
+  };
 }
 
 describe('BegTask', () => {
@@ -142,37 +151,67 @@ describe('BegTask', () => {
 
   it('Ищет место для клянчанья, ближайшее к NPC', () => {
     const places = createPlacesWithSpot();
-    const state = createNpcState({ actor: { position: { x: 1, y: 2, z: 3 }, angle: 0 } });
+    const state = createNpcState({
+      actor: {
+        position: {
+          x: 1,
+          y: 2,
+          z: 3,
+        },
+        angle: 0,
+      },
+    });
 
     plan(createTask(places), state);
 
     expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
-      { x: 1, y: 2, z: 3 },
+      {
+        x: 1,
+        y: 2,
+        z: 3,
+      },
       PlaceType.BeggingSpot
     );
   });
 
   it('Идёт к месту, которое вернул places.findNearest', () => {
     const goToCoords = vi.fn();
-    const spot = createPlace({ type: PlaceType.BeggingSpot, position: { x: 50, y: 0, z: 0 } });
+    const spot = createPlace({
+      type: PlaceType.BeggingSpot,
+      position: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
+    });
     const task = createTask(createPlacesWithSpot(spot), createTaskFactory({ goToCoords }));
 
     plan(task, createNpcState());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
+      coords: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
       completeRadius: 0.5,
     });
   });
 
   it('Поворачивается на угол места, которое вернул places.findNearest', () => {
     const achieveAngle = vi.fn();
-    const spot = createPlace({ type: PlaceType.BeggingSpot, angle: 90 });
+    const spot = createPlace({
+      type: PlaceType.BeggingSpot,
+      angle: 90,
+    });
     const task = createTask(createPlacesWithSpot(spot), createTaskFactory({ achieveAngle }));
 
     plan(task, createNpcState());
 
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
+    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
+      angle: 90,
+      tolerance: 15,
+    });
   });
 
   it('Клянчит с шансом BEGGING_CHANCE', () => {
@@ -251,7 +290,10 @@ describe('BegTask', () => {
       const psyche = createMockedPsyche();
       plan(createTask(createPlacesWithSpot(), taskFactory), createNpcState());
 
-      tryLuck.mock.calls[0]?.[0].onAttempt?.({ ...createNpcContext(), psyche });
+      tryLuck.mock.calls[0]?.[0].onAttempt?.({
+        ...createNpcContext(),
+        psyche,
+      });
 
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.Begging);
     });

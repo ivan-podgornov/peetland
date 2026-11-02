@@ -49,14 +49,25 @@ describe('SellBottlesTask', () => {
   it('Ищет приёмку, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCollection();
     const state = createNpcState({
-      actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
+      actor: {
+        position: {
+          x: 8,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      },
       inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE },
     });
 
     plan(createTask(places), state);
 
     expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
-      { x: 8, y: 0, z: 0 },
+      {
+        x: 8,
+        y: 0,
+        z: 0,
+      },
       PlaceType.BottleCollection
     );
   });
@@ -65,7 +76,11 @@ describe('SellBottlesTask', () => {
     const goToCoords = vi.fn();
     const collection = createPlace({
       type: PlaceType.BottleCollection,
-      position: { x: 50, y: 0, z: 0 },
+      position: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
     });
     const task = createTask(
       createPlacesWithCollection(collection),
@@ -75,14 +90,21 @@ describe('SellBottlesTask', () => {
     plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
+      coords: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
       completeRadius: 0.5,
     });
   });
 
   it('Поворачивается лицом к приёмщику приёмки, которую вернул places.findNearest', () => {
     const achieveAngle = vi.fn();
-    const collection = createPlace({ type: PlaceType.BottleCollection, angle: 90 });
+    const collection = createPlace({
+      type: PlaceType.BottleCollection,
+      angle: 90,
+    });
     const task = createTask(
       createPlacesWithCollection(collection),
       createTaskFactory({ achieveAngle })
@@ -90,7 +112,10 @@ describe('SellBottlesTask', () => {
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
+    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
+      angle: 90,
+      tolerance: 15,
+    });
   });
 
   it('Отдаёт бутылки с анимацией item-give', () => {
@@ -108,7 +133,10 @@ describe('SellBottlesTask', () => {
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: 12 } }));
 
-    expect(removeItem).toHaveBeenCalledExactlyOnceWith({ item: Item.Bottles, count: 12 });
+    expect(removeItem).toHaveBeenCalledExactlyOnceWith({
+      item: Item.Bottles,
+      count: 12,
+    });
   });
 
   it('Получает BOTTLE_PRICE за каждую бутылку', () => {
@@ -148,7 +176,10 @@ describe('SellBottlesTask', () => {
   it('Если бутылок вместе с деньгами хватает на пойло, планирует сдать бутылки', () => {
     const task = createTask(createPlacesWithCollection());
     const state = createNpcState({
-      inventory: { [Item.Bottles]: 1, [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE },
+      inventory: {
+        [Item.Bottles]: 1,
+        [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
+      },
     });
 
     expect(planNames(task, state)).not.toBeNull();
@@ -157,7 +188,10 @@ describe('SellBottlesTask', () => {
   it('Если бутылок вместе с деньгами не хватает на пойло, план не составляется', () => {
     const task = createTask(createPlacesWithCollection());
     const state = createNpcState({
-      inventory: { [Item.Bottles]: 1, [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE - 1 },
+      inventory: {
+        [Item.Bottles]: 1,
+        [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE - 1,
+      },
     });
 
     expect(planNames(task, state)).toBeNull();

@@ -10,7 +10,10 @@ describe('AddItemTask', () => {
     it('Добавляет предмет в инвентарь', () => {
       const context = createNpcContext();
       context.inventory.set(Item.Booze, 1);
-      const task = new AddItemTask({ item: Item.Booze, count: 2 });
+      const task = new AddItemTask({
+        item: Item.Booze,
+        count: 2,
+      });
 
       task.start(createNpcState(), context);
 
@@ -18,7 +21,10 @@ describe('AddItemTask', () => {
     });
 
     it("Возвращает 'success'", () => {
-      const task = new AddItemTask({ item: Item.Booze, count: 1 });
+      const task = new AddItemTask({
+        item: Item.Booze,
+        count: 1,
+      });
 
       const result = task.start(createNpcState(), createNpcContext());
 
@@ -28,7 +34,10 @@ describe('AddItemTask', () => {
 
   describe('#applyEffects', () => {
     it('Увеличивает количество предмета в состоянии', () => {
-      const task = new AddItemTask({ item: Item.Booze, count: 1 });
+      const task = new AddItemTask({
+        item: Item.Booze,
+        count: 1,
+      });
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Booze]: 2 } }));
 
@@ -36,11 +45,17 @@ describe('AddItemTask', () => {
     });
 
     it('Если предмета в состоянии не было, добавляет его', () => {
-      const task = new AddItemTask({ item: Item.Booze, count: 1 });
+      const task = new AddItemTask({
+        item: Item.Booze,
+        count: 1,
+      });
 
       const state = task.applyEffects(createNpcState({ inventory: { [Item.Money]: 5 } }));
 
-      expect(state.inventory).toStrictEqual({ [Item.Money]: 5, [Item.Booze]: 1 });
+      expect(state.inventory).toStrictEqual({
+        [Item.Money]: 5,
+        [Item.Booze]: 1,
+      });
     });
   });
 });

@@ -16,7 +16,12 @@ describe('NpcFactory', () => {
     });
 
     it('Создаёт NPC с переданными местами', () => {
-      const rootTaskFactory = { create: vi.fn(() => ({ name: 'root', methods: [] })) };
+      const rootTaskFactory = {
+        create: vi.fn(() => ({
+          name: 'root',
+          methods: [],
+        })),
+      };
       const places = createMockedPlaces();
       const factory = new NpcFactory(createNpcFactoryDeps({ rootTaskFactory }));
 

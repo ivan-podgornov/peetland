@@ -7,8 +7,14 @@ import { createPlace, mockedPlace } from './helpers';
 describe('InMemoryRepository', () => {
   describe('#getAll', () => {
     it('Возвращает все записи, переданные в конструктор', async () => {
-      const first = createPlace({ ...mockedPlace, id: 'first' });
-      const second = createPlace({ ...mockedPlace, id: 'second' });
+      const first = createPlace({
+        ...mockedPlace,
+        id: 'first',
+      });
+      const second = createPlace({
+        ...mockedPlace,
+        id: 'second',
+      });
       const repository = new InMemoryRepository([first, second]);
 
       const places = await repository.getAll();

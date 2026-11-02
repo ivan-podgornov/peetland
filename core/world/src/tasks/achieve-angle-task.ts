@@ -27,9 +27,15 @@ export class AchieveAngleTask extends CommandTask {
     const { geometry } = this.deps;
     const angle = geometry.normalizeAngle(this.options.angle);
 
-    const actor = { ...state.actor, angle };
+    const actor = {
+      ...state.actor,
+      angle,
+    };
 
-    return { ...state, actor };
+    return {
+      ...state,
+      actor,
+    };
   }
 
   protected createCommand(actor: IActor): IActorCommand {

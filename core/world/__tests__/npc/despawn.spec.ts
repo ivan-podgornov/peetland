@@ -67,7 +67,10 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn), frames: frames.observable })
+        createNpcDeps({
+          htnFactory: createMockedHTNFactory(htn),
+          frames: frames.observable,
+        })
       );
 
       npc.despawn();

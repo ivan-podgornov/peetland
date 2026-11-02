@@ -57,7 +57,10 @@ export class Listeners<Events extends EventMap<Events>> {
       return;
     }
 
-    eventListeners.set(listener, { actual: true, options });
+    eventListeners.set(listener, {
+      actual: true,
+      options,
+    });
   }
 
   /**

@@ -25,6 +25,9 @@ export class NpcFactory implements INpcFactory {
   }
 
   create(data: NpcData, options: CreateNpcOptions): Npc {
-    return new Npc(data, { ...this.deps, places: options.places });
+    return new Npc(data, {
+      ...this.deps,
+      places: options.places,
+    });
   }
 }

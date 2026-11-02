@@ -21,7 +21,13 @@ function createTask(
   taskFactory: ITaskFactory = createTaskFactory(),
   random = createMockedRandom(false)
 ): CollectBottlesTask {
-  return new CollectBottlesTask({ places }, { taskFactory, random });
+  return new CollectBottlesTask(
+    { places },
+    {
+      taskFactory,
+      random,
+    }
+  );
 }
 
 /** Создаёт мок мест, в которых есть переданные мусорки */
@@ -48,8 +54,14 @@ describe('CollectBottlesTask', () => {
 
   it('Выбирает случайную мусорку из всех мусорок', () => {
     const bins = [
-      createPlace({ id: 'bin-1', type: PlaceType.TrashBin }),
-      createPlace({ id: 'bin-2', type: PlaceType.TrashBin }),
+      createPlace({
+        id: 'bin-1',
+        type: PlaceType.TrashBin,
+      }),
+      createPlace({
+        id: 'bin-2',
+        type: PlaceType.TrashBin,
+      }),
     ];
     const random = createMockedRandom(false);
 
@@ -63,7 +75,14 @@ describe('CollectBottlesTask', () => {
 
   it('Идёт к мусорке, которую вернул random.pick', () => {
     const goToCoords = vi.fn();
-    const bin = createPlace({ type: PlaceType.TrashBin, position: { x: 50, y: 0, z: 0 } });
+    const bin = createPlace({
+      type: PlaceType.TrashBin,
+      position: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
+    });
     const random = createMockedRandom(false);
     random.pick.mockReturnValue(bin);
     const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ goToCoords }), random);
@@ -71,14 +90,21 @@ describe('CollectBottlesTask', () => {
     plan(task, createNpcState());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
+      coords: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
       completeRadius: 0.5,
     });
   });
 
   it('Поворачивается лицом к мусорке, которую вернул random.pick', () => {
     const achieveAngle = vi.fn();
-    const bin = createPlace({ type: PlaceType.TrashBin, angle: 90 });
+    const bin = createPlace({
+      type: PlaceType.TrashBin,
+      angle: 90,
+    });
     const random = createMockedRandom(false);
     random.pick.mockReturnValue(bin);
     const task = createTask(
@@ -89,7 +115,10 @@ describe('CollectBottlesTask', () => {
 
     plan(task, createNpcState());
 
-    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({ angle: 90, tolerance: 15 });
+    expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
+      angle: 90,
+      tolerance: 15,
+    });
   });
 
   it('Начинает рыться с анимацией trash-search-start, а заканчивает — с trash-search-end', () => {
@@ -132,7 +161,10 @@ describe('CollectBottlesTask', () => {
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
-    expect(parallel).toHaveBeenCalledExactlyOnceWith({ main: tryLuck, background: searching });
+    expect(parallel).toHaveBeenCalledExactlyOnceWith({
+      main: tryLuck,
+      background: searching,
+    });
   });
 
   it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket, добавляет в инвентарь и реагирует на находку', () => {
@@ -159,7 +191,10 @@ describe('CollectBottlesTask', () => {
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
-    expect(addItem).toHaveBeenCalledExactlyOnceWith({ item: Item.Bottles, count: 1 });
+    expect(addItem).toHaveBeenCalledExactlyOnceWith({
+      item: Item.Bottles,
+      count: 1,
+    });
   });
 
   it('На каждую найденную бутылку реагирует поступком Deed.BottleFound', () => {

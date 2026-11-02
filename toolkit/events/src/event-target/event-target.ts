@@ -37,7 +37,10 @@ export class EventTarget<Events extends EventMap<Events>> implements IEventTarge
       });
     }
 
-    this.listeners.add(type, listener, { ...DEFAULT_LISTENER_OPTIONS, ...options });
+    this.listeners.add(type, listener, {
+      ...DEFAULT_LISTENER_OPTIONS,
+      ...options,
+    });
   }
 
   removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events[K]>): void {

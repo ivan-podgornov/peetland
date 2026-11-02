@@ -18,9 +18,15 @@ export class GoToCoordsTask extends CommandTask {
   /** Актор оказывается на координатах */
   applyEffects(state: NpcState): NpcState {
     const { coords } = this.options;
-    const actor = { ...state.actor, position: coords };
+    const actor = {
+      ...state.actor,
+      position: coords,
+    };
 
-    return { ...state, actor };
+    return {
+      ...state,
+      actor,
+    };
   }
 
   protected createCommand(actor: IActor): IActorCommand {

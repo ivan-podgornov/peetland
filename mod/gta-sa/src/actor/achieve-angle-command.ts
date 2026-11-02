@@ -15,7 +15,10 @@ export type GtaAchieveAngleCommandDeps = CommandDeps & {
 };
 
 /** Персонаж поворачивается быстрее секунды, поэтому команда проверяет угол часто */
-const ACHIEVE_ANGLE = { name: 'achieve-angle', updatePeriod: 100 };
+const ACHIEVE_ANGLE = {
+  name: 'achieve-angle',
+  updatePeriod: 100,
+};
 
 /** Сколько миллисекунд персонаж может поворачиваться сам, прежде чем его повернут сразу */
 const TURN_TIMEOUT = 1000;

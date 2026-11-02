@@ -59,9 +59,19 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
     }
 
     return [
-      taskFactory.goToCoords({ coords: shop.position, completeRadius: SHOP_COMPLETE_RADIUS }),
-      taskFactory.achieveAngle({ angle: shop.angle, tolerance: SHOP_FACING_TOLERANCE }),
-      taskFactory.purchase({ item: Item.Booze, count: 1, price: BOOZE_PRICE }),
+      taskFactory.goToCoords({
+        coords: shop.position,
+        completeRadius: SHOP_COMPLETE_RADIUS,
+      }),
+      taskFactory.achieveAngle({
+        angle: shop.angle,
+        tolerance: SHOP_FACING_TOLERANCE,
+      }),
+      taskFactory.purchase({
+        item: Item.Booze,
+        count: 1,
+        price: BOOZE_PRICE,
+      }),
     ];
   }
 }

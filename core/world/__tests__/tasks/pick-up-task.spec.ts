@@ -8,7 +8,10 @@ import { applyPlanEffects, createNpcState, createTaskFactory, planNames } from '
 describe('PickUpTask', () => {
   it('Планирует проиграть анимацию, а потом добавить предмет', () => {
     const task = new PickUpTask(
-      { item: Item.Bottles, count: 1 },
+      {
+        item: Item.Bottles,
+        count: 1,
+      },
       { taskFactory: createTaskFactory() }
     );
 
@@ -21,7 +24,10 @@ describe('PickUpTask', () => {
     const playAnimation = vi.fn();
 
     new PickUpTask(
-      { item: Item.Bottles, count: 1 },
+      {
+        item: Item.Bottles,
+        count: 1,
+      },
       { taskFactory: createTaskFactory({ playAnimation }) }
     );
 
@@ -30,13 +36,19 @@ describe('PickUpTask', () => {
 
   it('По плану добавляет предмет и не трогает деньги', () => {
     const task = new PickUpTask(
-      { item: Item.Bottles, count: 2 },
+      {
+        item: Item.Bottles,
+        count: 2,
+      },
       { taskFactory: createTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 10 } });
 
     const after = applyPlanEffects(task, state);
 
-    expect(after.inventory).toStrictEqual({ [Item.Money]: 10, [Item.Bottles]: 2 });
+    expect(after.inventory).toStrictEqual({
+      [Item.Money]: 10,
+      [Item.Bottles]: 2,
+    });
   });
 });

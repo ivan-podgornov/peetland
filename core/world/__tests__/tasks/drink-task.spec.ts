@@ -55,14 +55,25 @@ describe('DrinkTask', () => {
   it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
     const places = createPlacesWithCamp(true);
     const state = createNpcState({
-      actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
+      actor: {
+        position: {
+          x: 8,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      },
       inventory: { [Item.Booze]: 1 },
     });
 
     plan(createTask(places), state);
 
     expect(places.isNear).toHaveBeenCalledWith(
-      { x: 8, y: 0, z: 0 },
+      {
+        x: 8,
+        y: 0,
+        z: 0,
+      },
       PlaceType.HomelessCamp,
       HOMELESS_CAMP_RADIUS
     );
@@ -71,27 +82,49 @@ describe('DrinkTask', () => {
   it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCamp(false);
     const state = createNpcState({
-      actor: { position: { x: 8, y: 0, z: 0 }, angle: 0 },
+      actor: {
+        position: {
+          x: 8,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      },
       inventory: { [Item.Booze]: 1 },
     });
 
     plan(createTask(places), state);
 
     expect(places.findNearest).toHaveBeenCalledExactlyOnceWith(
-      { x: 8, y: 0, z: 0 },
+      {
+        x: 8,
+        y: 0,
+        z: 0,
+      },
       PlaceType.HomelessCamp
     );
   });
 
   it('Идёт к бомжарне, которую вернул places.findNearest', () => {
     const goToCoords = vi.fn();
-    const camp = createPlace({ type: PlaceType.HomelessCamp, position: { x: 50, y: 0, z: 0 } });
+    const camp = createPlace({
+      type: PlaceType.HomelessCamp,
+      position: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
+    });
     const task = createTask(createPlacesWithCamp(false, camp), createTaskFactory({ goToCoords }));
 
     plan(task, createStateWithBooze());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-      coords: { x: 50, y: 0, z: 0 },
+      coords: {
+        x: 50,
+        y: 0,
+        z: 0,
+      },
       completeRadius: 0.5,
     });
   });
@@ -112,7 +145,10 @@ describe('DrinkTask', () => {
 
     const after = applyPlanEffects(task, createStateWithBooze(3));
 
-    expect(after.inventory).toStrictEqual({ [Item.Booze]: 2, [Item.Bottles]: 1 });
+    expect(after.inventory).toStrictEqual({
+      [Item.Booze]: 2,
+      [Item.Bottles]: 1,
+    });
   });
 
   it('Если пойла нет, план не составляется', () => {

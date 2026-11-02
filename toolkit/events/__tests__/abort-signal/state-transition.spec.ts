@@ -5,8 +5,14 @@ import { AbortController } from '../../src/abort-controller';
 import { listenAbortEvent } from './helpers';
 
 const abortEventHandlingVariants = [
-  { name: 'обработчик назначенный с помощью addEventListener', variant: 'addEventListener' },
-  { name: 'обработчик назначенный с помощью onabort', variant: 'onabort' },
+  {
+    name: 'обработчик назначенный с помощью addEventListener',
+    variant: 'addEventListener',
+  },
+  {
+    name: 'обработчик назначенный с помощью onabort',
+    variant: 'onabort',
+  },
 ] as const;
 
 describe('AbortSignal', () => {

@@ -9,7 +9,10 @@ describe('Observable', () => {
       it('Если в observer.next происходит ошибка, вызывает reportError с этой ошибкой', () => {
         const error = new Error('next failed');
         const { observable, subscriber } = createControlledObservable();
-        const observer = { ...createMockedObserver(), next: vi.fn().mockThrow(error) };
+        const observer = {
+          ...createMockedObserver(),
+          next: vi.fn().mockThrow(error),
+        };
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
         subscriber.next('value');
@@ -20,7 +23,10 @@ describe('Observable', () => {
       it('Если в одном из observer.next происходит ошибка, остальные наблюдатели всё равно продолжают получать событие', () => {
         const error = new Error('next failed');
         const { observable, subscriber } = createControlledObservable();
-        const failedObserver = { ...createMockedObserver(), next: vi.fn().mockThrow(error) };
+        const failedObserver = {
+          ...createMockedObserver(),
+          next: vi.fn().mockThrow(error),
+        };
         const otherObserver = createMockedObserver();
 
         observable.subscribe(failedObserver, getDefaultSubscribeOptions());
@@ -33,7 +39,10 @@ describe('Observable', () => {
       it('Если в observer.error происходит ошибка, вызывает reportError с этой ошибкой', () => {
         const error = new Error('error failed');
         const { observable, subscriber } = createControlledObservable();
-        const observer = { ...createMockedObserver(), error: vi.fn().mockThrow(error) };
+        const observer = {
+          ...createMockedObserver(),
+          error: vi.fn().mockThrow(error),
+        };
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
         subscriber.error('other error');
@@ -44,7 +53,10 @@ describe('Observable', () => {
       it('Если в observer.complete происходит ошибка, вызывает reportError с этой ошибкой', () => {
         const error = new Error('complete failed');
         const { observable, subscriber } = createControlledObservable();
-        const observer = { ...createMockedObserver(), complete: vi.fn().mockThrow(error) };
+        const observer = {
+          ...createMockedObserver(),
+          complete: vi.fn().mockThrow(error),
+        };
 
         observable.subscribe(observer, getDefaultSubscribeOptions());
         subscriber.complete();

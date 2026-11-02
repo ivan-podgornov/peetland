@@ -4,7 +4,10 @@ import type { AchieveAngleOptions, IActor } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 
 /** Актор поворачивается через секунду после начала команды */
-const ACHIEVE_ANGLE = { name: 'achieve-angle', updatePeriod: 1000 };
+const ACHIEVE_ANGLE = {
+  name: 'achieve-angle',
+  updatePeriod: 1000,
+};
 
 export type VirtualAchieveAngleCommandDeps = CommandDeps & {
   geometry: IGeometry;

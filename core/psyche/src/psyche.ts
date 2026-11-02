@@ -58,7 +58,10 @@ export class Psyche implements IPsyche {
   }
 
   getState(): PsycheState {
-    return { traits: this.traitValues, feelings: this.feelings };
+    return {
+      traits: this.traitValues,
+      feelings: this.feelings,
+    };
   }
 
   /**
@@ -74,7 +77,10 @@ export class Psyche implements IPsyche {
         0
       );
 
-      return { ...feelings, [feeling]: this.clampFeeling(feelings[feeling] + change) };
+      return {
+        ...feelings,
+        [feeling]: this.clampFeeling(feelings[feeling] + change),
+      };
     }, this.feelings);
   }
 

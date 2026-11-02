@@ -8,7 +8,11 @@ import { applyPlanEffects, createNpcState, createTaskFactory, planNames } from '
 describe('PurchaseTask', () => {
   it('Если денег хватает, планирует заплатить, отнять деньги и добавить предмет', () => {
     const task = new PurchaseTask(
-      { item: Item.Booze, count: 1, price: 100 },
+      {
+        item: Item.Booze,
+        count: 1,
+        price: 100,
+      },
       { taskFactory: createTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 100 } });
@@ -22,7 +26,11 @@ describe('PurchaseTask', () => {
     const playAnimation = vi.fn();
 
     new PurchaseTask(
-      { item: Item.Booze, count: 1, price: 100 },
+      {
+        item: Item.Booze,
+        count: 1,
+        price: 100,
+      },
       { taskFactory: createTaskFactory({ playAnimation }) }
     );
 
@@ -31,19 +39,30 @@ describe('PurchaseTask', () => {
 
   it('По плану отнимает цену и добавляет предмет', () => {
     const task = new PurchaseTask(
-      { item: Item.Booze, count: 2, price: 100 },
+      {
+        item: Item.Booze,
+        count: 2,
+        price: 100,
+      },
       { taskFactory: createTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 150 } });
 
     const after = applyPlanEffects(task, state);
 
-    expect(after.inventory).toStrictEqual({ [Item.Money]: 50, [Item.Booze]: 2 });
+    expect(after.inventory).toStrictEqual({
+      [Item.Money]: 50,
+      [Item.Booze]: 2,
+    });
   });
 
   it('Если денег не хватает, план не составляется', () => {
     const task = new PurchaseTask(
-      { item: Item.Booze, count: 1, price: 100 },
+      {
+        item: Item.Booze,
+        count: 1,
+        price: 100,
+      },
       { taskFactory: createTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 99 } });

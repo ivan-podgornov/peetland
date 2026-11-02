@@ -37,8 +37,14 @@ export class PurchaseTask implements CompoundTask<NpcState, NpcContext> {
         preconditions: (state) => (state.inventory[Item.Money] ?? 0) >= price,
         tasks: [
           taskFactory.playAnimation({ animation: 'pay' }),
-          taskFactory.removeItem({ item: Item.Money, count: price }),
-          taskFactory.addItem({ item, count }),
+          taskFactory.removeItem({
+            item: Item.Money,
+            count: price,
+          }),
+          taskFactory.addItem({
+            item,
+            count,
+          }),
         ],
       },
     ];

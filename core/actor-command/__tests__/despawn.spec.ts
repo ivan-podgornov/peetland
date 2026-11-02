@@ -8,7 +8,10 @@ describe('Command', () => {
     it('Завершает Observable ошибкой из сигнала актора', () => {
       const actor = new TestActor();
       const error = vi.fn();
-      executeCommand({ actor, observer: { error } });
+      executeCommand({
+        actor,
+        observer: { error },
+      });
 
       actor.despawn();
 
@@ -18,7 +21,10 @@ describe('Command', () => {
     it("Вызывает onFinish с 'cancelled'", () => {
       const actor = new TestActor();
       const onFinish = vi.fn();
-      executeCommand({ actor, hooks: { onFinish } });
+      executeCommand({
+        actor,
+        hooks: { onFinish },
+      });
 
       actor.despawn();
 
@@ -29,7 +35,11 @@ describe('Command', () => {
       const timer = new ManualTimer();
       const actor = new TestActor();
       const onUpdate = vi.fn(() => 'running' as const);
-      executeCommand({ actor, hooks: { onUpdate }, timer });
+      executeCommand({
+        actor,
+        hooks: { onUpdate },
+        timer,
+      });
 
       actor.despawn();
       timer.advance(UPDATE_PERIOD);
@@ -42,7 +52,13 @@ describe('Command', () => {
     it('Не вызывает onFinish повторно', () => {
       const actor = new TestActor();
       const onFinish = vi.fn();
-      executeCommand({ actor, hooks: { onUpdate: () => 'success', onFinish } });
+      executeCommand({
+        actor,
+        hooks: {
+          onUpdate: () => 'success',
+          onFinish,
+        },
+      });
 
       actor.despawn();
 
@@ -52,7 +68,11 @@ describe('Command', () => {
     it('Не завершает Observable ошибкой', () => {
       const actor = new TestActor();
       const error = vi.fn();
-      executeCommand({ actor, hooks: { onUpdate: () => 'success' }, observer: { error } });
+      executeCommand({
+        actor,
+        hooks: { onUpdate: () => 'success' },
+        observer: { error },
+      });
 
       actor.despawn();
 
@@ -75,7 +95,10 @@ describe('Command', () => {
     it('При подписке не вызывает onStart', () => {
       const actor = new TestActor();
       const onStart = vi.fn();
-      const command = createCommand({ actor, hooks: { onStart } });
+      const command = createCommand({
+        actor,
+        hooks: { onStart },
+      });
       actor.despawn();
 
       command.execute().subscribe();
@@ -86,7 +109,10 @@ describe('Command', () => {
     it('При подписке не вызывает onFinish', () => {
       const actor = new TestActor();
       const onFinish = vi.fn();
-      const command = createCommand({ actor, hooks: { onFinish } });
+      const command = createCommand({
+        actor,
+        hooks: { onFinish },
+      });
       actor.despawn();
 
       command.execute().subscribe();

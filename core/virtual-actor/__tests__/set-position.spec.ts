@@ -5,21 +5,43 @@ import { createActor } from '../dev';
 describe('VirtualActor', () => {
   describe('#setPosition', () => {
     it('Переносит актора на переданную позицию', () => {
-      const actor = createActor({ position: { x: 0, y: 0, z: 0 } });
+      const actor = createActor({
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      });
 
-      actor.setPosition({ x: 5, y: 6, z: 7 });
+      actor.setPosition({
+        x: 5,
+        y: 6,
+        z: 7,
+      });
 
-      expect(actor.getPosition()).toStrictEqual({ x: 5, y: 6, z: 7 });
+      expect(actor.getPosition()).toStrictEqual({
+        x: 5,
+        y: 6,
+        z: 7,
+      });
     });
 
     it('Изменение переданной позиции после вызова не сдвигает актора', () => {
       const actor = createActor();
-      const position = { x: 5, y: 6, z: 7 };
+      const position = {
+        x: 5,
+        y: 6,
+        z: 7,
+      };
 
       actor.setPosition(position);
       position.x = 100;
 
-      expect(actor.getPosition()).toStrictEqual({ x: 5, y: 6, z: 7 });
+      expect(actor.getPosition()).toStrictEqual({
+        x: 5,
+        y: 6,
+        z: 7,
+      });
     });
   });
 });

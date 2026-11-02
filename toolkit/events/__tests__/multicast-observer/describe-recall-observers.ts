@@ -114,7 +114,10 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
       // а не потому что конкретный наблюдатель перешел в состояние aborted
       multicast.add(createMockedObserver(), getDefaultObserveOptions());
-      multicast.add(observer, { ...getDefaultObserveOptions(), signal: controller.signal });
+      multicast.add(observer, {
+        ...getDefaultObserveOptions(),
+        signal: controller.signal,
+      });
       const params = callMethod(multicast, method);
       controller.abort();
       callMethod(multicast, method);
@@ -131,7 +134,10 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
       // а не потому что конкретный наблюдатель перешел в состояние aborted
       multicast.add(createMockedObserver(), getDefaultObserveOptions());
-      multicast.add(observer, { ...getDefaultObserveOptions(), signal: AbortSignal.abort() });
+      multicast.add(observer, {
+        ...getDefaultObserveOptions(),
+        signal: AbortSignal.abort(),
+      });
       callMethod(multicast, method);
 
       expect(methodImplementation).not.toHaveBeenCalled();

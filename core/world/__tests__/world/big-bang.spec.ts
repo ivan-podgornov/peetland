@@ -13,7 +13,12 @@ describe('World', () => {
       const npcFactory = createMockedNpcFactory();
       const peet = createNpcData({ id: 'peet' });
       const joe = createNpcData({ id: 'joe' });
-      const world = new World(createWorldDeps({ npcs: [peet, joe], npcFactory }));
+      const world = new World(
+        createWorldDeps({
+          npcs: [peet, joe],
+          npcFactory,
+        })
+      );
 
       await world.bigBang();
 
@@ -23,7 +28,12 @@ describe('World', () => {
     it('Вызывает placesFactory.create с местами из репозитория мест', async () => {
       const placesFactory = createMockedPlacesFactory();
       const places = [createPlace({ id: 'shop' }), createPlace({ id: 'bin' })];
-      const world = new World(createWorldDeps({ places, placesFactory }));
+      const world = new World(
+        createWorldDeps({
+          places,
+          placesFactory,
+        })
+      );
 
       await world.bigBang();
 

@@ -75,7 +75,17 @@ describe('VirtualActor', () => {
     it('Если время проигрывания не подходит анимации, не прерывает текущую команду', () => {
       const actor = createActor();
       const error = vi.fn();
-      actor.goToCoords({ x: 10, y: 0, z: 0 }, 1).execute().subscribe({ error });
+      actor
+        .goToCoords(
+          {
+            x: 10,
+            y: 0,
+            z: 0,
+          },
+          1
+        )
+        .execute()
+        .subscribe({ error });
 
       try {
         actor.playAnimation('pay', 5000);

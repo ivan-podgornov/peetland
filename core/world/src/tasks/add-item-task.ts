@@ -31,7 +31,10 @@ export class AddItemTask implements PrimitiveTask<NpcState, NpcContext> {
     const inventory = new Inventory(state.inventory);
     inventory.add(item, count);
 
-    return { ...state, inventory: inventory.getAll() };
+    return {
+      ...state,
+      inventory: inventory.getAll(),
+    };
   }
 
   /** Добавляет предмет в инвентарь и возвращает 'success' */

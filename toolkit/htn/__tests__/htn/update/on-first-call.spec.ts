@@ -16,7 +16,10 @@ describe('HTN', () => {
         const root = primitive('Primitive Task');
         const planner = getDummyPlanner([root]);
 
-        const htn = new HTN(root, { ...getDefaultDeps(), plannerFactory: () => planner });
+        const htn = new HTN(root, {
+          ...getDefaultDeps(),
+          plannerFactory: () => planner,
+        });
         htn.update(testState, testContext);
 
         expect(planner.plan).toHaveBeenCalledExactlyOnceWith(root, testState);

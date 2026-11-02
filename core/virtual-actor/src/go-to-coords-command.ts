@@ -7,7 +7,10 @@ import type { IGeometry, Vector3 } from '@peetland/geometry';
 const WALKING_SPEED = 5 / 3.6;
 
 /** Актор делает шаг к точке раз в секунду */
-const GO_TO_COORDS = { name: 'go-to-coords', updatePeriod: 1000 };
+const GO_TO_COORDS = {
+  name: 'go-to-coords',
+  updatePeriod: 1000,
+};
 
 export type VirtualGoToCoordsCommandDeps = CommandDeps & {
   geometry: IGeometry;

@@ -10,7 +10,10 @@ describe('TryLuckTask', () => {
     it("Возвращает 'running'", () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
-        { random: createMockedRandom(false), timer: new ManualTimer() }
+        {
+          random: createMockedRandom(false),
+          timer: new ManualTimer(),
+        }
       );
 
       const result = task.start(createNpcState(), createNpcContext());
@@ -21,7 +24,13 @@ describe('TryLuckTask', () => {
     it('Раз в TRY_LUCK_PERIOD бросает шанс с переданной вероятностью', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random, timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random,
+          timer,
+        }
+      );
 
       task.start(createNpcState(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD * 2);
@@ -32,7 +41,13 @@ describe('TryLuckTask', () => {
     it('Не бросает шанс, пока не прошёл TRY_LUCK_PERIOD', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random, timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random,
+          timer,
+        }
+      );
 
       task.start(createNpcState(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD - 1);
@@ -43,7 +58,13 @@ describe('TryLuckTask', () => {
     it('Если повезло, больше не бросает шанс', () => {
       const random = createMockedRandom(true);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random, timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random,
+          timer,
+        }
+      );
 
       task.start(createNpcState(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD * 3);
@@ -55,8 +76,14 @@ describe('TryLuckTask', () => {
       const onAttempt = vi.fn();
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60, onAttempt },
-        { random: createMockedRandom(false), timer }
+        {
+          chance: 1 / 60,
+          onAttempt,
+        },
+        {
+          random: createMockedRandom(false),
+          timer,
+        }
       );
       const context = createNpcContext();
 
@@ -70,7 +97,16 @@ describe('TryLuckTask', () => {
       const onAttempt = vi.fn();
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60, onAttempt }, { random, timer });
+      const task = new TryLuckTask(
+        {
+          chance: 1 / 60,
+          onAttempt,
+        },
+        {
+          random,
+          timer,
+        }
+      );
 
       task.start(createNpcState(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD);
@@ -82,8 +118,14 @@ describe('TryLuckTask', () => {
       const onAttempt = vi.fn();
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60, onAttempt },
-        { random: createMockedRandom(true), timer }
+        {
+          chance: 1 / 60,
+          onAttempt,
+        },
+        {
+          random: createMockedRandom(true),
+          timer,
+        }
       );
 
       task.start(createNpcState(), createNpcContext());
@@ -95,7 +137,13 @@ describe('TryLuckTask', () => {
     it('Если задачу этим актором уже начали, прекращает прежние попытки', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
-      const task = new TryLuckTask({ chance: 1 / 60 }, { random, timer });
+      const task = new TryLuckTask(
+        { chance: 1 / 60 },
+        {
+          random,
+          timer,
+        }
+      );
       const context = createNpcContext();
       task.start(createNpcState(), context);
 

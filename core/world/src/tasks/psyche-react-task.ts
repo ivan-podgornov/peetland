@@ -39,7 +39,10 @@ export class PsycheReactTask implements PrimitiveTask<NpcState, NpcContext> {
     const psyche = psycheFactory.create(state.psyche);
     psyche.react(this.options.deed);
 
-    return { ...state, psyche: psyche.getState() };
+    return {
+      ...state,
+      psyche: psyche.getState(),
+    };
   }
 
   /** Сообщает психике из контекста о поступке и возвращает 'success' */

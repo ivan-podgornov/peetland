@@ -7,7 +7,10 @@ import type { CompoundTask, PrimitiveTask, Method, Task, TaskResult } from '../s
 
 export type TestState = { canExecute: boolean; counter: number };
 
-export const testState = { canExecute: true, counter: 0 };
+export const testState = {
+  canExecute: true,
+  counter: 0,
+};
 
 export type TestContext = { name: string };
 
@@ -16,7 +19,10 @@ export const testContext: TestContext = { name: 'context' };
 export function primitive(name: string): PrimitiveTask<TestState, TestContext> {
   return {
     name,
-    applyEffects: (state) => ({ ...state, canExecute: true }),
+    applyEffects: (state) => ({
+      ...state,
+      canExecute: true,
+    }),
     canExecute: (state) => state.canExecute,
     start: () => 'running',
     update: () => 'running',

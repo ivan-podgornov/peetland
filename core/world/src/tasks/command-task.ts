@@ -32,7 +32,10 @@ export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext>
    */
   start(_state: NpcState, context: NpcContext): TaskResult {
     const { actor } = context;
-    const execution: Execution = { command: this.createCommand(actor), result: 'running' };
+    const execution: Execution = {
+      command: this.createCommand(actor),
+      result: 'running',
+    };
     this.executions.set(actor, execution);
 
     execution.command.execute().subscribe({

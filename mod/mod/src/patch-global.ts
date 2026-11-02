@@ -32,7 +32,13 @@ function schedule(
   repeat: boolean
 ): number {
   const id = ++lastTimerId;
-  timers.set(id, { callback, args, delay, dueAt: now() + delay, repeat });
+  timers.set(id, {
+    callback,
+    args,
+    delay,
+    dueAt: now() + delay,
+    repeat,
+  });
 
   return id;
 }

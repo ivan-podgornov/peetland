@@ -14,9 +14,18 @@ describe('MulticastObserver', () => {
   describe('#error', () => {
     describeRecallObserver({ method: 'error' });
     describeBehaviourOnErrorInObserver({ method: 'error' });
-    describeBehaviourWhenMethodAbsent({ method: 'error', observerAsFunction: false });
-    describeBehaviourWhenMethodAbsent({ method: 'error', observerAsFunction: true });
-    describeSignalFinish({ method: 'error', reason: 'subscriber failed' });
+    describeBehaviourWhenMethodAbsent({
+      method: 'error',
+      observerAsFunction: false,
+    });
+    describeBehaviourWhenMethodAbsent({
+      method: 'error',
+      observerAsFunction: true,
+    });
+    describeSignalFinish({
+      method: 'error',
+      reason: 'subscriber failed',
+    });
 
     describe('При отсутствии error в наблюдателях', () => {
       it('Если один из добавленных наблюдателей является функцией, ошибка уходит в reportError', () => {

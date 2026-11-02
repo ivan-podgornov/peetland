@@ -20,7 +20,11 @@ export class TestActor implements IActor {
   }
 
   getPosition(): Vector3 {
-    return { x: 0, y: 0, z: 0 };
+    return {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
   }
 
   getAngle(): number {
@@ -64,7 +68,15 @@ export type TestCommandHooks = {
 /** Команда, хуки которой задаёт тест */
 export class TestCommand extends Command<number, TestCommandHooks> {
   constructor(actor: IActor, hooks: TestCommandHooks, deps: CommandDeps) {
-    super({ name: 'test', updatePeriod: UPDATE_PERIOD }, actor, hooks, deps);
+    super(
+      {
+        name: 'test',
+        updatePeriod: UPDATE_PERIOD,
+      },
+      actor,
+      hooks,
+      deps
+    );
   }
 
   /** Защищённый сигнал команды, открытый для тестов */

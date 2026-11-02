@@ -9,7 +9,10 @@ describe('Inventory', () => {
       inventory.set(Item.Money, 5);
       inventory.set(Item.Bottles, 2);
 
-      expect(inventory.getAll()).toStrictEqual({ [Item.Money]: 5, [Item.Bottles]: 2 });
+      expect(inventory.getAll()).toStrictEqual({
+        [Item.Money]: 5,
+        [Item.Bottles]: 2,
+      });
     });
 
     it('Не возвращает предметы, количество которых стало нулевым', () => {

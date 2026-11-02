@@ -7,7 +7,10 @@ describe('VirtualActor', () => {
   describe('#achieveAngle', () => {
     it('Не поворачивает актора до подписки', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 0, timer });
+      const actor = createActor({
+        angle: 0,
+        timer,
+      });
 
       actor.achieveAngle(90, 15);
       timer.advance(1000);
@@ -26,7 +29,10 @@ describe('VirtualActor', () => {
 
     it('Через секунду поворачивает актора на угол', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 0, timer });
+      const actor = createActor({
+        angle: 0,
+        timer,
+      });
       actor.achieveAngle(90, 15).execute().subscribe();
 
       timer.advance(1000);
@@ -36,7 +42,10 @@ describe('VirtualActor', () => {
 
     it('Через секунду сообщает новый угол актора', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 0, timer });
+      const actor = createActor({
+        angle: 0,
+        timer,
+      });
       const next = vi.fn();
       actor.achieveAngle(90, 15).execute().subscribe({ next });
 
@@ -47,7 +56,10 @@ describe('VirtualActor', () => {
 
     it('Поворачивает актора на угол, приведённый к диапазону [0, 360)', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 0, timer });
+      const actor = createActor({
+        angle: 0,
+        timer,
+      });
       actor.achieveAngle(-90, 15).execute().subscribe();
 
       timer.advance(1000);

@@ -43,7 +43,15 @@ export class VirtualPlayAnimationCommand extends Command<
 
     // Виртуальной анимации нечего делать между тиками, поэтому период равен длительности: так
     // команда завершается ровно тогда, когда проходит duration, а не на ближайшем тике после
-    super({ name: 'play-animation', updatePeriod: duration }, actor, options, deps);
+    super(
+      {
+        name: 'play-animation',
+        updatePeriod: duration,
+      },
+      actor,
+      options,
+      deps
+    );
     this.duration = duration;
     this.playedFor = null;
   }

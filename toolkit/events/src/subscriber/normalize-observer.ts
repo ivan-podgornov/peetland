@@ -24,7 +24,10 @@ export function normalizeObserver<T>(observer?: IObserver<T>): NormalizedObserve
   if (typeof observer === 'function') {
     // Оборачиваем, а не кладём observer как есть: в Lua next вызывается как метод, и функция без
     // self получила бы вместо значения сам объект наблюдателя
-    return { ...defaultObserver, next: (value: T) => observer(value) };
+    return {
+      ...defaultObserver,
+      next: (value: T) => observer(value),
+    };
   }
 
   // Методы вызываются через observer, а не через bind: в Lua bind ломает передачу self

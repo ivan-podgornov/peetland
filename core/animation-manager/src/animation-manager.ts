@@ -61,7 +61,11 @@ export class AnimationManager<
       throw new Error(`Не задана длительность анимации ${animation}`);
     }
 
-    return { animation: record, duration: playbackDuration ?? record.duration, loop };
+    return {
+      animation: record,
+      duration: playbackDuration ?? record.duration,
+      loop,
+    };
   }
 
   acquire(animation: AnimationId): Observable<void> {

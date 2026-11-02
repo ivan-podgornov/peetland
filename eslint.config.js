@@ -2,6 +2,7 @@ import { defineConfig } from 'eslint/config';
 import { globSync } from 'glob';
 import js from '@eslint/js';
 import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
+import stylistic from '@stylistic/eslint-plugin';
 import vitestPlugin from '@vitest/eslint-plugin';
 import importPlugin from 'eslint-plugin-import-x';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
@@ -38,6 +39,7 @@ export default defineConfig([
     files: ['**/*.ts'],
     plugins: {
       '@eslint-community/eslint-comments': eslintComments,
+      '@stylistic': stylistic,
       '@typescript-eslint': tseslint.plugin,
       'import-x': importPlugin,
     },
@@ -58,6 +60,17 @@ export default defineConfig([
     rules: {
       // ESLint comments rules
       '@eslint-community/eslint-comments/require-description': 'error',
+
+      // Stylistic rules. Подключены после eslint-config-prettier, иначе он бы их выключил.
+      // Prettier оставляет объект однострочным, если он влезает в строку, и многострочным, если в
+      // исходнике после `{` стоит перенос. Правило ставит этот перенос, чтобы объекты с несколькими
+      // свойствами, например с вложенными объектами, не сливались в одну строку (см. #97)
+      '@stylistic/object-curly-newline': [
+        'error',
+        {
+          ObjectExpression: { minProperties: 2, consistent: true },
+        },
+      ],
 
       // TypeScript rules
       '@typescript-eslint/no-use-before-define': ['error', { functions: false }],

@@ -32,7 +32,10 @@ export class PickUpTask implements CompoundTask<NpcState, NpcContext> {
         preconditions: () => true,
         tasks: [
           taskFactory.playAnimation({ animation: 'item-receive' }),
-          taskFactory.addItem({ item, count }),
+          taskFactory.addItem({
+            item,
+            count,
+          }),
         ],
       },
     ];

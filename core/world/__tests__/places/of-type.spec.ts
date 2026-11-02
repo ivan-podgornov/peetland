@@ -8,8 +8,14 @@ import { createPlaces } from './helpers';
 describe('Places', () => {
   describe('#ofType', () => {
     it('Возвращает места переданного типа', () => {
-      const shop = createPlace({ id: 'shop', type: PlaceType.Shop });
-      const bin = createPlace({ id: 'bin', type: PlaceType.TrashBin });
+      const shop = createPlace({
+        id: 'shop',
+        type: PlaceType.Shop,
+      });
+      const bin = createPlace({
+        id: 'bin',
+        type: PlaceType.TrashBin,
+      });
 
       expect(createPlaces([shop, bin]).ofType(PlaceType.Shop)).toStrictEqual([shop]);
     });

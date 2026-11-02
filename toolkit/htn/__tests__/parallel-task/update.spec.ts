@@ -9,7 +9,10 @@ describe('ParallelTask', () => {
   describe('#update', () => {
     it('Обновляет основную задачу с состоянием и контекстом', () => {
       const main = createMockedPrimitive();
-      const task = new ParallelTask({ main, background: createMockedPrimitive() });
+      const task = new ParallelTask({
+        main,
+        background: createMockedPrimitive(),
+      });
       const context = createContext();
       task.start(testState, context);
 
@@ -20,7 +23,10 @@ describe('ParallelTask', () => {
 
     it('Если обе задачи выполняются, обновляет фоновую задачу с состоянием и контекстом', () => {
       const background = createMockedPrimitive();
-      const task = new ParallelTask({ main: createMockedPrimitive(), background });
+      const task = new ParallelTask({
+        main: createMockedPrimitive(),
+        background,
+      });
       const context = createContext();
       task.start(testState, context);
 
@@ -98,7 +104,10 @@ describe('ParallelTask', () => {
 
     it('Если фоновая задача завершилась успешно, запускает её заново в следующем update', () => {
       const background = createMockedPrimitive({ update: vi.fn(() => 'success' as const) });
-      const task = new ParallelTask({ main: createMockedPrimitive(), background });
+      const task = new ParallelTask({
+        main: createMockedPrimitive(),
+        background,
+      });
       const context = createContext();
       task.start(testState, context);
       task.update(testState, context);
@@ -121,7 +130,10 @@ describe('ParallelTask', () => {
 
     it("Если фоновую задачу нельзя запустить заново, возвращает 'failed'", () => {
       const background = createMockedPrimitive({ start: vi.fn(() => 'success' as const) });
-      const task = new ParallelTask({ main: createMockedPrimitive(), background });
+      const task = new ParallelTask({
+        main: createMockedPrimitive(),
+        background,
+      });
       const context = createContext();
       task.start(testState, context);
       background.canExecute.mockReturnValue(false);
@@ -165,7 +177,10 @@ describe('ParallelTask', () => {
 
     it('Обновляет фоновую задачу только того контекста, в котором её начали заново', () => {
       const background = createMockedPrimitive({ start: vi.fn(() => 'success' as const) });
-      const task = new ParallelTask({ main: createMockedPrimitive(), background });
+      const task = new ParallelTask({
+        main: createMockedPrimitive(),
+        background,
+      });
       const firstContext = createContext();
       const secondContext = createContext();
       task.start(testState, firstContext);
@@ -180,7 +195,10 @@ describe('ParallelTask', () => {
 
     it("После того как основная задача завершилась, возвращает 'failed'", () => {
       const main = createMockedPrimitive({ update: vi.fn(() => 'success' as const) });
-      const task = new ParallelTask({ main, background: createMockedPrimitive() });
+      const task = new ParallelTask({
+        main,
+        background: createMockedPrimitive(),
+      });
       const context = createContext();
       task.start(testState, context);
       task.update(testState, context);

@@ -25,7 +25,14 @@ import { CommandTask } from '../../src/tasks/command-task';
 /** Создаёт состояние NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcState(state: Partial<NpcState> = {}): NpcState {
   return {
-    actor: { position: { x: 0, y: 0, z: 0 }, angle: 0 },
+    actor: {
+      position: {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      angle: 0,
+    },
     inventory: {},
     psyche: createPsycheState(),
     ...state,
@@ -50,7 +57,10 @@ export function createControlledCommand() {
     cancel: vi.fn((reason: unknown) => subscriber.error(reason)),
   };
 
-  return { command, subscriber };
+  return {
+    command,
+    subscriber,
+  };
 }
 
 /** Создаёт команду, Observable которой завершается сразу при подписке */
@@ -94,7 +104,11 @@ export function createPlace(place: Partial<PlaceData> = {}): PlaceData {
   return {
     id: 'shop',
     type: PlaceType.Shop,
-    position: { x: 0, y: 0, z: 0 },
+    position: {
+      x: 0,
+      y: 0,
+      z: 0,
+    },
     angle: 0,
     ...place,
   };
@@ -164,7 +178,10 @@ export function createTaskFactory(factory: Partial<ITaskFactory> = {}): ITaskFac
  */
 export function createStubTask(name: string, plannable = true): Task<NpcState, NpcContext> {
   if (!plannable) {
-    return { name, methods: [] };
+    return {
+      name,
+      methods: [],
+    };
   }
 
   return {

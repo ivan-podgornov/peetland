@@ -21,7 +21,14 @@ export type CreateActorOptions = {
  */
 export function createActor(options: CreateActorOptions = {}): VirtualActor {
   return new VirtualActor(
-    { position: options.position ?? { x: 0, y: 0, z: 0 }, angle: options.angle ?? 0 },
+    {
+      position: options.position ?? {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      angle: options.angle ?? 0,
+    },
     {
       animations: createAnimationManager(options.animations ?? VIRTUAL_ANIMATIONS),
       geometry: new Geometry(),

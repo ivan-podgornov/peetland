@@ -65,7 +65,11 @@ export class Npc {
       position: data.spawnPosition,
       angle: data.spawnAngle,
     });
-    this.context = { actor: this.actor, inventory: this.inventory, psyche: this.psyche };
+    this.context = {
+      actor: this.actor,
+      inventory: this.inventory,
+      psyche: this.psyche,
+    };
     this.htn = htnFactory.create(rootTaskFactory.create({ places }));
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
@@ -76,7 +80,10 @@ export class Npc {
   /** Возвращает состояние NPC со слепками актора, инвентаря и психики (см. NpcState) */
   getState(): NpcState {
     return {
-      actor: { position: this.actor.getPosition(), angle: this.actor.getAngle() },
+      actor: {
+        position: this.actor.getPosition(),
+        angle: this.actor.getAngle(),
+      },
       inventory: this.inventory.getAll(),
       psyche: this.psyche.getState(),
     };

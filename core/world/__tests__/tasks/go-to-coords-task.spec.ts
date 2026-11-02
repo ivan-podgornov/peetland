@@ -11,11 +11,25 @@ describe('GoToCoordsTask', () => {
     it('Отдаёт актору команду идти к координатам', () => {
       const actor = createActor();
       const goToCoords = vi.spyOn(actor, 'goToCoords');
-      const task = new GoToCoordsTask({ coords: { x: 10, y: 0, z: 0 }, completeRadius: 1 });
+      const task = new GoToCoordsTask({
+        coords: {
+          x: 10,
+          y: 0,
+          z: 0,
+        },
+        completeRadius: 1,
+      });
 
       task.start(createNpcState(), createNpcContext(actor));
 
-      expect(goToCoords).toHaveBeenCalledExactlyOnceWith({ x: 10, y: 0, z: 0 }, 1);
+      expect(goToCoords).toHaveBeenCalledExactlyOnceWith(
+        {
+          x: 10,
+          y: 0,
+          z: 0,
+        },
+        1
+      );
     });
   });
 
@@ -23,7 +37,14 @@ describe('GoToCoordsTask', () => {
     it("Возвращает 'success', когда актор дошёл", () => {
       const timer = new ManualTimer();
       const context = createNpcContext(createActor({ timer }));
-      const task = new GoToCoordsTask({ coords: { x: 2, y: 0, z: 0 }, completeRadius: 1 });
+      const task = new GoToCoordsTask({
+        coords: {
+          x: 2,
+          y: 0,
+          z: 0,
+        },
+        completeRadius: 1,
+      });
       task.start(createNpcState(), context);
 
       timer.advance(1000);
@@ -38,25 +59,59 @@ describe('GoToCoordsTask', () => {
       const timer = new ManualTimer();
       const actor = createActor({ timer });
       const context = createNpcContext(actor);
-      const task = new GoToCoordsTask({ coords: { x: 100, y: 0, z: 0 }, completeRadius: 1 });
+      const task = new GoToCoordsTask({
+        coords: {
+          x: 100,
+          y: 0,
+          z: 0,
+        },
+        completeRadius: 1,
+      });
       task.start(createNpcState(), context);
 
       task.stop(context);
       timer.advance(1000);
 
-      expect(actor.getPosition()).toEqual({ x: 0, y: 0, z: 0 });
+      expect(actor.getPosition()).toEqual({
+        x: 0,
+        y: 0,
+        z: 0,
+      });
     });
   });
 
   describe('#applyEffects', () => {
     it('Перемещает актора в состоянии на координаты', () => {
-      const task = new GoToCoordsTask({ coords: { x: 10, y: 5, z: 1 }, completeRadius: 1 });
+      const task = new GoToCoordsTask({
+        coords: {
+          x: 10,
+          y: 5,
+          z: 1,
+        },
+        completeRadius: 1,
+      });
 
       const state = task.applyEffects(
-        createNpcState({ actor: { position: { x: 0, y: 0, z: 0 }, angle: 90 } })
+        createNpcState({
+          actor: {
+            position: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            angle: 90,
+          },
+        })
       );
 
-      expect(state.actor).toEqual({ position: { x: 10, y: 5, z: 1 }, angle: 90 });
+      expect(state.actor).toEqual({
+        position: {
+          x: 10,
+          y: 5,
+          z: 1,
+        },
+        angle: 90,
+      });
     });
   });
 });

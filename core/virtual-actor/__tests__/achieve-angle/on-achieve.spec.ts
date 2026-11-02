@@ -7,7 +7,10 @@ describe('VirtualActor', () => {
   describe('#achieveAngle', () => {
     it('Через секунду завершает команду', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 0, timer });
+      const actor = createActor({
+        angle: 0,
+        timer,
+      });
       const complete = vi.fn();
       actor.achieveAngle(90, 15).execute().subscribe({ complete });
 
@@ -27,7 +30,10 @@ describe('VirtualActor', () => {
 
     it('Если актор уже повёрнут на угол в пределах допуска, не меняет его угол', () => {
       const timer = new ManualTimer();
-      const actor = createActor({ angle: 80, timer });
+      const actor = createActor({
+        angle: 80,
+        timer,
+      });
       actor.achieveAngle(90, 15).execute().subscribe();
 
       timer.advance(1000);

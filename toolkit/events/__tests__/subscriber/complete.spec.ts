@@ -68,7 +68,10 @@ describe('Subscriber', () => {
 
       it('Если observer.complete выбрасывает ошибку, она не выбрасывается из метода subscriber.complete', () => {
         const throwsErrorComplete = vi.fn().mockThrow(new Error());
-        const observer = { ...createMockedObserver(), complete: throwsErrorComplete };
+        const observer = {
+          ...createMockedObserver(),
+          complete: throwsErrorComplete,
+        };
         const subscriber = new Subscriber(observer, getDefaultConstructorOptions());
 
         expect(() => subscriber.complete()).not.toThrow();
@@ -77,7 +80,10 @@ describe('Subscriber', () => {
       it('Если observer.complete выбрасывает ошибку, вызывается reportError с ошибкой, которую выбросил observer.complete', () => {
         const error = new Error();
         const throwsErrorComplete = vi.fn().mockThrow(error);
-        const observer = { ...createMockedObserver(), complete: throwsErrorComplete };
+        const observer = {
+          ...createMockedObserver(),
+          complete: throwsErrorComplete,
+        };
         const subscriber = new Subscriber(observer);
 
         subscriber.complete();

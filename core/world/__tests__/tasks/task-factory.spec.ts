@@ -28,7 +28,14 @@ describe('TaskFactory', () => {
     it('Возвращает GoToCoordsTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.goToCoords({ coords: { x: 0, y: 0, z: 0 }, completeRadius: 1 });
+      const task = factory.goToCoords({
+        coords: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        completeRadius: 1,
+      });
 
       expect(task).toBeInstanceOf(GoToCoordsTask);
     });
@@ -38,7 +45,10 @@ describe('TaskFactory', () => {
     it('Возвращает AchieveAngleTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.achieveAngle({ angle: 0, tolerance: 1 });
+      const task = factory.achieveAngle({
+        angle: 0,
+        tolerance: 1,
+      });
 
       expect(task).toBeInstanceOf(AchieveAngleTask);
     });
@@ -58,7 +68,10 @@ describe('TaskFactory', () => {
     it('Возвращает AddItemTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.addItem({ item: Item.Booze, count: 1 });
+      const task = factory.addItem({
+        item: Item.Booze,
+        count: 1,
+      });
 
       expect(task).toBeInstanceOf(AddItemTask);
     });
@@ -68,7 +81,10 @@ describe('TaskFactory', () => {
     it('Возвращает RemoveItemTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.removeItem({ item: Item.Booze, count: 1 });
+      const task = factory.removeItem({
+        item: Item.Booze,
+        count: 1,
+      });
 
       expect(task).toBeInstanceOf(RemoveItemTask);
     });
@@ -111,7 +127,11 @@ describe('TaskFactory', () => {
     it('Возвращает PurchaseTask', () => {
       const factory = new TaskFactory(createTaskFactoryDeps());
 
-      const task = factory.purchase({ item: Item.Booze, count: 1, price: 100 });
+      const task = factory.purchase({
+        item: Item.Booze,
+        count: 1,
+        price: 100,
+      });
 
       expect(task).toBeInstanceOf(PurchaseTask);
     });

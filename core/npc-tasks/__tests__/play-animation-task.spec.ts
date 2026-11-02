@@ -4,7 +4,7 @@ import { VIRTUAL_ANIMATIONS } from '@peetland/virtual-actor';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PlayAnimationTask } from '../src';
+import { PlayAnimationTask } from '../src/play-animation-task';
 
 describe('PlayAnimationTask', () => {
   describe('#start', () => {

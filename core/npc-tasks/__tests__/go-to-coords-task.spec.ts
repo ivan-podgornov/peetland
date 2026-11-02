@@ -3,7 +3,7 @@ import { ManualTimer } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { GoToCoordsTask } from '../src';
+import { GoToCoordsTask } from '../src/go-to-coords-task';
 
 describe('GoToCoordsTask', () => {
   describe('#start', () => {

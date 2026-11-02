@@ -1,5 +1,5 @@
-import { Planner } from '../src';
 import type { PrimitiveTask, Task } from '../src';
+import { Planner } from '../src/planner';
 
 /** Составляет план корневой задачи */
 export function plan<TState, TContext>(

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { Conscientiousness, Deed, Feeling } from '../../../src';
+import { Deed, Feeling } from '../../../src';
+import { Conscientiousness } from '../../../src/traits';
 import {
   BEGGING_SHAME,
   MAX_CONSCIENTIOUSNESS,

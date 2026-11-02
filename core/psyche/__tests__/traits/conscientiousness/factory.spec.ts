@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Conscientiousness, ConscientiousnessFactory } from '../../../src';
+import { Conscientiousness, ConscientiousnessFactory } from '../../../src/traits';
 
 describe('ConscientiousnessFactory', () => {
   describe('#create', () => {

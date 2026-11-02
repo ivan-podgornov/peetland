@@ -1,7 +1,7 @@
 import { AbortController } from '@peetland/events';
 import { describe, expect, it, vi } from 'vitest';
 
-import { InstantAnimationLoader } from '../src';
+import { InstantAnimationLoader } from '../src/instant-animation-loader';
 
 import { createTestAnimationManager, createManualLoader } from './helpers';
 

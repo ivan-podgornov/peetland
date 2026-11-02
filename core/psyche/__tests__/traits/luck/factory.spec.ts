@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Luck, LuckFactory } from '../../../src';
+import { Luck, LuckFactory } from '../../../src/traits';
 
 describe('LuckFactory', () => {
   describe('#create', () => {

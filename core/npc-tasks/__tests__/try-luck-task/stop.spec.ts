@@ -3,7 +3,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TRY_LUCK_PERIOD, TryLuckTask } from '../../src';
+import { TRY_LUCK_PERIOD, TryLuckTask } from '../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#stop', () => {

@@ -4,8 +4,9 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 
-import { HomelessTaskFactory } from '../src';
-import type { HomelessTaskFactoryDeps, IHomelessTaskFactory } from '../src';
+import type { IHomelessTaskFactory } from '../src';
+import { HomelessTaskFactory } from '../src/factory';
+import type { HomelessTaskFactoryDeps } from '../src/factory';
 
 /**
  * Создаёт зависимости фабрики задач бомжа. Примитивы создаёт настоящая фабрика примитивов, удача в

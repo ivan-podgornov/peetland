@@ -9,7 +9,8 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, BOTTLE_PRICE, SellBottlesTask } from '../src';
+import { BOOZE_PRICE } from '../src/buy-booze-task';
+import { BOTTLE_PRICE, SellBottlesTask } from '../src/sell-bottles-task';
 
 /** Создаёт задачу сдачи бутылок с настоящей фабрикой примитивов, если другая не передана */
 function createTask(

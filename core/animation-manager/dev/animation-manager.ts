@@ -1,5 +1,6 @@
-import { AnimationManager, InstantAnimationLoader } from '../src';
+import { AnimationManager } from '../src';
 import type { AnimationRecord, AnimationTable, IAnimationLoader } from '../src';
+import { InstantAnimationLoader } from '../src/instant-animation-loader';
 
 /**
  * Создаёт менеджер анимаций с переданной таблицей. Если загрузчик не указан, все анимации

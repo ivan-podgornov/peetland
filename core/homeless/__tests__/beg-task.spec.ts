@@ -19,14 +19,9 @@ import {
 } from '@peetland/psyche/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  BEGGING_CHANCE,
-  BEGGING_REWARD,
-  BEGGING_SHAME_LIMIT,
-  BegTask,
-  BOOZE_PRICE,
-  BOTTLE_PRICE,
-} from '../src';
+import { BEGGING_CHANCE, BEGGING_REWARD, BEGGING_SHAME_LIMIT, BegTask } from '../src/beg-task';
+import { BOOZE_PRICE } from '../src/buy-booze-task';
+import { BOTTLE_PRICE } from '../src/sell-bottles-task';
 
 /** Создаёт фабрику психики, у которой каждая попытка клянчить меняет стыд на shame */
 function createPsycheFactory(shame = 0): IPsycheFactory {

@@ -1,15 +1,13 @@
 import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
-import {
-  BegTask,
-  BuyBoozeTask,
-  CollectBottlesTask,
-  DrinkTask,
-  PurchaseTask,
-  SellBottlesTask,
-  HomelessTaskFactory,
-} from '../src';
+import { BegTask } from '../src/beg-task';
+import { BuyBoozeTask } from '../src/buy-booze-task';
+import { CollectBottlesTask } from '../src/collect-bottles-task';
+import { DrinkTask } from '../src/drink-task';
+import { HomelessTaskFactory } from '../src/factory';
+import { PurchaseTask } from '../src/purchase-task';
+import { SellBottlesTask } from '../src/sell-bottles-task';
 
 import { createHomelessTaskFactoryDeps } from './helpers';
 

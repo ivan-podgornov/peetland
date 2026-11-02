@@ -5,10 +5,10 @@ import type {
   FeelingsContribution,
   ITrait,
   ITraitFactory,
-  PsycheDeps,
   PsycheState,
   TraitFactories,
 } from '../src';
+import type { PsycheDeps } from '../src/psyche';
 
 /** Создаёт черту, которая на любой поступок возвращает переданный вклад */
 export function createMockedTrait(contribution: FeelingsContribution = {}): ITrait {

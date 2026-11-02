@@ -9,8 +9,8 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { RootTaskFactory } from '../src';
-import type { RootTaskFactoryDeps } from '../src';
+import { RootTaskFactory } from '../src/root-task-factory';
+import type { RootTaskFactoryDeps } from '../src/root-task-factory';
 
 /** Создаёт зависимости фабрики корневых задач. Фабрики типов NPC — по умолчанию */
 function createDeps(deps: Partial<RootTaskFactoryDeps> = {}): RootTaskFactoryDeps {

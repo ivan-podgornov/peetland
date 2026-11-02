@@ -118,7 +118,12 @@ describe('World', () => {
             npcs: [createNpcData()],
           }),
           {
-            worldKnowledge: createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 }),
+            worldKnowledge: createMockedNpcWorldKnowledge({
+              time: {
+                hours: 20,
+                minutes: 15,
+              },
+            }),
             rootTaskFactory: createMockedRootTaskFactory({
               name: 'root',
               methods: [
@@ -136,7 +141,14 @@ describe('World', () => {
         frames.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalledWith(
-          expect.objectContaining({ world: { time: 20 * 60 + 15 } })
+          expect.objectContaining({
+            world: {
+              time: {
+                hours: 20,
+                minutes: 15,
+              },
+            },
+          })
         );
       });
 
@@ -146,7 +158,10 @@ describe('World', () => {
         const world = new World(
           createWorldOptions({
             game: createGame({
-              time: new ManualTime(20, 15),
+              time: new ManualTime({
+                hours: 20,
+                minutes: 15,
+              }),
               frames: frames.observable,
             }),
             npcs: [createNpcData()],
@@ -169,7 +184,14 @@ describe('World', () => {
         frames.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalledWith(
-          expect.objectContaining({ world: { time: 20 * 60 + 15 } })
+          expect.objectContaining({
+            world: {
+              time: {
+                hours: 20,
+                minutes: 15,
+              },
+            },
+          })
         );
       });
 

@@ -106,10 +106,20 @@ describe('Npc', () => {
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 });
+      const worldKnowledge = createMockedNpcWorldKnowledge({
+        time: {
+          hours: 20,
+          minutes: 15,
+        },
+      });
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      expect(npc.getState().world).toStrictEqual({ time: 20 * 60 + 15 });
+      expect(npc.getState().world).toStrictEqual({
+        time: {
+          hours: 20,
+          minutes: 15,
+        },
+      });
     });
   });
 });

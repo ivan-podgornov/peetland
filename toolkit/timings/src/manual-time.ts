@@ -1,21 +1,26 @@
-import type { ITime } from './types';
+import type { ITime, TimeState } from './types';
 
 /**
- * Время суток, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту
+ * Время суток, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту.
+ * Можно воссоздать из слепка другого времени (см. ITime.getState)
  */
+const DEFAULT_STATE: TimeState = {
+  hours: 0,
+  minutes: 0,
+};
+
 export class ManualTime implements ITime {
   private currentHours: number;
   private currentMinutes: number;
 
   /**
-   * Выбрасывает RangeError, если hours или minutes не время суток (см. set)
-   * @param hours - час, от 0 до 23
-   * @param minutes - минуты, от 0 до 59
+   * Выбрасывает RangeError, если в слепке не время суток (см. set)
+   * @param state - слепок времени суток, с которого начинается время. По умолчанию полночь
    */
-  constructor(hours = 0, minutes = 0) {
+  constructor(state: TimeState = DEFAULT_STATE) {
     this.currentHours = 0;
     this.currentMinutes = 0;
-    this.set(hours, minutes);
+    this.set(state.hours, state.minutes);
   }
 
   get hours(): number {
@@ -28,6 +33,13 @@ export class ManualTime implements ITime {
 
   get minutesSinceMidnight(): number {
     return this.currentHours * 60 + this.currentMinutes;
+  }
+
+  getState(): TimeState {
+    return {
+      hours: this.currentHours,
+      minutes: this.currentMinutes,
+    };
   }
 
   /**

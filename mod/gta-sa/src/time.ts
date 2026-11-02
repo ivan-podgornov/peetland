@@ -1,5 +1,5 @@
 import { getTimeOfDay } from '@peetland/moonloader';
-import type { ITime } from '@peetland/timings';
+import type { ITime, TimeState } from '@peetland/timings';
 
 /** Время суток в GTA */
 export class GtaTime implements ITime {
@@ -19,5 +19,14 @@ export class GtaTime implements ITime {
     const [hours, minutes] = getTimeOfDay();
 
     return hours * 60 + minutes;
+  }
+
+  getState(): TimeState {
+    const [hours, minutes] = getTimeOfDay();
+
+    return {
+      hours,
+      minutes,
+    };
   }
 }

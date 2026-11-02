@@ -57,7 +57,10 @@ describe('ManualTime', () => {
     });
 
     it('Если время не выставлено из-за ошибки, время остаётся прежним', () => {
-      const time = new ManualTime(8, 30);
+      const time = new ManualTime({
+        hours: 8,
+        minutes: 30,
+      });
 
       expect(() => time.set(24, 0)).toThrow(RangeError);
       expect(time.minutesSinceMidnight).toBe(8 * 60 + 30);

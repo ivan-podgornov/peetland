@@ -80,11 +80,21 @@ describe('RemoveItemTask', () => {
       const state = task.applyEffects(
         createNpcState({
           self: { inventory: { [Item.Booze]: 1 } },
-          world: { time: 20 * 60 },
+          world: {
+            time: {
+              hours: 20,
+              minutes: 0,
+            },
+          },
         })
       );
 
-      expect(state.world).toStrictEqual({ time: 20 * 60 });
+      expect(state.world).toStrictEqual({
+        time: {
+          hours: 20,
+          minutes: 0,
+        },
+      });
     });
 
     it('Уменьшает количество предмета в состоянии', () => {

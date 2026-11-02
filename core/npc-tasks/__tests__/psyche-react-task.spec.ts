@@ -74,9 +74,23 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory(createMockedPsyche()) }
       );
 
-      const state = task.applyEffects(createNpcState({ world: { time: 20 * 60 } }));
+      const state = task.applyEffects(
+        createNpcState({
+          world: {
+            time: {
+              hours: 20,
+              minutes: 0,
+            },
+          },
+        })
+      );
 
-      expect(state.world).toStrictEqual({ time: 20 * 60 });
+      expect(state.world).toStrictEqual({
+        time: {
+          hours: 20,
+          minutes: 0,
+        },
+      });
     });
 
     it('Кладёт в состояние слепок собранной психики', () => {

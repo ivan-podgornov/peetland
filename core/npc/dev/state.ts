@@ -31,7 +31,10 @@ export function createNpcState(state: CreateNpcStateOptions = {}): NpcState {
       ...state.self,
     },
     world: {
-      time: 0,
+      time: {
+        hours: 0,
+        minutes: 0,
+      },
       ...state.world,
     },
   };

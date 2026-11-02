@@ -18,6 +18,6 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
   getState(): NpcWorldState {
     const { time } = this.deps;
 
-    return { time: time.minutesSinceMidnight };
+    return { time: time.getState() };
   }
 }

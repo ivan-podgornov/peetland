@@ -340,10 +340,22 @@ describe('BegTask', () => {
       plan(createTask(createPlacesWithSpot(), npcTaskFactory), createNpcState());
 
       const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(
-        createNpcState({ world: { time: 20 * 60 } })
+        createNpcState({
+          world: {
+            time: {
+              hours: 20,
+              minutes: 0,
+            },
+          },
+        })
       );
 
-      expect(after?.world).toStrictEqual({ time: 20 * 60 });
+      expect(after?.world).toStrictEqual({
+        time: {
+          hours: 20,
+          minutes: 0,
+        },
+      });
     });
   });
 });

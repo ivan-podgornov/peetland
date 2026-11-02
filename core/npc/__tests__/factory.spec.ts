@@ -66,12 +66,22 @@ describe('NpcFactory', () => {
     });
 
     it('NPC узнаёт о мире через worldKnowledge из зависимостей', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledge({ time: 20 * 60 + 15 });
+      const worldKnowledge = createMockedNpcWorldKnowledge({
+        time: {
+          hours: 20,
+          minutes: 15,
+        },
+      });
       const factory = new NpcFactory(createRequiredDeps({ worldKnowledge }));
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.getState().world).toStrictEqual({ time: 20 * 60 + 15 });
+      expect(npc.getState().world).toStrictEqual({
+        time: {
+          hours: 20,
+          minutes: 15,
+        },
+      });
     });
 
     it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {

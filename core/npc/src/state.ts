@@ -1,6 +1,7 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { InventoryCounts } from '@peetland/inventory';
 import type { PsycheState } from '@peetland/psyche';
+import type { TimeState } from '@peetland/timings';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
 export type NpcActorState = Readonly<{
@@ -18,8 +19,8 @@ export type NpcSelfState = Readonly<{
 
 /** Что NPC знает о мире на момент сбора состояния */
 export type NpcWorldState = Readonly<{
-  /** Время суток в минутах от полуночи, от 0 до 1439 */
-  time: number;
+  /** Слепок времени суток */
+  time: TimeState;
 }>;
 
 /**

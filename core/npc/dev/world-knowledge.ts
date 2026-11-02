@@ -8,7 +8,12 @@ import type { INpcWorldKnowledge, NpcWorldState } from '../src';
  * передано, в мире полночь
  */
 export function createMockedNpcWorldKnowledge(
-  state: NpcWorldState = { time: 0 }
+  state: NpcWorldState = {
+    time: {
+      hours: 0,
+      minutes: 0,
+    },
+  }
 ): Mocked<INpcWorldKnowledge> {
   return { getState: vi.fn(() => state) };
 }

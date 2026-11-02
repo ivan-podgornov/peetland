@@ -10,6 +10,14 @@ export interface ITimer {
   interval(period: number): Observable<number>;
 }
 
+/** Слепок времени суток */
+export type TimeState = Readonly<{
+  /** Час, от 0 до 23 */
+  hours: number;
+  /** Минуты текущего часа, от 0 до 59 */
+  minutes: number;
+}>;
+
 /** Текущее время суток */
 export interface ITime {
   /** Час, от 0 до 23 */
@@ -18,4 +26,10 @@ export interface ITime {
   readonly minutes: number;
   /** Сколько минут прошло с полуночи, от 0 до 1439 */
   readonly minutesSinceMidnight: number;
+
+  /**
+   * Возвращает слепок времени суток на момент вызова. Время идёт, и геттеры между вызовами
+   * возвращают разное, а слепок не меняется
+   */
+  getState(): TimeState;
 }

@@ -1,3 +1,4 @@
+import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -7,7 +8,7 @@ import { createNpcState, createStubTask, createTaskFactory, planNames } from './
 
 describe('RootTask', () => {
   it('Вызывает taskFactory.drink с местами', () => {
-    const drink = vi.fn(() => createStubTask('drink'));
+    const drink = vi.fn(() => createStubTask<NpcState, NpcContext>('drink'));
     const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ drink }) });
@@ -16,7 +17,7 @@ describe('RootTask', () => {
   });
 
   it('Вызывает taskFactory.buyBooze с местами', () => {
-    const buyBooze = vi.fn(() => createStubTask('buy-booze'));
+    const buyBooze = vi.fn(() => createStubTask<NpcState, NpcContext>('buy-booze'));
     const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ buyBooze }) });
@@ -25,7 +26,7 @@ describe('RootTask', () => {
   });
 
   it('Вызывает taskFactory.sellBottles с местами', () => {
-    const sellBottles = vi.fn(() => createStubTask('sell-bottles'));
+    const sellBottles = vi.fn(() => createStubTask<NpcState, NpcContext>('sell-bottles'));
     const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ sellBottles }) });
@@ -34,7 +35,7 @@ describe('RootTask', () => {
   });
 
   it('Вызывает taskFactory.beg с местами', () => {
-    const beg = vi.fn(() => createStubTask('beg'));
+    const beg = vi.fn(() => createStubTask<NpcState, NpcContext>('beg'));
     const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ beg }) });
@@ -43,7 +44,7 @@ describe('RootTask', () => {
   });
 
   it('Вызывает taskFactory.collectBottles с местами', () => {
-    const collectBottles = vi.fn(() => createStubTask('collect-bottles'));
+    const collectBottles = vi.fn(() => createStubTask<NpcState, NpcContext>('collect-bottles'));
     const places = createMockedPlaces();
 
     new RootTask({ places }, { taskFactory: createTaskFactory({ collectBottles }) });

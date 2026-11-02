@@ -1,4 +1,5 @@
 import { Item } from '@peetland/inventory';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -108,7 +109,7 @@ describe('BuyBoozeTask', () => {
   });
 
   it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {
-    const purchase = vi.fn(() => createStubTask('purchase'));
+    const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
     const task = createTask(createPlacesWithShop(), createTaskFactory({ purchase }));
 
     plan(task, createNpcState());

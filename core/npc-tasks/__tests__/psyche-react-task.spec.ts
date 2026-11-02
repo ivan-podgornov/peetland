@@ -1,3 +1,4 @@
+import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { Deed, Feeling } from '@peetland/psyche';
 import {
   createMockedPsyche,
@@ -6,9 +7,7 @@ import {
 } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
-import { PsycheReactTask } from '../../src';
-
-import { createNpcContext, createNpcState } from './helpers';
+import { PsycheReactTask } from '../src';
 
 describe('PsycheReactTask', () => {
   describe('#start', () => {

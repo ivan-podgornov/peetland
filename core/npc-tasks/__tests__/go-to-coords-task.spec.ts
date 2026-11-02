@@ -1,10 +1,9 @@
+import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { ManualTimer } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { GoToCoordsTask } from '../../src';
-
-import { createNpcContext, createNpcState } from './helpers';
+import { GoToCoordsTask } from '../src';
 
 describe('GoToCoordsTask', () => {
   describe('#start', () => {

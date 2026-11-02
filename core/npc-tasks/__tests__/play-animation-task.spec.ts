@@ -1,11 +1,10 @@
+import { createNpcContext, createNpcState } from '@peetland/npc/dev';
 import { ManualTimer } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS } from '@peetland/virtual-actor';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PlayAnimationTask } from '../../src';
-
-import { createNpcContext, createNpcState } from './helpers';
+import { PlayAnimationTask } from '../src';
 
 describe('PlayAnimationTask', () => {
   describe('#start', () => {

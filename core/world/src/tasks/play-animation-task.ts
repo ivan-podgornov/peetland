@@ -1,6 +1,6 @@
 import type { AnimationId, IActor, IActorCommand } from '@peetland/game';
 
-import type { NpcState } from '../npc';
+import type { NpcState } from '@peetland/npc';
 
 import { CommandTask } from './command-task';
 

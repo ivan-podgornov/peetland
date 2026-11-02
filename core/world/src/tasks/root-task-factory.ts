@@ -1,4 +1,4 @@
-import type { IRootTaskFactory } from '../npc';
+import type { IRootTaskFactory } from '@peetland/npc';
 
 import { RootTask } from './root-task';
 import type { RootTaskDeps, RootTaskOptions } from './root-task';

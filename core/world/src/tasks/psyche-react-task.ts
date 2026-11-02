@@ -1,7 +1,6 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import type { Deed, IPsycheFactory } from '@peetland/psyche';
-
-import type { NpcContext, NpcState } from '../npc';
 
 export type PsycheReactTaskOptions = {
   /** Поступок, о котором задача сообщает психике */

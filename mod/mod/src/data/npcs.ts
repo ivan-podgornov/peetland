@@ -1,5 +1,5 @@
+import type { NpcData } from '@peetland/npc';
 import { Feeling, Trait } from '@peetland/psyche';
-import type { NpcData } from '@peetland/world';
 
 export const npcs: NpcData[] = [
   {

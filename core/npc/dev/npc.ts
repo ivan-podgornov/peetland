@@ -4,10 +4,11 @@ import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
-
 import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
-import type { NpcData, NpcDeps, NpcFactoryDeps } from '../../src';
+import { Npc } from '../src';
+import type { INpcFactory, NpcData, NpcDeps } from '../src';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -45,20 +46,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   };
 }
 
-/** Создаёт зависимости фабрики NPC. Зависимости, которые не переданы, заполняются незначимыми моками */
-export function createNpcFactoryDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
-  return {
-    actorFactory: createMockedActorFactory(),
-    htnFactory: createMockedHTNFactory(),
-    inventoryFactory: createMockedInventoryFactory(),
-    psycheFactory: createMockedPsycheFactory(),
-    frames: createControlledObservable().observable,
-    rootTaskFactory: {
-      create: vi.fn(() => ({
-        name: 'root',
-        methods: [],
-      })),
-    },
-    ...deps,
-  };
+/** Создаёт фабрику NPC, которая создаёт NPC по данным с незначимыми зависимостями */
+export function createMockedNpcFactory(): Mocked<INpcFactory> {
+  return { create: vi.fn((data: NpcData) => new Npc(data, createNpcDeps())) };
 }

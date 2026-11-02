@@ -1,11 +1,10 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { Deed } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
-
-import type { NpcContext, NpcState } from '../npc';
 
 import type { ITaskFactory } from './task-factory';
 

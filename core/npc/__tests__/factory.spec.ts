@@ -1,9 +1,10 @@
 import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Npc, NpcFactory } from '../../src';
+import { createNpcData } from '../dev';
+import { Npc, NpcFactory } from '../src';
 
-import { createNpcData, createNpcFactoryDeps } from './helpers';
+import { createNpcFactoryDeps } from './helpers';
 
 describe('NpcFactory', () => {
   describe('#create', () => {

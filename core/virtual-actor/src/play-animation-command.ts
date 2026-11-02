@@ -65,4 +65,7 @@ export class VirtualPlayAnimationCommand extends Command<
 
     return this.playedFor >= this.duration ? 'success' : 'running';
   }
+
+  /** Виртуальный актёр не занимает ресурсов, освобождать нечего */
+  protected onFinish(): void {}
 }

@@ -34,4 +34,7 @@ export class VirtualGoToCoordsCommand extends Command<
 
     return geometry.isWithinRadius2d(position, coords, completeRadius) ? 'success' : 'running';
   }
+
+  /** Виртуальный актёр не занимает ресурсов, освобождать нечего */
+  protected onFinish(): void {}
 }

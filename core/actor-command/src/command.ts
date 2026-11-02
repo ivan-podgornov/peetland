@@ -116,7 +116,7 @@ export abstract class Command<
    * освободить ресурсы. Если от Observable отписались, команда считается прерванной
    * @param result - чем закончилась команда
    */
-  protected onFinish(_result: CommandResult): void {}
+  protected abstract onFinish(result: CommandResult): void;
 
   /**
    * Сигнал, который переходит в состояние aborted, когда команда закончилась, как бы она ни

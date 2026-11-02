@@ -1,5 +1,5 @@
 import { Command } from '@peetland/actor-command';
-import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-command';
+import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
 import type { GoToCoordsOptions, IActor } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -62,7 +62,7 @@ export class GtaGoToCoordsCommand extends Command<
     return geometry.isWithinRadius2d(position, coords, completeRadius) ? 'success' : 'running';
   }
 
-  protected override onFinish(_result: CommandResult): void {
+  protected override onFinish(): void {
     if (!this.target) {
       return;
     }

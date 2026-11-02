@@ -1,5 +1,5 @@
 import { Command } from '@peetland/actor-command';
-import type { CommandDeps, CommandResult, CommandStatus } from '@peetland/actor-command';
+import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
 import type { AchieveAngleOptions, IActor } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import type { PedHandle } from '@peetland/moonloader';
@@ -64,7 +64,7 @@ export class GtaAchieveAngleCommand extends Command<
     return geometry.isWithinAngle(current, angle, tolerance) ? 'success' : 'running';
   }
 
-  protected override onFinish(_result: CommandResult): void {
+  protected override onFinish(): void {
     clearCharTasksImmediately(this.options.handle);
   }
 }

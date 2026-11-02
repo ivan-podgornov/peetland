@@ -15,5 +15,5 @@ export function createMockedPsyche(state: PsycheState = createPsycheState()): Mo
 export function createMockedPsycheFactory(
   psyche: IPsyche = new Psyche(createPsycheState(), createPsycheDeps())
 ): IPsycheFactory {
-  return { create: vi.fn((_state: PsycheState) => psyche) };
+  return { create: vi.fn(() => psyche) };
 }

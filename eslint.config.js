@@ -69,10 +69,7 @@ export default defineConfig([
           allowAsThisParameter: true,
         },
       ],
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_', ignoreRestSiblings: true },
-      ],
+      '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
       '@typescript-eslint/parameter-properties': 'error',
 
       // Core rules

@@ -36,4 +36,7 @@ export class VirtualAchieveAngleCommand extends Command<
 
     return geometry.isWithinAngle(current, angle, tolerance) ? 'success' : 'running';
   }
+
+  /** Виртуальный актёр не занимает ресурсов, освобождать нечего */
+  protected onFinish(): void {}
 }

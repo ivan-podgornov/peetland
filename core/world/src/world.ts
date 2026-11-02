@@ -60,13 +60,13 @@ export class World {
    */
   async bigBang(): Promise<void> {
     const { game, npcs, places } = this.options;
-    const { actorFactory, clock, frames, geometry } = game;
+    const { actorFactory, time, frames, geometry } = game;
     const {
       random = new Random(),
       timer = new Timer(),
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry }),
-      worldKnowledge = new NpcWorldKnowledge({ clock }),
+      worldKnowledge = new NpcWorldKnowledge({ time }),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
     const {

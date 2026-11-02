@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import { ManualClock } from '../../src';
+import { ManualTime } from '../../src';
 
-describe('ManualClock', () => {
+describe('ManualTime', () => {
   describe('#minutesSinceMidnight', () => {
     it('Возвращает, сколько минут прошло с полуночи', () => {
-      const clock = new ManualClock(20, 15);
+      const time = new ManualTime(20, 15);
 
-      expect(clock.minutesSinceMidnight).toBe(20 * 60 + 15);
+      expect(time.minutesSinceMidnight).toBe(20 * 60 + 15);
     });
 
     it('За минуту до полуночи возвращает 1439', () => {
-      const clock = new ManualClock(23, 59);
+      const time = new ManualTime(23, 59);
 
-      expect(clock.minutesSinceMidnight).toBe(1439);
+      expect(time.minutesSinceMidnight).toBe(1439);
     });
   });
 });

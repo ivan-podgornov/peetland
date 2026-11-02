@@ -1,16 +1,15 @@
-import type { IClock } from './types';
+import type { ITime } from './types';
 
 /**
- * Часы, которые показывают время, только выставленное через set. Нужны в тестах: часы показывают
- * то время, которое нужно тесту
+ * Время суток, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту
  */
-export class ManualClock implements IClock {
+export class ManualTime implements ITime {
   private currentHours: number;
   private currentMinutes: number;
 
   /**
    * Выбрасывает RangeError, если hours или minutes не время суток (см. set)
-   * @param hours - часы, от 0 до 23
+   * @param hours - час, от 0 до 23
    * @param minutes - минуты, от 0 до 59
    */
   constructor(hours = 0, minutes = 0) {
@@ -34,12 +33,12 @@ export class ManualClock implements IClock {
   /**
    * Выставляет время суток.
    * Выбрасывает RangeError, если hours не целое от 0 до 23 или minutes не целое от 0 до 59
-   * @param hours - часы, от 0 до 23
+   * @param hours - час, от 0 до 23
    * @param minutes - минуты, от 0 до 59
    */
   set(hours: number, minutes: number): void {
     if (!Number.isInteger(hours) || hours < 0 || hours > 23) {
-      throw new RangeError('Часы должны быть целым числом от 0 до 23');
+      throw new RangeError('Час должен быть целым числом от 0 до 23');
     }
 
     if (!Number.isInteger(minutes) || minutes < 0 || minutes > 59) {

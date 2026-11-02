@@ -1,9 +1,9 @@
 import type { INpcWorldKnowledge, NpcWorldState } from '@peetland/npc';
-import type { IClock } from '@peetland/timings';
+import type { ITime } from '@peetland/timings';
 
 export type NpcWorldKnowledgeDeps = {
-  /** Часы, по которым NPC знают время суток */
-  clock: IClock;
+  /** Время суток, которое знают NPC */
+  time: ITime;
 };
 
 /** Знание NPC о мире, которое мир собирает из своих источников */
@@ -14,10 +14,10 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
     this.deps = deps;
   }
 
-  /** Возвращает слепок мира со временем суток по часам */
+  /** Возвращает слепок мира с текущим временем суток */
   getState(): NpcWorldState {
-    const { clock } = this.deps;
+    const { time } = this.deps;
 
-    return { time: clock.minutesSinceMidnight };
+    return { time: time.minutesSinceMidnight };
   }
 }

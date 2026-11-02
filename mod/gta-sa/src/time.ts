@@ -1,8 +1,8 @@
 import { getTimeOfDay } from '@peetland/moonloader';
-import type { IClock } from '@peetland/timings';
+import type { ITime } from '@peetland/timings';
 
-/** Часы, которые показывают игровое время суток GTA */
-export class GtaClock implements IClock {
+/** Время суток в GTA */
+export class GtaTime implements ITime {
   get hours(): number {
     const [hours] = getTimeOfDay();
 

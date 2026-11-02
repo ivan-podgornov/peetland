@@ -6,20 +6,20 @@ import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
 import { isGamePaused, lua_thread, wait } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
-import type { IClock } from '@peetland/timings';
+import type { ITime } from '@peetland/timings';
 
 import { GTA_ANIMATIONS, GtaActorFactory, GtaAnimationLoader } from './actor';
-import { GtaClock } from './clock';
 
 import { GtaObjectFactory } from './object';
 import type { IGtaObjectFactory } from './object';
+import { GtaTime } from './time';
 
 /** Как часто игра сообщает о кадре, в миллисекундах */
 const FRAME_PERIOD = 50;
 
 export class GtaGame implements IGame {
   readonly actorFactory: IActorFactory;
-  readonly clock: IClock;
+  readonly time: ITime;
   readonly objectFactory: IGtaObjectFactory;
   readonly geometry: IGeometry;
   readonly frames: Observable<unknown>;
@@ -41,7 +41,7 @@ export class GtaGame implements IGame {
 
     this.frames = frameEvents.when('frame');
 
-    this.clock = new GtaClock();
+    this.time = new GtaTime();
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     this.actorFactory = new GtaActorFactory({

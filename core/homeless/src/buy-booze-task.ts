@@ -2,10 +2,11 @@ import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
-import type { ITaskFactory } from './task-factory';
+import type { IHomelessTaskFactory } from './factory';
 
 /** Цена бутылки пойла, в долларах */
 export const BOOZE_PRICE = 100;
@@ -22,7 +23,9 @@ export type BuyBoozeTaskOptions = {
 };
 
 export type BuyBoozeTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
+  /** Фабрика, которой создаётся покупка в магазине */
+  homelessTaskFactory: IHomelessTaskFactory;
 };
 
 /**
@@ -51,7 +54,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { taskFactory } = this.deps;
+    const { homelessTaskFactory, npcTaskFactory } = this.deps;
     const shop = this.places.findNearest(state.actor.position, PlaceType.Shop);
 
     if (!shop) {
@@ -59,15 +62,15 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
     }
 
     return [
-      taskFactory.goToCoords({
+      npcTaskFactory.goToCoords({
         coords: shop.position,
         completeRadius: SHOP_COMPLETE_RADIUS,
       }),
-      taskFactory.achieveAngle({
+      npcTaskFactory.achieveAngle({
         angle: shop.angle,
         tolerance: SHOP_FACING_TOLERANCE,
       }),
-      taskFactory.purchase({
+      homelessTaskFactory.purchase({
         item: Item.Booze,
         count: 1,
         price: BOOZE_PRICE,

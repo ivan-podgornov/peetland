@@ -1,9 +1,10 @@
+import { applyPlanEffects, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
+import { createNpcState } from '@peetland/npc/dev';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { PurchaseTask } from '../../src';
-
-import { applyPlanEffects, createNpcState, createTaskFactory, planNames } from './helpers';
+import { PurchaseTask } from '../src';
 
 describe('PurchaseTask', () => {
   it('Если денег хватает, планирует заплатить, отнять деньги и добавить предмет', () => {
@@ -13,7 +14,7 @@ describe('PurchaseTask', () => {
         count: 1,
         price: 100,
       },
-      { taskFactory: createTaskFactory() }
+      { npcTaskFactory: createNpcTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 100 } });
 
@@ -31,7 +32,7 @@ describe('PurchaseTask', () => {
         count: 1,
         price: 100,
       },
-      { taskFactory: createTaskFactory({ playAnimation }) }
+      { npcTaskFactory: createNpcTaskFactory({ playAnimation }) }
     );
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'pay' });
@@ -44,7 +45,7 @@ describe('PurchaseTask', () => {
         count: 2,
         price: 100,
       },
-      { taskFactory: createTaskFactory() }
+      { npcTaskFactory: createNpcTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 150 } });
 
@@ -63,7 +64,7 @@ describe('PurchaseTask', () => {
         count: 1,
         price: 100,
       },
-      { taskFactory: createTaskFactory() }
+      { npcTaskFactory: createNpcTaskFactory() }
     );
     const state = createNpcState({ inventory: { [Item.Money]: 99 } });
 

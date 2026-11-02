@@ -1,0 +1,16 @@
+{
+  "name": "@peetland/homeless",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@peetland/htn": "0.0.0",
+    "@peetland/inventory": "0.0.0",
+    "@peetland/npc": "0.0.0",
+    "@peetland/npc-tasks": "0.0.0",
+    "@peetland/places": "0.0.0",
+    "@peetland/psyche": "0.0.0",
+    "@peetland/random": "0.0.0"
+  }
+}

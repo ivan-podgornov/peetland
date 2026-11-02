@@ -1,6 +1,7 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { Deed, Feeling } from '@peetland/psyche';
@@ -8,7 +9,6 @@ import type { IPsycheFactory, PsycheState } from '@peetland/psyche';
 
 import { BOOZE_PRICE } from './buy-booze-task';
 import { BOTTLE_PRICE } from './sell-bottles-task';
-import type { ITaskFactory } from './task-factory';
 
 /** Шанс выклянчить деньги за одну попытку, раз в секунду (см. TryLuckTask) */
 export const BEGGING_CHANCE = 1 / 40;
@@ -39,7 +39,7 @@ export type BegTaskOptions = {
 };
 
 export type BegTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
   /** Фабрика, которой задача собирает психику из слепка, чтобы предсказать стыд */
   psycheFactory: IPsycheFactory;
 };
@@ -91,7 +91,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи захода к ближайшему месту для клянчанья */
   private begAtNearestSpot(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { taskFactory } = this.deps;
+    const { npcTaskFactory } = this.deps;
     const spot = this.places.findNearest(state.actor.position, PlaceType.BeggingSpot);
 
     if (!spot) {
@@ -99,11 +99,11 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     }
 
     const tasks: Task<NpcState, NpcContext>[] = [
-      taskFactory.goToCoords({
+      npcTaskFactory.goToCoords({
         coords: spot.position,
         completeRadius: BEGGING_SPOT_COMPLETE_RADIUS,
       }),
-      taskFactory.achieveAngle({
+      npcTaskFactory.achieveAngle({
         angle: spot.angle,
         tolerance: BEGGING_SPOT_FACING_TOLERANCE,
       }),
@@ -111,8 +111,8 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
 
     for (let index = 0; index < this.countNeededRewards(state); index++) {
       tasks.push(
-        taskFactory.parallel({
-          main: taskFactory.tryLuck({
+        npcTaskFactory.parallel({
+          main: npcTaskFactory.tryLuck({
             chance: BEGGING_CHANCE,
             stopWhen: (current) => this.isAshamed(current.psyche),
             onAttempt: (context) => context.psyche.react(Deed.Begging),
@@ -121,9 +121,9 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
               psyche: this.predictReward(current.psyche),
             }),
           }),
-          background: taskFactory.playAnimation({ animation: 'beg-sitting' }),
+          background: npcTaskFactory.playAnimation({ animation: 'beg-sitting' }),
         }),
-        taskFactory.addItem({
+        npcTaskFactory.addItem({
           item: Item.Money,
           count: BEGGING_REWARD,
         })

@@ -2,8 +2,7 @@ import type { CompoundTask, Method } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
-
-import type { ITaskFactory } from './task-factory';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 
 export type PurchaseTaskOptions = {
   /** Какой предмет купить */
@@ -15,7 +14,7 @@ export type PurchaseTaskOptions = {
 };
 
 export type PurchaseTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
 };
 
 /**
@@ -29,19 +28,19 @@ export class PurchaseTask implements CompoundTask<NpcState, NpcContext> {
 
   constructor(options: PurchaseTaskOptions, deps: PurchaseTaskDeps) {
     const { item, count, price } = options;
-    const { taskFactory } = deps;
+    const { npcTaskFactory } = deps;
 
     this.methods = [
       {
         name: 'pay',
         preconditions: (state) => (state.inventory[Item.Money] ?? 0) >= price,
         tasks: [
-          taskFactory.playAnimation({ animation: 'pay' }),
-          taskFactory.removeItem({
+          npcTaskFactory.playAnimation({ animation: 'pay' }),
+          npcTaskFactory.removeItem({
             item: Item.Money,
             count: price,
           }),
-          taskFactory.addItem({
+          npcTaskFactory.addItem({
             item,
             count,
           }),

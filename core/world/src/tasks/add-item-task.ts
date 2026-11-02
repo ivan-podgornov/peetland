@@ -2,7 +2,7 @@ import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 import { Inventory } from '@peetland/inventory';
 import type { Item } from '@peetland/inventory';
 
-import type { NpcContext, NpcState } from '../npc';
+import type { NpcContext, NpcState } from '@peetland/npc';
 
 export type AddItemTaskOptions = {
   /** Какой предмет добавить */

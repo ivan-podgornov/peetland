@@ -1,11 +1,10 @@
-import { createMockedPlaces } from '@peetland/places/dev';
+import { createMockedNpcFactory, createNpcData } from '@peetland/npc/dev';
+import { createMockedPlaces, createPlace } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { World } from '../../src';
-import { createNpcData } from '../npc/helpers';
-import { createPlace } from '../tasks/helpers';
 
-import { createMockedNpcFactory, createMockedPlacesFactory, createWorldDeps } from './helpers';
+import { createMockedPlacesFactory, createWorldDeps } from './helpers';
 
 describe('World', () => {
   describe('#bigBang', () => {

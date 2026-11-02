@@ -2,11 +2,10 @@ import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import { ParallelTask } from '@peetland/htn';
 import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
-
-import type { NpcContext, NpcState } from '../npc';
 
 import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';

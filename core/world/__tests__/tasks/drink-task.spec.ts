@@ -1,11 +1,12 @@
 import { Item } from '@peetland/inventory';
+import type { NpcState } from '@peetland/npc';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from '../../src';
-import type { ITaskFactory, NpcState } from '../../src';
+import type { ITaskFactory } from '../../src';
 
 import {
   applyPlanEffects,

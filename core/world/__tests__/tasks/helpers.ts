@@ -1,54 +1,22 @@
 import { Observable } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
-import type { IActor, IActorCommand } from '@peetland/game';
+import type { IActorCommand } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { Planner } from '@peetland/htn';
 import type { PrimitiveTask, Task } from '@peetland/htn';
-import { Inventory } from '@peetland/inventory';
-import { Psyche } from '@peetland/psyche';
-import {
-  createMockedPsycheFactory,
-  createPsycheDeps,
-  createPsycheState,
-} from '@peetland/psyche/dev';
+import type { NpcContext, NpcState } from '@peetland/npc';
+import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
-import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { TaskFactory } from '../../src';
 import type { ITaskFactory, TaskFactoryDeps } from '../../src';
-import type { NpcContext, NpcState } from '../../src';
 import { CommandTask } from '../../src/tasks/command-task';
 
+export { createNpcContext, createNpcState } from '@peetland/npc/dev';
 export { createPlace } from '@peetland/places/dev';
-
-/** Создаёт состояние NPC. Поля, которые не переданы, заполняются незначимыми значениями */
-export function createNpcState(state: Partial<NpcState> = {}): NpcState {
-  return {
-    actor: {
-      position: {
-        x: 0,
-        y: 0,
-        z: 0,
-      },
-      angle: 0,
-    },
-    inventory: {},
-    psyche: createPsycheState(),
-    ...state,
-  };
-}
-
-/** Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют чувства */
-export function createNpcContext(actor: IActor = createActor()): NpcContext {
-  return {
-    actor,
-    inventory: new Inventory(),
-    psyche: new Psyche(createPsycheState(), createPsycheDeps()),
-  };
-}
 
 /** Создаёт команду, завершением которой управляет тест */
 export function createControlledCommand() {

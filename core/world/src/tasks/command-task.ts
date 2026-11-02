@@ -1,7 +1,7 @@
 import type { IActor, IActorCommand } from '@peetland/game';
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 
-import type { NpcContext, NpcState } from '../npc';
+import type { NpcContext, NpcState } from '@peetland/npc';
 
 /** Выполнение команды конкретным актором */
 type Execution = {

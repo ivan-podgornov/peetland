@@ -1,7 +1,6 @@
+import type { INpcFactory, NpcData } from '@peetland/npc';
 import type { IPlacesFactory, PlaceData } from '@peetland/places';
 import type { IRepository } from '@peetland/repository';
-
-import type { INpcFactory, NpcData } from './npc';
 
 export type WorldDeps = {
   /** NPC, которые живут в мире */

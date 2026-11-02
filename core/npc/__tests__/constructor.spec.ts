@@ -12,10 +12,9 @@ import {
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Npc } from '../../src';
-import type { NpcContext, NpcState } from '../../src';
-
-import { createNpcData, createNpcDeps } from './helpers';
+import { createNpcData, createNpcDeps } from '../dev';
+import { Npc } from '../src';
+import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
   describe('#constructor', () => {

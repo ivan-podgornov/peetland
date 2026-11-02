@@ -1,10 +1,9 @@
 import { AbortController } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
-
-import type { NpcContext, NpcState } from '../npc';
 
 /** Как часто NPC пытает удачу, в миллисекундах */
 export const TRY_LUCK_PERIOD = 1000;

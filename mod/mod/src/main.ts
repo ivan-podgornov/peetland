@@ -1,7 +1,4 @@
 import { GtaGame } from '@peetland/gta-sa';
-import { HomelessRootTaskFactory, HomelessTaskFactory } from '@peetland/homeless';
-import { HTNFactory } from '@peetland/htn';
-import { InventoryFactory } from '@peetland/inventory';
 import {
   getCharCoordinates,
   getCharHeading,
@@ -16,14 +13,7 @@ import {
   PLAYER_PED,
   setCharCoordinates,
 } from '@peetland/moonloader';
-import { NpcFactory, NpcKind, RootTaskFactory } from '@peetland/npc';
-import type { NpcContext, NpcState } from '@peetland/npc';
-import { NpcTaskFactory } from '@peetland/npc-tasks';
-import { PlacesFactory } from '@peetland/places';
-import { ConscientiousnessFactory, LuckFactory, PsycheFactory, Trait } from '@peetland/psyche';
-import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
-import { Timer } from '@peetland/timings';
 import { World } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
@@ -37,47 +27,12 @@ function isGameRunning(): boolean {
   return isPlayerPlaying(PLAYER_HANDLE) && !isGamePaused();
 }
 
-/** Загружает места мира, собирает зависимости и запускает жизнь в мире */
+/** Создаёт мир в игре с местами и NPC из данных мода и запускает в нём жизнь */
 async function bigBang(): Promise<void> {
-  const game = new GtaGame();
-  const { actorFactory, frames, geometry } = game;
-  const random = new Random();
-  const psycheFactory = new PsycheFactory({
-    traitFactories: {
-      [Trait.Conscientiousness]: new ConscientiousnessFactory(),
-      [Trait.Luck]: new LuckFactory(),
-    },
-  });
-  const worldPlaces = new PlacesFactory({ geometry }).create({
-    places: await new InMemoryRepository(places).getAll(),
-  });
-
   await new World({
+    game: new GtaGame(),
+    places: new InMemoryRepository(places),
     npcs: new InMemoryRepository(npcs),
-    npcFactory: new NpcFactory({
-      actorFactory,
-      htnFactory: new HTNFactory<NpcState, NpcContext>(),
-      frames,
-      inventoryFactory: new InventoryFactory(),
-      psycheFactory,
-      rootTaskFactory: new RootTaskFactory({
-        kindFactories: {
-          [NpcKind.Homeless]: new HomelessRootTaskFactory({
-            homelessTaskFactory: new HomelessTaskFactory({
-              npcTaskFactory: new NpcTaskFactory({
-                geometry,
-                psycheFactory,
-                random,
-                timer: new Timer(),
-              }),
-              places: worldPlaces,
-              psycheFactory,
-              random,
-            }),
-          }),
-        },
-      }),
-    }),
   }).bigBang();
 }
 

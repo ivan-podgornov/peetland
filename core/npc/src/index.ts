@@ -5,11 +5,5 @@ export { NpcKind } from './kind';
 export type { INpcFactory } from './factory';
 export { Npc } from './npc';
 export type { NpcDeps } from './npc';
-export { RootTaskFactory } from './root-task-factory';
-export type {
-  IKindRootTaskFactory,
-  IRootTaskFactory,
-  KindRootTaskFactories,
-  RootTaskFactoryDeps,
-} from './root-task-factory';
+export type { IKindRootTaskFactory, IRootTaskFactory } from './root-task-factory';
 export type { NpcActorState, NpcState } from './state';

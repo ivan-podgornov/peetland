@@ -22,6 +22,7 @@ export type { PurchaseTaskDeps, PurchaseTaskOptions } from './purchase-task';
 export { HomelessRootTask } from './root-task';
 export type { HomelessRootTaskDeps } from './root-task';
 export { HomelessRootTaskFactory } from './root-task-factory';
+export type { HomelessRootTaskFactoryDeps } from './root-task-factory';
 export { BOTTLE_PRICE, SellBottlesTask } from './sell-bottles-task';
 export type { SellBottlesTaskDeps } from './sell-bottles-task';
 export { HomelessTaskFactory } from './factory';

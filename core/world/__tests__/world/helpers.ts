@@ -1,21 +1,43 @@
-import type { INpcFactory, NpcData } from '@peetland/npc';
-import { createMockedNpcFactory } from '@peetland/npc/dev';
+import { createControlledObservable } from '@peetland/events/dev';
+import type { IGame } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
+import type { NpcData } from '@peetland/npc';
+import type { PlaceData } from '@peetland/places';
 import { InMemoryRepository } from '@peetland/repository';
+import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { vi } from 'vitest';
 
-import type { WorldDeps } from '../../src';
+import type { WorldOptions } from '../../src';
 
-export type CreateWorldDepsOptions = {
+/** Создаёт игру с виртуальными акторами. Кадры не идут, а объекты создавать нельзя */
+export function createGame(game: Partial<IGame> = {}): IGame {
+  return {
+    actorFactory: createMockedActorFactory(),
+    geometry: new Geometry(),
+    objectFactory: {
+      create: vi.fn(() => {
+        throw new Error('Мир не создаёт объекты');
+      }),
+    },
+    frames: createControlledObservable().observable,
+    ...game,
+  };
+}
+
+export type CreateWorldOptionsOptions = {
+  game?: IGame;
   npcs?: NpcData[];
-  npcFactory?: INpcFactory;
+  places?: PlaceData[];
 };
 
 /**
- * Создаёт зависимости мира с репозиторием в памяти. То, что не передано, заполняется незначимыми
- * значениями: NPC нет, фабрика NPC — мок
+ * Создаёт опции мира с репозиториями в памяти. То, что не передано, заполняется незначимыми
+ * значениями: NPC и мест нет, игра — с виртуальными акторами
  */
-export function createWorldDeps(options: CreateWorldDepsOptions = {}): WorldDeps {
+export function createWorldOptions(options: CreateWorldOptionsOptions = {}): WorldOptions {
   return {
+    game: options.game ?? createGame(),
     npcs: new InMemoryRepository(options.npcs ?? []),
-    npcFactory: options.npcFactory ?? createMockedNpcFactory(),
+    places: new InMemoryRepository(options.places ?? []),
   };
 }

@@ -2,11 +2,11 @@ import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
 import { BOOZE_PRICE } from './buy-booze-task';
-import type { ITaskFactory } from './task-factory';
 
 /** Сколько платят за одну пустую бутылку, в долларах */
 export const BOTTLE_PRICE = 10;
@@ -23,7 +23,7 @@ export type SellBottlesTaskOptions = {
 };
 
 export type SellBottlesTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
 };
 
 /**
@@ -66,7 +66,7 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи сдачи всех бутылок в приёмке, ближайшей к NPC */
   private sellInNearestCollection(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { taskFactory } = this.deps;
+    const { npcTaskFactory } = this.deps;
     const collection = this.places.findNearest(state.actor.position, PlaceType.BottleCollection);
 
     if (!collection) {
@@ -76,20 +76,20 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
     const bottles = this.countBottles(state);
 
     return [
-      taskFactory.goToCoords({
+      npcTaskFactory.goToCoords({
         coords: collection.position,
         completeRadius: BOTTLE_COLLECTION_COMPLETE_RADIUS,
       }),
-      taskFactory.achieveAngle({
+      npcTaskFactory.achieveAngle({
         angle: collection.angle,
         tolerance: BOTTLE_COLLECTION_FACING_TOLERANCE,
       }),
-      taskFactory.playAnimation({ animation: 'item-give' }),
-      taskFactory.removeItem({
+      npcTaskFactory.playAnimation({ animation: 'item-give' }),
+      npcTaskFactory.removeItem({
         item: Item.Bottles,
         count: bottles,
       }),
-      taskFactory.addItem({
+      npcTaskFactory.addItem({
         item: Item.Money,
         count: bottles * BOTTLE_PRICE,
       }),

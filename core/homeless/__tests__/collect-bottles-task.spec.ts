@@ -1,33 +1,29 @@
+import { plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
+import { createNpcState } from '@peetland/npc/dev';
 import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
+import { createPlace } from '@peetland/places/dev';
 import { Deed } from '@peetland/psyche';
 import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  BOTTLE_FIND_CHANCE,
-  CollectBottlesTask,
-  MAX_BOTTLES,
-  MAX_BOTTLES_PER_VISIT,
-} from '../../src';
+import { BOTTLE_FIND_CHANCE, CollectBottlesTask, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from '../src';
 
-import type { ITaskFactory } from '../../src';
-
-import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
-
-/** Создаёт задачу сбора бутылок с настоящей фабрикой задач, если другая не передана */
+/** Создаёт задачу сбора бутылок с настоящей фабрикой примитивов, если другая не передана */
 function createTask(
   places: IPlaces,
-  taskFactory: ITaskFactory = createTaskFactory(),
+  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory(),
   random = createMockedRandom(false)
 ): CollectBottlesTask {
   return new CollectBottlesTask(
     { places },
     {
-      taskFactory,
+      npcTaskFactory,
       random,
     }
   );
@@ -69,7 +65,7 @@ describe('CollectBottlesTask', () => {
     const random = createMockedRandom(false);
 
     plan(
-      createTask(createPlacesWithTrashBins(bins), createTaskFactory(), random),
+      createTask(createPlacesWithTrashBins(bins), createNpcTaskFactory(), random),
       createNpcState()
     );
 
@@ -88,7 +84,11 @@ describe('CollectBottlesTask', () => {
     });
     const random = createMockedRandom(false);
     random.pick.mockReturnValue(bin);
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ goToCoords }), random);
+    const task = createTask(
+      createPlacesWithTrashBins(),
+      createNpcTaskFactory({ goToCoords }),
+      random
+    );
 
     plan(task, createNpcState());
 
@@ -112,7 +112,7 @@ describe('CollectBottlesTask', () => {
     random.pick.mockReturnValue(bin);
     const task = createTask(
       createPlacesWithTrashBins(),
-      createTaskFactory({ achieveAngle }),
+      createNpcTaskFactory({ achieveAngle }),
       random
     );
 
@@ -126,7 +126,7 @@ describe('CollectBottlesTask', () => {
 
   it('Начинает рыться с анимацией trash-search-start, а заканчивает — с trash-search-end', () => {
     const playAnimation = vi.fn();
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ playAnimation }));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ playAnimation }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
@@ -139,8 +139,8 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Ищет каждую бутылку с шансом BOTTLE_FIND_CHANCE', () => {
-    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
@@ -148,13 +148,13 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Пока ищет бутылку, роется в мусорке с анимацией trash-search', () => {
-    const real = createTaskFactory();
+    const real = createNpcTaskFactory();
     const tryLuck = real.tryLuck({ chance: BOTTLE_FIND_CHANCE });
     const searching = real.playAnimation({ animation: 'trash-search' });
     const parallel = vi.fn();
     const task = createTask(
       createPlacesWithTrashBins(),
-      createTaskFactory({
+      createNpcTaskFactory({
         tryLuck: () => tryLuck,
         playAnimation: (options) =>
           options.animation === 'trash-search' ? searching : real.playAnimation(options),
@@ -190,7 +190,7 @@ describe('CollectBottlesTask', () => {
 
   it('Добавляет по одной бутылке за находку', () => {
     const addItem = vi.fn();
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ addItem }));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ addItem }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
@@ -202,7 +202,7 @@ describe('CollectBottlesTask', () => {
 
   it('На каждую найденную бутылку реагирует поступком Deed.BottleFound', () => {
     const psycheReact = vi.fn();
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ psycheReact }));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ psycheReact }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 1 } }));
 
@@ -210,8 +210,8 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Если NPC унесёт много бутылок, за заход ищет MAX_BOTTLES_PER_VISIT', () => {
-    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: {} }));
 
@@ -219,8 +219,8 @@ describe('CollectBottlesTask', () => {
   });
 
   it('Если до MAX_BOTTLES осталось меньше MAX_BOTTLES_PER_VISIT, ищет столько, сколько осталось', () => {
-    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createTaskFactory().tryLuck(options));
-    const task = createTask(createPlacesWithTrashBins(), createTaskFactory({ tryLuck }));
+    const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
+    const task = createTask(createPlacesWithTrashBins(), createNpcTaskFactory({ tryLuck }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: MAX_BOTTLES - 3 } }));
 

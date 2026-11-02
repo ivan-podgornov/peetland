@@ -5,14 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "dependencies": {
-    "@peetland/game": "0.0.0",
-    "@peetland/htn": "0.0.0",
-    "@peetland/inventory": "0.0.0",
     "@peetland/npc": "0.0.0",
-    "@peetland/npc-tasks": "0.0.0",
     "@peetland/places": "0.0.0",
-    "@peetland/psyche": "0.0.0",
-    "@peetland/random": "0.0.0",
     "@peetland/repository": "0.0.0"
   }
 }

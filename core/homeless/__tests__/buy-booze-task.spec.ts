@@ -1,28 +1,29 @@
+import { createStubTask, plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { createNpcState } from '@peetland/npc/dev';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
+import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, BuyBoozeTask } from '../../src';
-import type { ITaskFactory } from '../../src';
+import { BOOZE_PRICE, BuyBoozeTask } from '../src';
+import type { BuyBoozeTaskDeps } from '../src';
 
-import {
-  createNpcState,
-  createPlace,
-  createStubTask,
-  createTaskFactory,
-  plan,
-  planNames,
-} from './helpers';
+import { createHomelessTaskFactory } from './helpers';
 
-/** Создаёт задачу покупки пойла с настоящей фабрикой задач, если другая не передана */
-function createTask(
-  places: IPlaces,
-  taskFactory: ITaskFactory = createTaskFactory()
-): BuyBoozeTask {
-  return new BuyBoozeTask({ places }, { taskFactory });
+/** Создаёт задачу покупки пойла с настоящими фабриками задач, если другие не переданы */
+function createTask(places: IPlaces, deps: Partial<BuyBoozeTaskDeps> = {}): BuyBoozeTask {
+  return new BuyBoozeTask(
+    { places },
+    {
+      npcTaskFactory: createNpcTaskFactory(),
+      homelessTaskFactory: createHomelessTaskFactory(),
+      ...deps,
+    }
+  );
 }
 
 /** Создаёт мок мест, в которых есть переданный магазин, и он же ближайший */
@@ -35,10 +36,11 @@ function createPlacesWithShop(shop = createPlace()) {
 
 describe('BuyBoozeTask', () => {
   it('Планирует дойти до магазина, повернуться к прилавку и купить пойло', () => {
-    const task = createTask(
-      createPlacesWithShop(),
-      createTaskFactory({ purchase: () => createStubTask('purchase') })
-    );
+    const task = createTask(createPlacesWithShop(), {
+      homelessTaskFactory: createHomelessTaskFactory({
+        purchase: () => createStubTask('purchase'),
+      }),
+    });
 
     expect(planNames(task, createNpcState())).toStrictEqual([
       'go-to-coords',
@@ -81,7 +83,9 @@ describe('BuyBoozeTask', () => {
         z: 0,
       },
     });
-    const task = createTask(createPlacesWithShop(shop), createTaskFactory({ goToCoords }));
+    const task = createTask(createPlacesWithShop(shop), {
+      npcTaskFactory: createNpcTaskFactory({ goToCoords }),
+    });
 
     plan(task, createNpcState());
 
@@ -98,7 +102,9 @@ describe('BuyBoozeTask', () => {
   it('Поворачивается лицом к прилавку магазина, который вернул places.findNearest', () => {
     const achieveAngle = vi.fn();
     const shop = createPlace({ angle: 90 });
-    const task = createTask(createPlacesWithShop(shop), createTaskFactory({ achieveAngle }));
+    const task = createTask(createPlacesWithShop(shop), {
+      npcTaskFactory: createNpcTaskFactory({ achieveAngle }),
+    });
 
     plan(task, createNpcState());
 
@@ -110,7 +116,9 @@ describe('BuyBoozeTask', () => {
 
   it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {
     const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
-    const task = createTask(createPlacesWithShop(), createTaskFactory({ purchase }));
+    const task = createTask(createPlacesWithShop(), {
+      homelessTaskFactory: createHomelessTaskFactory({ purchase }),
+    });
 
     plan(task, createNpcState());
 

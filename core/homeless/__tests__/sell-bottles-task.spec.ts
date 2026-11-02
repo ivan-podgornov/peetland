@@ -1,20 +1,22 @@
+import { plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
+import { createNpcState } from '@peetland/npc/dev';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
+import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOOZE_PRICE, BOTTLE_PRICE, SellBottlesTask } from '../../src';
-import type { ITaskFactory } from '../../src';
+import { BOOZE_PRICE, BOTTLE_PRICE, SellBottlesTask } from '../src';
 
-import { createNpcState, createPlace, createTaskFactory, plan, planNames } from './helpers';
-
-/** Создаёт задачу сдачи бутылок с настоящей фабрикой задач, если другая не передана */
+/** Создаёт задачу сдачи бутылок с настоящей фабрикой примитивов, если другая не передана */
 function createTask(
   places: IPlaces,
-  taskFactory: ITaskFactory = createTaskFactory()
+  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
 ): SellBottlesTask {
-  return new SellBottlesTask({ places }, { taskFactory });
+  return new SellBottlesTask({ places }, { npcTaskFactory });
 }
 
 /** Создаёт мок мест, в которых есть переданная приёмка, и она же ближайшая */
@@ -86,7 +88,7 @@ describe('SellBottlesTask', () => {
     });
     const task = createTask(
       createPlacesWithCollection(collection),
-      createTaskFactory({ goToCoords })
+      createNpcTaskFactory({ goToCoords })
     );
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
@@ -109,7 +111,7 @@ describe('SellBottlesTask', () => {
     });
     const task = createTask(
       createPlacesWithCollection(collection),
-      createTaskFactory({ achieveAngle })
+      createNpcTaskFactory({ achieveAngle })
     );
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
@@ -122,7 +124,7 @@ describe('SellBottlesTask', () => {
 
   it('Отдаёт бутылки с анимацией item-give', () => {
     const playAnimation = vi.fn();
-    const task = createTask(createPlacesWithCollection(), createTaskFactory({ playAnimation }));
+    const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ playAnimation }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } }));
 
@@ -131,7 +133,7 @@ describe('SellBottlesTask', () => {
 
   it('Отдаёт все бутылки из состояния', () => {
     const removeItem = vi.fn();
-    const task = createTask(createPlacesWithCollection(), createTaskFactory({ removeItem }));
+    const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ removeItem }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: 12 } }));
 
@@ -143,7 +145,7 @@ describe('SellBottlesTask', () => {
 
   it('Получает BOTTLE_PRICE за каждую бутылку', () => {
     const addItem = vi.fn();
-    const task = createTask(createPlacesWithCollection(), createTaskFactory({ addItem }));
+    const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ addItem }));
 
     plan(task, createNpcState({ inventory: { [Item.Bottles]: 12 } }));
 

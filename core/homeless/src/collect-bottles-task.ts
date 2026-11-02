@@ -1,12 +1,11 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { Deed } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
-
-import type { ITaskFactory } from './task-factory';
 
 /** Шанс найти бутылку за одну попытку, раз в секунду (см. TryLuckTask) */
 export const BOTTLE_FIND_CHANCE = 1 / 60;
@@ -29,7 +28,7 @@ export type CollectBottlesTaskOptions = {
 };
 
 export type CollectBottlesTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
   random: IRandom;
 };
 
@@ -68,37 +67,37 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи захода к случайной мусорке */
   private searchRandomTrashBin(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { random, taskFactory } = this.deps;
+    const { random, npcTaskFactory } = this.deps;
     const bin = random.pick(this.places.ofType(PlaceType.TrashBin));
     const bottles = Math.min(MAX_BOTTLES_PER_VISIT, MAX_BOTTLES - this.countBottles(state));
     const tasks: Task<NpcState, NpcContext>[] = [
-      taskFactory.goToCoords({
+      npcTaskFactory.goToCoords({
         coords: bin.position,
         completeRadius: TRASH_BIN_COMPLETE_RADIUS,
       }),
-      taskFactory.achieveAngle({
+      npcTaskFactory.achieveAngle({
         angle: bin.angle,
         tolerance: TRASH_BIN_FACING_TOLERANCE,
       }),
-      taskFactory.playAnimation({ animation: 'trash-search-start' }),
+      npcTaskFactory.playAnimation({ animation: 'trash-search-start' }),
     ];
 
     for (let index = 0; index < bottles; index++) {
       tasks.push(
-        taskFactory.parallel({
-          main: taskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
-          background: taskFactory.playAnimation({ animation: 'trash-search' }),
+        npcTaskFactory.parallel({
+          main: npcTaskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
+          background: npcTaskFactory.playAnimation({ animation: 'trash-search' }),
         }),
-        taskFactory.playAnimation({ animation: 'trash-search-pocket' }),
-        taskFactory.addItem({
+        npcTaskFactory.playAnimation({ animation: 'trash-search-pocket' }),
+        npcTaskFactory.addItem({
           item: Item.Bottles,
           count: 1,
         }),
-        taskFactory.psycheReact({ deed: Deed.BottleFound })
+        npcTaskFactory.psycheReact({ deed: Deed.BottleFound })
       );
     }
 
-    tasks.push(taskFactory.playAnimation({ animation: 'trash-search-end' }));
+    tasks.push(npcTaskFactory.playAnimation({ animation: 'trash-search-end' }));
 
     return tasks;
   }

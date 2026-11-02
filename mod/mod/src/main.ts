@@ -1,4 +1,5 @@
 import { GtaGame } from '@peetland/gta-sa';
+import { HomelessRootTaskFactory, HomelessTaskFactory } from '@peetland/homeless';
 import { HTNFactory } from '@peetland/htn';
 import { InventoryFactory } from '@peetland/inventory';
 import {
@@ -23,7 +24,7 @@ import { ConscientiousnessFactory, LuckFactory, PsycheFactory, Trait } from '@pe
 import { Random } from '@peetland/random';
 import { InMemoryRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
-import { RootTaskFactory, TaskFactory, World } from '@peetland/world';
+import { World } from '@peetland/world';
 
 import { VK_G, VK_H, VK_J } from 'vkeys';
 
@@ -82,8 +83,8 @@ function main() {
           frames,
           inventoryFactory: new InventoryFactory(),
           psycheFactory,
-          rootTaskFactory: new RootTaskFactory({
-            taskFactory: new TaskFactory({
+          rootTaskFactory: new HomelessRootTaskFactory({
+            homelessTaskFactory: new HomelessTaskFactory({
               npcTaskFactory: new NpcTaskFactory({
                 geometry,
                 psycheFactory,

@@ -2,10 +2,9 @@ import type { CompoundTask, Method, PrimitiveTask, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
-
-import type { ITaskFactory } from './task-factory';
 
 /** Сколько NPC пьёт одну бутылку пойла, в миллисекундах */
 export const DRINK_DURATION = 10000;
@@ -22,7 +21,7 @@ export type DrinkTaskOptions = {
 };
 
 export type DrinkTaskDeps = {
-  taskFactory: ITaskFactory;
+  npcTaskFactory: INpcTaskFactory;
 };
 
 /**
@@ -38,17 +37,17 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
   private readonly deps: DrinkTaskDeps;
 
   constructor(options: DrinkTaskOptions, deps: DrinkTaskDeps) {
-    const { taskFactory } = deps;
+    const { npcTaskFactory } = deps;
     const drink: PrimitiveTask<NpcState, NpcContext>[] = [
-      taskFactory.playAnimation({
+      npcTaskFactory.playAnimation({
         animation: 'drink-standing-1',
         duration: DRINK_DURATION,
       }),
-      taskFactory.removeItem({
+      npcTaskFactory.removeItem({
         item: Item.Booze,
         count: 1,
       }),
-      taskFactory.addItem({
+      npcTaskFactory.addItem({
         item: Item.Bottles,
         count: 1,
       }),
@@ -78,14 +77,14 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Создаёт задачу дойти до бомжарни, ближайшей к NPC. Вызывается, только если бомжарни есть */
   private goToNearestCamp(state: NpcState): Task<NpcState, NpcContext> {
-    const { taskFactory } = this.deps;
+    const { npcTaskFactory } = this.deps;
     const camp = this.places.findNearest(state.actor.position, PlaceType.HomelessCamp);
 
     if (!camp) {
       throw new Error('Не из чего выбрать бомжарню');
     }
 
-    return taskFactory.goToCoords({
+    return npcTaskFactory.goToCoords({
       coords: camp.position,
       completeRadius: HOMELESS_CAMP_COMPLETE_RADIUS,
     });

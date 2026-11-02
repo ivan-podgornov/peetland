@@ -1,28 +1,26 @@
+import { applyPlanEffects, plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import type { NpcState } from '@peetland/npc';
+import { createNpcState } from '@peetland/npc/dev';
+import type { INpcTaskFactory } from '@peetland/npc-tasks';
+import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
+import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from '../../src';
-import type { ITaskFactory } from '../../src';
-
-import {
-  applyPlanEffects,
-  createNpcState,
-  createPlace,
-  createTaskFactory,
-  plan,
-  planNames,
-} from './helpers';
+import { DRINK_DURATION, DrinkTask, HOMELESS_CAMP_RADIUS } from '../src';
 
 /** Задачи плана «выпить» */
 const DRINK = ['play-animation', 'remove-item', 'add-item'];
 
-/** Создаёт задачу «бухать» с настоящей фабрикой задач, если другая не передана */
-function createTask(places: IPlaces, taskFactory: ITaskFactory = createTaskFactory()): DrinkTask {
-  return new DrinkTask({ places }, { taskFactory });
+/** Создаёт задачу «бухать» с настоящей фабрикой примитивов, если другая не передана */
+function createTask(
+  places: IPlaces,
+  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
+): DrinkTask {
+  return new DrinkTask({ places }, { npcTaskFactory });
 }
 
 /** Создаёт мок мест, в которых есть бомжарня. NPC в ней, если inCamp */
@@ -118,7 +116,10 @@ describe('DrinkTask', () => {
         z: 0,
       },
     });
-    const task = createTask(createPlacesWithCamp(false, camp), createTaskFactory({ goToCoords }));
+    const task = createTask(
+      createPlacesWithCamp(false, camp),
+      createNpcTaskFactory({ goToCoords })
+    );
 
     plan(task, createStateWithBooze());
 
@@ -135,7 +136,7 @@ describe('DrinkTask', () => {
   it('Пьёт стоя в течение DRINK_DURATION', () => {
     const playAnimation = vi.fn();
 
-    createTask(createMockedPlaces(), createTaskFactory({ playAnimation }));
+    createTask(createMockedPlaces(), createNpcTaskFactory({ playAnimation }));
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({
       animation: 'drink-standing-1',

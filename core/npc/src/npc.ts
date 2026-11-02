@@ -19,7 +19,7 @@ export type NpcDeps = {
   inventoryFactory: IInventoryFactory;
   /** Фабрика, которой NPC создаёт свою психику */
   psycheFactory: IPsycheFactory;
-  /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента */
+  /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
@@ -59,7 +59,7 @@ export class Npc {
       inventory: this.inventory,
       psyche: this.psyche,
     };
-    this.htn = htnFactory.create(rootTaskFactory.create());
+    this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
       signal: this.lifetime.signal,

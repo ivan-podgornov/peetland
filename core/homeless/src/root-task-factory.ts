@@ -1,10 +1,10 @@
-import type { IRootTaskFactory } from '@peetland/npc';
+import type { IKindRootTaskFactory } from '@peetland/npc';
 
 import { HomelessRootTask } from './root-task';
 import type { HomelessRootTaskDeps } from './root-task';
 
 /** Создаёт корневые задачи бомжа (см. HomelessRootTask) */
-export class HomelessRootTaskFactory implements IRootTaskFactory {
+export class HomelessRootTaskFactory implements IKindRootTaskFactory {
   private readonly deps: HomelessRootTaskDeps;
 
   constructor(deps: HomelessRootTaskDeps) {

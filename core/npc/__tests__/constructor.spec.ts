@@ -12,7 +12,7 @@ import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
-import { Npc } from '../src';
+import { Npc, NpcKind } from '../src';
 import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
@@ -82,7 +82,7 @@ describe('Npc', () => {
       expect(npc.psyche).toBe(psyche);
     });
 
-    it('Вызывает rootTaskFactory.create', () => {
+    it('Вызывает rootTaskFactory.create с типом NPC из данных', () => {
       const rootTaskFactory = {
         create: vi.fn(() => ({
           name: 'root',
@@ -90,9 +90,9 @@ describe('Npc', () => {
         })),
       };
 
-      new Npc(createNpcData(), createNpcDeps({ rootTaskFactory }));
+      new Npc(createNpcData({ kind: NpcKind.Homeless }), createNpcDeps({ rootTaskFactory }));
 
-      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
+      expect(rootTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
     });
 
     it('Создаёт HTN-агента с корневой задачей, которую вернула rootTaskFactory', () => {

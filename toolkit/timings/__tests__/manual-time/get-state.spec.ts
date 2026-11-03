@@ -4,11 +4,16 @@ import { ManualTime } from '../../src';
 
 describe('ManualTime', () => {
   describe('#getState', () => {
-    it('Возвращает час и минуты текущего времени', () => {
+    it('Возвращает день, час и минуты текущего времени', () => {
       const time = new ManualTime();
-      time.set(20, 15);
+      time.set({
+        day: 3,
+        hours: 20,
+        minutes: 15,
+      });
 
       expect(time.getState()).toStrictEqual({
+        day: 3,
         hours: 20,
         minutes: 15,
       });
@@ -16,14 +21,20 @@ describe('ManualTime', () => {
 
     it('Возвращает слепок, который не меняется, когда меняется время', () => {
       const time = new ManualTime({
+        day: 3,
         hours: 20,
         minutes: 15,
       });
       const state = time.getState();
 
-      time.set(21, 0);
+      time.set({
+        day: 4,
+        hours: 0,
+        minutes: 0,
+      });
 
       expect(state).toStrictEqual({
+        day: 3,
         hours: 20,
         minutes: 15,
       });

@@ -41,7 +41,7 @@ export class GtaGame implements IGame {
 
     this.frames = frameEvents.when('frame');
 
-    this.time = new GtaTime();
+    this.time = new GtaTime({ frames: this.frames });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     this.actorFactory = new GtaActorFactory({

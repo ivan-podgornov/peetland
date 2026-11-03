@@ -10,6 +10,7 @@ import type { INpcWorldKnowledge, NpcWorldState } from '../src';
 export function createMockedNpcWorldKnowledge(
   state: NpcWorldState = {
     time: {
+      day: 1,
       hours: 0,
       minutes: 0,
     },

@@ -108,6 +108,7 @@ describe('Npc', () => {
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
       const worldKnowledge = createMockedNpcWorldKnowledge({
         time: {
+          day: 1,
           hours: 20,
           minutes: 15,
         },
@@ -116,6 +117,7 @@ describe('Npc', () => {
 
       expect(npc.getState().world).toStrictEqual({
         time: {
+          day: 1,
           hours: 20,
           minutes: 15,
         },

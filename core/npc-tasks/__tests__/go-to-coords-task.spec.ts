@@ -94,6 +94,7 @@ describe('GoToCoordsTask', () => {
         createNpcState({
           world: {
             time: {
+              day: 1,
               hours: 20,
               minutes: 0,
             },
@@ -103,6 +104,7 @@ describe('GoToCoordsTask', () => {
 
       expect(state.world).toStrictEqual({
         time: {
+          day: 1,
           hours: 20,
           minutes: 0,
         },

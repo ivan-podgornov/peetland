@@ -1,50 +1,63 @@
 import type { ITime, TimeState } from './types';
 
-/**
- * Время суток, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту.
- * Можно воссоздать из слепка другого времени (см. ITime.getState)
- */
+/** Первый день в полночь */
 const DEFAULT_STATE: TimeState = {
+  day: 1,
   hours: 0,
   minutes: 0,
 };
 
+/**
+ * Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
+ * воссоздать из слепка другого времени (см. ITime.getState)
+ */
 export class ManualTime implements ITime {
-  private currentHours: number;
-  private currentMinutes: number;
+  private state: TimeState;
 
   /**
-   * Выбрасывает RangeError, если в слепке не время суток (см. set)
-   * @param state - слепок времени суток, с которого начинается время. По умолчанию полночь
+   * Выбрасывает RangeError, если слепок не момент времени (см. set)
+   * @param state - слепок, с которого начинается время. По умолчанию полночь первого дня
    */
   constructor(state: TimeState = DEFAULT_STATE) {
-    this.currentHours = 0;
-    this.currentMinutes = 0;
-    this.set(state.hours, state.minutes);
+    this.state = DEFAULT_STATE;
+    this.set(state);
+  }
+
+  get day(): number {
+    return this.state.day;
   }
 
   get hours(): number {
-    return this.currentHours;
+    return this.state.hours;
   }
 
   get minutes(): number {
-    return this.currentMinutes;
+    return this.state.minutes;
   }
 
   getState(): TimeState {
+    const { day, hours, minutes } = this.state;
+
     return {
-      hours: this.currentHours,
-      minutes: this.currentMinutes,
+      day,
+      hours,
+      minutes,
     };
   }
 
   /**
-   * Выставляет время суток.
-   * Выбрасывает RangeError, если hours не целое от 0 до 23 или minutes не целое от 0 до 59
-   * @param hours - час, от 0 до 23
-   * @param minutes - минуты, от 0 до 59
+   * Выставляет время.
+   * Выбрасывает RangeError, если day не целое от 1, hours не целое от 0 до 23 или minutes не целое
+   * от 0 до 59
+   * @param state - слепок времени, которое нужно выставить
    */
-  set(hours: number, minutes: number): void {
+  set(state: TimeState): void {
+    const { day, hours, minutes } = state;
+
+    if (!Number.isInteger(day) || day < 1) {
+      throw new RangeError('День должен быть целым числом от 1');
+    }
+
     if (!Number.isInteger(hours) || hours < 0 || hours > 23) {
       throw new RangeError('Час должен быть целым числом от 0 до 23');
     }
@@ -53,7 +66,10 @@ export class ManualTime implements ITime {
       throw new RangeError('Минуты должны быть целым числом от 0 до 59');
     }
 
-    this.currentHours = hours;
-    this.currentMinutes = minutes;
+    this.state = {
+      day,
+      hours,
+      minutes,
+    };
   }
 }

@@ -68,6 +68,7 @@ describe('NpcFactory', () => {
     it('NPC узнаёт о мире через worldKnowledge из зависимостей', () => {
       const worldKnowledge = createMockedNpcWorldKnowledge({
         time: {
+          day: 1,
           hours: 20,
           minutes: 15,
         },
@@ -78,6 +79,7 @@ describe('NpcFactory', () => {
 
       expect(npc.getState().world).toStrictEqual({
         time: {
+          day: 1,
           hours: 20,
           minutes: 15,
         },

@@ -120,6 +120,7 @@ describe('World', () => {
           {
             worldKnowledge: createMockedNpcWorldKnowledge({
               time: {
+                day: 1,
                 hours: 20,
                 minutes: 15,
               },
@@ -144,6 +145,7 @@ describe('World', () => {
           expect.objectContaining({
             world: {
               time: {
+                day: 1,
                 hours: 20,
                 minutes: 15,
               },
@@ -159,6 +161,7 @@ describe('World', () => {
           createWorldOptions({
             game: createGame({
               time: new ManualTime({
+                day: 1,
                 hours: 20,
                 minutes: 15,
               }),
@@ -187,6 +190,7 @@ describe('World', () => {
           expect.objectContaining({
             world: {
               time: {
+                day: 1,
                 hours: 20,
                 minutes: 15,
               },

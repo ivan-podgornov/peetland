@@ -87,6 +87,7 @@ describe('AchieveAngleTask', () => {
         createNpcState({
           world: {
             time: {
+              day: 1,
               hours: 20,
               minutes: 0,
             },
@@ -96,6 +97,7 @@ describe('AchieveAngleTask', () => {
 
       expect(state.world).toStrictEqual({
         time: {
+          day: 1,
           hours: 20,
           minutes: 0,
         },

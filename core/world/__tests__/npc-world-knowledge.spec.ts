@@ -7,6 +7,7 @@ describe('NpcWorldKnowledge', () => {
   describe('#getState', () => {
     it('Возвращает слепок времени суток', () => {
       const time = new ManualTime({
+        day: 1,
         hours: 20,
         minutes: 15,
       });

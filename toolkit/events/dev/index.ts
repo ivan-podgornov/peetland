@@ -28,3 +28,8 @@ export { createMockedObserver } from './observer';
 export { getDefaultSubscribeOptions } from './subscribe-options';
 export { getDefaultConstructorOptions, createDeactivator } from './subscriber';
 export type { DeactivateMethod } from './subscriber';
+export {
+  getCasesAfterDeactivation,
+  getCasesWithObserverNext,
+  getCasesWithoutObserverNext,
+} from './subscriber-next-cases';

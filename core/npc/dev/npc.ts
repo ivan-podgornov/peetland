@@ -1,3 +1,4 @@
+import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
@@ -45,6 +46,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     },
     frames: createControlledObservable().observable,
     worldKnowledge: createMockedNpcWorldKnowledge(),
+    signal: new AbortController().signal,
     ...deps,
   };
 }

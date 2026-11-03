@@ -1,3 +1,4 @@
+import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import type { CompoundTask } from '@peetland/htn';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
@@ -5,7 +6,7 @@ import { Inventory, Item } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
-import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
@@ -24,6 +25,7 @@ function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps 
       })),
     },
     worldKnowledge: createMockedNpcWorldKnowledge(),
+    signal: new AbortController().signal,
     ...deps,
   };
 }
@@ -84,6 +86,22 @@ describe('NpcFactory', () => {
           minutes: 15,
         },
       });
+    });
+
+    it('NPC деспавнится, когда завершается игра из сигнала signal в зависимостях', () => {
+      const game = new AbortController();
+      const actor = createActor();
+      const factory = new NpcFactory(
+        createRequiredDeps({
+          actorFactory: createMockedActorFactory(actor),
+          signal: game.signal,
+        })
+      );
+      factory.create(createNpcData());
+
+      game.abort();
+
+      expect(actor.signal.aborted).toBe(true);
     });
 
     it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {

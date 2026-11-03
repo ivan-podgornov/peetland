@@ -1,9 +1,11 @@
+import type { LuaScript } from './lua';
+
 /**
  * Интерфейс событий MoonLoader
  */
 export type Events = {
-  /** Вызывается при завершении скрипта */
-  onScriptTerminate: [];
+  /** Вызывается при завершении любого скрипта, не только текущего */
+  onScriptTerminate: [script: LuaScript, quitGame: boolean];
   /** Вызывается каждый кадр, перед тем как Direct3D выведет его на экран */
   onD3DPresent: [];
   /** Вызывается при спавне игрока */

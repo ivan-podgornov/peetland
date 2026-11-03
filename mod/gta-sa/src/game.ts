@@ -4,7 +4,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
-import { addEventHandler, isGamePaused, lua_thread, wait } from '@peetland/moonloader';
+import { addEventHandler, isGamePaused, lua_thread, thisScript, wait } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
 import type { ITime } from '@peetland/timings';
 
@@ -17,6 +17,11 @@ import { GtaTime } from './time';
 /** Как часто игра сообщает о кадре, в миллисекундах */
 const FRAME_PERIOD = 50;
 
+/**
+ * Игра GTA SA. Создавать её нужно в потоке MoonLoader, например в main, а не внутри async-функции:
+ * конструктор запускает поток MoonLoader, а поток, созданный из корутины async-функции, портит память
+ * скрипта, когда корутина завершается
+ */
 export class GtaGame implements IGame {
   readonly actorFactory: IActorFactory;
   readonly time: ITime;
@@ -29,8 +34,11 @@ export class GtaGame implements IGame {
   constructor() {
     const timer = new Timer();
     this.terminateController = new AbortController();
-    addEventHandler('onScriptTerminate', () => {
-      this.terminateController.abort(new Error('Скрипт выгружен'));
+    // Событие приходит при завершении любого скрипта, поэтому чужие скрипты пропускаем
+    addEventHandler('onScriptTerminate', (script) => {
+      if (script === thisScript()) {
+        this.terminateController.abort(new Error('Скрипт выгружен'));
+      }
     });
 
     const { signal } = this.terminateController;

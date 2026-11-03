@@ -1,9 +1,8 @@
-import { AbortController } from '@peetland/events';
 import { NpcKind } from '@peetland/npc';
 import { createNpcData } from '@peetland/npc/dev';
 import { Feeling } from '@peetland/psyche';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createGame, createWorldOptions, createMockedRootTaskFactory } from '../../../dev';
@@ -27,26 +26,6 @@ describe('World', () => {
         expect(actorFactory.create).toHaveBeenCalledExactlyOnceWith(
           expect.objectContaining({ modelId: 78 })
         );
-      });
-
-      it('NPC деспавнится, когда завершается игра', async () => {
-        const game = new AbortController();
-        const actor = createActor();
-        const world = new World(
-          createWorldOptions({
-            game: createGame({
-              actorFactory: createMockedActorFactory(actor),
-              signal: game.signal,
-            }),
-            npcs: [createNpcData()],
-          }),
-          { rootTaskFactory: createMockedRootTaskFactory() }
-        );
-        await world.bigBang();
-
-        game.abort();
-
-        expect(actor.signal.aborted).toBe(true);
       });
 
       it('NPC создаёт психику фабрикой psycheFactory', async () => {

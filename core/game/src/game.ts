@@ -1,4 +1,4 @@
-import type { Observable } from '@peetland/events';
+import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IGeometry } from '@peetland/geometry';
 import type { ITime } from '@peetland/timings';
 
@@ -13,4 +13,9 @@ export interface IGame {
   readonly objectFactory: IObjectFactory;
   /** Сообщает о каждом кадре игры */
   readonly frames: Observable<unknown>;
+  /**
+   * Переходит в состояние aborted, когда скрипт выгружается. Кто что создал в игре, тот по этому
+   * сигналу это и убирает
+   */
+  readonly signal: IAbortSignal;
 }

@@ -18,10 +18,10 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TRY_LUCK_PERIOD);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('running');
     });
@@ -36,10 +36,10 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TRY_LUCK_PERIOD);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -57,7 +57,7 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TRY_LUCK_PERIOD);
       const result = task.update(
@@ -82,9 +82,9 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
-      task.update(new NpcStateBuilder().build(), context);
+      task.update(NpcStateBuilder.default(), context);
       timer.advance(TRY_LUCK_PERIOD);
 
       expect(random.chance).not.toHaveBeenCalled();
@@ -103,10 +103,10 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TRY_LUCK_PERIOD);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -120,7 +120,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      const result = task.update(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.update(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('failed');
     });
@@ -137,12 +137,12 @@ describe('TryLuckTask', () => {
       );
       const firstContext = createNpcContext();
       const secondContext = createNpcContext();
-      task.start(new NpcStateBuilder().build(), firstContext);
-      task.start(new NpcStateBuilder().build(), secondContext);
+      task.start(NpcStateBuilder.default(), firstContext);
+      task.start(NpcStateBuilder.default(), secondContext);
 
       random.chance.mockReturnValueOnce(true);
       timer.advance(TRY_LUCK_PERIOD);
-      const result = task.update(new NpcStateBuilder().build(), secondContext);
+      const result = task.update(NpcStateBuilder.default(), secondContext);
 
       expect(result).toBe('running');
     });
@@ -157,11 +157,11 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
       timer.advance(TRY_LUCK_PERIOD);
-      task.update(new NpcStateBuilder().build(), context);
+      task.update(NpcStateBuilder.default(), context);
 
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });

@@ -33,6 +33,11 @@ export class NpcStateBuilder {
     minutes: 0,
   };
 
+  /** Возвращает состояние, в котором тесту ничего не важно: всё заполнено значениями по умолчанию */
+  static default(): NpcState {
+    return new NpcStateBuilder().build();
+  }
+
   constructor() {
     const psyche = createPsycheState();
     this.traits = psyche.traits;

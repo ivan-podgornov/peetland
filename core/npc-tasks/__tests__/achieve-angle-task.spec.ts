@@ -18,7 +18,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      task.start(new NpcStateBuilder().build(), createNpcContext(actor));
+      task.start(NpcStateBuilder.default(), createNpcContext(actor));
 
       expect(achieveAngle).toHaveBeenCalledExactlyOnceWith(90, 5);
     });
@@ -33,7 +33,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const result = task.start(new NpcStateBuilder().build(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -106,7 +106,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const state = task.applyEffects(new NpcStateBuilder().build());
+      const state = task.applyEffects(NpcStateBuilder.default());
 
       expect(state.self.actor.angle).toBe(270);
     });

@@ -18,7 +18,7 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
       timer.advance(TRY_LUCK_PERIOD);
@@ -37,8 +37,8 @@ describe('TryLuckTask', () => {
         }
       );
       const firstContext = createNpcContext();
-      task.start(new NpcStateBuilder().build(), firstContext);
-      task.start(new NpcStateBuilder().build(), createNpcContext());
+      task.start(NpcStateBuilder.default(), firstContext);
+      task.start(NpcStateBuilder.default(), createNpcContext());
 
       task.stop(firstContext);
       timer.advance(TRY_LUCK_PERIOD);
@@ -55,10 +55,10 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });

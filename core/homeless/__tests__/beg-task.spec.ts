@@ -163,7 +163,7 @@ describe('BegTask', () => {
     });
     const task = createTask(createPlacesWithSpot(spot), createNpcTaskFactory({ goToCoords }));
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -183,7 +183,7 @@ describe('BegTask', () => {
     });
     const task = createTask(createPlacesWithSpot(spot), createNpcTaskFactory({ achieveAngle }));
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
       angle: 90,
@@ -194,7 +194,7 @@ describe('BegTask', () => {
   it('Клянчит с шансом BEGGING_CHANCE', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
 
-    plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+    plan(createTask(createPlacesWithSpot(), npcTaskFactory), NpcStateBuilder.default());
 
     expect(tryLuck).toHaveBeenCalledWith(expect.objectContaining({ chance: BEGGING_CHANCE }));
   });
@@ -205,7 +205,7 @@ describe('BegTask', () => {
     );
     const task = createTask(createPlacesWithSpot(), createNpcTaskFactory({ playAnimation }));
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(playAnimation).toHaveBeenCalledWith({ animation: 'beg-sitting' });
   });
@@ -262,14 +262,14 @@ describe('BegTask', () => {
   it('Если мест для клянчанья нет, план не составляется', () => {
     const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-    expect(planNames(createTask(places), new NpcStateBuilder().build())).toBeNull();
+    expect(planNames(createTask(places), NpcStateBuilder.default())).toBeNull();
   });
 
   describe('Каждая попытка', () => {
     it('Сообщает психике NPC о поступке Deed.Begging', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
       const psyche = createMockedPsyche();
-      plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+      plan(createTask(createPlacesWithSpot(), npcTaskFactory), NpcStateBuilder.default());
 
       tryLuck.mock.calls[0]?.[0].onAttempt?.({
         ...createNpcContext(),
@@ -281,7 +281,7 @@ describe('BegTask', () => {
 
     it('Если стыд достиг BEGGING_SHAME_LIMIT, останавливает клянчанье', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-      plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+      plan(createTask(createPlacesWithSpot(), npcTaskFactory), NpcStateBuilder.default());
 
       const stop = tryLuck.mock.calls[0]?.[0].stopWhen?.(
         new NpcStateBuilder().withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build()
@@ -292,7 +292,7 @@ describe('BegTask', () => {
 
     it('Если стыд ниже BEGGING_SHAME_LIMIT, не останавливает клянчанье', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-      plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+      plan(createTask(createPlacesWithSpot(), npcTaskFactory), NpcStateBuilder.default());
 
       const stop = tryLuck.mock.calls[0]?.[0].stopWhen?.(
         new NpcStateBuilder().withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT - 1).build()
@@ -318,7 +318,7 @@ describe('BegTask', () => {
 
     it('Предсказание стыда не меняет то, что NPC знает о мире', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-      plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+      plan(createTask(createPlacesWithSpot(), npcTaskFactory), NpcStateBuilder.default());
 
       const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(
         new NpcStateBuilder()

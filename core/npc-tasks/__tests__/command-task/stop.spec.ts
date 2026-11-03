@@ -9,7 +9,7 @@ describe('CommandTask', () => {
       const { command } = createControlledCommand();
       const task = new TestCommandTask(() => command);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
 
@@ -22,8 +22,8 @@ describe('CommandTask', () => {
       const commands = [first.command, second.command];
       const task = new TestCommandTask(() => commands.shift()!);
       const firstContext = createNpcContext();
-      task.start(new NpcStateBuilder().build(), firstContext);
-      task.start(new NpcStateBuilder().build(), createNpcContext());
+      task.start(NpcStateBuilder.default(), firstContext);
+      task.start(NpcStateBuilder.default(), createNpcContext());
 
       task.stop(firstContext);
 
@@ -34,10 +34,10 @@ describe('CommandTask', () => {
       const { command } = createControlledCommand();
       const task = new TestCommandTask(() => command);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });

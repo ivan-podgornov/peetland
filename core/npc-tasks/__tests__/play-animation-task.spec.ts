@@ -16,7 +16,7 @@ describe('PlayAnimationTask', () => {
         duration: 5000,
       });
 
-      task.start(new NpcStateBuilder().build(), createNpcContext(actor));
+      task.start(NpcStateBuilder.default(), createNpcContext(actor));
 
       expect(playAnimation).toHaveBeenCalledExactlyOnceWith('drink-standing-1', 5000);
     });
@@ -27,10 +27,10 @@ describe('PlayAnimationTask', () => {
       const timer = new ManualTimer();
       const context = createNpcContext(createActor({ timer }));
       const task = new PlayAnimationTask({ animation: 'pay' });
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -39,7 +39,7 @@ describe('PlayAnimationTask', () => {
   describe('#applyEffects', () => {
     it('Не меняет состояние', () => {
       const task = new PlayAnimationTask({ animation: 'pay' });
-      const before = new NpcStateBuilder().build();
+      const before = NpcStateBuilder.default();
 
       const after = task.applyEffects(before);
 

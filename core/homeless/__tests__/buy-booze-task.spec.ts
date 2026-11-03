@@ -40,7 +40,7 @@ describe('BuyBoozeTask', () => {
       }),
     });
 
-    expect(planNames(task, new NpcStateBuilder().build())).toStrictEqual([
+    expect(planNames(task, NpcStateBuilder.default())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
       'purchase',
@@ -82,7 +82,7 @@ describe('BuyBoozeTask', () => {
       npcTaskFactory: createNpcTaskFactory({ goToCoords }),
     });
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -101,7 +101,7 @@ describe('BuyBoozeTask', () => {
       npcTaskFactory: createNpcTaskFactory({ achieveAngle }),
     });
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
       angle: 90,
@@ -115,7 +115,7 @@ describe('BuyBoozeTask', () => {
       homelessTaskFactory: createHomelessTaskFactory({ purchase }),
     });
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(purchase).toHaveBeenCalledExactlyOnceWith({
       item: Item.Booze,
@@ -127,13 +127,13 @@ describe('BuyBoozeTask', () => {
   it('Если магазинов нет, план не составляется', () => {
     const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-    expect(planNames(createTask(places), new NpcStateBuilder().build())).toBeNull();
+    expect(planNames(createTask(places), NpcStateBuilder.default())).toBeNull();
   });
 
   it('Спрашивает у places магазины', () => {
     const places = createMockedPlaces();
 
-    plan(createTask(places), new NpcStateBuilder().build());
+    plan(createTask(places), NpcStateBuilder.default());
 
     expect(places.ofType).toHaveBeenCalledWith(PlaceType.Shop);
   });

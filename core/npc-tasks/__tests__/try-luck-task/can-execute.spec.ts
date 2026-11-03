@@ -16,7 +16,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(new NpcStateBuilder().build())).toBe(true);
+      expect(task.canExecute(NpcStateBuilder.default())).toBe(true);
     });
 
     it('Если условие остановки не выполнилось, возвращает true', () => {
@@ -31,7 +31,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(new NpcStateBuilder().build())).toBe(true);
+      expect(task.canExecute(NpcStateBuilder.default())).toBe(true);
     });
 
     it('Если условие остановки выполнилось, возвращает false', () => {
@@ -46,7 +46,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(new NpcStateBuilder().build())).toBe(false);
+      expect(task.canExecute(NpcStateBuilder.default())).toBe(false);
     });
 
     it('Проверяет условие остановки на переданном состоянии', () => {
@@ -61,7 +61,7 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = new NpcStateBuilder().build();
+      const state = NpcStateBuilder.default();
 
       task.canExecute(state);
 

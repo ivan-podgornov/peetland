@@ -56,7 +56,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['drink']);
@@ -70,7 +70,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['buy-booze']);
@@ -85,7 +85,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['buy-booze']);
@@ -101,7 +101,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['sell-bottles']);
@@ -118,7 +118,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['beg']);
@@ -135,7 +135,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toStrictEqual(['collect-bottles']);
@@ -152,7 +152,7 @@ describe('HomelessRootTask', () => {
 
     const names = planNames(
       new HomelessRootTask({ homelessTaskFactory }),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(names).toBeNull();

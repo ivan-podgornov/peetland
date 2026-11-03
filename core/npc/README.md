@@ -39,3 +39,9 @@ const state = new NpcStateBuilder()
   .withTime({ day: 1, hours: 20, minutes: 0 })
   .build();
 ```
+
+Если тесту не важно ни одно поле, хватит готового состояния по умолчанию:
+
+```ts
+const state = NpcStateBuilder.default();
+```

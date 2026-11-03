@@ -22,7 +22,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory() }
       );
 
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
@@ -33,7 +33,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory() }
       );
 
-      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('success');
     });
@@ -57,7 +57,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory(psyche) }
       );
 
-      task.applyEffects(new NpcStateBuilder().build());
+      task.applyEffects(NpcStateBuilder.default());
 
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
@@ -96,7 +96,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory(createMockedPsyche(after)) }
       );
 
-      const state = task.applyEffects(new NpcStateBuilder().build());
+      const state = task.applyEffects(NpcStateBuilder.default());
 
       expect(state.self.psyche).toBe(after);
     });

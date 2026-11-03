@@ -9,9 +9,9 @@ describe('CommandTask', () => {
       const { command } = createControlledCommand();
       const task = new TestCommandTask(() => command);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('running');
     });
@@ -20,10 +20,10 @@ describe('CommandTask', () => {
       const { command, subscriber } = createControlledCommand();
       const task = new TestCommandTask(() => command);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       subscriber.complete();
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -32,10 +32,10 @@ describe('CommandTask', () => {
       const { command, subscriber } = createControlledCommand();
       const task = new TestCommandTask(() => command);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       subscriber.error(new Error('Не дошёл'));
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });
@@ -43,7 +43,7 @@ describe('CommandTask', () => {
     it("Если задачу этим актором не начинали, возвращает 'failed'", () => {
       const task = new TestCommandTask(() => createControlledCommand().command);
 
-      const result = task.update(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.update(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('failed');
     });
@@ -55,11 +55,11 @@ describe('CommandTask', () => {
       const task = new TestCommandTask(() => commands.shift()!);
       const firstContext = createNpcContext();
       const secondContext = createNpcContext();
-      task.start(new NpcStateBuilder().build(), firstContext);
-      task.start(new NpcStateBuilder().build(), secondContext);
+      task.start(NpcStateBuilder.default(), firstContext);
+      task.start(NpcStateBuilder.default(), secondContext);
 
       first.subscriber.complete();
-      const result = task.update(new NpcStateBuilder().build(), secondContext);
+      const result = task.update(NpcStateBuilder.default(), secondContext);
 
       expect(result).toBe('running');
     });
@@ -70,12 +70,12 @@ describe('CommandTask', () => {
       const commands = [first.command, second.command];
       const task = new TestCommandTask(() => commands.shift()!);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
       first.subscriber.complete();
-      task.update(new NpcStateBuilder().build(), context);
-      task.start(new NpcStateBuilder().build(), context);
+      task.update(NpcStateBuilder.default(), context);
+      task.start(NpcStateBuilder.default(), context);
 
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('running');
     });

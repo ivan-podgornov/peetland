@@ -38,7 +38,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(context.inventory.get(Item.Money)).toBe(50);
     });
@@ -51,7 +51,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      const result = task.start(new NpcStateBuilder().build(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -64,7 +64,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      const result = task.start(new NpcStateBuilder().build(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });

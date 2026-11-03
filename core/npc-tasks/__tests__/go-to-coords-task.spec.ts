@@ -19,7 +19,7 @@ describe('GoToCoordsTask', () => {
         completeRadius: 1,
       });
 
-      task.start(new NpcStateBuilder().build(), createNpcContext(actor));
+      task.start(NpcStateBuilder.default(), createNpcContext(actor));
 
       expect(goToCoords).toHaveBeenCalledExactlyOnceWith(
         {
@@ -44,10 +44,10 @@ describe('GoToCoordsTask', () => {
         },
         completeRadius: 1,
       });
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(1000);
-      const result = task.update(new NpcStateBuilder().build(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -66,7 +66,7 @@ describe('GoToCoordsTask', () => {
         },
         completeRadius: 1,
       });
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
       timer.advance(1000);

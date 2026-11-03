@@ -14,7 +14,7 @@ describe('AddItemTask', () => {
         count: 2,
       });
 
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(context.inventory.get(Item.Booze)).toBe(3);
     });
@@ -25,7 +25,7 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('success');
     });

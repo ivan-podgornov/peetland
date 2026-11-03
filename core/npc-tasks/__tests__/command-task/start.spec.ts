@@ -9,7 +9,7 @@ describe('CommandTask', () => {
       const { command } = createControlledCommand();
       const task = new TestCommandTask(() => command);
 
-      task.start(new NpcStateBuilder().build(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(command.execute).toHaveBeenCalledOnce();
     });
@@ -18,7 +18,7 @@ describe('CommandTask', () => {
       const { command } = createControlledCommand();
       const task = new TestCommandTask(() => command);
 
-      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('running');
     });
@@ -26,7 +26,7 @@ describe('CommandTask', () => {
     it("Если команда выполнилась сразу при подписке, возвращает 'success'", () => {
       const task = new TestCommandTask(() => createImmediateCommand('complete'));
 
-      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('success');
     });
@@ -34,7 +34,7 @@ describe('CommandTask', () => {
     it("Если команда сразу при подписке завершилась ошибкой, возвращает 'failed'", () => {
       const task = new TestCommandTask(() => createImmediateCommand('error'));
 
-      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('failed');
     });
@@ -45,11 +45,11 @@ describe('CommandTask', () => {
       const commands = [first.command, second.command];
       const task = new TestCommandTask(() => commands.shift()!);
       const context = createNpcContext();
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
       first.subscriber.complete();
-      task.update(new NpcStateBuilder().build(), context);
+      task.update(NpcStateBuilder.default(), context);
 
-      task.start(new NpcStateBuilder().build(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(second.command.execute).toHaveBeenCalledOnce();
     });

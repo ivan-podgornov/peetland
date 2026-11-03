@@ -69,7 +69,7 @@ describe('CollectBottlesTask', () => {
 
     plan(
       createTask(createPlacesWithTrashBins(bins), createNpcTaskFactory(), random),
-      new NpcStateBuilder().build()
+      NpcStateBuilder.default()
     );
 
     expect(random.pick).toHaveBeenCalledExactlyOnceWith(bins);
@@ -93,7 +93,7 @@ describe('CollectBottlesTask', () => {
       random
     );
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -119,7 +119,7 @@ describe('CollectBottlesTask', () => {
       random
     );
 
-    plan(task, new NpcStateBuilder().build());
+    plan(task, NpcStateBuilder.default());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
       angle: 90,
@@ -244,13 +244,13 @@ describe('CollectBottlesTask', () => {
   it('Если мусорок нет, план не составляется', () => {
     const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-    expect(planNames(createTask(places), new NpcStateBuilder().build())).toBeNull();
+    expect(planNames(createTask(places), NpcStateBuilder.default())).toBeNull();
   });
 
   it('Спрашивает у places мусорки', () => {
     const places = createMockedPlaces();
 
-    plan(createTask(places), new NpcStateBuilder().build());
+    plan(createTask(places), NpcStateBuilder.default());
 
     expect(places.ofType).toHaveBeenCalledWith(PlaceType.TrashBin);
   });

@@ -16,7 +16,7 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = new NpcStateBuilder().build();
+      const state = NpcStateBuilder.default();
 
       expect(task.applyEffects(state)).toBe(state);
     });
@@ -34,7 +34,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.applyEffects(new NpcStateBuilder().build())).toBe(effected);
+      expect(task.applyEffects(NpcStateBuilder.default())).toBe(effected);
     });
 
     it('Применяет переданные эффекты к переданному состоянию', () => {
@@ -49,7 +49,7 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = new NpcStateBuilder().build();
+      const state = NpcStateBuilder.default();
 
       task.applyEffects(state);
 

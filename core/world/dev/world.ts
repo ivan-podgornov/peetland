@@ -1,3 +1,4 @@
+import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import type { IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
@@ -10,7 +11,10 @@ import { vi } from 'vitest';
 
 import type { WorldOptions } from '../src';
 
-/** Создаёт игру с виртуальными акторами и ручным временем. Кадры не идут, а объекты создавать нельзя */
+/**
+ * Создаёт игру с виртуальными акторами и ручным временем. Кадры не идут, скрипт не выгружается, а
+ * объекты создавать нельзя
+ */
 export function createGame(game: Partial<IGame> = {}): IGame {
   return {
     actorFactory: createMockedActorFactory(),
@@ -22,6 +26,7 @@ export function createGame(game: Partial<IGame> = {}): IGame {
       }),
     },
     frames: createControlledObservable().observable,
+    signal: new AbortController().signal,
     ...game,
   };
 }

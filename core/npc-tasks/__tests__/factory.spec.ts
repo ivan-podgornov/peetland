@@ -1,8 +1,7 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling, Trait } from '@peetland/psyche';
-import { createPsycheState } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createNpcTaskFactoryDeps } from '../dev';
@@ -101,16 +100,7 @@ describe('NpcTaskFactory', () => {
       const task = factory.psycheReact({ deed: Deed.Begging });
 
       const state = task.applyEffects(
-        createNpcState({
-          self: {
-            psyche: createPsycheState({
-              traits: {
-                [Trait.Conscientiousness]: 100,
-                [Trait.Luck]: 50,
-              },
-            }),
-          },
-        })
+        new NpcStateBuilder().withTrait(Trait.Conscientiousness, 100).build()
       );
 
       expect(state.self.psyche.feelings[Feeling.Shame]).toBeGreaterThan(0);

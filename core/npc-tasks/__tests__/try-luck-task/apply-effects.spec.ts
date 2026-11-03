@@ -1,4 +1,5 @@
-import { createNpcState } from '@peetland/npc/dev';
+import { Item } from '@peetland/inventory';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -15,13 +16,13 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = createNpcState();
+      const state = NpcStateBuilder.default();
 
       expect(task.applyEffects(state)).toBe(state);
     });
 
     it('Возвращает состояние, которое вернули переданные эффекты', () => {
-      const effected = createNpcState({ self: { inventory: { bottles: 1 } } });
+      const effected = new NpcStateBuilder().withInventory({ [Item.Bottles]: 1 }).build();
       const task = new TryLuckTask(
         {
           chance: 1 / 60,
@@ -33,7 +34,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.applyEffects(createNpcState())).toBe(effected);
+      expect(task.applyEffects(NpcStateBuilder.default())).toBe(effected);
     });
 
     it('Применяет переданные эффекты к переданному состоянию', () => {
@@ -48,7 +49,7 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = createNpcState();
+      const state = NpcStateBuilder.default();
 
       task.applyEffects(state);
 

@@ -1,4 +1,4 @@
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { ManualTimer } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS } from '@peetland/virtual-actor';
 import { createActor } from '@peetland/virtual-actor/dev';
@@ -16,7 +16,7 @@ describe('PlayAnimationTask', () => {
         duration: 5000,
       });
 
-      task.start(createNpcState(), createNpcContext(actor));
+      task.start(NpcStateBuilder.default(), createNpcContext(actor));
 
       expect(playAnimation).toHaveBeenCalledExactlyOnceWith('drink-standing-1', 5000);
     });
@@ -27,10 +27,10 @@ describe('PlayAnimationTask', () => {
       const timer = new ManualTimer();
       const context = createNpcContext(createActor({ timer }));
       const task = new PlayAnimationTask({ animation: 'pay' });
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-      const result = task.update(createNpcState(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -39,7 +39,7 @@ describe('PlayAnimationTask', () => {
   describe('#applyEffects', () => {
     it('Не меняет состояние', () => {
       const task = new PlayAnimationTask({ animation: 'pay' });
-      const before = createNpcState();
+      const before = NpcStateBuilder.default();
 
       const after = task.applyEffects(before);
 

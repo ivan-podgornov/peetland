@@ -1,4 +1,4 @@
 export { createMockedNpcFactory, createNpcData, createNpcDeps } from './npc';
-export { createNpcContext, createNpcState } from './state';
-export type { CreateNpcStateOptions } from './state';
+export { createNpcContext } from './context';
+export { NpcStateBuilder } from './state-builder';
 export { createMockedNpcWorldKnowledge } from './world-knowledge';

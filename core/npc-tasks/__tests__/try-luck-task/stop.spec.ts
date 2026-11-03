@@ -1,4 +1,4 @@
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
@@ -18,7 +18,7 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
       timer.advance(TRY_LUCK_PERIOD);
@@ -37,8 +37,8 @@ describe('TryLuckTask', () => {
         }
       );
       const firstContext = createNpcContext();
-      task.start(createNpcState(), firstContext);
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), firstContext);
+      task.start(NpcStateBuilder.default(), createNpcContext());
 
       task.stop(firstContext);
       timer.advance(TRY_LUCK_PERIOD);
@@ -55,10 +55,10 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
-      const result = task.update(createNpcState(), context);
+      const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });

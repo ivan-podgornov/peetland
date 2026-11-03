@@ -1,5 +1,5 @@
 import { Item } from '@peetland/inventory';
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
 import { AddItemTask } from '../src/add-item-task';
@@ -14,7 +14,7 @@ describe('AddItemTask', () => {
         count: 2,
       });
 
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(context.inventory.get(Item.Booze)).toBe(3);
     });
@@ -25,7 +25,7 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const result = task.start(createNpcState(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('success');
     });
@@ -39,15 +39,13 @@ describe('AddItemTask', () => {
       });
 
       const state = task.applyEffects(
-        createNpcState({
-          world: {
-            time: {
-              day: 1,
-              hours: 20,
-              minutes: 0,
-            },
-          },
-        })
+        new NpcStateBuilder()
+          .withTime({
+            day: 1,
+            hours: 20,
+            minutes: 0,
+          })
+          .build()
       );
 
       expect(state.world).toStrictEqual({
@@ -65,7 +63,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(createNpcState({ self: { inventory: { [Item.Booze]: 2 } } }));
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({ [Item.Booze]: 3 });
     });
@@ -76,7 +76,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(createNpcState({ self: { inventory: { [Item.Money]: 5 } } }));
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Money]: 5 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({
         [Item.Money]: 5,

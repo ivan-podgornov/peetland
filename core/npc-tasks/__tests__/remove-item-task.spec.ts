@@ -1,5 +1,5 @@
 import { Item } from '@peetland/inventory';
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
 import { RemoveItemTask } from '../src/remove-item-task';
@@ -12,9 +12,9 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      expect(task.canExecute(createNpcState({ self: { inventory: { [Item.Money]: 100 } } }))).toBe(
-        true
-      );
+      expect(
+        task.canExecute(new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build())
+      ).toBe(true);
     });
 
     it('Если предмета в состоянии не хватает, возвращает false', () => {
@@ -23,9 +23,9 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      expect(task.canExecute(createNpcState({ self: { inventory: { [Item.Money]: 99 } } }))).toBe(
-        false
-      );
+      expect(
+        task.canExecute(new NpcStateBuilder().withInventory({ [Item.Money]: 99 }).build())
+      ).toBe(false);
     });
   });
 
@@ -38,7 +38,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
       expect(context.inventory.get(Item.Money)).toBe(50);
     });
@@ -51,7 +51,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      const result = task.start(createNpcState(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -64,7 +64,7 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      const result = task.start(createNpcState(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('failed');
     });
@@ -78,16 +78,14 @@ describe('RemoveItemTask', () => {
       });
 
       const state = task.applyEffects(
-        createNpcState({
-          self: { inventory: { [Item.Booze]: 1 } },
-          world: {
-            time: {
-              day: 1,
-              hours: 20,
-              minutes: 0,
-            },
-          },
-        })
+        new NpcStateBuilder()
+          .withInventory({ [Item.Booze]: 1 })
+          .withTime({
+            day: 1,
+            hours: 20,
+            minutes: 0,
+          })
+          .build()
       );
 
       expect(state.world).toStrictEqual({
@@ -106,7 +104,7 @@ describe('RemoveItemTask', () => {
       });
 
       const state = task.applyEffects(
-        createNpcState({ self: { inventory: { [Item.Money]: 150 } } })
+        new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build()
       );
 
       expect(state.self.inventory).toStrictEqual({ [Item.Money]: 50 });
@@ -118,7 +116,9 @@ describe('RemoveItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(createNpcState({ self: { inventory: { [Item.Booze]: 1 } } }));
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({});
     });

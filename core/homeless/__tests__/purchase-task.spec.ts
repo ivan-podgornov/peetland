@@ -1,6 +1,6 @@
 import { applyPlanEffects, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -16,7 +16,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ self: { inventory: { [Item.Money]: 100 } } });
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build();
 
     const names = planNames(task, state);
 
@@ -47,7 +47,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ self: { inventory: { [Item.Money]: 150 } } });
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build();
 
     const after = applyPlanEffects(task, state);
 
@@ -66,7 +66,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ self: { inventory: { [Item.Money]: 99 } } });
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 99 }).build();
 
     expect(planNames(task, state)).toBeNull();
   });

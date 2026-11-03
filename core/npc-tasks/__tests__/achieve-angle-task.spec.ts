@@ -1,5 +1,5 @@
 import { Geometry } from '@peetland/geometry';
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -18,7 +18,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      task.start(createNpcState(), createNpcContext(actor));
+      task.start(NpcStateBuilder.default(), createNpcContext(actor));
 
       expect(achieveAngle).toHaveBeenCalledExactlyOnceWith(90, 5);
     });
@@ -33,7 +33,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const result = task.start(createNpcState(), context);
+      const result = task.start(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');
     });
@@ -49,20 +49,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const state = task.applyEffects(
-        createNpcState({
-          self: {
-            actor: {
-              position: {
-                x: 1,
-                y: 2,
-                z: 3,
-              },
-              angle: 0,
-            },
-          },
-        })
-      );
+      const state = task.applyEffects(new NpcStateBuilder().withPosition(1, 2, 3).build());
 
       expect(state.self.actor).toEqual({
         position: {
@@ -84,15 +71,13 @@ describe('AchieveAngleTask', () => {
       );
 
       const state = task.applyEffects(
-        createNpcState({
-          world: {
-            time: {
-              day: 1,
-              hours: 20,
-              minutes: 0,
-            },
-          },
-        })
+        new NpcStateBuilder()
+          .withTime({
+            day: 1,
+            hours: 20,
+            minutes: 0,
+          })
+          .build()
       );
 
       expect(state.world).toStrictEqual({
@@ -113,7 +98,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const state = task.applyEffects(createNpcState());
+      const state = task.applyEffects(NpcStateBuilder.default());
 
       expect(state.self.actor.angle).toBe(270);
     });

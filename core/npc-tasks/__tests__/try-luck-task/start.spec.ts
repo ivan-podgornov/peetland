@@ -1,4 +1,4 @@
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -16,7 +16,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      const result = task.start(createNpcState(), createNpcContext());
+      const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
       expect(result).toBe('running');
     });
@@ -32,7 +32,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD * 2);
 
       expect(random.chance.mock.calls).toStrictEqual([[1 / 60], [1 / 60]]);
@@ -49,7 +49,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD - 1);
 
       expect(random.chance).not.toHaveBeenCalled();
@@ -66,7 +66,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD * 3);
 
       expect(random.chance).toHaveBeenCalledOnce();
@@ -87,7 +87,7 @@ describe('TryLuckTask', () => {
       );
       const context = createNpcContext();
 
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
       timer.advance(TRY_LUCK_PERIOD * 2);
 
       expect(onAttempt.mock.calls).toStrictEqual([[context], [context]]);
@@ -108,7 +108,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD);
 
       expect(onAttempt).toHaveBeenCalledBefore(random.chance);
@@ -128,7 +128,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      task.start(createNpcState(), createNpcContext());
+      task.start(NpcStateBuilder.default(), createNpcContext());
       timer.advance(TRY_LUCK_PERIOD);
 
       expect(onAttempt).toHaveBeenCalledOnce();
@@ -145,9 +145,9 @@ describe('TryLuckTask', () => {
         }
       );
       const context = createNpcContext();
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
 
-      task.start(createNpcState(), context);
+      task.start(NpcStateBuilder.default(), context);
       timer.advance(TRY_LUCK_PERIOD);
 
       expect(random.chance).toHaveBeenCalledOnce();

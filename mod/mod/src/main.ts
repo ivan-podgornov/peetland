@@ -27,10 +27,13 @@ function isGameRunning(): boolean {
   return isPlayerPlaying(PLAYER_HANDLE) && !isGamePaused();
 }
 
-/** Создаёт мир в игре с местами и NPC из данных мода и запускает в нём жизнь */
-async function bigBang(): Promise<void> {
+/**
+ * Создаёт мир в игре с местами и NPC из данных мода и запускает в нём жизнь
+ * @param game - игра. Создаётся снаружи, в потоке MoonLoader (см. GtaGame)
+ */
+async function bigBang(game: GtaGame): Promise<void> {
   await new World({
-    game: new GtaGame(),
+    game,
     places: new InMemoryRepository(places),
     npcs: new InMemoryRepository(npcs),
   }).bigBang();
@@ -62,7 +65,7 @@ function main() {
     }
 
     if (wasKeyPressed(VK_H)) {
-      bigBang().catch((error: unknown) => reportError(error));
+      bigBang(new GtaGame()).catch((error: unknown) => reportError(error));
     }
 
     if (wasKeyPressed(VK_J)) {

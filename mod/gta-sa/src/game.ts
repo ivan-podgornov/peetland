@@ -17,6 +17,11 @@ import { GtaTime } from './time';
 /** Как часто игра сообщает о кадре, в миллисекундах */
 const FRAME_PERIOD = 50;
 
+/**
+ * Игра GTA SA. Создавать её нужно в потоке MoonLoader, например в main, а не внутри async-функции:
+ * конструктор запускает поток MoonLoader, а поток, созданный из корутины async-функции, портит память
+ * скрипта, когда корутина завершается
+ */
 export class GtaGame implements IGame {
   readonly actorFactory: IActorFactory;
   readonly time: ITime;

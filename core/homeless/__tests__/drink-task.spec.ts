@@ -1,7 +1,6 @@
 import { applyPlanEffects, plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import type { NpcState } from '@peetland/npc';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
@@ -38,39 +37,34 @@ function createPlacesWithCamp(
   });
 }
 
-/** Состояние NPC с пойлом */
-function createStateWithBooze(booze = 1): NpcState {
-  return createNpcState({ self: { inventory: { [Item.Booze]: booze } } });
-}
-
 describe('DrinkTask', () => {
   it('Если NPC в бомжарне, планирует проиграть анимацию питья, отнять пойло и добавить пустую бутылку', () => {
     const task = createTask(createPlacesWithCamp(true));
 
-    expect(planNames(task, createStateWithBooze())).toStrictEqual(DRINK);
+    expect(planNames(task, new NpcStateBuilder().withItem(Item.Booze, 1).build())).toStrictEqual(
+      DRINK
+    );
   });
 
   it('Если NPC не в бомжарне, планирует сначала дойти до бомжарни, а потом выпить', () => {
     const task = createTask(createPlacesWithCamp(false));
 
-    expect(planNames(task, createStateWithBooze())).toStrictEqual(['go-to-coords', ...DRINK]);
+    expect(planNames(task, new NpcStateBuilder().withItem(Item.Booze, 1).build())).toStrictEqual([
+      'go-to-coords',
+      ...DRINK,
+    ]);
   });
 
   it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
     const places = createPlacesWithCamp(true);
-    const state = createNpcState({
-      self: {
-        actor: {
-          position: {
-            x: 8,
-            y: 0,
-            z: 0,
-          },
-          angle: 0,
-        },
-        inventory: { [Item.Booze]: 1 },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withPosition({
+        x: 8,
+        y: 0,
+        z: 0,
+      })
+      .withItem(Item.Booze, 1)
+      .build();
 
     plan(createTask(places), state);
 
@@ -87,19 +81,14 @@ describe('DrinkTask', () => {
 
   it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCamp(false);
-    const state = createNpcState({
-      self: {
-        actor: {
-          position: {
-            x: 8,
-            y: 0,
-            z: 0,
-          },
-          angle: 0,
-        },
-        inventory: { [Item.Booze]: 1 },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withPosition({
+        x: 8,
+        y: 0,
+        z: 0,
+      })
+      .withItem(Item.Booze, 1)
+      .build();
 
     plan(createTask(places), state);
 
@@ -128,7 +117,7 @@ describe('DrinkTask', () => {
       createNpcTaskFactory({ goToCoords })
     );
 
-    plan(task, createStateWithBooze());
+    plan(task, new NpcStateBuilder().withItem(Item.Booze, 1).build());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -154,7 +143,7 @@ describe('DrinkTask', () => {
   it('По плану отнимает бутылку пойла и добавляет пустую бутылку', () => {
     const task = createTask(createPlacesWithCamp(true));
 
-    const after = applyPlanEffects(task, createStateWithBooze(3));
+    const after = applyPlanEffects(task, new NpcStateBuilder().withItem(Item.Booze, 3).build());
 
     expect(after.self.inventory).toStrictEqual({
       [Item.Booze]: 2,
@@ -165,12 +154,12 @@ describe('DrinkTask', () => {
   it('Если пойла нет, план не составляется', () => {
     const task = createTask(createPlacesWithCamp(true));
 
-    expect(planNames(task, createNpcState({ self: { inventory: {} } }))).toBeNull();
+    expect(planNames(task, new NpcStateBuilder().build())).toBeNull();
   });
 
   it('Если бомжарен нет, план не составляется', () => {
     const task = createTask(createMockedPlaces());
 
-    expect(planNames(task, createStateWithBooze())).toBeNull();
+    expect(planNames(task, new NpcStateBuilder().withItem(Item.Booze, 1).build())).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { createStubTask, plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
@@ -40,7 +40,7 @@ describe('BuyBoozeTask', () => {
       }),
     });
 
-    expect(planNames(task, createNpcState())).toStrictEqual([
+    expect(planNames(task, new NpcStateBuilder().build())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
       'purchase',
@@ -49,18 +49,13 @@ describe('BuyBoozeTask', () => {
 
   it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
     const places = createPlacesWithShop();
-    const state = createNpcState({
-      self: {
-        actor: {
-          position: {
-            x: 8,
-            y: 0,
-            z: 0,
-          },
-          angle: 0,
-        },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withPosition({
+        x: 8,
+        y: 0,
+        z: 0,
+      })
+      .build();
 
     plan(createTask(places), state);
 
@@ -87,7 +82,7 @@ describe('BuyBoozeTask', () => {
       npcTaskFactory: createNpcTaskFactory({ goToCoords }),
     });
 
-    plan(task, createNpcState());
+    plan(task, new NpcStateBuilder().build());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -106,7 +101,7 @@ describe('BuyBoozeTask', () => {
       npcTaskFactory: createNpcTaskFactory({ achieveAngle }),
     });
 
-    plan(task, createNpcState());
+    plan(task, new NpcStateBuilder().build());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
       angle: 90,
@@ -120,7 +115,7 @@ describe('BuyBoozeTask', () => {
       homelessTaskFactory: createHomelessTaskFactory({ purchase }),
     });
 
-    plan(task, createNpcState());
+    plan(task, new NpcStateBuilder().build());
 
     expect(purchase).toHaveBeenCalledExactlyOnceWith({
       item: Item.Booze,
@@ -132,13 +127,13 @@ describe('BuyBoozeTask', () => {
   it('Если магазинов нет, план не составляется', () => {
     const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-    expect(planNames(createTask(places), createNpcState())).toBeNull();
+    expect(planNames(createTask(places), new NpcStateBuilder().build())).toBeNull();
   });
 
   it('Спрашивает у places магазины', () => {
     const places = createMockedPlaces();
 
-    plan(createTask(places), createNpcState());
+    plan(createTask(places), new NpcStateBuilder().build());
 
     expect(places.ofType).toHaveBeenCalledWith(PlaceType.Shop);
   });

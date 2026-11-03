@@ -1,6 +1,6 @@
 import { plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
@@ -42,7 +42,7 @@ describe('SellBottlesTask', () => {
 
     const names = planNames(
       task,
-      createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } })
+      new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build()
     );
 
     expect(names).toStrictEqual([
@@ -56,19 +56,14 @@ describe('SellBottlesTask', () => {
 
   it('Ищет приёмку, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCollection();
-    const state = createNpcState({
-      self: {
-        actor: {
-          position: {
-            x: 8,
-            y: 0,
-            z: 0,
-          },
-          angle: 0,
-        },
-        inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withPosition({
+        x: 8,
+        y: 0,
+        z: 0,
+      })
+      .withItem(Item.Bottles, BOTTLES_FOR_BOOZE)
+      .build();
 
     plan(createTask(places), state);
 
@@ -97,7 +92,7 @@ describe('SellBottlesTask', () => {
       createNpcTaskFactory({ goToCoords })
     );
 
-    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } }));
+    plan(task, new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build());
 
     expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
       coords: {
@@ -120,7 +115,7 @@ describe('SellBottlesTask', () => {
       createNpcTaskFactory({ achieveAngle })
     );
 
-    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } }));
+    plan(task, new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build());
 
     expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
       angle: 90,
@@ -132,7 +127,7 @@ describe('SellBottlesTask', () => {
     const playAnimation = vi.fn();
     const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ playAnimation }));
 
-    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } }));
+    plan(task, new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build());
 
     expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-give' });
   });
@@ -141,7 +136,7 @@ describe('SellBottlesTask', () => {
     const removeItem = vi.fn();
     const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ removeItem }));
 
-    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: 12 } } }));
+    plan(task, new NpcStateBuilder().withItem(Item.Bottles, 12).build());
 
     expect(removeItem).toHaveBeenCalledExactlyOnceWith({
       item: Item.Bottles,
@@ -153,7 +148,7 @@ describe('SellBottlesTask', () => {
     const addItem = vi.fn();
     const task = createTask(createPlacesWithCollection(), createNpcTaskFactory({ addItem }));
 
-    plan(task, createNpcState({ self: { inventory: { [Item.Bottles]: 12 } } }));
+    plan(task, new NpcStateBuilder().withItem(Item.Bottles, 12).build());
 
     expect(addItem).toHaveBeenCalledExactlyOnceWith({
       item: Item.Money,
@@ -166,7 +161,7 @@ describe('SellBottlesTask', () => {
 
     const names = planNames(
       task,
-      createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } })
+      new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build()
     );
 
     expect(names).not.toBeNull();
@@ -177,7 +172,7 @@ describe('SellBottlesTask', () => {
 
     const names = planNames(
       task,
-      createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE - 1 } } })
+      new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE - 1).build()
     );
 
     expect(names).toBeNull();
@@ -185,28 +180,20 @@ describe('SellBottlesTask', () => {
 
   it('Если бутылок вместе с деньгами хватает на пойло, планирует сдать бутылки', () => {
     const task = createTask(createPlacesWithCollection());
-    const state = createNpcState({
-      self: {
-        inventory: {
-          [Item.Bottles]: 1,
-          [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
-        },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withItem(Item.Bottles, 1)
+      .withItem(Item.Money, BOOZE_PRICE - BOTTLE_PRICE)
+      .build();
 
     expect(planNames(task, state)).not.toBeNull();
   });
 
   it('Если бутылок вместе с деньгами не хватает на пойло, план не составляется', () => {
     const task = createTask(createPlacesWithCollection());
-    const state = createNpcState({
-      self: {
-        inventory: {
-          [Item.Bottles]: 1,
-          [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE - 1,
-        },
-      },
-    });
+    const state = new NpcStateBuilder()
+      .withItem(Item.Bottles, 1)
+      .withItem(Item.Money, BOOZE_PRICE - BOTTLE_PRICE - 1)
+      .build();
 
     expect(planNames(task, state)).toBeNull();
   });
@@ -214,7 +201,7 @@ describe('SellBottlesTask', () => {
   it('Если бутылок нет, план не составляется', () => {
     const task = createTask(createPlacesWithCollection());
 
-    expect(planNames(task, createNpcState({ self: { inventory: {} } }))).toBeNull();
+    expect(planNames(task, new NpcStateBuilder().build())).toBeNull();
   });
 
   it('Если приёмок нет, план не составляется', () => {
@@ -222,7 +209,7 @@ describe('SellBottlesTask', () => {
 
     const names = planNames(
       createTask(places),
-      createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } })
+      new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build()
     );
 
     expect(names).toBeNull();
@@ -233,7 +220,7 @@ describe('SellBottlesTask', () => {
 
     plan(
       createTask(places),
-      createNpcState({ self: { inventory: { [Item.Bottles]: BOTTLES_FOR_BOOZE } } })
+      new NpcStateBuilder().withItem(Item.Bottles, BOTTLES_FOR_BOOZE).build()
     );
 
     expect(places.ofType).toHaveBeenCalledWith(PlaceType.BottleCollection);

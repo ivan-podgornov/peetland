@@ -1,6 +1,6 @@
 import { createStubTask, planNames } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { HomelessRootTask } from '../src';
@@ -54,7 +54,10 @@ describe('HomelessRootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['drink']);
   });
@@ -65,7 +68,10 @@ describe('HomelessRootTask', () => {
       buyBooze: () => createStubTask('buy-booze'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['buy-booze']);
   });
@@ -77,7 +83,10 @@ describe('HomelessRootTask', () => {
       sellBottles: () => createStubTask('sell-bottles'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['buy-booze']);
   });
@@ -90,7 +99,10 @@ describe('HomelessRootTask', () => {
       beg: () => createStubTask('beg'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['sell-bottles']);
   });
@@ -104,7 +116,10 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['beg']);
   });
@@ -118,7 +133,10 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles'),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toStrictEqual(['collect-bottles']);
   });
@@ -132,7 +150,10 @@ describe('HomelessRootTask', () => {
       collectBottles: () => createStubTask('collect-bottles', false),
     });
 
-    const names = planNames(new HomelessRootTask({ homelessTaskFactory }), createNpcState());
+    const names = planNames(
+      new HomelessRootTask({ homelessTaskFactory }),
+      new NpcStateBuilder().build()
+    );
 
     expect(names).toBeNull();
   });

@@ -1,4 +1,4 @@
-import { createNpcState } from '@peetland/npc/dev';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -16,7 +16,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(createNpcState())).toBe(true);
+      expect(task.canExecute(new NpcStateBuilder().build())).toBe(true);
     });
 
     it('Если условие остановки не выполнилось, возвращает true', () => {
@@ -31,7 +31,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(createNpcState())).toBe(true);
+      expect(task.canExecute(new NpcStateBuilder().build())).toBe(true);
     });
 
     it('Если условие остановки выполнилось, возвращает false', () => {
@@ -46,7 +46,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(task.canExecute(createNpcState())).toBe(false);
+      expect(task.canExecute(new NpcStateBuilder().build())).toBe(false);
     });
 
     it('Проверяет условие остановки на переданном состоянии', () => {
@@ -61,7 +61,7 @@ describe('TryLuckTask', () => {
           timer: new ManualTimer(),
         }
       );
-      const state = createNpcState();
+      const state = new NpcStateBuilder().build();
 
       task.canExecute(state);
 

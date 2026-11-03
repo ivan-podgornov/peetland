@@ -1,4 +1,4 @@
-import { createNpcContext, createNpcState } from '@peetland/npc/dev';
+import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling } from '@peetland/psyche';
 import {
   createMockedPsyche,
@@ -22,7 +22,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory() }
       );
 
-      task.start(createNpcState(), context);
+      task.start(new NpcStateBuilder().build(), context);
 
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
@@ -33,7 +33,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory() }
       );
 
-      const result = task.start(createNpcState(), createNpcContext());
+      const result = task.start(new NpcStateBuilder().build(), createNpcContext());
 
       expect(result).toBe('success');
     });
@@ -42,13 +42,7 @@ describe('PsycheReactTask', () => {
   describe('#applyEffects', () => {
     it('Собирает психику фабрикой из слепка психики в состоянии', () => {
       const psycheFactory = createMockedPsycheFactory();
-      const state = createNpcState({
-        self: {
-          psyche: createPsycheState({
-            feelings: { [Feeling.Shame]: 30 },
-          }),
-        },
-      });
+      const state = new NpcStateBuilder().withFeeling(Feeling.Shame, 30).build();
       const task = new PsycheReactTask({ deed: Deed.BottleFound }, { psycheFactory });
 
       task.applyEffects(state);
@@ -63,7 +57,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory(psyche) }
       );
 
-      task.applyEffects(createNpcState());
+      task.applyEffects(new NpcStateBuilder().build());
 
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
@@ -75,15 +69,13 @@ describe('PsycheReactTask', () => {
       );
 
       const state = task.applyEffects(
-        createNpcState({
-          world: {
-            time: {
-              day: 1,
-              hours: 20,
-              minutes: 0,
-            },
-          },
-        })
+        new NpcStateBuilder()
+          .withTime({
+            day: 1,
+            hours: 20,
+            minutes: 0,
+          })
+          .build()
       );
 
       expect(state.world).toStrictEqual({
@@ -104,7 +96,7 @@ describe('PsycheReactTask', () => {
         { psycheFactory: createMockedPsycheFactory(createMockedPsyche(after)) }
       );
 
-      const state = task.applyEffects(createNpcState());
+      const state = task.applyEffects(new NpcStateBuilder().build());
 
       expect(state.self.psyche).toBe(after);
     });

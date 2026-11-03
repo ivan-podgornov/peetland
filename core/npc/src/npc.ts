@@ -1,5 +1,5 @@
 import { AbortController } from '@peetland/events';
-import type { Observable } from '@peetland/events';
+import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
@@ -26,6 +26,8 @@ export type NpcDeps = {
   frames: Observable<unknown>;
   /** То, что NPC знает о мире */
   worldKnowledge: INpcWorldKnowledge;
+  /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
+  gameSignal: IAbortSignal;
 };
 
 /** NPC склеивает свои данные, актора и HTN-агента */
@@ -42,7 +44,8 @@ export class Npc {
 
   /**
    * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
-   * контекст с актором, инвентарём и психикой
+   * контекст с актором, инвентарём и психикой. Когда игра завершается, деспавнится, а если она уже
+   * завершилась, деспавнится сразу
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
@@ -53,6 +56,7 @@ export class Npc {
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
+      gameSignal,
       worldKnowledge,
     } = deps;
 
@@ -74,6 +78,16 @@ export class Npc {
     this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
     frames.subscribe(() => this.htn.update(this.getState(), this.context), {
+      signal: this.lifetime.signal,
+    });
+
+    if (gameSignal.aborted) {
+      this.despawn();
+      return;
+    }
+
+    gameSignal.addEventListener('abort', () => this.despawn(), {
+      once: true,
       signal: this.lifetime.signal,
     });
   }

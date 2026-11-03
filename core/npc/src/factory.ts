@@ -14,12 +14,12 @@ export interface INpcFactory {
 }
 
 /**
- * Зависимости фабрики NPC. Снаружи нужны игра, знание о мире и корневые задачи, а остальное фабрика собирает
+ * Зависимости фабрики NPC. Снаружи нужны игра, её сигнал завершения, знание о мире и корневые задачи, а остальное фабрика собирает
  * сама, если его не передали
  */
 export type NpcFactoryDeps = Pick<
   NpcDeps,
-  'actorFactory' | 'frames' | 'rootTaskFactory' | 'worldKnowledge'
+  'actorFactory' | 'frames' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
 > &
   Partial<Pick<NpcDeps, 'htnFactory' | 'inventoryFactory' | 'psycheFactory'>>;
 
@@ -31,6 +31,7 @@ export class NpcFactory implements INpcFactory {
       actorFactory,
       frames,
       rootTaskFactory,
+      gameSignal,
       worldKnowledge,
       htnFactory = new HTNFactory<NpcState, NpcContext>(),
       inventoryFactory = new InventoryFactory(),
@@ -44,6 +45,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
+      gameSignal,
       worldKnowledge,
     };
   }

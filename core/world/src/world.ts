@@ -60,28 +60,28 @@ export class World {
    */
   async bigBang(): Promise<void> {
     const { game, npcs, places } = this.options;
-    const { actorFactory, time, frames, geometry } = game;
     const {
       random = new Random(),
       timer = new Timer(),
       psycheFactory = new PsycheFactory(),
-      placesFactory = new PlacesFactory({ geometry }),
-      worldKnowledge = new NpcWorldKnowledge({ time }),
+      placesFactory = new PlacesFactory({ geometry: game.geometry }),
+      worldKnowledge = new NpcWorldKnowledge({ time: game.time }),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
     const {
       rootTaskFactory = new RootTaskFactory({
-        geometry,
+        geometry: game.geometry,
         places: worldPlaces,
         psycheFactory,
         random,
         timer,
       }),
       npcFactory = new NpcFactory({
-        actorFactory,
-        frames,
+        actorFactory: game.actorFactory,
+        frames: game.frames,
         psycheFactory,
         rootTaskFactory,
+        gameSignal: game.signal,
         worldKnowledge,
       }),
     } = this.deps;

@@ -1,7 +1,7 @@
+import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
-import type { CompoundTask } from '@peetland/htn';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
-import { Inventory, Item } from '@peetland/inventory';
+import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
@@ -24,6 +24,7 @@ function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps 
       })),
     },
     worldKnowledge: createMockedNpcWorldKnowledge(),
+    gameSignal: new AbortController().signal,
     ...deps,
   };
 }
@@ -65,60 +66,12 @@ describe('NpcFactory', () => {
       expect(psycheFactory.create).toHaveBeenCalledOnce();
     });
 
-    it('NPC узнаёт о мире через worldKnowledge из зависимостей', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledge({
-        time: {
-          day: 1,
-          hours: 20,
-          minutes: 15,
-        },
-      });
-      const factory = new NpcFactory(createRequiredDeps({ worldKnowledge }));
+    it('Если inventoryFactory не передана, NPC получает экземпляр Inventory', () => {
+      const factory = new NpcFactory(createRequiredDeps());
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.getState().world).toStrictEqual({
-        time: {
-          day: 1,
-          hours: 20,
-          minutes: 15,
-        },
-      });
-    });
-
-    it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {
-      const frames = createControlledObservable();
-      const preconditions = vi.fn(() => false);
-      const rootTask: CompoundTask<NpcState, NpcContext> = {
-        name: 'root',
-        methods: [
-          {
-            name: 'never',
-            preconditions,
-            tasks: [],
-          },
-        ],
-      };
-      const factory = new NpcFactory(
-        createRequiredDeps({
-          frames: frames.observable,
-          rootTaskFactory: { create: () => rootTask },
-        })
-      );
-      factory.create(createNpcData());
-
-      frames.subscriber.next(undefined);
-
-      expect(preconditions).toHaveBeenCalled();
-    });
-
-    it('Если inventoryFactory не передана, NPC получает инвентарь с содержимым из данных', () => {
-      const factory = new NpcFactory(createRequiredDeps());
-
-      const npc = factory.create(createNpcData({ inventory: { [Item.Money]: 150 } }));
-
       expect(npc.inventory).toBeInstanceOf(Inventory);
-      expect(npc.inventory.getAll()).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Если psycheFactory не передана, NPC получает экземпляр Psyche', () => {

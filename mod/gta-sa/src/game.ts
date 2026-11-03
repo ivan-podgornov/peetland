@@ -1,10 +1,10 @@
 import { AnimationManager } from '@peetland/animation-manager';
-import { EventTarget } from '@peetland/events';
-import type { Observable } from '@peetland/events';
+import { AbortController, EventTarget } from '@peetland/events';
+import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
-import { isGamePaused, lua_thread, wait } from '@peetland/moonloader';
+import { addEventHandler, isGamePaused, lua_thread, wait } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
 import type { ITime } from '@peetland/timings';
 
@@ -24,16 +24,25 @@ export class GtaGame implements IGame {
   readonly geometry: IGeometry;
   readonly frames: Observable<unknown>;
 
+  private readonly terminateController: AbortController;
+
   constructor() {
     const timer = new Timer();
+    this.terminateController = new AbortController();
+    addEventHandler('onScriptTerminate', () => {
+      this.terminateController.abort(new Error('Скрипт выгружен'));
+    });
+
+    const { signal } = this.terminateController;
     // Поток не остановить снаружи, поэтому он один на игру, а подписчики кадров подписываются и
-    // отписываются через EventTarget. На паузе кадры не идут
+    // отписываются через EventTarget. На паузе кадры не идут, а после выгрузки скрипта поток
+    // заканчивается
     const frameEvents = new EventTarget<{ frame: [] }>();
     lua_thread.create(() => {
-      while (true) {
+      while (!signal.aborted) {
         wait(FRAME_PERIOD);
 
-        if (!isGamePaused()) {
+        if (!signal.aborted && !isGamePaused()) {
           frameEvents.dispatchEvent('frame');
         }
       }
@@ -53,5 +62,9 @@ export class GtaGame implements IGame {
       objectFactory: this.objectFactory,
       timer,
     });
+  }
+
+  get signal(): IAbortSignal {
+    return this.terminateController.signal;
   }
 }

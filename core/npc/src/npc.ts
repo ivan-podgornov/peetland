@@ -27,7 +27,7 @@ export type NpcDeps = {
   /** То, что NPC знает о мире */
   worldKnowledge: INpcWorldKnowledge;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
-  signal: IAbortSignal;
+  gameSignal: IAbortSignal;
 };
 
 /** NPC склеивает свои данные, актора и HTN-агента */
@@ -56,7 +56,7 @@ export class Npc {
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
-      signal,
+      gameSignal,
       worldKnowledge,
     } = deps;
 
@@ -81,12 +81,12 @@ export class Npc {
       signal: this.lifetime.signal,
     });
 
-    if (signal.aborted) {
+    if (gameSignal.aborted) {
       this.despawn();
       return;
     }
 
-    signal.addEventListener('abort', () => this.despawn(), {
+    gameSignal.addEventListener('abort', () => this.despawn(), {
       once: true,
       signal: this.lifetime.signal,
     });

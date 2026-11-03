@@ -16,7 +16,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           actorFactory: createMockedActorFactory(actor),
-          signal: game.signal,
+          gameSignal: game.signal,
         })
       );
 
@@ -32,7 +32,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           htnFactory: createMockedHTNFactory(htn),
-          signal: game.signal,
+          gameSignal: game.signal,
         })
       );
 
@@ -48,7 +48,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           htnFactory: createMockedHTNFactory(htn),
-          signal: game.signal,
+          gameSignal: game.signal,
         })
       );
 
@@ -69,7 +69,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           actorFactory: createMockedActorFactory(actor),
-          signal: game.signal,
+          gameSignal: game.signal,
         })
       );
 
@@ -85,7 +85,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           htnFactory: createMockedHTNFactory(htn),
-          signal: game.signal,
+          gameSignal: game.signal,
         })
       );
 

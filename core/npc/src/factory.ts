@@ -19,7 +19,7 @@ export interface INpcFactory {
  */
 export type NpcFactoryDeps = Pick<
   NpcDeps,
-  'actorFactory' | 'frames' | 'rootTaskFactory' | 'signal' | 'worldKnowledge'
+  'actorFactory' | 'frames' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
 > &
   Partial<Pick<NpcDeps, 'htnFactory' | 'inventoryFactory' | 'psycheFactory'>>;
 
@@ -31,7 +31,7 @@ export class NpcFactory implements INpcFactory {
       actorFactory,
       frames,
       rootTaskFactory,
-      signal,
+      gameSignal,
       worldKnowledge,
       htnFactory = new HTNFactory<NpcState, NpcContext>(),
       inventoryFactory = new InventoryFactory(),
@@ -45,7 +45,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory,
       psycheFactory,
       rootTaskFactory,
-      signal,
+      gameSignal,
       worldKnowledge,
     };
   }

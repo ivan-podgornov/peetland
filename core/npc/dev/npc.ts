@@ -46,7 +46,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     },
     frames: createControlledObservable().observable,
     worldKnowledge: createMockedNpcWorldKnowledge(),
-    signal: new AbortController().signal,
+    gameSignal: new AbortController().signal,
     ...deps,
   };
 }

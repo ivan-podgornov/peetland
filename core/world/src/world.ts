@@ -82,7 +82,7 @@ export class World {
         frames,
         psycheFactory,
         rootTaskFactory,
-        signal,
+        gameSignal: signal,
         worldKnowledge,
       }),
     } = this.deps;

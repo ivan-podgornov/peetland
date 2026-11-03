@@ -12,7 +12,9 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      expect(task.canExecute(new NpcStateBuilder().withItem(Item.Money, 100).build())).toBe(true);
+      expect(
+        task.canExecute(new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build())
+      ).toBe(true);
     });
 
     it('Если предмета в состоянии не хватает, возвращает false', () => {
@@ -21,7 +23,9 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      expect(task.canExecute(new NpcStateBuilder().withItem(Item.Money, 99).build())).toBe(false);
+      expect(
+        task.canExecute(new NpcStateBuilder().withInventory({ [Item.Money]: 99 }).build())
+      ).toBe(false);
     });
   });
 
@@ -75,7 +79,7 @@ describe('RemoveItemTask', () => {
 
       const state = task.applyEffects(
         new NpcStateBuilder()
-          .withItem(Item.Booze, 1)
+          .withInventory({ [Item.Booze]: 1 })
           .withTime({
             day: 1,
             hours: 20,
@@ -99,7 +103,9 @@ describe('RemoveItemTask', () => {
         count: 100,
       });
 
-      const state = task.applyEffects(new NpcStateBuilder().withItem(Item.Money, 150).build());
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({ [Item.Money]: 50 });
     });
@@ -110,7 +116,9 @@ describe('RemoveItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(new NpcStateBuilder().withItem(Item.Booze, 1).build());
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({});
     });

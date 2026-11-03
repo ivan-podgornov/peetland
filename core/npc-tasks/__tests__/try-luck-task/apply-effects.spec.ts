@@ -22,7 +22,7 @@ describe('TryLuckTask', () => {
     });
 
     it('Возвращает состояние, которое вернули переданные эффекты', () => {
-      const effected = new NpcStateBuilder().withItem(Item.Bottles, 1).build();
+      const effected = new NpcStateBuilder().withInventory({ [Item.Bottles]: 1 }).build();
       const task = new TryLuckTask(
         {
           chance: 1 / 60,

@@ -63,7 +63,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(new NpcStateBuilder().withItem(Item.Booze, 2).build());
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({ [Item.Booze]: 3 });
     });
@@ -74,7 +76,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(new NpcStateBuilder().withItem(Item.Money, 5).build());
+      const state = task.applyEffects(
+        new NpcStateBuilder().withInventory({ [Item.Money]: 5 }).build()
+      );
 
       expect(state.self.inventory).toStrictEqual({
         [Item.Money]: 5,

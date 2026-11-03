@@ -33,7 +33,7 @@ import { Feeling, Trait } from '@peetland/psyche';
 const state = new NpcStateBuilder()
   .withPosition({ x: 10, y: 20, z: 3 })
   .withAngle(90)
-  .withItem(Item.Money, 50)
+  .withInventory({ [Item.Money]: 50 })
   .withTrait(Trait.Luck, 80)
   .withFeeling(Feeling.Shame, 30)
   .withTime({ day: 1, hours: 20, minutes: 0 })

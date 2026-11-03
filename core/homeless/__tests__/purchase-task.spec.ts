@@ -16,7 +16,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = new NpcStateBuilder().withItem(Item.Money, 100).build();
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build();
 
     const names = planNames(task, state);
 
@@ -47,7 +47,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = new NpcStateBuilder().withItem(Item.Money, 150).build();
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build();
 
     const after = applyPlanEffects(task, state);
 
@@ -66,7 +66,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = new NpcStateBuilder().withItem(Item.Money, 99).build();
+    const state = new NpcStateBuilder().withInventory({ [Item.Money]: 99 }).build();
 
     expect(planNames(task, state)).toBeNull();
   });

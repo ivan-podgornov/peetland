@@ -67,7 +67,9 @@ function createTaskFactoryWithTryLuckSpy() {
 describe('BegTask', () => {
   it('Планирует дойти до места, повернуться и клянчить', () => {
     const task = createTask(createPlacesWithSpot());
-    const state = new NpcStateBuilder().withItem(Item.Money, BOOZE_PRICE - BEGGING_REWARD).build();
+    const state = new NpcStateBuilder()
+      .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD })
+      .build();
 
     expect(planNames(task, state)).toStrictEqual([
       'go-to-coords',
@@ -80,7 +82,10 @@ describe('BegTask', () => {
   it('Если ни денег, ни бутылок нет, клянчит на всё пойло', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
 
-    plan(createTask(createPlacesWithSpot(), npcTaskFactory), new NpcStateBuilder().build());
+    plan(
+      createTask(createPlacesWithSpot(), npcTaskFactory),
+      new NpcStateBuilder().withEmptyInventory().build()
+    );
 
     expect(tryLuck).toHaveBeenCalledTimes(BOOZE_PRICE / BEGGING_REWARD);
   });
@@ -88,8 +93,10 @@ describe('BegTask', () => {
   it('Клянчит столько, сколько не хватает на пойло вместе с деньгами и выручкой за бутылки', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
     const state = new NpcStateBuilder()
-      .withItem(Item.Money, 3 * BEGGING_REWARD)
-      .withItem(Item.Bottles, 2)
+      .withInventory({
+        [Item.Money]: 3 * BEGGING_REWARD,
+        [Item.Bottles]: 2,
+      })
       .build();
 
     plan(createTask(createPlacesWithSpot(), npcTaskFactory), state);
@@ -102,7 +109,7 @@ describe('BegTask', () => {
   it('Если не хватает не кратно BEGGING_REWARD, клянчит с запасом до целой удачи', () => {
     const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
     const state = new NpcStateBuilder()
-      .withItem(Item.Money, BOOZE_PRICE - BEGGING_REWARD - 1)
+      .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 })
       .build();
 
     plan(createTask(createPlacesWithSpot(), npcTaskFactory), state);
@@ -113,8 +120,10 @@ describe('BegTask', () => {
   it('Если на пойло хватает денег и выручки за бутылки, план не составляется', () => {
     const task = createTask(createPlacesWithSpot());
     const state = new NpcStateBuilder()
-      .withItem(Item.Money, BOOZE_PRICE - BOTTLE_PRICE)
-      .withItem(Item.Bottles, 1)
+      .withInventory({
+        [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
+        [Item.Bottles]: 1,
+      })
       .build();
 
     expect(planNames(task, state)).toBeNull();
@@ -204,7 +213,7 @@ describe('BegTask', () => {
   it('За каждую удачу получает BEGGING_REWARD', () => {
     const task = createTask(createPlacesWithSpot());
     const state = new NpcStateBuilder()
-      .withItem(Item.Money, BOOZE_PRICE - 2 * BEGGING_REWARD)
+      .withInventory({ [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD })
       .build();
 
     const after = applyPlanEffects(task, state);
@@ -222,7 +231,7 @@ describe('BegTask', () => {
         createPsycheFactory(0.5)
       );
       const state = new NpcStateBuilder()
-        .withItem(Item.Money, BOOZE_PRICE - 3 * BEGGING_REWARD)
+        .withInventory({ [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD })
         .build();
 
       expect(planNames(task, state)).not.toBeNull();
@@ -235,7 +244,7 @@ describe('BegTask', () => {
         createPsycheFactory(0.5)
       );
       const state = new NpcStateBuilder()
-        .withItem(Item.Money, BOOZE_PRICE - 4 * BEGGING_REWARD)
+        .withInventory({ [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD })
         .build();
 
       expect(planNames(task, state)).toBeNull();
@@ -296,7 +305,7 @@ describe('BegTask', () => {
       const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
       plan(
         createTask(createPlacesWithSpot(), npcTaskFactory, createPsycheFactory(0.5)),
-        new NpcStateBuilder().withItem(Item.Money, BOOZE_PRICE - BEGGING_REWARD).build()
+        new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD }).build()
       );
 
       const after = tryLuck.mock.calls[0]?.[0].applyEffects?.(

@@ -1,5 +1,5 @@
 import type { Vector3 } from '@peetland/geometry';
-import type { InventoryCounts, Item } from '@peetland/inventory';
+import type { InventoryCounts } from '@peetland/inventory';
 import type { Feeling, PsycheFeelings, PsycheTraits, Trait } from '@peetland/psyche';
 import { createPsycheState } from '@peetland/psyche/dev';
 import type { TimeState } from '@peetland/timings';
@@ -13,7 +13,7 @@ import type { NpcState } from '../src';
  *
  * @example
  * const state = new NpcStateBuilder()
- *   .withItem(Item.Money, 50)
+ *   .withInventory({ [Item.Money]: 50 })
  *   .withFeeling(Feeling.Shame, 30)
  *   .build();
  */
@@ -51,13 +51,15 @@ export class NpcStateBuilder {
     return this;
   }
 
-  /** Задаёт количество предмета в инвентаре */
-  withItem(item: Item, count: number): this {
-    this.inventory = {
-      ...this.inventory,
-      [item]: count,
-    };
+  /** Задаёт инвентарь целиком: какие предметы и сколько их у NPC */
+  withInventory(inventory: InventoryCounts): this {
+    this.inventory = inventory;
     return this;
+  }
+
+  /** Опустошает инвентарь. Нужен, когда пустой инвентарь значим для теста */
+  withEmptyInventory(): this {
+    return this.withInventory({});
   }
 
   /** Задаёт значение черты характера */

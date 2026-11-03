@@ -15,12 +15,6 @@ export class GtaTime implements ITime {
     return minutes;
   }
 
-  get minutesSinceMidnight(): number {
-    const [hours, minutes] = getTimeOfDay();
-
-    return hours * 60 + minutes;
-  }
-
   getState(): TimeState {
     const [hours, minutes] = getTimeOfDay();
 

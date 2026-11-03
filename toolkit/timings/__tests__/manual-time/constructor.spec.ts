@@ -7,7 +7,10 @@ describe('ManualTime', () => {
     it('Если слепок не передан, время — полночь', () => {
       const time = new ManualTime();
 
-      expect(time.minutesSinceMidnight).toBe(0);
+      expect(time.getState()).toStrictEqual({
+        hours: 0,
+        minutes: 0,
+      });
     });
 
     it('Час равен часу из слепка', () => {

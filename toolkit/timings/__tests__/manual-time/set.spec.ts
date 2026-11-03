@@ -63,7 +63,10 @@ describe('ManualTime', () => {
       });
 
       expect(() => time.set(24, 0)).toThrow(RangeError);
-      expect(time.minutesSinceMidnight).toBe(8 * 60 + 30);
+      expect(time.getState()).toStrictEqual({
+        hours: 8,
+        minutes: 30,
+      });
     });
   });
 });

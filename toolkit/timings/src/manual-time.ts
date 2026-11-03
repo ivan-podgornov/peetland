@@ -31,10 +31,6 @@ export class ManualTime implements ITime {
     return this.currentMinutes;
   }
 
-  get minutesSinceMidnight(): number {
-    return this.currentHours * 60 + this.currentMinutes;
-  }
-
   getState(): TimeState {
     return {
       hours: this.currentHours,

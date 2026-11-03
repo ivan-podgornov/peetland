@@ -24,9 +24,6 @@ export interface ITime {
   readonly hours: number;
   /** Минуты текущего часа, от 0 до 59 */
   readonly minutes: number;
-  /** Сколько минут прошло с полуночи, от 0 до 1439 */
-  readonly minutesSinceMidnight: number;
-
   /**
    * Возвращает слепок времени суток на момент вызова. Время идёт, и геттеры между вызовами
    * возвращают разное, а слепок не меняется

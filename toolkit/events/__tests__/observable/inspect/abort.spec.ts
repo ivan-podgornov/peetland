@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createControlledObservable, createMockedObserver } from '../../../dev';
+import { getDefaultSubscribeOptions } from '../../../dev';
 import { AbortController } from '../../../src/abort-controller';
-
-import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#inspect', () => {

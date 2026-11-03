@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { createMockedObserver, flushPromises } from '../../../dev';
+import { getDefaultSubscribeOptions } from '../../../dev';
 import { Observable } from '../../../src/observable';
-
-import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('.from', () => {

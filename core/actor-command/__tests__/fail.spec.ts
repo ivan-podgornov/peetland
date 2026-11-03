@@ -1,8 +1,8 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { executeCommand, UPDATE_PERIOD } from './helpers';
-import type { TestCommandControls } from './helpers';
+import { executeCommand, UPDATE_PERIOD } from '../dev';
+import type { TestCommandControls } from '../dev';
 
 describe('Command', () => {
   describe('#fail', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCommand } from './helpers';
+import { createCommand } from '../dev';
 
 describe('Command', () => {
   it('Берёт название из описания команды', () => {

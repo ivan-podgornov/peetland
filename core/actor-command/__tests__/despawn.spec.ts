@@ -1,7 +1,7 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCommand, executeCommand, TestActor, UPDATE_PERIOD } from './helpers';
+import { createCommand, executeCommand, TestActor, UPDATE_PERIOD } from '../dev';
 
 describe('Command', () => {
   describe('Если актора деспавнили во время выполнения', () => {

@@ -1,11 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedObserver } from '../../dev';
+import { getDefaultSubscribeOptions } from '../../dev';
 import { EventTarget } from '../../src';
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
-
-import { getDefaultSubscribeOptions } from './helpers';
 
 type Events = {
   update: [value: string];

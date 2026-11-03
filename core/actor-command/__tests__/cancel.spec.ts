@@ -1,7 +1,7 @@
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCommand, executeCommand, UPDATE_PERIOD } from './helpers';
+import { createCommand, executeCommand, UPDATE_PERIOD } from '../dev';
 
 describe('Command', () => {
   describe('#cancel', () => {

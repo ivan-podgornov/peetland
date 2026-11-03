@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { Planner } from '../../src/planner';
-
 import {
   blockedPrimitive,
   compound,
@@ -11,9 +9,10 @@ import {
   primitive,
   spyPrimitive,
   testState,
-} from '../helpers';
+} from '../../dev';
 
-import type { TestState } from '../helpers';
+import type { TestState } from '../../dev';
+import { Planner } from '../../src/planner';
 
 describe('Planner', () => {
   describe('#plan', () => {

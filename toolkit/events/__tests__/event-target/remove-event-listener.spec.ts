@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { optionsCases, type TestEvents } from '../../dev';
 import { EventTarget } from '../../src/event-target';
-
-import { optionsCases, type TestEvents } from './helpers';
 
 describe('EventTarget', () => {
   describe('#removeEventListener', () => {

@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { ParallelTask } from '../../src';
-import { testState } from '../helpers';
+import { testState } from '../../dev';
 
-import { createContext, createMockedPrimitive } from './helpers';
+import { createContext, createMockedPrimitive } from '../../dev';
+import { ParallelTask } from '../../src';
 
 describe('ParallelTask', () => {
   describe('#start', () => {

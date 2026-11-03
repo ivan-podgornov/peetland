@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { createPlace } from '../dev';
+import { createPlaces } from '../dev';
 import { PlaceType } from '../src';
-
-import { createPlaces } from './helpers';
 
 describe('Places', () => {
   describe('#ofType', () => {

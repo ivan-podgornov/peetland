@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { createPlace, mockedPlace, PlaceType } from '../dev';
+import type { Place } from '../dev';
 import { InMemoryRepository } from '../src';
 import type { Criteria } from '../src';
-
-import { createPlace, mockedPlace, PlaceType } from './helpers';
-import type { Place } from './helpers';
 
 describe('InMemoryRepository', () => {
   describe('#find', () => {

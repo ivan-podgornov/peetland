@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { createPlace, mockedPlace } from '../dev';
 import { InMemoryRepository } from '../src';
-
-import { createPlace, mockedPlace } from './helpers';
 
 describe('InMemoryRepository', () => {
   describe('#getAll', () => {

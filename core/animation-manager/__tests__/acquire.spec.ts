@@ -1,9 +1,8 @@
 import { AbortController } from '@peetland/events';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createTestAnimationManager, createManualLoader } from '../dev';
 import { InstantAnimationLoader } from '../src/instant-animation-loader';
-
-import { createTestAnimationManager, createManualLoader } from './helpers';
 
 describe('AnimationManager', () => {
   describe('#acquire', () => {

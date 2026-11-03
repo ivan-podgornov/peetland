@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { executeCommand } from './helpers';
-import type { TestCommandControls } from './helpers';
+import { executeCommand } from '../dev';
+import type { TestCommandControls } from '../dev';
 
 describe('Command', () => {
   describe('#emit', () => {

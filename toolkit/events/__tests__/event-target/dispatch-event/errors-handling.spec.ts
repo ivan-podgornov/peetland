@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import type { TestEvents } from '../../../dev';
 import { EventTarget } from '../../../src/event-target';
-import type { TestEvents } from '../helpers';
 
 describe('EventTarget', () => {
   describe('#dispatchEvent', () => {

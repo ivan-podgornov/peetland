@@ -1,8 +1,8 @@
 import { AbortController } from '@peetland/events';
 import { describe, expect, it } from 'vitest';
 
-import { createCommand, executeCommand } from './helpers';
-import type { TestCommand } from './helpers';
+import { createCommand, executeCommand } from '../dev';
+import type { TestCommand } from '../dev';
 
 describe('Command', () => {
   describe('#signal', () => {

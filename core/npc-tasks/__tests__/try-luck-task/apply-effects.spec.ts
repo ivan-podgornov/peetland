@@ -21,7 +21,7 @@ describe('TryLuckTask', () => {
     });
 
     it('Возвращает состояние, которое вернули переданные эффекты', () => {
-      const effected = createNpcState({ inventory: { bottles: 1 } });
+      const effected = createNpcState({ self: { inventory: { bottles: 1 } } });
       const task = new TryLuckTask(
         {
           chance: 1 / 60,

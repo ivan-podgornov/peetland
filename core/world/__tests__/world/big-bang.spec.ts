@@ -2,10 +2,15 @@ import { createControlledObservable } from '@peetland/events/dev';
 import type { Task } from '@peetland/htn';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import { createMockedNpcFactory, createNpcData } from '@peetland/npc/dev';
+import {
+  createMockedNpcFactory,
+  createMockedNpcWorldKnowledge,
+  createNpcData,
+} from '@peetland/npc/dev';
 import { createMockedPlaces, createPlace } from '@peetland/places/dev';
 import { Feeling } from '@peetland/psyche';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
+import { ManualTime } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -102,6 +107,96 @@ describe('World', () => {
         frames.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalled();
+      });
+
+      it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
+        const frames = createControlledObservable();
+        const preconditions = vi.fn(() => false);
+        const world = new World(
+          createWorldOptions({
+            game: createGame({ frames: frames.observable }),
+            npcs: [createNpcData()],
+          }),
+          {
+            worldKnowledge: createMockedNpcWorldKnowledge({
+              time: {
+                day: 1,
+                hours: 20,
+                minutes: 15,
+              },
+            }),
+            rootTaskFactory: createMockedRootTaskFactory({
+              name: 'root',
+              methods: [
+                {
+                  name: 'never',
+                  preconditions,
+                  tasks: [],
+                },
+              ],
+            }),
+          }
+        );
+        await world.bigBang();
+
+        frames.subscriber.next(undefined);
+
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({
+            world: {
+              time: {
+                day: 1,
+                hours: 20,
+                minutes: 15,
+              },
+            },
+          })
+        );
+      });
+
+      it('Если worldKnowledge не передано, NPC планирует с временем суток игры', async () => {
+        const frames = createControlledObservable();
+        const preconditions = vi.fn(() => false);
+        const world = new World(
+          createWorldOptions({
+            game: createGame({
+              time: new ManualTime({
+                day: 1,
+                hours: 20,
+                minutes: 15,
+              }),
+              frames: frames.observable,
+            }),
+            npcs: [createNpcData()],
+          }),
+          {
+            rootTaskFactory: createMockedRootTaskFactory({
+              name: 'root',
+              methods: [
+                {
+                  name: 'never',
+                  preconditions,
+                  tasks: [],
+                },
+              ],
+            }),
+          }
+        );
+        await world.bigBang();
+
+        frames.subscriber.next(undefined);
+
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({
+            world: {
+              time: {
+                day: 1,
+                hours: 20,
+                minutes: 15,
+              },
+            },
+          })
+        );
       });
 
       it('NPC создаёт психику фабрикой psycheFactory', async () => {

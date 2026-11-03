@@ -53,7 +53,7 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
    * купить пойло. И если есть приёмка, где их сдать
    */
   private canSell(state: NpcState): boolean {
-    const money = state.inventory[Item.Money] ?? 0;
+    const money = state.self.inventory[Item.Money] ?? 0;
     const revenue = this.countBottles(state) * BOTTLE_PRICE;
 
     return (
@@ -64,7 +64,10 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   /** Собирает задачи сдачи всех бутылок в приёмке, ближайшей к NPC */
   private sellInNearestCollection(state: NpcState): Task<NpcState, NpcContext>[] {
     const { npcTaskFactory } = this.deps;
-    const collection = this.places.findNearest(state.actor.position, PlaceType.BottleCollection);
+    const collection = this.places.findNearest(
+      state.self.actor.position,
+      PlaceType.BottleCollection
+    );
 
     if (!collection) {
       throw new Error('Не из чего выбрать приёмку');
@@ -95,6 +98,6 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Сколько у NPC бутылок */
   private countBottles(state: NpcState): number {
-    return state.inventory[Item.Bottles] ?? 0;
+    return state.self.inventory[Item.Bottles] ?? 0;
   }
 }

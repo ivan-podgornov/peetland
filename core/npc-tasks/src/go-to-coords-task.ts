@@ -19,13 +19,16 @@ export class GoToCoordsTask extends CommandTask {
   applyEffects(state: NpcState): NpcState {
     const { coords } = this.options;
     const actor = {
-      ...state.actor,
+      ...state.self.actor,
       position: coords,
     };
 
     return {
       ...state,
-      actor,
+      self: {
+        ...state.self,
+        actor,
+      },
     };
   }
 

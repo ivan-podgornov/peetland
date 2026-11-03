@@ -40,7 +40,7 @@ function createPlacesWithCamp(
 
 /** Состояние NPC с пойлом */
 function createStateWithBooze(booze = 1): NpcState {
-  return createNpcState({ inventory: { [Item.Booze]: booze } });
+  return createNpcState({ self: { inventory: { [Item.Booze]: booze } } });
 }
 
 describe('DrinkTask', () => {
@@ -59,15 +59,17 @@ describe('DrinkTask', () => {
   it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
     const places = createPlacesWithCamp(true);
     const state = createNpcState({
-      actor: {
-        position: {
-          x: 8,
-          y: 0,
-          z: 0,
+      self: {
+        actor: {
+          position: {
+            x: 8,
+            y: 0,
+            z: 0,
+          },
+          angle: 0,
         },
-        angle: 0,
+        inventory: { [Item.Booze]: 1 },
       },
-      inventory: { [Item.Booze]: 1 },
     });
 
     plan(createTask(places), state);
@@ -86,15 +88,17 @@ describe('DrinkTask', () => {
   it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCamp(false);
     const state = createNpcState({
-      actor: {
-        position: {
-          x: 8,
-          y: 0,
-          z: 0,
+      self: {
+        actor: {
+          position: {
+            x: 8,
+            y: 0,
+            z: 0,
+          },
+          angle: 0,
         },
-        angle: 0,
+        inventory: { [Item.Booze]: 1 },
       },
-      inventory: { [Item.Booze]: 1 },
     });
 
     plan(createTask(places), state);
@@ -152,7 +156,7 @@ describe('DrinkTask', () => {
 
     const after = applyPlanEffects(task, createStateWithBooze(3));
 
-    expect(after.inventory).toStrictEqual({
+    expect(after.self.inventory).toStrictEqual({
       [Item.Booze]: 2,
       [Item.Bottles]: 1,
     });
@@ -161,7 +165,7 @@ describe('DrinkTask', () => {
   it('Если пойла нет, план не составляется', () => {
     const task = createTask(createPlacesWithCamp(true));
 
-    expect(planNames(task, createNpcState({ inventory: {} }))).toBeNull();
+    expect(planNames(task, createNpcState({ self: { inventory: {} } }))).toBeNull();
   });
 
   it('Если бомжарен нет, план не составляется', () => {

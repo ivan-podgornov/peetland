@@ -9,7 +9,7 @@ import {
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc } from '../src';
 
 describe('Npc', () => {
@@ -21,7 +21,7 @@ describe('Npc', () => {
         createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
       );
 
-      expect(npc.getState().inventory).toStrictEqual({ [Item.Money]: 150 });
+      expect(npc.getState().self.inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает слепок инвентаря, который не меняется, когда меняется инвентарь', () => {
@@ -34,7 +34,7 @@ describe('Npc', () => {
 
       npc.inventory.add(Item.Money, 50);
 
-      expect(state.inventory).toStrictEqual({ [Item.Money]: 150 });
+      expect(state.self.inventory).toStrictEqual({ [Item.Money]: 150 });
     });
 
     it('Возвращает позицию актора', () => {
@@ -50,7 +50,7 @@ describe('Npc', () => {
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
       );
 
-      expect(npc.getState().actor.position).toStrictEqual(actor.getPosition());
+      expect(npc.getState().self.actor.position).toStrictEqual(actor.getPosition());
     });
 
     it('Возвращает угол актора', () => {
@@ -60,7 +60,7 @@ describe('Npc', () => {
         createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
       );
 
-      expect(npc.getState().actor.angle).toBe(actor.getAngle());
+      expect(npc.getState().self.actor.angle).toBe(actor.getAngle());
     });
 
     it('Возвращает слепок актора, который не меняется, когда актор двигается', () => {
@@ -83,7 +83,7 @@ describe('Npc', () => {
         z: 5,
       });
 
-      expect(state.actor.position).toStrictEqual({
+      expect(state.self.actor.position).toStrictEqual({
         x: 0,
         y: 0,
         z: 0,
@@ -102,7 +102,26 @@ describe('Npc', () => {
         createNpcDeps({ psycheFactory: createMockedPsycheFactory(psyche) })
       );
 
-      expect(npc.getState().psyche).toStrictEqual(psyche.getState());
+      expect(npc.getState().self.psyche).toStrictEqual(psyche.getState());
+    });
+
+    it('Возвращает состояние мира, которое вернуло знание о мире', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 15,
+        },
+      });
+      const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
+
+      expect(npc.getState().world).toStrictEqual({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 15,
+        },
+      });
     });
   });
 });

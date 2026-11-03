@@ -9,6 +9,7 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
+import type { INpcWorldKnowledge } from './world-knowledge';
 
 export type NpcDeps = {
   /** Фабрика, которой NPC создаёт своего актора */
@@ -23,6 +24,8 @@ export type NpcDeps = {
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом кадре игры */
   frames: Observable<unknown>;
+  /** То, что NPC знает о мире */
+  worldKnowledge: INpcWorldKnowledge;
 };
 
 /** NPC склеивает свои данные, актора и HTN-агента */
@@ -35,6 +38,7 @@ export class Npc {
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
   private readonly lifetime: AbortController;
+  private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
    * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
@@ -42,10 +46,18 @@ export class Npc {
    * @param data - данные NPC
    */
   constructor(data: NpcData, deps: NpcDeps) {
-    const { actorFactory, frames, htnFactory, inventoryFactory, psycheFactory, rootTaskFactory } =
-      deps;
+    const {
+      actorFactory,
+      frames,
+      htnFactory,
+      inventoryFactory,
+      psycheFactory,
+      rootTaskFactory,
+      worldKnowledge,
+    } = deps;
 
     this.id = data.id;
+    this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
     this.lifetime = new AbortController();
@@ -66,15 +78,18 @@ export class Npc {
     });
   }
 
-  /** Возвращает состояние NPC со слепками актора, инвентаря и психики (см. NpcState) */
+  /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */
   getState(): NpcState {
     return {
-      actor: {
-        position: this.actor.getPosition(),
-        angle: this.actor.getAngle(),
+      self: {
+        actor: {
+          position: this.actor.getPosition(),
+          angle: this.actor.getAngle(),
+        },
+        inventory: this.inventory.getAll(),
+        psyche: this.psyche.getState(),
       },
-      inventory: this.inventory.getAll(),
-      psyche: this.psyche.getState(),
+      world: this.worldKnowledge.getState(),
     };
   }
 

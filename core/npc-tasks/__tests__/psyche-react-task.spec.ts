@@ -43,15 +43,17 @@ describe('PsycheReactTask', () => {
     it('Собирает психику фабрикой из слепка психики в состоянии', () => {
       const psycheFactory = createMockedPsycheFactory();
       const state = createNpcState({
-        psyche: createPsycheState({
-          feelings: { [Feeling.Shame]: 30 },
-        }),
+        self: {
+          psyche: createPsycheState({
+            feelings: { [Feeling.Shame]: 30 },
+          }),
+        },
       });
       const task = new PsycheReactTask({ deed: Deed.BottleFound }, { psycheFactory });
 
       task.applyEffects(state);
 
-      expect(psycheFactory.create).toHaveBeenCalledExactlyOnceWith(state.psyche);
+      expect(psycheFactory.create).toHaveBeenCalledExactlyOnceWith(state.self.psyche);
     });
 
     it('Сообщает собранной психике о поступке', () => {
@@ -66,6 +68,33 @@ describe('PsycheReactTask', () => {
       expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
 
+    it('Не меняет то, что NPC знает о мире', () => {
+      const task = new PsycheReactTask(
+        { deed: Deed.BottleFound },
+        { psycheFactory: createMockedPsycheFactory(createMockedPsyche()) }
+      );
+
+      const state = task.applyEffects(
+        createNpcState({
+          world: {
+            time: {
+              day: 1,
+              hours: 20,
+              minutes: 0,
+            },
+          },
+        })
+      );
+
+      expect(state.world).toStrictEqual({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 0,
+        },
+      });
+    });
+
     it('Кладёт в состояние слепок собранной психики', () => {
       const after = createPsycheState({
         feelings: { [Feeling.Shame]: 28 },
@@ -77,7 +106,7 @@ describe('PsycheReactTask', () => {
 
       const state = task.applyEffects(createNpcState());
 
-      expect(state.psyche).toBe(after);
+      expect(state.self.psyche).toBe(after);
     });
   });
 });

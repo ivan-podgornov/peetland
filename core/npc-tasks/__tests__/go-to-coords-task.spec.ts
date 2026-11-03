@@ -80,6 +80,37 @@ describe('GoToCoordsTask', () => {
   });
 
   describe('#applyEffects', () => {
+    it('Не меняет то, что NPC знает о мире', () => {
+      const task = new GoToCoordsTask({
+        coords: {
+          x: 10,
+          y: 5,
+          z: 1,
+        },
+        completeRadius: 1,
+      });
+
+      const state = task.applyEffects(
+        createNpcState({
+          world: {
+            time: {
+              day: 1,
+              hours: 20,
+              minutes: 0,
+            },
+          },
+        })
+      );
+
+      expect(state.world).toStrictEqual({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 0,
+        },
+      });
+    });
+
     it('Перемещает актора в состоянии на координаты', () => {
       const task = new GoToCoordsTask({
         coords: {
@@ -92,18 +123,20 @@ describe('GoToCoordsTask', () => {
 
       const state = task.applyEffects(
         createNpcState({
-          actor: {
-            position: {
-              x: 0,
-              y: 0,
-              z: 0,
+          self: {
+            actor: {
+              position: {
+                x: 0,
+                y: 0,
+                z: 0,
+              },
+              angle: 90,
             },
-            angle: 90,
           },
         })
       );
 
-      expect(state.actor).toEqual({
+      expect(state.self.actor).toEqual({
         position: {
           x: 10,
           y: 5,

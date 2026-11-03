@@ -16,7 +16,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ inventory: { [Item.Money]: 100 } });
+    const state = createNpcState({ self: { inventory: { [Item.Money]: 100 } } });
 
     const names = planNames(task, state);
 
@@ -47,11 +47,11 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ inventory: { [Item.Money]: 150 } });
+    const state = createNpcState({ self: { inventory: { [Item.Money]: 150 } } });
 
     const after = applyPlanEffects(task, state);
 
-    expect(after.inventory).toStrictEqual({
+    expect(after.self.inventory).toStrictEqual({
       [Item.Money]: 50,
       [Item.Booze]: 2,
     });
@@ -66,7 +66,7 @@ describe('PurchaseTask', () => {
       },
       { npcTaskFactory: createNpcTaskFactory() }
     );
-    const state = createNpcState({ inventory: { [Item.Money]: 99 } });
+    const state = createNpcState({ self: { inventory: { [Item.Money]: 99 } } });
 
     expect(planNames(task, state)).toBeNull();
   });

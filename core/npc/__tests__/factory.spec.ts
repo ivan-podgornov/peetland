@@ -8,7 +8,7 @@ import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc, NpcFactory } from '../src';
 import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 
@@ -23,6 +23,7 @@ function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps 
         methods: [],
       })),
     },
+    worldKnowledge: createMockedNpcWorldKnowledge(),
     ...deps,
   };
 }
@@ -62,6 +63,27 @@ describe('NpcFactory', () => {
       factory.create(createNpcData());
 
       expect(psycheFactory.create).toHaveBeenCalledOnce();
+    });
+
+    it('NPC узнаёт о мире через worldKnowledge из зависимостей', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 15,
+        },
+      });
+      const factory = new NpcFactory(createRequiredDeps({ worldKnowledge }));
+
+      const npc = factory.create(createNpcData());
+
+      expect(npc.getState().world).toStrictEqual({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 15,
+        },
+      });
     });
 
     it('Если htnFactory не передана, NPC на кадре планирует свою корневую задачу', () => {

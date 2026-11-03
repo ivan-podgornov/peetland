@@ -35,12 +35,15 @@ export class PsycheReactTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Собирает психику из слепка в состоянии, сообщает ей о поступке и кладёт в состояние её новый слепок */
   applyEffects(state: NpcState): NpcState {
     const { psycheFactory } = this.deps;
-    const psyche = psycheFactory.create(state.psyche);
+    const psyche = psycheFactory.create(state.self.psyche);
     psyche.react(this.options.deed);
 
     return {
       ...state,
-      psyche: psyche.getState(),
+      self: {
+        ...state.self,
+        psyche: psyche.getState(),
+      },
     };
   }
 

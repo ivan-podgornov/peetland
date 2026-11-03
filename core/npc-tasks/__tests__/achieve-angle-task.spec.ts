@@ -51,24 +51,56 @@ describe('AchieveAngleTask', () => {
 
       const state = task.applyEffects(
         createNpcState({
-          actor: {
-            position: {
-              x: 1,
-              y: 2,
-              z: 3,
+          self: {
+            actor: {
+              position: {
+                x: 1,
+                y: 2,
+                z: 3,
+              },
+              angle: 0,
             },
-            angle: 0,
           },
         })
       );
 
-      expect(state.actor).toEqual({
+      expect(state.self.actor).toEqual({
         position: {
           x: 1,
           y: 2,
           z: 3,
         },
         angle: 90,
+      });
+    });
+
+    it('Не меняет то, что NPC знает о мире', () => {
+      const task = new AchieveAngleTask(
+        {
+          angle: 90,
+          tolerance: 5,
+        },
+        { geometry: new Geometry() }
+      );
+
+      const state = task.applyEffects(
+        createNpcState({
+          world: {
+            time: {
+              day: 1,
+              hours: 20,
+              minutes: 0,
+            },
+          },
+        })
+      );
+
+      expect(state.world).toStrictEqual({
+        time: {
+          day: 1,
+          hours: 20,
+          minutes: 0,
+        },
       });
     });
 
@@ -83,7 +115,7 @@ describe('AchieveAngleTask', () => {
 
       const state = task.applyEffects(createNpcState());
 
-      expect(state.actor.angle).toBe(270);
+      expect(state.self.actor.angle).toBe(270);
     });
   });
 });

@@ -31,6 +31,15 @@ interface LuaGlobal {
   };
 }
 
+/** Скрипт MoonLoader */
+declare class LuaScript {
+  /** Уникальный номер скрипта */
+  readonly id: number;
+
+  /** Имя скрипта */
+  readonly name: string;
+}
+
 /** Класс для работы с Lua потоками в MoonLoader */
 declare class LuaThread<Args extends unknown[]> {
   /** Выполняет замороженный, выполняющийся или завершённый поток с начала */
@@ -51,6 +60,6 @@ declare class LuaThread<Args extends unknown[]> {
 
 declare const _G: LuaGlobal;
 
-export { LuaThread };
+export { LuaScript, LuaThread };
 
 export const { lua_thread, math, os } = _G;

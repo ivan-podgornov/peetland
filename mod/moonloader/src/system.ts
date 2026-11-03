@@ -1,4 +1,5 @@
 import type { PlayerHandle } from './handles';
+import type { LuaScript } from './lua';
 
 export type VKey = (typeof import('vkeys'))[keyof typeof import('vkeys')];
 
@@ -42,8 +43,8 @@ interface SystemGlobal {
   /** Проверяет, была ли клавиша нажата */
   wasKeyPressed(this: void, key: VKey): boolean;
 
-  /** Получает имя текущего скрипта */
-  thisScript(this: void): string;
+  /** Возвращает текущий скрипт */
+  thisScript(this: void): LuaScript;
 
   /** Выгружает скрипт */
   unloadScript(this: void, scriptName: string): void;

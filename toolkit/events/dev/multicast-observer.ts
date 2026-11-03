@@ -1,8 +1,9 @@
 import { vi } from 'vitest';
 
-import { createMockedObserver } from '../../dev';
-import type { MulticastObserver } from '../../src/multicast-observer';
-import type { IObserverObject, ObserveOptions } from '../../src/subscriber';
+import type { MulticastObserver } from '../src/multicast-observer';
+import type { IObserverObject, ObserveOptions } from '../src/subscriber';
+
+import { createMockedObserver } from './observer';
 
 export function getDefaultObserveOptions(): ObserveOptions {
   return {};

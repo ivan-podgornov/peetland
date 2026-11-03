@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMockedObserver } from '../../dev';
-import { MulticastObserver } from '../../src/multicast-observer';
+import { MulticastObserver } from '../src/multicast-observer';
 
-import { callMethod, createObserverWithThrowsMethod, getDefaultObserveOptions } from './helpers';
+import {
+  callMethod,
+  createObserverWithThrowsMethod,
+  getDefaultObserveOptions,
+} from './multicast-observer';
 
-import type { CreateMockedObserverOptions } from './helpers';
+import type { CreateMockedObserverOptions } from './multicast-observer';
+import { createMockedObserver } from './observer';
 
 export function describeBehaviourOnErrorInObserver(options: CreateMockedObserverOptions) {
   const { method } = options;

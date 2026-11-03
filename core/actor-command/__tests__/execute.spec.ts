@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCommand, executeCommand } from './helpers';
+import { createCommand, executeCommand } from '../dev';
 
 describe('Command', () => {
   describe('#execute', () => {

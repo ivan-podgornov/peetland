@@ -1,6 +1,6 @@
-import { AbortController } from '../../src/abort-controller';
-import type { ISubscriber } from '../../src/subscriber';
-import type { SubscriberConstructorOptions } from '../../src/subscriber/subscriber';
+import { AbortController } from '../src/abort-controller';
+import type { ISubscriber } from '../src/subscriber';
+import type { SubscriberConstructorOptions } from '../src/subscriber/subscriber';
 
 export function getDefaultConstructorOptions(): SubscriberConstructorOptions {
   return {};

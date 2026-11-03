@@ -3,9 +3,8 @@ import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createHomelessTaskFactory } from '../dev';
 import { HomelessRootTask } from '../src';
-
-import { createHomelessTaskFactory } from './helpers';
 
 describe('HomelessRootTask', () => {
   it('Вызывает homelessTaskFactory.drink', () => {

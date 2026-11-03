@@ -1,8 +1,9 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { PrimitiveTask } from '../../src';
-import type { TestContext, TestState } from '../helpers';
+import type { PrimitiveTask } from '../src';
+
+import type { TestContext, TestState } from './test-tasks';
 
 /**
  * Создаёт примитивную задачу, методы которой — моки. Методы, которые не переданы, отвечают, что

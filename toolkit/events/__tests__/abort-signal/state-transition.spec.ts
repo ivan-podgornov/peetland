@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { listenAbortEvent } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
-
-import { listenAbortEvent } from './helpers';
 
 const abortEventHandlingVariants = [
   {

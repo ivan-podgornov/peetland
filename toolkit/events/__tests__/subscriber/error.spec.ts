@@ -1,15 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedObserver } from '../../dev';
+
+import { describeBehaviorOnDeactivation } from '../../dev';
+import { describeBehaviorOnRepeatDeactivation, getRepeatBehaviourCases } from '../../dev';
+import { getDefaultConstructorOptions } from '../../dev';
 import { AbortController } from '../../src/abort-controller';
 import { Subscriber } from '../../src/subscriber/subscriber';
-
-import { describeBehaviorOnDeactivation } from './describe-behavior-on-deactivation';
-import {
-  describeBehaviorOnRepeatDeactivation,
-  getRepeatBehaviourCases,
-} from './describe-behaviour-on-repeat-deactivation';
-import { getDefaultConstructorOptions } from './helpers';
 
 const casesWithoutErrorInObserver = [
   {

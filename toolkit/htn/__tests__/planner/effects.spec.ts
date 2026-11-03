@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { blockedPrimitive, compound, method, spyMethod, spyPrimitive, testState } from '../../dev';
+
+import type { TestState } from '../../dev';
 import { Planner } from '../../src/planner';
-
-import { blockedPrimitive, compound, method, spyMethod, spyPrimitive, testState } from '../helpers';
-
-import type { TestState } from '../helpers';
 
 describe('Planner', () => {
   describe('#plan', () => {

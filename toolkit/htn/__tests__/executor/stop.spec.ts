@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { primitive, testContext, testState } from '../../dev';
 import { Executor } from '../../src/executor';
-import { primitive, testContext, testState } from '../helpers';
 
 describe('Executor', () => {
   describe('#stop', () => {

@@ -1,7 +1,7 @@
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createControlledCommand, TestCommandTask } from '../helpers';
+import { createControlledCommand, TestCommandTask } from '../../dev';
 
 describe('CommandTask', () => {
   describe('#update', () => {

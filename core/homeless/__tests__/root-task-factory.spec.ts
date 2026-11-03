@@ -8,10 +8,9 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createHomelessTaskFactory } from '../dev';
 import { HomelessRootTask, HomelessRootTaskFactory } from '../src';
 import type { HomelessRootTaskFactoryDeps } from '../src';
-
-import { createHomelessTaskFactory } from './helpers';
 
 /** Создаёт зависимости фабрики корневой задачи бомжа. Свои задачи фабрика собирает по умолчанию */
 function createDeps(deps: Partial<HomelessRootTaskFactoryDeps> = {}): HomelessRootTaskFactoryDeps {

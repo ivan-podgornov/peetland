@@ -14,9 +14,8 @@ import { ManualTime } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createGame, createWorldOptions } from '../../dev';
 import { World } from '../../src';
-
-import { createGame, createWorldOptions } from './helpers';
 
 /** Создаёт фабрику корневых задач, которая всегда возвращает переданную задачу */
 function createMockedRootTaskFactory(

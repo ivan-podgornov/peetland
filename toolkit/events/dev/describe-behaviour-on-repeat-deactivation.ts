@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createMockedObserver } from '../../dev';
-import { AbortController } from '../../src/abort-controller';
-import { Subscriber } from '../../src/subscriber';
+import { AbortController } from '../src/abort-controller';
+import { Subscriber } from '../src/subscriber';
 
-import { createDeactivator, getDefaultConstructorOptions } from './helpers';
-import type { DeactivateMethod } from './helpers';
+import { createMockedObserver } from './observer';
+
+import { createDeactivator, getDefaultConstructorOptions } from './subscriber';
+import type { DeactivateMethod } from './subscriber';
 
 function getOtherMethodRepeatBehaviourTitle(method: DeactivateMethod) {
   switch (method) {

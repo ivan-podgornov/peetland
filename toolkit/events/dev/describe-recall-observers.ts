@@ -1,13 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createMockedObserver } from '../../dev';
-import { AbortController } from '../../src/abort-controller';
-import { AbortSignal } from '../../src/abort-signal';
-import { MulticastObserver } from '../../src/multicast-observer';
+import { AbortController } from '../src/abort-controller';
+import { AbortSignal } from '../src/abort-signal';
+import { MulticastObserver } from '../src/multicast-observer';
 
-import type { CreateMockedObserverOptions } from './helpers';
+import type { CreateMockedObserverOptions } from './multicast-observer';
 
-import { callMethod, createObserverWithMethod, getDefaultObserveOptions } from './helpers';
+import {
+  callMethod,
+  createObserverWithMethod,
+  getDefaultObserveOptions,
+} from './multicast-observer';
+import { createMockedObserver } from './observer';
 
 // Методы, после вызова которых вещание завершается и наблюдатели больше ничего не получают
 const FINISH_METHODS = ['complete', 'error'] as const;

@@ -1,8 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { MulticastObserver } from '../../src/multicast-observer';
+import { MulticastObserver } from '../src/multicast-observer';
 
-import { callMethod, createObserverWithMethod, getDefaultObserveOptions } from './helpers';
+import {
+  callMethod,
+  createObserverWithMethod,
+  getDefaultObserveOptions,
+} from './multicast-observer';
 
 type DescribeSignalFinishOptions = {
   /** Метод для которого нужно проверить завершение сигнала */

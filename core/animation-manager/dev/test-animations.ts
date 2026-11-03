@@ -1,5 +1,7 @@
-import { createAnimationManager, ManualAnimationLoader } from '../dev';
 import type { AnimationManager, AnimationTable, IAnimationLoader } from '../src';
+
+import { createAnimationManager } from './animation-manager';
+import { ManualAnimationLoader } from './manual-animation-loader';
 
 /** Анимация для тестов менеджера анимаций. Анимации одной группы загружаются одной загрузкой */
 export type TestAnimation = {

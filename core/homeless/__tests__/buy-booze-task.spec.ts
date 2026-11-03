@@ -9,10 +9,9 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createHomelessTaskFactory } from '../dev';
 import { BOOZE_PRICE, BuyBoozeTask } from '../src/buy-booze-task';
 import type { BuyBoozeTaskDeps } from '../src/buy-booze-task';
-
-import { createHomelessTaskFactory } from './helpers';
 
 /** Создаёт задачу покупки пойла с настоящими фабриками задач, если другие не переданы */
 function createTask(places: IPlaces, deps: Partial<BuyBoozeTaskDeps> = {}): BuyBoozeTask {

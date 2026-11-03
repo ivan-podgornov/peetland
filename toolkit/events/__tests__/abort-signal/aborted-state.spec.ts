@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { immediatelyAbortedSignalExecutor } from '../../dev';
 import { AbortSignal } from '../../src/abort-signal';
-
-import { immediatelyAbortedSignalExecutor } from './helpers';
 
 describe('AbortSignal', () => {
   describe('При состоянии aborted', () => {

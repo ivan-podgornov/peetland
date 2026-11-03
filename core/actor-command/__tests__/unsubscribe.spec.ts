@@ -2,7 +2,7 @@ import { AbortController } from '@peetland/events';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { executeCommand, UPDATE_PERIOD } from './helpers';
+import { executeCommand, UPDATE_PERIOD } from '../dev';
 
 describe('Command', () => {
   describe('Если от Observable отписались', () => {

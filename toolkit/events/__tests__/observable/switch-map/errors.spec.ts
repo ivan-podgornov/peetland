@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createControlledObservable, createMockedObserver } from '../../../dev';
-import { getDefaultSubscribeOptions } from '../helpers';
+import { getDefaultSubscribeOptions } from '../../../dev';
 
 // Внутренний observable — тот, который вернул mapper
 

@@ -8,7 +8,7 @@ import { ManualTime } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
-import type { WorldOptions } from '../../src';
+import type { WorldOptions } from '../src';
 
 /** Создаёт игру с виртуальными акторами и ручным временем. Кадры не идут, а объекты создавать нельзя */
 export function createGame(game: Partial<IGame> = {}): IGame {

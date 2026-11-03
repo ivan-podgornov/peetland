@@ -1,13 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { getDummyExecutor, getDummyPlanner, primitive, testContext, testState } from '../../../dev';
 import { HTN, getDefaultDeps } from '../../../src/htn';
-import {
-  getDummyExecutor,
-  getDummyPlanner,
-  primitive,
-  testContext,
-  testState,
-} from '../../helpers';
 
 describe('HTN', () => {
   describe('#update', () => {

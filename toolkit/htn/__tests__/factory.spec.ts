@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { primitive } from '../dev';
 import { HTN, HTNFactory } from '../src';
-
-import { primitive } from './helpers';
 
 describe('HTNFactory', () => {
   describe('#create', () => {

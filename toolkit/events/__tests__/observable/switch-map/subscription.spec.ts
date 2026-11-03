@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { createControlledObservable, createMockedObserver } from '../../../dev';
+import { getDefaultSubscribeOptions } from '../../../dev';
 import { AbortController } from '../../../src/abort-controller';
-
-import { getDefaultSubscribeOptions } from '../helpers';
 
 // Внутренний observable — тот, который вернул mapper
 

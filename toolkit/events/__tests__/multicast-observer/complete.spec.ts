@@ -1,9 +1,9 @@
 import { describe } from 'vitest';
 
-import { describeBehaviourOnErrorInObserver } from './describe-behaviour-on-error-in-observer';
-import { describeBehaviourWhenMethodAbsent } from './describe-behaviour-when-method-absent';
-import { describeRecallObserver } from './describe-recall-observers';
-import { describeSignalFinish } from './describe-signal-finish';
+import { describeBehaviourOnErrorInObserver } from '../../dev';
+import { describeBehaviourWhenMethodAbsent } from '../../dev';
+import { describeRecallObserver } from '../../dev';
+import { describeSignalFinish } from '../../dev';
 
 describe('MulticastObserver', () => {
   describe('#complete', () => {

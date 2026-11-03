@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import { createTestAnimationManager, createManualLoader, TEST_ANIMATIONS } from '../dev';
+import type { TestAnimation } from '../dev';
 import { AnimationManager } from '../src';
 import type { AnimationTable } from '../src';
-
-import { createTestAnimationManager, createManualLoader, TEST_ANIMATIONS } from './helpers';
-import type { TestAnimation } from './helpers';
 
 describe('AnimationManager', () => {
   describe('#resolve', () => {

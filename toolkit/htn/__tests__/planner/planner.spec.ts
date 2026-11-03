@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { Planner } from '../../src/planner';
-import type { Task } from '../../src/task';
-
 import {
   blockedMethod,
   blockedPrimitive,
@@ -11,9 +8,10 @@ import {
   method,
   primitive,
   testState,
-} from '../helpers';
-
-import type { TestContext, TestState } from '../helpers';
+} from '../../dev';
+import type { TestContext, TestState } from '../../dev';
+import { Planner } from '../../src/planner';
+import type { Task } from '../../src/task';
 
 describe('Planner', () => {
   describe('#plan', () => {

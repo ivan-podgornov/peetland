@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedObserver } from '../../../dev';
+import { getDefaultSubscribeOptions } from '../../../dev';
 import { Observable } from '../../../src/observable';
-
-import { getDefaultSubscribeOptions } from '../helpers';
 
 describe('Observable', () => {
   describe('#subscribe', () => {

@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedAbortSignal } from '../../../dev';
+import { type TestEvents } from '../../../dev';
 import { EventTarget } from '../../../src/event-target';
-import { type TestEvents } from '../helpers';
 
 describe('EventTarget', () => {
   describe('С опцией signal', () => {

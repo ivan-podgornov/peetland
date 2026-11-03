@@ -57,11 +57,7 @@ describe('DrinkTask', () => {
   it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
     const places = createPlacesWithCamp(true);
     const state = new NpcStateBuilder()
-      .withPosition({
-        x: 8,
-        y: 0,
-        z: 0,
-      })
+      .withPosition(8, 0, 0)
       .withInventory({ [Item.Booze]: 1 })
       .build();
 
@@ -81,11 +77,7 @@ describe('DrinkTask', () => {
   it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCamp(false);
     const state = new NpcStateBuilder()
-      .withPosition({
-        x: 8,
-        y: 0,
-        z: 0,
-      })
+      .withPosition(8, 0, 0)
       .withInventory({ [Item.Booze]: 1 })
       .build();
 

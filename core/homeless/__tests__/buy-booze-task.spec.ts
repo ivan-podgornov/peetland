@@ -49,13 +49,7 @@ describe('BuyBoozeTask', () => {
 
   it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
     const places = createPlacesWithShop();
-    const state = new NpcStateBuilder()
-      .withPosition({
-        x: 8,
-        y: 0,
-        z: 0,
-      })
-      .build();
+    const state = new NpcStateBuilder().withPosition(8, 0, 0).build();
 
     plan(createTask(places), state);
 

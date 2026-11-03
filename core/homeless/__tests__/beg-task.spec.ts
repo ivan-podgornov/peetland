@@ -131,13 +131,7 @@ describe('BegTask', () => {
 
   it('Ищет место для клянчанья, ближайшее к NPC', () => {
     const places = createPlacesWithSpot();
-    const state = new NpcStateBuilder()
-      .withPosition({
-        x: 1,
-        y: 2,
-        z: 3,
-      })
-      .build();
+    const state = new NpcStateBuilder().withPosition(1, 2, 3).build();
 
     plan(createTask(places), state);
 

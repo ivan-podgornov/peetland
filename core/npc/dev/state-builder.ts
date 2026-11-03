@@ -45,8 +45,12 @@ export class NpcStateBuilder {
   }
 
   /** Задаёт позицию актора */
-  withPosition(position: Vector3): this {
-    this.position = position;
+  withPosition(x: number, y: number, z: number): this {
+    this.position = {
+      x,
+      y,
+      z,
+    };
     return this;
   }
 

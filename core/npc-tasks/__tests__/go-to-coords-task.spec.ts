@@ -120,14 +120,7 @@ describe('GoToCoordsTask', () => {
       });
 
       const state = task.applyEffects(
-        new NpcStateBuilder()
-          .withPosition({
-            x: 0,
-            y: 0,
-            z: 0,
-          })
-          .withAngle(90)
-          .build()
+        new NpcStateBuilder().withPosition(0, 0, 0).withAngle(90).build()
       );
 
       expect(state.self.actor).toEqual({

@@ -57,11 +57,7 @@ describe('SellBottlesTask', () => {
   it('Ищет приёмку, ближайшую к позиции NPC из состояния', () => {
     const places = createPlacesWithCollection();
     const state = new NpcStateBuilder()
-      .withPosition({
-        x: 8,
-        y: 0,
-        z: 0,
-      })
+      .withPosition(8, 0, 0)
       .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
       .build();
 

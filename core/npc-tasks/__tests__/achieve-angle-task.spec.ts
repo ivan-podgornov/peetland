@@ -49,15 +49,7 @@ describe('AchieveAngleTask', () => {
         { geometry: new Geometry() }
       );
 
-      const state = task.applyEffects(
-        new NpcStateBuilder()
-          .withPosition({
-            x: 1,
-            y: 2,
-            z: 3,
-          })
-          .build()
-      );
+      const state = task.applyEffects(new NpcStateBuilder().withPosition(1, 2, 3).build());
 
       expect(state.self.actor).toEqual({
         position: {

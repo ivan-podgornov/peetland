@@ -25,8 +25,8 @@ export type SellBottlesTaskDeps = {
 
 /**
  * Сдать бутылки в ближайшей приёмке: все бутылки, по BOTTLE_PRICE за штуку. Приёмка и количество
- * бутылок определяются при планировании, один раз на весь план. Сдавать идёт, только если после
- * сдачи денег хватит на пойло
+ * бутылок определяются при планировании, один раз на весь план. Сдавать идёт, только если есть
+ * что сдать и после сдачи денег хватит на пойло
  */
 export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'sell-bottles';
@@ -49,15 +49,17 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   /**
-   * Сдавать бутылки есть смысл, только если на вырученные деньги вместе с теми, что уже есть, можно
-   * купить пойло. И если есть приёмка, где их сдать
+   * Сдавать бутылки есть смысл, только если они есть и на вырученные деньги вместе с теми, что уже
+   * есть, можно купить пойло. И если есть приёмка, где их сдать
    */
   private canSell(state: NpcState): boolean {
     const money = state.self.inventory[Item.Money] ?? 0;
-    const revenue = this.countBottles(state) * BOTTLE_PRICE;
+    const bottles = this.countBottles(state);
 
     return (
-      money + revenue >= BOOZE_PRICE && this.places.ofType(PlaceType.BottleCollection).length > 0
+      bottles > 0 &&
+      money + bottles * BOTTLE_PRICE >= BOOZE_PRICE &&
+      this.places.ofType(PlaceType.BottleCollection).length > 0
     );
   }
 

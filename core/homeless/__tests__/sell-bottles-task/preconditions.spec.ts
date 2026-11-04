@@ -60,6 +60,13 @@ describe('SellBottlesTask', () => {
         expect(planNames(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
       });
 
+      it('Если бутылок нет, план не составляется, даже если денег хватает на пойло', () => {
+        const task = createSellBottlesTask(createPlacesWithCollection());
+        const state = new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
+
+        expect(planNames(task, state)).toBeNull();
+      });
+
       it('Если приёмок нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
         const state = new NpcStateBuilder()

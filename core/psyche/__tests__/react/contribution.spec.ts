@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createPsycheDeps,
   createPsycheState,
+  createMockedLuck,
   createMockedTrait,
   createMockedTraitFactory,
 } from '../../dev';
@@ -12,7 +13,7 @@ describe('Psyche', () => {
   describe('#react', () => {
     it('Передаёт поступок каждой черте', () => {
       const conscientiousness = createMockedTrait();
-      const luck = createMockedTrait();
+      const luck = createMockedLuck();
       const psyche = new Psyche(
         createPsycheState(),
         createPsycheDeps({
@@ -55,7 +56,7 @@ describe('Psyche', () => {
           [Trait.Conscientiousness]: createMockedTraitFactory(
             createMockedTrait({ [Feeling.Shame]: 5 })
           ),
-          [Trait.Luck]: createMockedTraitFactory(createMockedTrait({ [Feeling.Shame]: -2 })),
+          [Trait.Luck]: createMockedTraitFactory(createMockedLuck({ [Feeling.Shame]: -2 })),
         })
       );
 

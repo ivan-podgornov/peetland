@@ -1,6 +1,6 @@
 import { Deed } from '../deed';
 import { Feeling } from '../feeling';
-import type { FeelingsContribution, ITrait, ITraitFactory, ModifiersContribution } from '../types';
+import type { FeelingsContribution, ITrait, ITraitFactory } from '../types';
 
 /** Минимальная совестливость */
 export const MIN_CONSCIENTIOUSNESS = 0;
@@ -38,11 +38,6 @@ export class Conscientiousness implements ITrait {
       case Deed.BottleFound:
         return { [Feeling.Shame]: -BOTTLE_FOUND_SHAME_RELIEF * (1.5 - this.getShare()) };
     }
-  }
-
-  /** Совестливость не меняет модификаторы */
-  getModifiers(): ModifiersContribution {
-    return {};
   }
 
   /** Возвращает совестливость долей от 0 до 1 */

@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { createPsycheDeps, createPsycheState, createMockedTraitFactory } from '../dev';
+import {
+  createMockedLuck,
+  createMockedTraitFactory,
+  createPsycheDeps,
+  createPsycheState,
+} from '../dev';
 import { Feeling, Psyche, Trait } from '../src';
 
 describe('Psyche', () => {
   describe('#constructor', () => {
     it('Создаёт каждую черту фабрикой этой черты со значением из состояния', () => {
       const conscientiousness = createMockedTraitFactory();
-      const luck = createMockedTraitFactory();
+      const luck = createMockedTraitFactory(createMockedLuck());
       const state = createPsycheState({
         traits: {
           [Trait.Conscientiousness]: 70,

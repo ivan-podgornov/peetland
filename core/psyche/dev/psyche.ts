@@ -1,29 +1,36 @@
 import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
 import { Feeling, Trait } from '../src';
 import type {
   FeelingsContribution,
+  ILuck,
   ITrait,
   ITraitFactory,
-  ModifiersContribution,
   PsycheState,
   TraitFactories,
 } from '../src';
 import type { PsycheDeps } from '../src/psyche';
 
-/** Создаёт черту, которая на любой поступок возвращает переданный вклад в чувства и всегда — переданный вклад в модификаторы */
-export function createMockedTrait(
-  contribution: FeelingsContribution = {},
-  modifiers: ModifiersContribution = {}
-): ITrait {
+/** Создаёт черту, которая на любой поступок возвращает переданный вклад */
+export function createMockedTrait(contribution: FeelingsContribution = {}): Mocked<ITrait> {
+  return { react: vi.fn(() => contribution) };
+}
+
+/** Создаёт удачливость, которая на любой поступок возвращает переданный вклад и не меняет шанс */
+export function createMockedLuck(contribution: FeelingsContribution = {}): Mocked<ILuck> {
   return {
-    react: vi.fn(() => contribution),
-    getModifiers: vi.fn(() => modifiers),
+    ...createMockedTrait(contribution),
+    adjustChance: vi.fn((chance: number) => chance),
   };
 }
 
 /** Создаёт фабрику, которая всегда возвращает переданную черту */
-export function createMockedTraitFactory(trait: ITrait = createMockedTrait()): ITraitFactory {
+export function createMockedTraitFactory(): Mocked<ITraitFactory>;
+export function createMockedTraitFactory<T extends ITrait>(trait: T): Mocked<ITraitFactory<T>>;
+export function createMockedTraitFactory(
+  trait: ITrait = createMockedTrait()
+): Mocked<ITraitFactory> {
   return { create: vi.fn(() => trait) };
 }
 
@@ -41,12 +48,15 @@ export function createPsycheState(state: Partial<PsycheState> = {}): PsycheState
   };
 }
 
-/** Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вкладов */
+/**
+ * Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вкладов, а
+ * удачливость не меняет шанс
+ */
 export function createPsycheDeps(traitFactories: Partial<TraitFactories> = {}): PsycheDeps {
   return {
     traitFactories: {
       [Trait.Conscientiousness]: createMockedTraitFactory(),
-      [Trait.Luck]: createMockedTraitFactory(),
+      [Trait.Luck]: createMockedTraitFactory(createMockedLuck()),
       ...traitFactories,
     },
   };

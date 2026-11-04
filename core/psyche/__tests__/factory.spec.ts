@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMockedTraitFactory, createPsycheDeps, createPsycheState } from '../dev';
-import { Deed, Feeling, Modifier, Psyche, PsycheFactory, Trait } from '../src';
+import {
+  createMockedLuck,
+  createMockedTraitFactory,
+  createPsycheDeps,
+  createPsycheState,
+} from '../dev';
+import { Deed, Feeling, Psyche, PsycheFactory, Trait } from '../src';
 import { BEGGING_SHAME } from '../src/traits/conscientiousness';
-import { LUCK_CHANCE_SPREAD } from '../src/traits/luck';
 
 describe('PsycheFactory', () => {
   describe('#create', () => {
@@ -35,7 +39,7 @@ describe('PsycheFactory', () => {
 
     it('Если фабрика совестливости не передана, стыд растёт от клянчанья по совестливости', () => {
       const factory = new PsycheFactory({
-        traitFactories: { [Trait.Luck]: createMockedTraitFactory() },
+        traitFactories: { [Trait.Luck]: createMockedTraitFactory(createMockedLuck()) },
       });
       const psyche = factory.create(
         createPsycheState({
@@ -51,7 +55,7 @@ describe('PsycheFactory', () => {
       expect(psyche.getState().feelings[Feeling.Shame]).toBeCloseTo(BEGGING_SHAME * 1.5);
     });
 
-    it('Если фабрика удачливости не передана, модификатор шанса меняется по удачливости', () => {
+    it('Если фабрика удачливости не передана, шанс поправляется по удачливости', () => {
       const factory = new PsycheFactory({
         traitFactories: { [Trait.Conscientiousness]: createMockedTraitFactory() },
       });
@@ -64,7 +68,8 @@ describe('PsycheFactory', () => {
         })
       );
 
-      expect(psyche.getModifier(Modifier.Chance)).toBeCloseTo(LUCK_CHANCE_SPREAD);
+      // Соотношение 1 к 1 становится 1.5 к 1
+      expect(psyche.adjustChance(0.5)).toBeCloseTo(0.6);
     });
   });
 });

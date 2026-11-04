@@ -1,4 +1,5 @@
 export { createHomelessTaskFactoryDeps, createHomelessTaskFactory } from './factory';
+export { createBuyBoozeTask, createPlacesWithShop } from './buy-booze-task';
 export {
   createBeggingPsycheFactory,
   createBeggingOptimism,

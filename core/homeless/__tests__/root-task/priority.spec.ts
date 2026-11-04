@@ -26,48 +26,50 @@ function createRootTask(unavailable: HomelessTaskName[] = []): HomelessRootTask 
 }
 
 describe('HomelessRootTask', () => {
-  it('Если можно бухать, планирует бухать', () => {
-    const names = planNames(createRootTask(), NpcStateBuilder.default());
+  describe('Порядок методов', () => {
+    it('Если можно бухать, планирует бухать', () => {
+      const names = planNames(createRootTask(), NpcStateBuilder.default());
 
-    expect(names).toStrictEqual(['drink']);
-  });
+      expect(names).toStrictEqual(['drink']);
+    });
 
-  it('Если бухать нельзя, планирует купить пойло', () => {
-    const names = planNames(createRootTask(['drink']), NpcStateBuilder.default());
+    it('Если бухать нельзя, планирует купить пойло', () => {
+      const names = planNames(createRootTask(['drink']), NpcStateBuilder.default());
 
-    expect(names).toStrictEqual(['buy-booze']);
-  });
+      expect(names).toStrictEqual(['buy-booze']);
+    });
 
-  it('Если и купить пойло нельзя, планирует сдать бутылки', () => {
-    const names = planNames(createRootTask(['drink', 'buy-booze']), NpcStateBuilder.default());
+    it('Если и купить пойло нельзя, планирует сдать бутылки', () => {
+      const names = planNames(createRootTask(['drink', 'buy-booze']), NpcStateBuilder.default());
 
-    expect(names).toStrictEqual(['sell-bottles']);
-  });
+      expect(names).toStrictEqual(['sell-bottles']);
+    });
 
-  it('Если и сдать бутылки нельзя, планирует клянчить', () => {
-    const names = planNames(
-      createRootTask(['drink', 'buy-booze', 'sell-bottles']),
-      NpcStateBuilder.default()
-    );
+    it('Если и сдать бутылки нельзя, планирует клянчить', () => {
+      const names = planNames(
+        createRootTask(['drink', 'buy-booze', 'sell-bottles']),
+        NpcStateBuilder.default()
+      );
 
-    expect(names).toStrictEqual(['beg']);
-  });
+      expect(names).toStrictEqual(['beg']);
+    });
 
-  it('Если и клянчить нельзя, планирует собирать бутылки', () => {
-    const names = planNames(
-      createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
-      NpcStateBuilder.default()
-    );
+    it('Если и клянчить нельзя, планирует собирать бутылки', () => {
+      const names = planNames(
+        createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
+        NpcStateBuilder.default()
+      );
 
-    expect(names).toStrictEqual(['collect-bottles']);
-  });
+      expect(names).toStrictEqual(['collect-bottles']);
+    });
 
-  it('Если и собирать бутылки нельзя, план не составляется', () => {
-    const names = planNames(
-      createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg', 'collect-bottles']),
-      NpcStateBuilder.default()
-    );
+    it('Если и собирать бутылки нельзя, план не составляется', () => {
+      const names = planNames(
+        createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg', 'collect-bottles']),
+        NpcStateBuilder.default()
+      );
 
-    expect(names).toBeNull();
+      expect(names).toBeNull();
+    });
   });
 });

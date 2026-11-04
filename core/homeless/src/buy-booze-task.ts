@@ -26,7 +26,7 @@ export type BuyBoozeTaskDeps = {
 };
 
 /**
- * Купить пойло в ближайшем магазине. Магазин выбирается при планировании по позиции NPC, один раз
+ * Купить пойло в ближайшем магазине, если на него хватает денег. Магазин выбирается при планировании по позиции NPC, один раз
  * на весь план
  */
 export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
@@ -43,10 +43,17 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
     this.methods = [
       {
         name: 'buy-in-nearest-shop',
-        preconditions: () => this.places.ofType(PlaceType.Shop).length > 0,
+        preconditions: (state) => this.canBuy(state),
         tasks: (state) => this.buyInNearestShop(state),
       },
     ];
+  }
+
+  /** Купить пойло можно, если на него хватает денег и есть магазины */
+  private canBuy(state: NpcState): boolean {
+    const money = state.self.inventory[Item.Money] ?? 0;
+
+    return money >= BOOZE_PRICE && this.places.ofType(PlaceType.Shop).length > 0;
   }
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */

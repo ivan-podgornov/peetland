@@ -6,7 +6,10 @@ import { createActor } from '@peetland/virtual-actor/dev';
 
 import type { NpcContext } from '../src';
 
-/** Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют чувства */
+/**
+ * Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют
+ * чувства и модификаторы
+ */
 export function createNpcContext(actor: IActor = createActor()): NpcContext {
   return {
     actor,

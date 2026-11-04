@@ -1,9 +1,11 @@
 import type { Deed } from './deed';
 import { Feeling } from './feeling';
+import type { Modifier } from './modifier';
 import { Trait } from './trait';
 import type {
   FeelingsContribution,
   ITrait,
+  ModifiersContribution,
   PsycheFeelings,
   PsycheState,
   PsycheTraits,
@@ -21,6 +23,11 @@ export interface IPsyche {
   getState(): PsycheState;
   /** Прогоняет поступок через черты и меняет чувства на сумму их вкладов */
   react(deed: Deed): void;
+  /**
+   * Возвращает модификатор: произведение вкладов всех черт. Если ни одна черта его не меняет,
+   * возвращает 1
+   */
+  getModifier(modifier: Modifier): number;
 }
 
 export type PsycheDeps = {
@@ -82,6 +89,29 @@ export class Psyche implements IPsyche {
         [feeling]: this.clampFeeling(feelings[feeling] + change),
       };
     }, this.feelings);
+  }
+
+  /** Если вклад не конечное неотрицательное число, выбрасывает RangeError */
+  getModifier(modifier: Modifier): number {
+    return this.traits.reduce(
+      (product, trait) => product * this.getMultiplier(trait.getModifiers(), modifier),
+      1
+    );
+  }
+
+  /**
+   * Возвращает, на что вклад умножает модификатор. Если вклад не конечное неотрицательное число,
+   * выбрасывает RangeError
+   */
+  private getMultiplier(contribution: ModifiersContribution, modifier: Modifier): number {
+    const multiplier = contribution[modifier] ?? 1;
+    if (!Number.isFinite(multiplier) || multiplier < 0) {
+      throw new RangeError(
+        `Вклад в модификатор ${modifier} должен быть конечным неотрицательным числом: ${multiplier}`
+      );
+    }
+
+    return multiplier;
   }
 
   /** Возвращает, на сколько вклад меняет чувство. Если вклад не конечное число, выбрасывает RangeError */

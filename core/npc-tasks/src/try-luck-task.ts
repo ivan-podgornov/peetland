@@ -2,6 +2,7 @@ import { AbortController } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { Modifier } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -9,7 +10,10 @@ import type { ITimer } from '@peetland/timings';
 export const TRY_LUCK_PERIOD = 1000;
 
 export type TryLuckTaskOptions = {
-  /** Шанс, что попытка удастся, от 0 до 1, например, 1 / 60 */
+  /**
+   * Шанс, что попытка удастся, от 0 до 1, например, 1 / 60. Это шанс персонажа без поправок: при
+   * броске он умножается на модификатор шанса психики (Modifier.Chance)
+   */
   chance: number;
   /**
    * Условие остановки. Проверяется перед началом и каждый тик с актуальным состоянием. Если
@@ -35,7 +39,9 @@ type Attempts = {
 };
 
 /**
- * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Когда повезло, задача
+ * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Шанс умножается на
+ * модификатор шанса психики NPC, например, удачливым везёт чаще. Если с модификатором шанс больше 1,
+ * бросается шанс 1. Когда повезло, задача
  * завершается с 'success', и план продолжается следующими задачами: что получил NPC, решают они.
  * Одну задачу могут выполнять разные NPC, поэтому попытки хранятся по акторам, а не в полях задачи
  */
@@ -65,7 +71,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Начинает раз в TRY_LUCK_PERIOD пытать удачу и возвращает 'running' */
   start(_state: NpcState, context: NpcContext): TaskResult {
     const { random, timer } = this.deps;
-    const { chance, onAttempt } = this.options;
+    const { onAttempt } = this.options;
     const { actor } = context;
     const attempts: Attempts = {
       lifetime: new AbortController(),
@@ -78,7 +84,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
       () => {
         onAttempt?.(context);
 
-        if (random.chance(chance)) {
+        if (random.chance(this.getChance(context))) {
           attempts.isLucky = true;
           attempts.lifetime.abort();
         }
@@ -118,6 +124,13 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Перестаёт пытать удачу. Если задачу этим актором не начинали, ничего не делает */
   stop(context: NpcContext): void {
     this.stopAttempts(context.actor);
+  }
+
+  /** Возвращает шанс с модификатором психики, но не больше 1 */
+  private getChance(context: NpcContext): number {
+    const { chance } = this.options;
+
+    return Math.min(1, chance * context.psyche.getModifier(Modifier.Chance));
   }
 
   private shouldStop(state: NpcState): boolean {

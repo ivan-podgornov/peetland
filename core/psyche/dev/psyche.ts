@@ -5,14 +5,21 @@ import type {
   FeelingsContribution,
   ITrait,
   ITraitFactory,
+  ModifiersContribution,
   PsycheState,
   TraitFactories,
 } from '../src';
 import type { PsycheDeps } from '../src/psyche';
 
-/** Создаёт черту, которая на любой поступок возвращает переданный вклад */
-export function createMockedTrait(contribution: FeelingsContribution = {}): ITrait {
-  return { react: vi.fn(() => contribution) };
+/** Создаёт черту, которая на любой поступок возвращает переданный вклад в чувства и всегда — переданный вклад в модификаторы */
+export function createMockedTrait(
+  contribution: FeelingsContribution = {},
+  modifiers: ModifiersContribution = {}
+): ITrait {
+  return {
+    react: vi.fn(() => contribution),
+    getModifiers: vi.fn(() => modifiers),
+  };
 }
 
 /** Создаёт фабрику, которая всегда возвращает переданную черту */
@@ -34,7 +41,7 @@ export function createPsycheState(state: Partial<PsycheState> = {}): PsycheState
   };
 }
 
-/** Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вклада */
+/** Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вкладов */
 export function createPsycheDeps(traitFactories: Partial<TraitFactories> = {}): PsycheDeps {
   return {
     traitFactories: {

@@ -61,19 +61,19 @@ describe('Npc', () => {
       expect(actor.signal.aborted).toBe(true);
     });
 
-    it('После деспавна кадры не вызывают htn.update', () => {
-      const frames = createControlledObservable();
+    it('После деспавна тики не вызывают htn.update', () => {
+      const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
           htnFactory: createMockedHTNFactory(htn),
-          frames: frames.observable,
+          ticks: ticks.observable,
         })
       );
 
       npc.despawn();
-      frames.subscriber.next(undefined);
+      ticks.subscriber.next(undefined);
 
       expect(htn.update).not.toHaveBeenCalled();
     });

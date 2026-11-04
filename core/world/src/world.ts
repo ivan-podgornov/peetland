@@ -78,7 +78,7 @@ export class World {
       }),
       npcFactory = new NpcFactory({
         actorFactory: game.actorFactory,
-        frames: game.frames,
+        ticks: game.ticks,
         psycheFactory,
         rootTaskFactory,
         gameSignal: game.signal,

@@ -27,7 +27,7 @@ export class GtaGame implements IGame {
   readonly time: ITime;
   readonly objectFactory: IGtaObjectFactory;
   readonly geometry: IGeometry;
-  readonly frames: Observable<unknown>;
+  readonly ticks: Observable<unknown>;
 
   private readonly terminateController: AbortController;
 
@@ -56,9 +56,9 @@ export class GtaGame implements IGame {
       }
     });
 
-    this.frames = frameEvents.when('frame');
+    this.ticks = frameEvents.when('frame');
 
-    this.time = new GtaTime({ frames: this.frames });
+    this.time = new GtaTime({ ticks: this.ticks });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     this.actorFactory = new GtaActorFactory({

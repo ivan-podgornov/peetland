@@ -10,12 +10,12 @@ import { World } from '../../../src';
 describe('World', () => {
   describe('#bigBang', () => {
     describe('Если npcFactory не передана', () => {
-      it('NPC на кадре игры планирует корневую задачу, которую вернула rootTaskFactory', async () => {
-        const frames = createControlledObservable();
+      it('NPC на тике мира планирует корневую задачу, которую вернула rootTaskFactory', async () => {
+        const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
         const world = new World(
           createWorldOptions({
-            game: createGame({ frames: frames.observable }),
+            game: createGame({ ticks: ticks.observable }),
             npcs: [createNpcData()],
           }),
           {
@@ -33,24 +33,24 @@ describe('World', () => {
         );
         await world.bigBang();
 
-        frames.subscriber.next(undefined);
+        ticks.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalled();
       });
 
       it('Если rootTaskFactory не передана, задачи бомжа получают места из placesFactory', async () => {
-        const frames = createControlledObservable();
+        const ticks = createControlledObservable();
         const worldPlaces = createMockedPlaces();
         const world = new World(
           createWorldOptions({
-            game: createGame({ frames: frames.observable }),
+            game: createGame({ ticks: ticks.observable }),
             npcs: [createNpcData({ kind: NpcKind.Homeless })],
           }),
           { placesFactory: { create: () => worldPlaces } }
         );
         await world.bigBang();
 
-        frames.subscriber.next(undefined);
+        ticks.subscriber.next(undefined);
 
         expect(worldPlaces.ofType).toHaveBeenCalled();
       });

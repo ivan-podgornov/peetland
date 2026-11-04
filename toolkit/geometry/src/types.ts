@@ -54,4 +54,11 @@ export interface IGeometry {
    * возвращает 0
    */
   getAngleTo(from: Vector2, to: Vector2): number;
+
+  /**
+   * Возвращает точку строкой «x, y, z», где каждая координата округлена до двух знаков после
+   * запятой, например, для логов
+   * @param point - точка, которую нужно перевести в строку
+   */
+  formatPoint(point: Vector3): string;
 }

@@ -61,6 +61,10 @@ export class Geometry implements IGeometry {
     return this.normalizeAngle(angle);
   }
 
+  formatPoint(point: Vector3): string {
+    return `${point.x.toFixed(2)}, ${point.y.toFixed(2)}, ${point.z.toFixed(2)}`;
+  }
+
   normalizeAngle(angle: number): number {
     const { FULL_TURN } = Geometry;
 

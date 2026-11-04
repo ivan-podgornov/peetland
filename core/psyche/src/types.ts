@@ -1,6 +1,5 @@
 import type { Deed } from './deed';
 import type { Feeling } from './feeling';
-import type { Modifier } from './modifier';
 import type { Trait } from './trait';
 
 /** Значение каждой черты характера. Черты не меняются со временем */
@@ -12,30 +11,44 @@ export type PsycheFeelings = Readonly<Record<Feeling, number>>;
 /** Вклад черты в чувства: на сколько изменить каждое чувство. Чувств без изменений в объекте нет */
 export type FeelingsContribution = Readonly<Partial<Record<Feeling, number>>>;
 
-/**
- * Вклад черты в модификаторы: на что умножить каждый модификатор. Модификаторов без изменений в
- * объекте нет
- */
-export type ModifiersContribution = Readonly<Partial<Record<Modifier, number>>>;
-
 /** Состояние психики. Содержит только данные и полностью описывает психику */
 export type PsycheState = Readonly<{
   traits: PsycheTraits;
   feelings: PsycheFeelings;
 }>;
 
-/** Черта характера. Решает, как поступок меняет чувства и на что умножаются модификаторы */
+/** Черта характера. Решает, как поступок меняет чувства */
 export interface ITrait {
   /** Возвращает вклад черты в чувства после поступка */
   react(deed: Deed): FeelingsContribution;
-  /** Возвращает вклад черты в модификаторы */
-  getModifiers(): ModifiersContribution;
 }
 
-export interface ITraitFactory {
+/** Удачливость. Кроме чувств, решает, с каким шансом персонажу везёт в игре */
+export interface ILuck extends ITrait {
+  /**
+   * Возвращает шанс, с которым персонажу везёт на самом деле
+   * @param chance - базовый шанс среднего персонажа от 0 до 1, например, 1 / 40
+   */
+  adjustChance(chance: number): number;
+}
+
+/** Оптимизм. Кроме чувств, решает, сколько попыток персонаж ожидает до удачи, когда планирует */
+export interface IOptimism extends ITrait {
+  /**
+   * Возвращает, сколько попыток персонаж ожидает до удачи
+   * @param chance - шанс удачи за одну попытку от 0 до 1, например, 1 / 40
+   */
+  expectAttempts(chance: number): number;
+}
+
+export interface ITraitFactory<T extends ITrait = ITrait> {
   /** Создаёт черту с переданным значением */
-  create(value: number): ITrait;
+  create(value: number): T;
 }
 
 /** Фабрика каждой черты */
-export type TraitFactories = Readonly<Record<Trait, ITraitFactory>>;
+export type TraitFactories = Readonly<{
+  [Trait.Conscientiousness]: ITraitFactory;
+  [Trait.Luck]: ITraitFactory<ILuck>;
+  [Trait.Optimism]: ITraitFactory<IOptimism>;
+}>;

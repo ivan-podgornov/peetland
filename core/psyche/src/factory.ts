@@ -1,7 +1,7 @@
 import { Psyche } from './psyche';
 import type { IPsyche, PsycheDeps } from './psyche';
 import { Trait } from './trait';
-import { ConscientiousnessFactory, LuckFactory } from './traits';
+import { ConscientiousnessFactory, LuckFactory, OptimismFactory } from './traits';
 import type { PsycheState, TraitFactories } from './types';
 
 export interface IPsycheFactory {
@@ -28,6 +28,7 @@ export class PsycheFactory implements IPsycheFactory {
         [Trait.Conscientiousness]:
           traitFactories[Trait.Conscientiousness] ?? new ConscientiousnessFactory(),
         [Trait.Luck]: traitFactories[Trait.Luck] ?? new LuckFactory(),
+        [Trait.Optimism]: traitFactories[Trait.Optimism] ?? new OptimismFactory(),
       },
     };
   }

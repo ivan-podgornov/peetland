@@ -18,6 +18,7 @@ export const npcs: NpcData[] = [
       traits: {
         [Trait.Conscientiousness]: 100,
         [Trait.Luck]: 50,
+        [Trait.Optimism]: 50,
       },
       feelings: {
         [Feeling.Shame]: 0,

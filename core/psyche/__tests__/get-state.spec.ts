@@ -15,6 +15,7 @@ describe('Psyche', () => {
         traits: {
           [Trait.Conscientiousness]: 70,
           [Trait.Luck]: 20,
+          [Trait.Optimism]: 80,
         },
       });
       const psyche = new Psyche(state, createPsycheDeps());
@@ -22,6 +23,7 @@ describe('Psyche', () => {
       expect(psyche.getState().traits).toStrictEqual({
         [Trait.Conscientiousness]: 70,
         [Trait.Luck]: 20,
+        [Trait.Optimism]: 80,
       });
     });
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createPsycheDeps,
   createPsycheState,
+  createMockedLuck,
   createMockedTrait,
   createMockedTraitFactory,
 } from '../../dev';
@@ -57,7 +58,7 @@ describe('Psyche', () => {
           [Trait.Conscientiousness]: createMockedTraitFactory(
             createMockedTrait({ [Feeling.Shame]: 80 })
           ),
-          [Trait.Luck]: createMockedTraitFactory(createMockedTrait({ [Feeling.Shame]: -50 })),
+          [Trait.Luck]: createMockedTraitFactory(createMockedLuck({ [Feeling.Shame]: -50 })),
         })
       );
 

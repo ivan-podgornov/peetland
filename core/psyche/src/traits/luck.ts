@@ -1,5 +1,4 @@
-import { Modifier } from '../modifier';
-import type { FeelingsContribution, ITrait, ITraitFactory, ModifiersContribution } from '../types';
+import type { FeelingsContribution, ILuck, ITraitFactory } from '../types';
 
 /** Минимальная удачливость */
 export const MIN_LUCK = 0;
@@ -7,16 +6,19 @@ export const MIN_LUCK = 0;
 /** Максимальная удачливость */
 export const MAX_LUCK = 100;
 
-/** Во сколько раз меняется соотношение удач и неудач на краях удачливости (см. Modifier.Chance) */
+/** Во сколько раз меняется соотношение удач и неудач на краях удачливости */
 export const LUCK_CHANCE_SPREAD = 1.5;
 
 /**
  * Удачливость. Меняет шанс, с которым персонажу везёт в игре: при средней удачливости шанс как есть,
- * а на краях соотношение удач и неудач в LUCK_CHANCE_SPREAD раз ниже или выше. Множитель
- * экспоненциальный, потому что шанс меняется «в разах»: так каждый шаг удачливости меняет его в
- * одинаковое число раз, а нижний край душит шанс не сильнее, чем верхний поднимает
+ * а на краях соотношение удач и неудач, шанс / (1 − шанс), в LUCK_CHANCE_SPREAD раз ниже или выше.
+ *
+ * Умножается соотношение, а не сам шанс, чтобы большой шанс не выходил за 1: 0.8 × 1.5 = 1.2, а с
+ * соотношением 0.8 становится ~0.86. На малых шансах соотношение почти равно шансу: 1/40 становится
+ * ~1/27. Множитель экспоненциальный, потому что шанс меняется «в разах»: так каждый шаг удачливости
+ * меняет его в одинаковое число раз, а нижний край душит шанс не сильнее, чем верхний поднимает
  */
-export class Luck implements ITrait {
+export class Luck implements ILuck {
   private readonly value: number;
 
   /**
@@ -33,8 +35,15 @@ export class Luck implements ITrait {
     return {};
   }
 
-  getModifiers(): ModifiersContribution {
-    return { [Modifier.Chance]: LUCK_CHANCE_SPREAD ** (this.getShare() * 2 - 1) };
+  /** Шанс 1 — гарантированная удача, удачливость его не меняет */
+  adjustChance(chance: number): number {
+    if (chance === 1) {
+      return 1;
+    }
+
+    const odds = (chance / (1 - chance)) * LUCK_CHANCE_SPREAD ** (this.getShare() * 2 - 1);
+
+    return odds / (1 + odds);
   }
 
   /** Возвращает удачливость долей от 0 до 1 */
@@ -51,8 +60,8 @@ export class Luck implements ITrait {
   }
 }
 
-export class LuckFactory implements ITraitFactory {
-  create(value: number): ITrait {
+export class LuckFactory implements ITraitFactory<ILuck> {
+  create(value: number): ILuck {
     return new Luck(value);
   }
 }

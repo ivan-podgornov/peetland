@@ -1,6 +1,7 @@
 export { createHomelessTaskFactoryDeps, createHomelessTaskFactory } from './factory';
 export {
   createBeggingPsycheFactory,
+  createBeggingOptimism,
   createBegTask,
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,

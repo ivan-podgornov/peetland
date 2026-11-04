@@ -1,11 +1,11 @@
 import type { Deed } from './deed';
 import { Feeling } from './feeling';
-import type { Modifier } from './modifier';
 import { Trait } from './trait';
 import type {
   FeelingsContribution,
+  ILuck,
+  IOptimism,
   ITrait,
-  ModifiersContribution,
   PsycheFeelings,
   PsycheState,
   PsycheTraits,
@@ -24,10 +24,15 @@ export interface IPsyche {
   /** Прогоняет поступок через черты и меняет чувства на сумму их вкладов */
   react(deed: Deed): void;
   /**
-   * Возвращает модификатор: произведение вкладов всех черт. Если ни одна черта его не меняет,
-   * возвращает 1
+   * Возвращает шанс, с которым персонажу везёт на самом деле: базовый шанс поправляет удачливость
+   * @param chance - базовый шанс среднего персонажа от 0 до 1, например, 1 / 40
    */
-  getModifier(modifier: Modifier): number;
+  adjustChance(chance: number): number;
+  /**
+   * Возвращает, сколько попыток персонаж ожидает до удачи, когда планирует: решает оптимизм
+   * @param chance - шанс удачи за одну попытку от 0 до 1, например, 1 / 40
+   */
+  expectAttempts(chance: number): number;
 }
 
 export type PsycheDeps = {
@@ -43,6 +48,8 @@ export type PsycheDeps = {
 export class Psyche implements IPsyche {
   private readonly traitValues: PsycheTraits;
   private readonly traits: ITrait[];
+  private readonly luck: ILuck;
+  private readonly optimism: IOptimism;
   private feelings: PsycheFeelings;
 
   /**
@@ -59,9 +66,13 @@ export class Psyche implements IPsyche {
 
     this.traitValues = state.traits;
     this.feelings = state.feelings;
-    this.traits = Object.values(Trait).map((trait) =>
-      traitFactories[trait].create(state.traits[trait])
-    );
+    this.luck = traitFactories[Trait.Luck].create(state.traits[Trait.Luck]);
+    this.optimism = traitFactories[Trait.Optimism].create(state.traits[Trait.Optimism]);
+    this.traits = [
+      traitFactories[Trait.Conscientiousness].create(state.traits[Trait.Conscientiousness]),
+      this.luck,
+      this.optimism,
+    ];
   }
 
   getState(): PsycheState {
@@ -91,27 +102,12 @@ export class Psyche implements IPsyche {
     }, this.feelings);
   }
 
-  /** Если вклад не конечное неотрицательное число, выбрасывает RangeError */
-  getModifier(modifier: Modifier): number {
-    return this.traits.reduce(
-      (product, trait) => product * this.getMultiplier(trait.getModifiers(), modifier),
-      1
-    );
+  adjustChance(chance: number): number {
+    return this.luck.adjustChance(chance);
   }
 
-  /**
-   * Возвращает, на что вклад умножает модификатор. Если вклад не конечное неотрицательное число,
-   * выбрасывает RangeError
-   */
-  private getMultiplier(contribution: ModifiersContribution, modifier: Modifier): number {
-    const multiplier = contribution[modifier] ?? 1;
-    if (!Number.isFinite(multiplier) || multiplier < 0) {
-      throw new RangeError(
-        `Вклад в модификатор ${modifier} должен быть конечным неотрицательным числом: ${multiplier}`
-      );
-    }
-
-    return multiplier;
+  expectAttempts(chance: number): number {
+    return this.optimism.expectAttempts(chance);
   }
 
   /** Возвращает, на сколько вклад меняет чувство. Если вклад не конечное число, выбрасывает RangeError */

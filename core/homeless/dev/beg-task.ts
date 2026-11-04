@@ -6,23 +6,50 @@ import type { IPlaces, PlaceData } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { Feeling, PsycheFactory, Trait } from '@peetland/psyche';
-import type { IPsycheFactory } from '@peetland/psyche';
+import type { IOptimism, IPsycheFactory } from '@peetland/psyche';
 import {
+  createMockedOptimism,
   createMockedTrait,
   createMockedTraitFactory,
   createPsycheDeps,
 } from '@peetland/psyche/dev';
 import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
-import { BegTask } from '../src/beg-task';
+import { BEGGING_CHANCE, BegTask } from '../src/beg-task';
 
-/** Создаёт фабрику психики, у которой каждая попытка клянчить меняет стыд на shame */
-export function createBeggingPsycheFactory(shame = 0): IPsycheFactory {
+/**
+ * Создаёт оптимизм, который при шансе BEGGING_CHANCE ожидает attempts попыток до удачи. Если его
+ * спросят о другом шансе, выбрасывает Error: клянчанье должно ожидать попыток только при своём шансе
+ */
+export function createBeggingOptimism(attempts: number): Mocked<IOptimism> {
+  const optimism = createMockedOptimism();
+  optimism.expectAttempts.mockImplementation((chance) => {
+    if (chance !== BEGGING_CHANCE) {
+      throw new Error(`Ожидание попыток при шансе ${chance}, а не BEGGING_CHANCE`);
+    }
+
+    return attempts;
+  });
+
+  return optimism;
+}
+
+/**
+ * Создаёт фабрику психики, у которой каждая попытка клянчить меняет стыд на shame, а сколько
+ * попыток NPC ожидает до удачи, решает переданный оптимизм. По умолчанию NPC ожидает как реалист:
+ * 1 / шанс
+ */
+export function createBeggingPsycheFactory(
+  shame = 0,
+  optimism: IOptimism = createMockedOptimism()
+): IPsycheFactory {
   return new PsycheFactory(
     createPsycheDeps({
       [Trait.Conscientiousness]: createMockedTraitFactory(
         createMockedTrait({ [Feeling.Shame]: shame })
       ),
+      [Trait.Optimism]: createMockedTraitFactory(optimism),
     })
   );
 }

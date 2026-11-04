@@ -148,6 +148,27 @@ export default defineConfig([
       ],
     },
   },
+  // Поток MoonLoader, созданный изнутри async-функции, портит память скрипта (см. #139), поэтому
+  // потоки создаёт только patch-global, из main
+  {
+    files: ['**/*.ts'],
+    ignores: ['mod/mod/src/patch-global.ts', 'mod/moonloader/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@peetland/moonloader',
+              importNames: ['lua_thread'],
+              message:
+                'Потоки MoonLoader создаёт только patch-global (см. #139). Используйте таймеры: setTimeout и setInterval',
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Правила для файлов с тестами
   {
     files: ['**/*.spec.ts', '**/*.test.ts'],

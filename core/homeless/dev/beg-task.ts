@@ -14,8 +14,26 @@ import {
   createPsycheDeps,
 } from '@peetland/psyche/dev';
 import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
-import { BegTask } from '../src/beg-task';
+import { BEGGING_CHANCE, BegTask } from '../src/beg-task';
+
+/**
+ * Создаёт оптимизм, который при шансе BEGGING_CHANCE ожидает attempts попыток до удачи. Если его
+ * спросят о другом шансе, выбрасывает Error: клянчанье должно ожидать попыток только при своём шансе
+ */
+export function createBeggingOptimism(attempts: number): Mocked<IOptimism> {
+  const optimism = createMockedOptimism();
+  optimism.expectAttempts.mockImplementation((chance) => {
+    if (chance !== BEGGING_CHANCE) {
+      throw new Error(`Ожидание попыток при шансе ${chance}, а не BEGGING_CHANCE`);
+    }
+
+    return attempts;
+  });
+
+  return optimism;
+}
 
 /**
  * Создаёт фабрику психики, у которой каждая попытка клянчить меняет стыд на shame, а сколько

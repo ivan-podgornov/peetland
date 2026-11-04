@@ -1,7 +1,9 @@
+import type { IActor } from '@peetland/game';
 import { GtaGame } from '@peetland/gta-sa';
 import {
   getCharCoordinates,
   getCharHeading,
+  getClosestCharNode,
   isGamePaused,
   isPlayerPlaying,
   math,
@@ -16,7 +18,7 @@ import {
 import { InMemoryRepository } from '@peetland/repository';
 import { World } from '@peetland/world';
 
-import { VK_G, VK_H, VK_J } from 'vkeys';
+import { VK_G, VK_H, VK_J, VK_L } from 'vkeys';
 
 import { npcs } from './data/npcs';
 import { places } from './data/places';
@@ -37,6 +39,58 @@ async function bigBang(game: GtaGame): Promise<void> {
     places: new InMemoryRepository(places),
     npcs: new InMemoryRepository(npcs),
   }).bigBang();
+}
+
+/** Пед для проверки застревания. null, пока пед не заспавнен */
+let stuckPed: IActor | null = null;
+
+/**
+ * Отладка застревания (issue #106). Первый вызов спавнит педа у мусорки за торговым центром и
+ * отправляет к киоску, где сдают бутылки: этот путь пед сам не проходит и застревает. Следующие
+ * вызовы телепортируют педа на ближайший к нему узел путей пешеходов
+ */
+function debugStuckPed(): void {
+  if (stuckPed) {
+    const { x, y, z } = stuckPed.getPosition();
+    const [nodeX, nodeY, nodeZ] = getClosestCharNode(x, y, z);
+    print(`stuck ped: ${x}, ${y}, ${z} -> node ${nodeX}, ${nodeY}, ${nodeZ}`);
+    stuckPed.setPosition({
+      x: nodeX,
+      y: nodeY,
+      z: nodeZ,
+    });
+    return;
+  }
+
+  const game = new GtaGame();
+  // Мусорка montgomery-trash-bin-4
+  const actor = game.actorFactory.create({
+    modelId: 230,
+    position: {
+      x: 1320.22,
+      y: 210.51,
+      z: 19.55,
+    },
+    angle: 339,
+  });
+  game.signal.addEventListener('abort', () => actor.despawn(), { once: true });
+  stuckPed = actor;
+
+  // Киоск montgomery-hannibal-liquor-kiosk-backdoor
+  actor
+    .goToCoords(
+      {
+        x: 1311.13,
+        y: 351.59,
+        z: 19.55,
+      },
+      1
+    )
+    .execute()
+    .subscribe({
+      complete: () => print('stuck ped: arrived'),
+      error: (error: unknown) => reportError(error),
+    });
 }
 
 function main() {
@@ -71,6 +125,10 @@ function main() {
     if (wasKeyPressed(VK_J)) {
       // Рядом со входом в бомжарню, у которого спавнится бомж
       setCharCoordinates(PLAYER_PED, 1267.41, 177.76, 19.44);
+    }
+
+    if (wasKeyPressed(VK_L)) {
+      debugStuckPed();
     }
   }
 }

@@ -2,6 +2,7 @@ import { AbortController } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { Modifier } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -9,7 +10,11 @@ import type { ITimer } from '@peetland/timings';
 export const TRY_LUCK_PERIOD = 1000;
 
 export type TryLuckTaskOptions = {
-  /** Шанс, что попытка удастся, от 0 до 1, например, 1 / 60 */
+  /**
+   * Базовый шанс, что попытка удастся, от 0 до 1, например, 1 / 60. Это шанс среднего персонажа: при
+   * броске его поправляет модификатор шанса психики (Modifier.Chance), например, удачливость NPC
+   * может сделать шанс как выше, так и ниже базового
+   */
   chance: number;
   /**
    * Условие остановки. Проверяется перед началом и каждый тик с актуальным состоянием. Если
@@ -35,8 +40,11 @@ type Attempts = {
 };
 
 /**
- * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Когда повезло, задача
- * завершается с 'success', и план продолжается следующими задачами: что получил NPC, решают они.
+ * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Шанс поправляет модификатор
+ * шанса психики NPC, например, удачливым везёт чаще. Модификатор умножает не сам шанс, а соотношение
+ * удач и неудач: шанс / (1 − шанс). Так поправленный шанс никогда не выходит за 1, а на малых шансах
+ * почти не отличается от умноженного. Когда повезло, задача завершается с 'success', и план
+ * продолжается следующими задачами: что получил NPC, решают они.
  * Одну задачу могут выполнять разные NPC, поэтому попытки хранятся по акторам, а не в полях задачи
  */
 export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
@@ -65,7 +73,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Начинает раз в TRY_LUCK_PERIOD пытать удачу и возвращает 'running' */
   start(_state: NpcState, context: NpcContext): TaskResult {
     const { random, timer } = this.deps;
-    const { chance, onAttempt } = this.options;
+    const { onAttempt } = this.options;
     const { actor } = context;
     const attempts: Attempts = {
       lifetime: new AbortController(),
@@ -78,7 +86,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
       () => {
         onAttempt?.(context);
 
-        if (random.chance(chance)) {
+        if (random.chance(this.getChance(context))) {
           attempts.isLucky = true;
           attempts.lifetime.abort();
         }
@@ -118,6 +126,22 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Перестаёт пытать удачу. Если задачу этим актором не начинали, ничего не делает */
   stop(context: NpcContext): void {
     this.stopAttempts(context.actor);
+  }
+
+  /**
+   * Возвращает шанс, у которого соотношение удач и неудач умножено на модификатор психики. Шанс 1 —
+   * гарантированная удача, модификатор его не меняет
+   */
+  private getChance(context: NpcContext): number {
+    const { chance } = this.options;
+
+    if (chance === 1) {
+      return 1;
+    }
+
+    const odds = (chance / (1 - chance)) * context.psyche.getModifier(Modifier.Chance);
+
+    return odds / (1 + odds);
   }
 
   private shouldStop(state: NpcState): boolean {

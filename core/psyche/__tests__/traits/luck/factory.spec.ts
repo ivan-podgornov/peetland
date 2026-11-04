@@ -7,7 +7,7 @@ describe('LuckFactory', () => {
     it('Возвращает экземпляр Luck', () => {
       const factory = new LuckFactory();
 
-      expect(factory.create()).toBeInstanceOf(Luck);
+      expect(factory.create(50)).toBeInstanceOf(Luck);
     });
   });
 });

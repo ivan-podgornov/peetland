@@ -5,17 +5,25 @@ import { createMockedRepeat, createNpcTaskFactory } from '@peetland/npc-tasks/de
 import { Feeling } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
 
-import { createBeggingPsycheFactory, createBegTask, createPlacesWithBeggingSpot } from '../../dev';
+import {
+  createBeggingPsycheFactory,
+  createBegTask,
+  createPlacesWithBeggingSpot,
+  createTaskFactoryWithTryLuckSpy,
+} from '../../dev';
 import { BEGGING_REWARD, BEGGING_SHAME_LIMIT } from '../../src/beg-task';
 import { BOOZE_PRICE } from '../../src/buy-booze-task';
 import { BOTTLE_PRICE } from '../../src/sell-bottles-task';
 
 describe('BegTask', () => {
+  // Фабрика собирает цепочку клянчанья один раз: одна попытка удачи на цепочку и число повторений
+  // в repeat вместе значат, сколько раз NPC будет пытать удачу
+
   it('Если ни денег, ни бутылок нет, клянчит на всё пойло', () => {
-    const repeat = createMockedRepeat();
+    const { tryLuck, repeat, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
 
     plan(
-      createBegTask(createPlacesWithBeggingSpot(), createNpcTaskFactory({ repeat })),
+      createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory),
       new NpcStateBuilder().withEmptyInventory().build()
     );
 
@@ -23,10 +31,11 @@ describe('BegTask', () => {
       BOOZE_PRICE / BEGGING_REWARD,
       expect.any(Function)
     );
+    expect(tryLuck).toHaveBeenCalledOnce();
   });
 
   it('Клянчит столько, сколько не хватает на пойло вместе с деньгами и выручкой за бутылки', () => {
-    const repeat = createMockedRepeat();
+    const { tryLuck, repeat, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
     const state = new NpcStateBuilder()
       .withInventory({
         [Item.Money]: 3 * BEGGING_REWARD,
@@ -34,23 +43,25 @@ describe('BegTask', () => {
       })
       .build();
 
-    plan(createBegTask(createPlacesWithBeggingSpot(), createNpcTaskFactory({ repeat })), state);
+    plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), state);
 
     expect(repeat).toHaveBeenCalledExactlyOnceWith(
       (BOOZE_PRICE - 3 * BEGGING_REWARD - 2 * BOTTLE_PRICE) / BEGGING_REWARD,
       expect.any(Function)
     );
+    expect(tryLuck).toHaveBeenCalledOnce();
   });
 
   it('Если не хватает не кратно BEGGING_REWARD, клянчит с запасом до целой удачи', () => {
-    const repeat = createMockedRepeat();
+    const { tryLuck, repeat, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
     const state = new NpcStateBuilder()
       .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 })
       .build();
 
-    plan(createBegTask(createPlacesWithBeggingSpot(), createNpcTaskFactory({ repeat })), state);
+    plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), state);
 
     expect(repeat).toHaveBeenCalledExactlyOnceWith(2, expect.any(Function));
+    expect(tryLuck).toHaveBeenCalledOnce();
   });
 
   it('Если на пойло хватает денег и выручки за бутылки, план не составляется', () => {

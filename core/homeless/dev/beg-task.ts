@@ -51,17 +51,20 @@ export function createPlacesWithBeggingSpot(
 }
 
 /**
- * Создаёт фабрику задач, которая запоминает параметры каждой попытки удачи. Цепочку клянчанья она
- * собирает один раз, сколько бы удач ни понадобилось (см. createMockedRepeat)
+ * Создаёт фабрику задач, которая запоминает параметры каждой попытки удачи и то, сколько повторений
+ * клянчанья попросили. Цепочку клянчанья она собирает один раз, сколько бы удач ни понадобилось (см.
+ * createMockedRepeat)
  */
 export function createTaskFactoryWithTryLuckSpy() {
   const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
+  const repeat = createMockedRepeat();
 
   return {
     tryLuck,
+    repeat,
     npcTaskFactory: createNpcTaskFactory({
       tryLuck,
-      repeat: createMockedRepeat(),
+      repeat,
     }),
   };
 }

@@ -38,11 +38,6 @@ const STUCK_CHECK_UPDATES = 20;
 /** Если за STUCK_CHECK_UPDATES обновлений персонаж сдвинулся не больше, чем на столько метров, он застрял */
 const STUCK_DISTANCE = 7;
 
-/** Переводит точку в строку для лога */
-function formatPoint(point: Vector3): string {
-  return `${point.x.toFixed(2)}, ${point.y.toFixed(2)}, ${point.z.toFixed(2)}`;
-}
-
 /**
  * Ведёт игрового персонажа к точке и раз в секунду сообщает его позицию. Игра ведёт персонажа к
  * ближайшему узлу путей пешеходов, и, если узел за стеной, персонаж упирается в неё. Поэтому, если за
@@ -122,7 +117,7 @@ export class GtaGoToCoordsCommand extends Command<
 
   /** Пишет в лог, что персонаж застрял, переносит его на ближайший узел и возвращает узел */
   private teleportToClosestNode(position: Vector3): Vector3 {
-    const { logger } = this.deps;
+    const { geometry, logger } = this.deps;
     const [x, y, z] = getClosestCharNode(position.x, position.y, position.z);
     const node = {
       x,
@@ -130,9 +125,10 @@ export class GtaGoToCoordsCommand extends Command<
       z,
     };
 
+    const from = geometry.formatPoint(position);
+    const to = geometry.formatPoint(this.options.coords);
     logger.warn(
-      `Персонаж застрял на ${formatPoint(position)} по пути к ${formatPoint(this.options.coords)}, ` +
-        `переносим на узел ${formatPoint(node)}`
+      `Персонаж застрял на ${from} по пути к ${to}, переносим на узел ${geometry.formatPoint(node)}`
     );
     this.actor.setPosition(node);
 

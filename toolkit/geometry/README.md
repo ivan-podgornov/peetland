@@ -143,6 +143,15 @@ const target = geometry.getAngleTo(actor.getPosition(), trash.getPosition());
 const isFacing = geometry.isWithinAngle(actor.getAngle(), target, 15);
 ```
 
+## Точка строкой
+
+`formatPoint` переводит точку в строку «x, y, z» с двумя знаками после запятой. Удобно, чтобы
+писать координаты в лог:
+
+```ts
+geometry.formatPoint({ x: 1320.2234, y: 210.5, z: -3 }); // '1320.22, 210.50, -3.00'
+```
+
 ## Зависимость от интерфейса
 
 Если ваш класс использует геометрию, принимайте её через интерфейс `IGeometry`, а не создавайте

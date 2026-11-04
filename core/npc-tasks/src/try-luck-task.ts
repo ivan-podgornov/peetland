@@ -12,7 +12,7 @@ export const TRY_LUCK_PERIOD = 1000;
 export type TryLuckTaskOptions = {
   /**
    * Шанс, что попытка удастся, от 0 до 1, например, 1 / 60. Это шанс персонажа без поправок: при
-   * броске он умножается на модификатор шанса психики (Modifier.Chance)
+   * броске его поправляет модификатор шанса психики (Modifier.Chance)
    */
   chance: number;
   /**
@@ -39,10 +39,11 @@ type Attempts = {
 };
 
 /**
- * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Шанс умножается на
- * модификатор шанса психики NPC, например, удачливым везёт чаще. Если с модификатором шанс больше 1,
- * бросается шанс 1. Когда повезло, задача
- * завершается с 'success', и план продолжается следующими задачами: что получил NPC, решают они.
+ * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Шанс поправляет модификатор
+ * шанса психики NPC, например, удачливым везёт чаще. Модификатор умножает не сам шанс, а соотношение
+ * удач и неудач: шанс / (1 − шанс). Так поправленный шанс никогда не выходит за 1, а на малых шансах
+ * почти не отличается от умноженного. Когда повезло, задача завершается с 'success', и план
+ * продолжается следующими задачами: что получил NPC, решают они.
  * Одну задачу могут выполнять разные NPC, поэтому попытки хранятся по акторам, а не в полях задачи
  */
 export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
@@ -126,11 +127,20 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
     this.stopAttempts(context.actor);
   }
 
-  /** Возвращает шанс с модификатором психики, но не больше 1 */
+  /**
+   * Возвращает шанс, у которого соотношение удач и неудач умножено на модификатор психики. Шанс 1 —
+   * гарантированная удача, модификатор его не меняет
+   */
   private getChance(context: NpcContext): number {
     const { chance } = this.options;
 
-    return Math.min(1, chance * context.psyche.getModifier(Modifier.Chance));
+    if (chance === 1) {
+      return 1;
+    }
+
+    const odds = (chance / (1 - chance)) * context.psyche.getModifier(Modifier.Chance);
+
+    return odds / (1 + odds);
   }
 
   private shouldStop(state: NpcState): boolean {

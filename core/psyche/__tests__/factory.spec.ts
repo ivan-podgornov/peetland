@@ -51,7 +51,7 @@ describe('PsycheFactory', () => {
       expect(psyche.getState().feelings[Feeling.Shame]).toBeCloseTo(BEGGING_SHAME * 1.5);
     });
 
-    it('Если фабрика удачливости не передана, шанс меняется по удачливости', () => {
+    it('Если фабрика удачливости не передана, модификатор шанса меняется по удачливости', () => {
       const factory = new PsycheFactory({
         traitFactories: { [Trait.Conscientiousness]: createMockedTraitFactory() },
       });

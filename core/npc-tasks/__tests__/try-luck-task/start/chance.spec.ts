@@ -9,18 +9,18 @@ import { TRY_LUCK_PERIOD, TryLuckTask } from '../../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#start', () => {
-    it('Бросает шанс, умноженный на модификатор шанса психики', () => {
+    it('Бросает шанс, у которого соотношение удач и неудач умножено на модификатор шанса психики', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 1 / 60 },
+        { chance: 0.5 },
         {
           random,
           timer,
         }
       );
       const psyche = createMockedPsyche();
-      psyche.getModifier.mockImplementation((modifier) => (modifier === Modifier.Chance ? 1.5 : 1));
+      psyche.getModifier.mockImplementation((modifier) => (modifier === Modifier.Chance ? 3 : 1));
 
       task.start(NpcStateBuilder.default(), {
         ...createNpcContext(),
@@ -28,21 +28,43 @@ describe('TryLuckTask', () => {
       });
       timer.advance(TRY_LUCK_PERIOD);
 
-      expect(random.chance).toHaveBeenCalledExactlyOnceWith(1.5 / 60);
+      expect(random.chance).toHaveBeenCalledExactlyOnceWith(0.75);
     });
 
-    it('Если с модификатором шанс больше 1, бросает шанс 1', () => {
+    it('Если модификатор шанса 0, бросает шанс 0', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
       const task = new TryLuckTask(
-        { chance: 0.8 },
+        { chance: 0.5 },
         {
           random,
           timer,
         }
       );
       const psyche = createMockedPsyche();
-      psyche.getModifier.mockReturnValue(1.5);
+      psyche.getModifier.mockReturnValue(0);
+
+      task.start(NpcStateBuilder.default(), {
+        ...createNpcContext(),
+        psyche,
+      });
+      timer.advance(TRY_LUCK_PERIOD);
+
+      expect(random.chance).toHaveBeenCalledExactlyOnceWith(0);
+    });
+
+    it('Если шанс 1, бросает шанс 1 при любом модификаторе', () => {
+      const random = createMockedRandom(false);
+      const timer = new ManualTimer();
+      const task = new TryLuckTask(
+        { chance: 1 },
+        {
+          random,
+          timer,
+        }
+      );
+      const psyche = createMockedPsyche();
+      psyche.getModifier.mockReturnValue(0);
 
       task.start(NpcStateBuilder.default(), {
         ...createNpcContext(),

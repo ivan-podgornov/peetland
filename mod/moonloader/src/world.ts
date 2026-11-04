@@ -60,6 +60,14 @@ interface WorldGlobal {
   /** Находит наземную Z-координату для точки */
   getGroundZFor3dCoord(this: void, x: number, y: number, z: number): number;
 
+  /** Находит координаты ближайшего к точке узла путей пешеходов */
+  getClosestCharNode(
+    this: void,
+    x: number,
+    y: number,
+    z: number
+  ): LuaMultiReturn<[number, number, number]>;
+
   /** Создает взрыв */
   addExplosion(this: void, x: number, y: number, z: number, type: number): void;
 
@@ -92,6 +100,7 @@ export const {
   getDistanceBetweenCoords3d,
   getHeadingFromVector2d,
   getGroundZFor3dCoord,
+  getClosestCharNode,
   addExplosion,
   startScriptFire,
   removeScriptFire,

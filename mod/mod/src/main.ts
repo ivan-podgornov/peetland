@@ -1,9 +1,7 @@
-import type { IActor } from '@peetland/game';
 import { GtaGame } from '@peetland/gta-sa';
 import {
   getCharCoordinates,
   getCharHeading,
-  getClosestCharNode,
   isGamePaused,
   isPlayerPlaying,
   math,
@@ -41,24 +39,15 @@ async function bigBang(game: GtaGame): Promise<void> {
   }).bigBang();
 }
 
-/** Пед для проверки застревания. null, пока пед не заспавнен */
-let stuckPed: IActor | null = null;
+/** Заспавнен ли пед для проверки застревания */
+let stuckPedSpawned = false;
 
 /**
- * Отладка застревания (issue #106). Первый вызов спавнит педа у мусорки за торговым центром и
- * отправляет к киоску, где сдают бутылки: этот путь пед сам не проходит и застревает. Следующие
- * вызовы телепортируют педа на ближайший к нему узел путей пешеходов
+ * Отладка застревания (issue #106). Спавнит педа у мусорки за торговым центром и отправляет к
+ * киоску, где сдают бутылки: этот путь пед сам не проходит и застревает. Пед спавнится один раз
  */
 function debugStuckPed(): void {
-  if (stuckPed) {
-    const { x, y, z } = stuckPed.getPosition();
-    const [nodeX, nodeY, nodeZ] = getClosestCharNode(x, y, z);
-    print(`stuck ped: ${x}, ${y}, ${z} -> node ${nodeX}, ${nodeY}, ${nodeZ}`);
-    stuckPed.setPosition({
-      x: nodeX,
-      y: nodeY,
-      z: nodeZ,
-    });
+  if (stuckPedSpawned) {
     return;
   }
 
@@ -74,7 +63,7 @@ function debugStuckPed(): void {
     angle: 339,
   });
   game.signal.addEventListener('abort', () => actor.despawn(), { once: true });
-  stuckPed = actor;
+  stuckPedSpawned = true;
 
   // Киоск montgomery-hannibal-liquor-kiosk-backdoor
   actor

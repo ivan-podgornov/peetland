@@ -7,7 +7,6 @@
     "build": "tstl -p ./tsconfig.build.json"
   },
   "dependencies": {
-    "@peetland/game": "0.0.0",
     "@peetland/gta-sa": "0.0.0",
     "@peetland/moonloader": "0.0.0",
     "@peetland/npc": "0.0.0",

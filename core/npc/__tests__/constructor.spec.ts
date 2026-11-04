@@ -113,7 +113,7 @@ describe('Npc', () => {
       expect(htnFactory.create).toHaveBeenCalledExactlyOnceWith(rootTask);
     });
 
-    it('Не обновляет HTN-агента, пока не наступил кадр', () => {
+    it('Не обновляет HTN-агента, пока не наступил тик', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
 
       new Npc(createNpcData(), createNpcDeps({ htnFactory: createMockedHTNFactory(htn) }));

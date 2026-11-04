@@ -19,7 +19,7 @@ export interface INpcFactory {
  */
 export type NpcFactoryDeps = Pick<
   NpcDeps,
-  'actorFactory' | 'frames' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
+  'actorFactory' | 'ticks' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
 > &
   Partial<Pick<NpcDeps, 'htnFactory' | 'inventoryFactory' | 'psycheFactory'>>;
 
@@ -29,7 +29,7 @@ export class NpcFactory implements INpcFactory {
   constructor(deps: NpcFactoryDeps) {
     const {
       actorFactory,
-      frames,
+      ticks,
       rootTaskFactory,
       gameSignal,
       worldKnowledge,
@@ -40,7 +40,7 @@ export class NpcFactory implements INpcFactory {
 
     this.deps = {
       actorFactory,
-      frames,
+      ticks,
       htnFactory,
       inventoryFactory,
       psycheFactory,

@@ -11,8 +11,8 @@ export interface IGame {
   readonly time: ITime;
   readonly geometry: IGeometry;
   readonly objectFactory: IObjectFactory;
-  /** Сообщает о каждом кадре игры */
-  readonly frames: Observable<unknown>;
+  /** Сообщает о каждом тике мира */
+  readonly ticks: Observable<unknown>;
   /**
    * Переходит в состояние aborted, когда скрипт выгружается. Кто что создал в игре, тот по этому
    * сигналу это и убирает

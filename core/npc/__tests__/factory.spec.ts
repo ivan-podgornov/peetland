@@ -16,7 +16,7 @@ import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
   return {
     actorFactory: createMockedActorFactory(),
-    frames: createControlledObservable().observable,
+    ticks: createControlledObservable().observable,
     rootTaskFactory: {
       create: vi.fn(() => ({
         name: 'root',

@@ -3,14 +3,14 @@ import { getTimeOfDay } from '@peetland/moonloader';
 import type { ITime, TimeState } from '@peetland/timings';
 
 export type GtaTimeDeps = {
-  /** Кадры игры, на которых время замечает, что наступила полночь */
-  frames: Observable<unknown>;
+  /** Тики мира, на которых время замечает, что наступила полночь */
+  ticks: Observable<unknown>;
 };
 
 /**
  * Время GTA. Часы и минуты берутся из игры, а дни игра не считает, поэтому их считает время: каждый
- * кадр и при каждом чтении сверяется с игрой и, если час стал меньше прошлого, значит наступила
- * полночь. Считается, что за один кадр игровое время не уходит вперёд на сутки
+ * тик и при каждом чтении сверяется с игрой и, если час стал меньше прошлого, значит наступила
+ * полночь. Считается, что за один тик игровое время не уходит вперёд на сутки
  */
 export class GtaTime implements ITime {
   private state: TimeState;
@@ -23,7 +23,7 @@ export class GtaTime implements ITime {
       minutes,
     };
 
-    deps.frames.subscribe(() => this.sync());
+    deps.ticks.subscribe(() => this.sync());
   }
 
   get day(): number {

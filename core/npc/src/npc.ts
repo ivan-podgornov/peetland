@@ -22,8 +22,8 @@ export type NpcDeps = {
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
   rootTaskFactory: IRootTaskFactory;
-  /** Сообщает о каждом кадре игры */
-  frames: Observable<unknown>;
+  /** Сообщает о каждом тике мира */
+  ticks: Observable<unknown>;
   /** То, что NPC знает о мире */
   worldKnowledge: INpcWorldKnowledge;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
@@ -43,7 +43,7 @@ export class Npc {
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
-   * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый кадр передаёт агенту актуальное состояние и
+   * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый тик передаёт агенту актуальное состояние и
    * контекст с актором, инвентарём и психикой. Когда игра завершается, деспавнится, а если она уже
    * завершилась, деспавнится сразу
    * @param data - данные NPC
@@ -51,7 +51,7 @@ export class Npc {
   constructor(data: NpcData, deps: NpcDeps) {
     const {
       actorFactory,
-      frames,
+      ticks,
       htnFactory,
       inventoryFactory,
       psycheFactory,
@@ -77,7 +77,7 @@ export class Npc {
     };
     this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
-    frames.subscribe(() => this.htn.update(this.getState(), this.context), {
+    ticks.subscribe(() => this.htn.update(this.getState(), this.context), {
       signal: this.lifetime.signal,
     });
 
@@ -108,7 +108,7 @@ export class Npc {
   }
 
   /**
-   * Завершает жизнь NPC: перестаёт следить за кадрами, останавливает HTN-агента и деспавнит
+   * Завершает жизнь NPC: перестаёт следить за тиками, останавливает HTN-агента и деспавнит
    * актора. После деспавна NPC больше не пользуются
    */
   despawn(): void {

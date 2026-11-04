@@ -4,7 +4,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
-import { addEventHandler, isGamePaused, lua_thread, thisScript, wait } from '@peetland/moonloader';
+import { addEventHandler, thisScript } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
 import type { ITime } from '@peetland/timings';
 
@@ -14,20 +14,19 @@ import { GtaObjectFactory } from './object';
 import type { IGtaObjectFactory } from './object';
 import { GtaTime } from './time';
 
-/** Как часто игра сообщает о кадре, в миллисекундах */
-const FRAME_PERIOD = 50;
+/** Как часто игра сообщает о тике мира, в миллисекундах */
+const TICK_PERIOD = 250;
 
 /**
- * Игра GTA SA. Создавать её нужно в потоке MoonLoader, например в main, а не внутри async-функции:
- * конструктор запускает поток MoonLoader, а поток, созданный из корутины async-функции, портит память
- * скрипта, когда корутина завершается
+ * Игра GTA SA. Тики мира идут по таймеру раз в TICK_PERIOD миллисекунд, поэтому, пока игра на паузе
+ * или ещё не загружена, тиков нет: таймеры в это время не срабатывают
  */
 export class GtaGame implements IGame {
   readonly actorFactory: IActorFactory;
   readonly time: ITime;
   readonly objectFactory: IGtaObjectFactory;
   readonly geometry: IGeometry;
-  readonly frames: Observable<unknown>;
+  readonly ticks: Observable<unknown>;
 
   private readonly terminateController: AbortController;
 
@@ -42,23 +41,14 @@ export class GtaGame implements IGame {
     });
 
     const { signal } = this.terminateController;
-    // Поток не остановить снаружи, поэтому он один на игру, а подписчики кадров подписываются и
-    // отписываются через EventTarget. На паузе кадры не идут, а после выгрузки скрипта поток
-    // заканчивается
-    const frameEvents = new EventTarget<{ frame: [] }>();
-    lua_thread.create(() => {
-      while (!signal.aborted) {
-        wait(FRAME_PERIOD);
+    // Таймер один на игру, а подписчики тиков подписываются и отписываются через EventTarget. После
+    // выгрузки скрипта тики заканчиваются
+    const tickEvents = new EventTarget<{ tick: [] }>();
+    timer.interval(TICK_PERIOD).subscribe(() => tickEvents.dispatchEvent('tick'), { signal });
 
-        if (!signal.aborted && !isGamePaused()) {
-          frameEvents.dispatchEvent('frame');
-        }
-      }
-    });
+    this.ticks = tickEvents.when('tick');
 
-    this.frames = frameEvents.when('frame');
-
-    this.time = new GtaTime({ frames: this.frames });
+    this.time = new GtaTime({ ticks: this.ticks });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     this.actorFactory = new GtaActorFactory({

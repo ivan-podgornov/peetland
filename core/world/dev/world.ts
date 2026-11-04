@@ -25,7 +25,7 @@ export function createGame(game: Partial<IGame> = {}): IGame {
         throw new Error('Мир не создаёт объекты');
       }),
     },
-    frames: createControlledObservable().observable,
+    ticks: createControlledObservable().observable,
     signal: new AbortController().signal,
     ...game,
   };

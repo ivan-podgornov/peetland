@@ -29,7 +29,7 @@ function isGameRunning(): boolean {
 
 /**
  * Создаёт мир в игре с местами и NPC из данных мода и запускает в нём жизнь
- * @param game - игра. Создаётся снаружи, в потоке MoonLoader (см. GtaGame)
+ * @param game - игра, в которой создаётся мир
  */
 async function bigBang(game: GtaGame): Promise<void> {
   await new World({

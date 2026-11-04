@@ -10,11 +10,11 @@ describe('World', () => {
   describe('#bigBang', () => {
     describe('Если npcFactory не передана', () => {
       it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
-        const frames = createControlledObservable();
+        const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
         const world = new World(
           createWorldOptions({
-            game: createGame({ frames: frames.observable }),
+            game: createGame({ ticks: ticks.observable }),
             npcs: [createNpcData()],
           }),
           {
@@ -39,7 +39,7 @@ describe('World', () => {
         );
         await world.bigBang();
 
-        frames.subscriber.next(undefined);
+        ticks.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -55,7 +55,7 @@ describe('World', () => {
       });
 
       it('Если worldKnowledge не передано, NPC планирует с временем суток игры', async () => {
-        const frames = createControlledObservable();
+        const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
         const world = new World(
           createWorldOptions({
@@ -65,7 +65,7 @@ describe('World', () => {
                 hours: 20,
                 minutes: 15,
               }),
-              frames: frames.observable,
+              ticks: ticks.observable,
             }),
             npcs: [createNpcData()],
           }),
@@ -84,7 +84,7 @@ describe('World', () => {
         );
         await world.bigBang();
 
-        frames.subscriber.next(undefined);
+        ticks.subscriber.next(undefined);
 
         expect(preconditions).toHaveBeenCalledWith(
           expect.objectContaining({

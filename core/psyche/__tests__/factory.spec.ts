@@ -30,6 +30,7 @@ describe('PsycheFactory', () => {
           traits: {
             [Trait.Conscientiousness]: 70,
             [Trait.Luck]: 50,
+            [Trait.Optimism]: 50,
           },
         })
       );
@@ -46,6 +47,7 @@ describe('PsycheFactory', () => {
           traits: {
             [Trait.Conscientiousness]: 100,
             [Trait.Luck]: 50,
+            [Trait.Optimism]: 50,
           },
         })
       );
@@ -64,12 +66,31 @@ describe('PsycheFactory', () => {
           traits: {
             [Trait.Conscientiousness]: 50,
             [Trait.Luck]: 100,
+            [Trait.Optimism]: 50,
           },
         })
       );
 
       // Соотношение 1 к 1 становится 1.5 к 1
       expect(psyche.adjustChance(0.5)).toBeCloseTo(0.6);
+    });
+
+    it('Если фабрика оптимизма не передана, ожидаемое число попыток решает оптимизм', () => {
+      const factory = new PsycheFactory({
+        traitFactories: { [Trait.Conscientiousness]: createMockedTraitFactory() },
+      });
+      const psyche = factory.create(
+        createPsycheState({
+          traits: {
+            [Trait.Conscientiousness]: 50,
+            [Trait.Luck]: 50,
+            [Trait.Optimism]: 100,
+          },
+        })
+      );
+
+      // Оптимист ожидает в полтора раза меньше попыток: 40 / 1.5 ≈ 27
+      expect(psyche.expectAttempts(1 / 40)).toBe(27);
     });
   });
 });

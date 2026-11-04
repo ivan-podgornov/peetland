@@ -32,6 +32,15 @@ export interface ILuck extends ITrait {
   adjustChance(chance: number): number;
 }
 
+/** Оптимизм. Кроме чувств, решает, сколько попыток персонаж ожидает до удачи, когда планирует */
+export interface IOptimism extends ITrait {
+  /**
+   * Возвращает, сколько попыток персонаж ожидает до удачи
+   * @param chance - шанс удачи за одну попытку от 0 до 1, например, 1 / 40
+   */
+  expectAttempts(chance: number): number;
+}
+
 export interface ITraitFactory<T extends ITrait = ITrait> {
   /** Создаёт черту с переданным значением */
   create(value: number): T;
@@ -41,4 +50,5 @@ export interface ITraitFactory<T extends ITrait = ITrait> {
 export type TraitFactories = Readonly<{
   [Trait.Conscientiousness]: ITraitFactory;
   [Trait.Luck]: ITraitFactory<ILuck>;
+  [Trait.Optimism]: ITraitFactory<IOptimism>;
 }>;

@@ -5,6 +5,7 @@ import { Feeling, Trait } from '../src';
 import type {
   FeelingsContribution,
   ILuck,
+  IOptimism,
   ITrait,
   ITraitFactory,
   PsycheState,
@@ -25,6 +26,17 @@ export function createMockedLuck(contribution: FeelingsContribution = {}): Mocke
   };
 }
 
+/**
+ * Создаёт оптимизм, который на любой поступок возвращает переданный вклад и ожидает попыток как
+ * реалист: 1 / шанс
+ */
+export function createMockedOptimism(contribution: FeelingsContribution = {}): Mocked<IOptimism> {
+  return {
+    ...createMockedTrait(contribution),
+    expectAttempts: vi.fn((chance: number) => Math.round(1 / chance)),
+  };
+}
+
 /** Создаёт фабрику, которая всегда возвращает переданную черту */
 export function createMockedTraitFactory(): Mocked<ITraitFactory>;
 export function createMockedTraitFactory<T extends ITrait>(trait: T): Mocked<ITraitFactory<T>>;
@@ -40,6 +52,7 @@ export function createPsycheState(state: Partial<PsycheState> = {}): PsycheState
     traits: {
       [Trait.Conscientiousness]: 50,
       [Trait.Luck]: 50,
+      [Trait.Optimism]: 50,
     },
     feelings: {
       [Feeling.Shame]: 0,
@@ -49,14 +62,15 @@ export function createPsycheState(state: Partial<PsycheState> = {}): PsycheState
 }
 
 /**
- * Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вкладов, а
- * удачливость не меняет шанс
+ * Создаёт зависимости психики. Фабрики черт, которые не переданы, создают черты без вкладов,
+ * удачливость не меняет шанс, а оптимизм ожидает попыток как реалист
  */
 export function createPsycheDeps(traitFactories: Partial<TraitFactories> = {}): PsycheDeps {
   return {
     traitFactories: {
       [Trait.Conscientiousness]: createMockedTraitFactory(),
       [Trait.Luck]: createMockedTraitFactory(createMockedLuck()),
+      [Trait.Optimism]: createMockedTraitFactory(createMockedOptimism()),
       ...traitFactories,
     },
   };

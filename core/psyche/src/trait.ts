@@ -4,4 +4,6 @@ export enum Trait {
   Conscientiousness = 'conscientiousness',
   /** Удачливость */
   Luck = 'luck',
+  /** Оптимизм */
+  Optimism = 'optimism',
 }

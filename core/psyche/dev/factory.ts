@@ -6,12 +6,16 @@ import type { IPsyche, IPsycheFactory, PsycheState } from '../src';
 
 import { createPsycheDeps, createPsycheState } from './psyche';
 
-/** Создаёт психику, которая ничего не делает на поступки, всегда возвращает переданное состояние и не меняет шанс */
+/**
+ * Создаёт психику, которая ничего не делает на поступки, всегда возвращает переданное состояние, не
+ * меняет шанс и ожидает попыток как реалист: 1 / шанс
+ */
 export function createMockedPsyche(state: PsycheState = createPsycheState()): Mocked<IPsyche> {
   return {
     getState: vi.fn(() => state),
     react: vi.fn(),
     adjustChance: vi.fn((chance: number) => chance),
+    expectAttempts: vi.fn((chance: number) => Math.round(1 / chance)),
   };
 }
 

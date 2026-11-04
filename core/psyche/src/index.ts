@@ -8,6 +8,7 @@ export { Trait } from './trait';
 export type {
   FeelingsContribution,
   ILuck,
+  IOptimism,
   ITrait,
   ITraitFactory,
   PsycheFeelings,

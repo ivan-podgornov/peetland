@@ -24,9 +24,6 @@ export const BEGGING_REWARD = 10;
  */
 export const BEGGING_SHAME_LIMIT = 60;
 
-/** Сколько попыток, по ожиданию NPC, уйдёт на одну удачу. По нему предсказывается стыд */
-export const EXPECTED_BEGGING_ATTEMPTS = 1 / BEGGING_CHANCE;
-
 /** На каком расстоянии от места для клянчанья можно считать, что NPC до него дошёл, в метрах */
 const BEGGING_SPOT_COMPLETE_RADIUS = 0.5;
 
@@ -49,8 +46,9 @@ export type BegTaskDeps = {
  * перестаёт клянчить.
  *
  * Клянчить NPC идёт, только если это окупится: по предсказанию, он успеет наклянчить на пойло до
- * того, как стыд достигнет порога. Стыд предсказывается так, будто на каждую удачу уходит
- * EXPECTED_BEGGING_ATTEMPTS попыток
+ * того, как стыд достигнет порога. Стыд предсказывается так, будто на каждую удачу уходит столько
+ * попыток, сколько NPC ожидает при шансе BEGGING_CHANCE: оптимист рассчитывает на меньшее число
+ * попыток, пессимист — на большее
  */
 export class BegTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'beg';
@@ -161,12 +159,14 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     return rewards;
   }
 
-  /** Предсказывает психику после одной удачи: EXPECTED_BEGGING_ATTEMPTS раз клянчил */
+  /** Предсказывает психику после одной удачи: клянчил столько раз, сколько NPC ожидает до удачи */
   private predictReward(state: PsycheState): PsycheState {
     const { psycheFactory } = this.deps;
     const psyche = psycheFactory.create(state);
 
-    for (let attempt = 0; attempt < EXPECTED_BEGGING_ATTEMPTS; attempt++) {
+    const attempts = psyche.expectAttempts(BEGGING_CHANCE);
+
+    for (let attempt = 0; attempt < attempts; attempt++) {
       psyche.react(Deed.Begging);
     }
 

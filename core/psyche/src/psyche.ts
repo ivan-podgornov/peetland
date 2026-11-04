@@ -4,6 +4,7 @@ import { Trait } from './trait';
 import type {
   FeelingsContribution,
   ILuck,
+  IOptimism,
   ITrait,
   PsycheFeelings,
   PsycheState,
@@ -27,6 +28,11 @@ export interface IPsyche {
    * @param chance - базовый шанс среднего персонажа от 0 до 1, например, 1 / 40
    */
   adjustChance(chance: number): number;
+  /**
+   * Возвращает, сколько попыток персонаж ожидает до удачи, когда планирует: решает оптимизм
+   * @param chance - шанс удачи за одну попытку от 0 до 1, например, 1 / 40
+   */
+  expectAttempts(chance: number): number;
 }
 
 export type PsycheDeps = {
@@ -43,6 +49,7 @@ export class Psyche implements IPsyche {
   private readonly traitValues: PsycheTraits;
   private readonly traits: ITrait[];
   private readonly luck: ILuck;
+  private readonly optimism: IOptimism;
   private feelings: PsycheFeelings;
 
   /**
@@ -60,9 +67,11 @@ export class Psyche implements IPsyche {
     this.traitValues = state.traits;
     this.feelings = state.feelings;
     this.luck = traitFactories[Trait.Luck].create(state.traits[Trait.Luck]);
+    this.optimism = traitFactories[Trait.Optimism].create(state.traits[Trait.Optimism]);
     this.traits = [
       traitFactories[Trait.Conscientiousness].create(state.traits[Trait.Conscientiousness]),
       this.luck,
+      this.optimism,
     ];
   }
 
@@ -95,6 +104,10 @@ export class Psyche implements IPsyche {
 
   adjustChance(chance: number): number {
     return this.luck.adjustChance(chance);
+  }
+
+  expectAttempts(chance: number): number {
+    return this.optimism.expectAttempts(chance);
   }
 
   /** Возвращает, на сколько вклад меняет чувство. Если вклад не конечное число, выбрасывает RangeError */

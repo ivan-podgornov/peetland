@@ -4,6 +4,7 @@ import {
   createPsycheDeps,
   createPsycheState,
   createMockedLuck,
+  createMockedOptimism,
   createMockedTrait,
   createMockedTraitFactory,
 } from '../../dev';
@@ -11,21 +12,24 @@ import { Deed, Feeling, Psyche, Trait } from '../../src';
 
 describe('Psyche', () => {
   describe('#react', () => {
-    it('Передаёт поступок каждой черте', () => {
-      const conscientiousness = createMockedTrait();
-      const luck = createMockedLuck();
+    it.each(Object.values(Trait))('Передаёт поступок черте %s', (trait) => {
+      const traits = {
+        [Trait.Conscientiousness]: createMockedTrait(),
+        [Trait.Luck]: createMockedLuck(),
+        [Trait.Optimism]: createMockedOptimism(),
+      };
       const psyche = new Psyche(
         createPsycheState(),
         createPsycheDeps({
-          [Trait.Conscientiousness]: createMockedTraitFactory(conscientiousness),
-          [Trait.Luck]: createMockedTraitFactory(luck),
+          [Trait.Conscientiousness]: createMockedTraitFactory(traits[Trait.Conscientiousness]),
+          [Trait.Luck]: createMockedTraitFactory(traits[Trait.Luck]),
+          [Trait.Optimism]: createMockedTraitFactory(traits[Trait.Optimism]),
         })
       );
 
       psyche.react(Deed.Begging);
 
-      expect(conscientiousness.react).toHaveBeenCalledExactlyOnceWith(Deed.Begging);
-      expect(luck.react).toHaveBeenCalledExactlyOnceWith(Deed.Begging);
+      expect(traits[trait].react).toHaveBeenCalledExactlyOnceWith(Deed.Begging);
     });
 
     it('Меняет чувство на вклад черты', () => {

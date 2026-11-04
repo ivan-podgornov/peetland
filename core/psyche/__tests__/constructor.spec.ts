@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createMockedLuck,
+  createMockedOptimism,
   createMockedTraitFactory,
   createPsycheDeps,
   createPsycheState,
@@ -13,10 +14,12 @@ describe('Psyche', () => {
     it('Создаёт каждую черту фабрикой этой черты со значением из состояния', () => {
       const conscientiousness = createMockedTraitFactory();
       const luck = createMockedTraitFactory(createMockedLuck());
+      const optimism = createMockedTraitFactory(createMockedOptimism());
       const state = createPsycheState({
         traits: {
           [Trait.Conscientiousness]: 70,
           [Trait.Luck]: 20,
+          [Trait.Optimism]: 80,
         },
       });
 
@@ -25,11 +28,13 @@ describe('Psyche', () => {
         createPsycheDeps({
           [Trait.Conscientiousness]: conscientiousness,
           [Trait.Luck]: luck,
+          [Trait.Optimism]: optimism,
         })
       );
 
       expect(conscientiousness.create).toHaveBeenCalledExactlyOnceWith(70);
       expect(luck.create).toHaveBeenCalledExactlyOnceWith(20);
+      expect(optimism.create).toHaveBeenCalledExactlyOnceWith(80);
     });
 
     it('Если чувство меньше MIN_FEELING, выбрасывает RangeError', () => {

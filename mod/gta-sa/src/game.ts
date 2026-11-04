@@ -4,18 +4,25 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
+import type { ILogger } from '@peetland/logger';
 import { addEventHandler, thisScript } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
 import type { ITime } from '@peetland/timings';
 
 import { GTA_ANIMATIONS, GtaActorFactory, GtaAnimationLoader } from './actor';
 
+import { GtaLogger } from './logger';
 import { GtaObjectFactory } from './object';
 import type { IGtaObjectFactory } from './object';
 import { GtaTime } from './time';
 
 /** Как часто игра сообщает о тике мира, в миллисекундах */
 const TICK_PERIOD = 250;
+
+export type GtaGameDeps = {
+  /** Куда игра и её акторы пишут лог. По умолчанию — GtaLogger */
+  logger?: ILogger;
+};
 
 /**
  * Игра GTA SA. Тики мира идут по таймеру раз в TICK_PERIOD миллисекунд, поэтому, пока игра на паузе
@@ -30,7 +37,8 @@ export class GtaGame implements IGame {
 
   private readonly terminateController: AbortController;
 
-  constructor() {
+  constructor(deps: GtaGameDeps = {}) {
+    const logger = deps.logger ?? new GtaLogger();
     const timer = new Timer();
     this.terminateController = new AbortController();
     // Событие приходит при завершении любого скрипта, поэтому чужие скрипты пропускаем
@@ -57,6 +65,7 @@ export class GtaGame implements IGame {
         { loader: new GtaAnimationLoader({ timer }) }
       ),
       geometry: this.geometry,
+      logger,
       objectFactory: this.objectFactory,
       timer,
     });

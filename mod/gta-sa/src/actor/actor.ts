@@ -3,6 +3,7 @@ import { AbortController } from '@peetland/events';
 import type { IAbortSignal } from '@peetland/events';
 import type { AnimationId, CreateActorOptions, IActor, IActorCommand } from '@peetland/game';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
+import type { ILogger } from '@peetland/logger';
 import type { PedHandle } from '@peetland/moonloader';
 import {
   createChar,
@@ -31,6 +32,7 @@ export type ActorDeps = {
   /** Менеджер анимаций. Один на всех акторов */
   animations: IAnimationManager<GtaAnimation>;
   geometry: IGeometry;
+  logger: ILogger;
   objectFactory: IGtaObjectFactory;
   timer: ITimer;
 };
@@ -102,7 +104,7 @@ export class GtaActor implements IActor {
   }
 
   goToCoords(coords: Vector3, completeRadius: number): IActorCommand<Vector3> {
-    const { geometry, objectFactory, timer } = this.deps;
+    const { geometry, logger, objectFactory, timer } = this.deps;
 
     return new GtaGoToCoordsCommand(
       this,
@@ -113,6 +115,7 @@ export class GtaActor implements IActor {
       },
       {
         geometry,
+        logger,
         objectFactory,
         timer,
       }

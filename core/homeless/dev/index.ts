@@ -14,3 +14,4 @@ export {
   BOTTLES_FOR_BOOZE,
 } from './sell-bottles-task';
 export { DRINK_PLAN, createDrinkTask, createPlacesWithCamp } from './drink-task';
+export { createPurchaseTask } from './purchase-task';

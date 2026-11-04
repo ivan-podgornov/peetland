@@ -1,7 +1,7 @@
 import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 import { ParallelTask } from '@peetland/htn';
-import type { ParallelTaskOptions, PrimitiveTask } from '@peetland/htn';
+import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { PsycheFactory } from '@peetland/psyche';
 import type { IPsycheFactory } from '@peetland/psyche';
@@ -23,7 +23,12 @@ import type { TryLuckTaskOptions } from './try-luck-task';
 
 type NpcPrimitiveTask = PrimitiveTask<NpcState, NpcContext>;
 
-/** Создаёт примитивные задачи, которые нужны любому NPC. Через неё составные задачи собирают свои методы */
+type NpcTask = Task<NpcState, NpcContext>;
+
+/**
+ * Создаёт примитивные задачи, которые нужны любому NPC, и повторяет цепочки из них. Через неё
+ * составные задачи собирают свои методы
+ */
 export interface INpcTaskFactory {
   /** Идти к координатам (см. GoToCoordsTask) */
   goToCoords(options: GoToCoordsOptions): NpcPrimitiveTask;
@@ -41,6 +46,12 @@ export interface INpcTaskFactory {
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
   /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */
   parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask;
+  /**
+   * Повторить цепочку задач times раз и вернуть повторения подряд одним массивом. build создаёт одну
+   * цепочку и вызывается на каждое повторение, чтобы у повторений были свои экземпляры задач. Если
+   * times — не целое неотрицательное число, выбрасывает ошибку
+   */
+  repeat(times: number, build: () => NpcTask[]): NpcTask[];
 }
 
 export type NpcTaskFactoryDeps = {
@@ -105,5 +116,20 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask {
     return new ParallelTask(options);
+  }
+
+  repeat(times: number, build: () => NpcTask[]): NpcTask[] {
+    // Остаток от деления на 1 не равен 0 и у дробного числа, и у NaN, и у бесконечности
+    if (times < 0 || times % 1 !== 0) {
+      throw new Error(`Нельзя повторить цепочку задач ${times} раз`);
+    }
+
+    const tasks: NpcTask[] = [];
+
+    for (let index = 0; index < times; index++) {
+      tasks.push(...build());
+    }
+
+    return tasks;
   }
 }

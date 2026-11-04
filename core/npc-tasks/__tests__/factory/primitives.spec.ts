@@ -4,15 +4,15 @@ import { NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling, Trait } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
 
-import { createNpcTaskFactoryDeps } from '../dev';
-import { NpcTaskFactory } from '../src';
-import { AchieveAngleTask } from '../src/achieve-angle-task';
-import { AddItemTask } from '../src/add-item-task';
-import { GoToCoordsTask } from '../src/go-to-coords-task';
-import { PlayAnimationTask } from '../src/play-animation-task';
-import { PsycheReactTask } from '../src/psyche-react-task';
-import { RemoveItemTask } from '../src/remove-item-task';
-import { TryLuckTask } from '../src/try-luck-task';
+import { createNpcTaskFactoryDeps } from '../../dev';
+import { NpcTaskFactory } from '../../src';
+import { AchieveAngleTask } from '../../src/achieve-angle-task';
+import { AddItemTask } from '../../src/add-item-task';
+import { GoToCoordsTask } from '../../src/go-to-coords-task';
+import { PlayAnimationTask } from '../../src/play-animation-task';
+import { PsycheReactTask } from '../../src/psyche-react-task';
+import { RemoveItemTask } from '../../src/remove-item-task';
+import { TryLuckTask } from '../../src/try-luck-task';
 
 describe('NpcTaskFactory', () => {
   describe('#goToCoords', () => {

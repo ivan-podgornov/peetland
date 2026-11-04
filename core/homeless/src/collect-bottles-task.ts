@@ -67,7 +67,7 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
     const { random, npcTaskFactory } = this.deps;
     const bin = random.pick(this.places.ofType(PlaceType.TrashBin));
     const bottles = Math.min(MAX_BOTTLES_PER_VISIT, MAX_BOTTLES - this.countBottles(state));
-    const tasks: Task<NpcState, NpcContext>[] = [
+    return [
       npcTaskFactory.goToCoords({
         coords: bin.position,
         completeRadius: TRASH_BIN_COMPLETE_RADIUS,
@@ -77,10 +77,7 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
         tolerance: TRASH_BIN_FACING_TOLERANCE,
       }),
       npcTaskFactory.playAnimation({ animation: 'trash-search-start' }),
-    ];
-
-    for (let index = 0; index < bottles; index++) {
-      tasks.push(
+      ...npcTaskFactory.repeat(bottles, () => [
         npcTaskFactory.parallel({
           main: npcTaskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
           background: npcTaskFactory.playAnimation({ animation: 'trash-search' }),
@@ -90,13 +87,10 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
           item: Item.Bottles,
           count: 1,
         }),
-        npcTaskFactory.psycheReact({ deed: Deed.BottleFound })
-      );
-    }
-
-    tasks.push(npcTaskFactory.playAnimation({ animation: 'trash-search-end' }));
-
-    return tasks;
+        npcTaskFactory.psycheReact({ deed: Deed.BottleFound }),
+      ]),
+      npcTaskFactory.playAnimation({ animation: 'trash-search-end' }),
+    ];
   }
 
   /** Сколько у NPC бутылок */

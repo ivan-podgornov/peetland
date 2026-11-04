@@ -95,7 +95,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
       throw new Error('Не из чего выбрать место для клянчанья');
     }
 
-    const tasks: Task<NpcState, NpcContext>[] = [
+    return [
       npcTaskFactory.goToCoords({
         coords: spot.position,
         completeRadius: BEGGING_SPOT_COMPLETE_RADIUS,
@@ -104,10 +104,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
         angle: spot.angle,
         tolerance: BEGGING_SPOT_FACING_TOLERANCE,
       }),
-    ];
-
-    for (let index = 0; index < this.countNeededRewards(state); index++) {
-      tasks.push(
+      ...npcTaskFactory.repeat(this.countNeededRewards(state), () => [
         npcTaskFactory.parallel({
           main: npcTaskFactory.tryLuck({
             chance: BEGGING_CHANCE,
@@ -126,11 +123,9 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
         npcTaskFactory.addItem({
           item: Item.Money,
           count: BEGGING_REWARD,
-        })
-      );
-    }
-
-    return tasks;
+        }),
+      ]),
+    ];
   }
 
   /**

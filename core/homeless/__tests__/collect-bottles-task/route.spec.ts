@@ -1,7 +1,6 @@
 import { plan, planNames } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createMockedRepeat, createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
@@ -9,14 +8,15 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../dev';
-import { MAX_BOTTLES } from '../../src/collect-bottles-task';
 
 describe('CollectBottlesTask', () => {
   it('Планирует дойти до мусорки, повернуться к ней, начать рыться, найти бутылки и перестать рыться', () => {
-    const task = createCollectBottlesTask(createPlacesWithTrashBins());
-    const state = new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build();
+    const task = createCollectBottlesTask(
+      createPlacesWithTrashBins(),
+      createNpcTaskFactory({ repeat: createMockedRepeat() })
+    );
 
-    expect(planNames(task, state)).toStrictEqual([
+    expect(planNames(task, NpcStateBuilder.default())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
       'play-animation',

@@ -1,8 +1,7 @@
 import { plan, planNames } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { PlayAnimationTaskOptions } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createMockedRepeat, createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
@@ -13,17 +12,16 @@ import {
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
 } from '../../dev';
-import { BEGGING_CHANCE, BEGGING_REWARD } from '../../src/beg-task';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
+import { BEGGING_CHANCE } from '../../src/beg-task';
 
 describe('BegTask', () => {
   it('Планирует дойти до места, повернуться и клянчить', () => {
-    const task = createBegTask(createPlacesWithBeggingSpot());
-    const state = new NpcStateBuilder()
-      .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD })
-      .build();
+    const task = createBegTask(
+      createPlacesWithBeggingSpot(),
+      createNpcTaskFactory({ repeat: createMockedRepeat() })
+    );
 
-    expect(planNames(task, state)).toStrictEqual([
+    expect(planNames(task, NpcStateBuilder.default())).toStrictEqual([
       'go-to-coords',
       'achieve-angle',
       'parallel',
@@ -107,12 +105,15 @@ describe('BegTask', () => {
     );
     const task = createBegTask(
       createPlacesWithBeggingSpot(),
-      createNpcTaskFactory({ playAnimation })
+      createNpcTaskFactory({
+        playAnimation,
+        repeat: createMockedRepeat(),
+      })
     );
 
     plan(task, NpcStateBuilder.default());
 
-    expect(playAnimation).toHaveBeenCalledWith({ animation: 'beg-sitting' });
+    expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'beg-sitting' });
   });
 
   it('Если мест для клянчанья нет, план не составляется', () => {

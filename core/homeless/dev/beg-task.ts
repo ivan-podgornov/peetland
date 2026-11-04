@@ -1,6 +1,6 @@
 import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createMockedRepeat, createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces, PlaceData } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -50,12 +50,18 @@ export function createPlacesWithBeggingSpot(
   });
 }
 
-/** Создаёт фабрику задач, которая запоминает параметры каждой попытки удачи */
+/**
+ * Создаёт фабрику задач, которая запоминает параметры каждой попытки удачи. Цепочку клянчанья она
+ * собирает один раз, сколько бы удач ни понадобилось (см. createMockedRepeat)
+ */
 export function createTaskFactoryWithTryLuckSpy() {
   const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
 
   return {
     tryLuck,
-    npcTaskFactory: createNpcTaskFactory({ tryLuck }),
+    npcTaskFactory: createNpcTaskFactory({
+      tryLuck,
+      repeat: createMockedRepeat(),
+    }),
   };
 }

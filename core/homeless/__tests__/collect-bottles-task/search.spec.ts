@@ -2,22 +2,25 @@ import { plan, planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createMockedRepeat, createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { Deed } from '@peetland/psyche';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../dev';
-import { BOTTLE_FIND_CHANCE, MAX_BOTTLES } from '../../src/collect-bottles-task';
+import { BOTTLE_FIND_CHANCE } from '../../src/collect-bottles-task';
 
 describe('CollectBottlesTask', () => {
   it('Начинает рыться с анимацией trash-search-start, а заканчивает — с trash-search-end', () => {
     const playAnimation = vi.fn();
     const task = createCollectBottlesTask(
       createPlacesWithTrashBins(),
-      createNpcTaskFactory({ playAnimation })
+      createNpcTaskFactory({
+        playAnimation,
+        repeat: createMockedRepeat(),
+      })
     );
 
-    plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build());
+    plan(task, NpcStateBuilder.default());
 
     expect(playAnimation.mock.calls).toStrictEqual([
       [{ animation: 'trash-search-start' }],
@@ -31,10 +34,13 @@ describe('CollectBottlesTask', () => {
     const tryLuck = vi.fn((options: TryLuckTaskOptions) => createNpcTaskFactory().tryLuck(options));
     const task = createCollectBottlesTask(
       createPlacesWithTrashBins(),
-      createNpcTaskFactory({ tryLuck })
+      createNpcTaskFactory({
+        tryLuck,
+        repeat: createMockedRepeat(),
+      })
     );
 
-    plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build());
+    plan(task, NpcStateBuilder.default());
 
     expect(tryLuck).toHaveBeenCalledExactlyOnceWith({ chance: BOTTLE_FIND_CHANCE });
   });
@@ -51,10 +57,11 @@ describe('CollectBottlesTask', () => {
         playAnimation: (options) =>
           options.animation === 'trash-search' ? searching : real.playAnimation(options),
         parallel,
+        repeat: createMockedRepeat(),
       })
     );
 
-    plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build());
+    plan(task, NpcStateBuilder.default());
 
     expect(parallel).toHaveBeenCalledExactlyOnceWith({
       main: tryLuck,
@@ -62,17 +69,15 @@ describe('CollectBottlesTask', () => {
     });
   });
 
-  it('Каждую найденную бутылку кладёт в карман с анимацией trash-search-pocket, добавляет в инвентарь и реагирует на находку', () => {
-    const task = createCollectBottlesTask(createPlacesWithTrashBins());
-    const state = new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 2 }).build();
+  it('Найденную бутылку кладёт в карман с анимацией trash-search-pocket, добавляет в инвентарь и реагирует на находку', () => {
+    const task = createCollectBottlesTask(
+      createPlacesWithTrashBins(),
+      createNpcTaskFactory({ repeat: createMockedRepeat() })
+    );
 
-    const names = planNames(task, state);
+    const names = planNames(task, NpcStateBuilder.default());
 
     expect(names?.slice(3, -1)).toStrictEqual([
-      'parallel',
-      'play-animation',
-      'add-item',
-      'psyche-react',
       'parallel',
       'play-animation',
       'add-item',
@@ -84,10 +89,13 @@ describe('CollectBottlesTask', () => {
     const addItem = vi.fn();
     const task = createCollectBottlesTask(
       createPlacesWithTrashBins(),
-      createNpcTaskFactory({ addItem })
+      createNpcTaskFactory({
+        addItem,
+        repeat: createMockedRepeat(),
+      })
     );
 
-    plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build());
+    plan(task, NpcStateBuilder.default());
 
     expect(addItem).toHaveBeenCalledExactlyOnceWith({
       item: Item.Bottles,
@@ -99,10 +107,13 @@ describe('CollectBottlesTask', () => {
     const psycheReact = vi.fn();
     const task = createCollectBottlesTask(
       createPlacesWithTrashBins(),
-      createNpcTaskFactory({ psycheReact })
+      createNpcTaskFactory({
+        psycheReact,
+        repeat: createMockedRepeat(),
+      })
     );
 
-    plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build());
+    plan(task, NpcStateBuilder.default());
 
     expect(psycheReact).toHaveBeenCalledExactlyOnceWith({ deed: Deed.BottleFound });
   });

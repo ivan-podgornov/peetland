@@ -10,6 +10,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { createBuyBoozeTask, createHomelessTaskFactory, createPlacesWithShop } from '../../dev';
 import { BOOZE_PRICE } from '../../src/buy-booze-task';
 
+/** Создаёт состояние NPC, у которого хватает денег на пойло: без них план не составляется */
+function createStateWithMoney() {
+  return new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
+}
+
 describe('BuyBoozeTask', () => {
   describe('Метод buy-in-nearest-shop', () => {
     describe('Задачи', () => {
@@ -20,7 +25,7 @@ describe('BuyBoozeTask', () => {
           }),
         });
 
-        expect(planNames(task, NpcStateBuilder.default())).toStrictEqual([
+        expect(planNames(task, createStateWithMoney())).toStrictEqual([
           'go-to-coords',
           'achieve-angle',
           'purchase',
@@ -29,7 +34,10 @@ describe('BuyBoozeTask', () => {
 
       it('Ищет магазин, ближайший к позиции NPC из состояния', () => {
         const places = createPlacesWithShop();
-        const state = new NpcStateBuilder().withPosition(8, 0, 0).build();
+        const state = new NpcStateBuilder()
+          .withPosition(8, 0, 0)
+          .withInventory({ [Item.Money]: BOOZE_PRICE })
+          .build();
 
         plan(createBuyBoozeTask(places), state);
 
@@ -56,7 +64,7 @@ describe('BuyBoozeTask', () => {
           npcTaskFactory: createNpcTaskFactory({ goToCoords }),
         });
 
-        plan(task, NpcStateBuilder.default());
+        plan(task, createStateWithMoney());
 
         expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
           coords: {
@@ -75,7 +83,7 @@ describe('BuyBoozeTask', () => {
           npcTaskFactory: createNpcTaskFactory({ achieveAngle }),
         });
 
-        plan(task, NpcStateBuilder.default());
+        plan(task, createStateWithMoney());
 
         expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
           angle: 90,
@@ -89,7 +97,7 @@ describe('BuyBoozeTask', () => {
           homelessTaskFactory: createHomelessTaskFactory({ purchase }),
         });
 
-        plan(task, NpcStateBuilder.default());
+        plan(task, createStateWithMoney());
 
         expect(purchase).toHaveBeenCalledExactlyOnceWith({
           item: Item.Booze,

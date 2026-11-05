@@ -1,5 +1,5 @@
 name: Deploy docs
-description: Build the docs of a branch and publish them to its folder of the gh-pages branch
+description: Build the docs of a branch and publish them to <branch>/docs in the gh-pages branch
 inputs:
   branch:
     description: Branch whose docs are published, for example main or feat/npc
@@ -14,7 +14,7 @@ runs:
       shell: bash
       env:
         DOCS_URL: https://${{ github.repository_owner }}.github.io
-        DOCS_BASE_URL: /${{ github.event.repository.name }}/${{ inputs.branch }}/
+        DOCS_BASE_URL: /${{ github.event.repository.name }}/${{ inputs.branch }}/docs/
         DOCS_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
         DOCS_BRANCH: ${{ inputs.branch }}
       run: npm run build -w @peetland/docs
@@ -29,14 +29,15 @@ runs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+        # В папке ветки документация лежит в docs: рядом позже появятся другие сборки ветки.
         # Сайты всех веток лежат в одной ветке gh-pages, поэтому пуши из параллельных запусков могут
         # конфликтовать. Тогда gh-pages скачивает свежую ветку, и публикация повторяется
         for attempt in 1 2 3 4 5; do
           npx gh-pages \
             --dist build \
-            --dest "$BRANCH" \
+            --dest "$BRANCH/docs" \
             --repo "$REPO" \
-            --message "Publish $BRANCH ($GITHUB_SHA)" && exit 0
+            --message "Publish $BRANCH/docs ($GITHUB_SHA)" && exit 0
           sleep $((attempt * 2))
         done
 

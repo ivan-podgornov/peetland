@@ -1,8 +1,8 @@
-name: Remove docs
-description: Remove the docs of a branch from the gh-pages branch
+name: Remove pages
+description: Remove the folder of a branch with everything published for it from the gh-pages branch
 inputs:
   branch:
-    description: Branch whose docs are removed, for example feat/npc
+    description: Branch whose folder is removed, for example feat/npc
     required: true
   token:
     description: Token with contents write permission
@@ -10,7 +10,7 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Remove docs
+    - name: Remove pages
       shell: bash
       env:
         BRANCH: ${{ inputs.branch }}
@@ -22,7 +22,7 @@ runs:
 
         # gh-pages не публикует пустую папку, поэтому публикуем .nojekyll, который и так лежит в
         # корне gh-pages, а папку ветки удаляем через --remove
-        dist="$RUNNER_TEMP/remove-docs"
+        dist="$RUNNER_TEMP/remove-pages"
         mkdir -p "$dist"
         touch "$dist/.nojekyll"
 
@@ -36,5 +36,5 @@ runs:
           sleep $((attempt * 2))
         done
 
-        echo "::error::Не удалось удалить документацию"
+        echo "::error::Не удалось удалить папку ветки"
         exit 1

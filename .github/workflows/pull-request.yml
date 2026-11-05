@@ -58,7 +58,7 @@ jobs:
       contents: write
     environment:
       name: docs
-      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/docs/
     steps:
       - uses: actions/checkout@v7
       - name: Prepare environment
@@ -78,8 +78,8 @@ jobs:
       - name: Delete pre-release
         run: gh release delete "$TAG" --cleanup-tag --yes || true
 
-  remove-docs:
-    # Документацию main не удаляем, даже если main была веткой закрытого пулл реквеста
+  remove-pages:
+    # Папку main не удаляем, даже если main была веткой закрытого пулл реквеста
     if: github.event.action == 'closed' && github.head_ref != 'main'
     runs-on: ubuntu-latest
     permissions:
@@ -88,8 +88,8 @@ jobs:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Remove docs
-        uses: ./.github/workflows/remove-docs
+      - name: Remove pages
+        uses: ./.github/workflows/remove-pages
         with:
           branch: ${{ github.head_ref }}
           token: ${{ github.token }}

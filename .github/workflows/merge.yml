@@ -1,6 +1,6 @@
 name: Merge
 
-# Проверяет main после мержа и публикует её документацию
+# Публикует документацию main после мержа. Проверки и сборки уже прошли в пулл реквесте
 on:
   push:
     branches:
@@ -12,44 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 50
-      - name: Prepare environment
-        uses: ./.github/workflows/prepare-environment
-      - name: Lint
-        uses: ./.github/workflows/lint
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Prepare environment
-        uses: ./.github/workflows/prepare-environment
-      - name: Test
-        run: npm test
-
-  build-mod:
-    needs: [lint, test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - name: Prepare environment
-        uses: ./.github/workflows/prepare-environment
-      - name: Build mod
-        uses: ./.github/workflows/build-mod
-
   docs:
-    needs: [lint, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     environment:
       name: docs
-      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/docs/
     steps:
       - uses: actions/checkout@v7
       - name: Prepare environment

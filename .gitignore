@@ -1,7 +1,9 @@
-/node_modules/
+node_modules/
 .husky/_/
 .DS_Store
 .idea
 .vscode
 tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
+/docs/build/
+/docs/.docusaurus/

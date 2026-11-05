@@ -1,0 +1,80 @@
+name: Update gh-pages
+description: Replace or remove one folder of the gh-pages branch
+inputs:
+  path:
+    description: Folder in gh-pages, for example main or feat/npc
+    required: true
+  source:
+    description: Folder with files to publish. If empty, the folder in gh-pages is removed
+    required: false
+    default: ''
+  token:
+    description: Token with contents write permission
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Update gh-pages
+      shell: bash
+      env:
+        TARGET: ${{ inputs.path }}
+        SOURCE: ${{ inputs.source }}
+        REMOTE: https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
+      run: |
+        if [ -z "$TARGET" ] || [ "$TARGET" = "." ]; then
+          echo "::error::Пустая папка в gh-pages"
+          exit 1
+        fi
+
+        site="$RUNNER_TEMP/gh-pages"
+
+        # Сайты всех веток лежат в одной ветке gh-pages, поэтому пуши из параллельных запусков могут
+        # конфликтовать. Тогда скачиваем свежую gh-pages и повторяем
+        for attempt in 1 2 3 4 5; do
+          rm -rf "$site"
+
+          if git ls-remote --exit-code --heads "$REMOTE" gh-pages > /dev/null; then
+            git clone --depth 1 --branch gh-pages "$REMOTE" "$site"
+          else
+            git init --initial-branch gh-pages "$site"
+            git -C "$site" remote add origin "$REMOTE"
+          fi
+
+          cd "$site"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          rm -rf "./$TARGET"
+          if [ -n "$SOURCE" ]; then
+            mkdir -p "./$TARGET"
+            cp -R "$GITHUB_WORKSPACE/$SOURCE/." "./$TARGET/"
+          fi
+
+          # Без .nojekyll GitHub Pages не отдаёт файлы и папки, которые начинаются с _
+          touch .nojekyll
+          cat > index.html <<'HTML'
+        <!doctype html>
+        <meta charset="utf-8" />
+        <meta http-equiv="refresh" content="0; url=main/" />
+        <link rel="canonical" href="main/" />
+        <a href="main/">main</a>
+        HTML
+
+          git add --all
+          if git diff --cached --quiet; then
+            echo "gh-pages не изменилась"
+            exit 0
+          fi
+
+          action=$([ -n "$SOURCE" ] && echo Publish || echo Remove)
+          git commit --quiet --message "$action $TARGET ($GITHUB_SHA)"
+          if git push origin gh-pages; then
+            exit 0
+          fi
+
+          cd "$GITHUB_WORKSPACE"
+          sleep $((attempt * 2))
+        done
+
+        echo "::error::Не удалось обновить gh-pages"
+        exit 1

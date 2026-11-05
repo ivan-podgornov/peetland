@@ -1,0 +1,75 @@
+name: Docs
+
+# Документация каждой ветки публикуется на GitHub Pages в свою папку ветки gh-pages: main — при
+# мерже, ветка пулл реквеста — при каждом пуше. Когда пулл реквест закрывают, его папка удаляется
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+# Новый запуск для той же ветки отменяет предыдущий
+concurrency:
+  group: docs-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  BRANCH: ${{ github.head_ref || github.ref_name }}
+
+jobs:
+  build:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Build
+        env:
+          DOCS_BASE_URL: /${{ github.event.repository.name }}/${{ env.BRANCH }}/
+        run: npm run build -w @peetland/docs
+      - uses: actions/upload-artifact@v7
+        with:
+          name: docs
+          path: docs/build
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: docs
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref || github.ref_name }}/
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: docs
+          path: docs/build
+      - name: Publish
+        uses: ./.github/workflows/update-gh-pages
+        with:
+          path: ${{ env.BRANCH }}
+          source: docs/build
+          token: ${{ github.token }}
+
+  cleanup:
+    # Папку main не удаляем, даже если main была веткой закрытого пулл реквеста
+    if: github.event.action == 'closed' && github.head_ref != 'main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Remove
+        uses: ./.github/workflows/update-gh-pages
+        with:
+          path: ${{ env.BRANCH }}
+          token: ${{ github.token }}

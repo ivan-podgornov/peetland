@@ -3,7 +3,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TRY_LUCK_PERIOD, TryLuckTask } from '../../../src/try-luck-task';
+import { TryLuckTask } from '../../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#start', () => {
@@ -21,7 +21,7 @@ describe('TryLuckTask', () => {
       expect(result).toBe('running');
     });
 
-    it('Раз в TRY_LUCK_PERIOD бросает шанс с переданной вероятностью', () => {
+    it('Раз в TryLuckTask.PERIOD бросает шанс с переданной вероятностью', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
       const task = new TryLuckTask(
@@ -33,12 +33,12 @@ describe('TryLuckTask', () => {
       );
 
       task.start(NpcStateBuilder.default(), createNpcContext());
-      timer.advance(TRY_LUCK_PERIOD * 2);
+      timer.advance(TryLuckTask.PERIOD * 2);
 
       expect(random.chance.mock.calls).toStrictEqual([[1 / 60], [1 / 60]]);
     });
 
-    it('Не бросает шанс, пока не прошёл TRY_LUCK_PERIOD', () => {
+    it('Не бросает шанс, пока не прошёл TryLuckTask.PERIOD', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
       const task = new TryLuckTask(
@@ -50,7 +50,7 @@ describe('TryLuckTask', () => {
       );
 
       task.start(NpcStateBuilder.default(), createNpcContext());
-      timer.advance(TRY_LUCK_PERIOD - 1);
+      timer.advance(TryLuckTask.PERIOD - 1);
 
       expect(random.chance).not.toHaveBeenCalled();
     });
@@ -67,7 +67,7 @@ describe('TryLuckTask', () => {
       );
 
       task.start(NpcStateBuilder.default(), createNpcContext());
-      timer.advance(TRY_LUCK_PERIOD * 3);
+      timer.advance(TryLuckTask.PERIOD * 3);
 
       expect(random.chance).toHaveBeenCalledOnce();
     });
@@ -86,7 +86,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       task.start(NpcStateBuilder.default(), context);
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).toHaveBeenCalledOnce();
     });

@@ -4,7 +4,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TRY_LUCK_PERIOD, TryLuckTask } from '../../../src/try-luck-task';
+import { TryLuckTask } from '../../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#update', () => {
@@ -23,7 +23,7 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
       const result = task.update(
         new NpcStateBuilder().withFeeling(Feeling.Shame, 80).build(),
         context
@@ -49,7 +49,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       task.update(NpcStateBuilder.default(), context);
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).not.toHaveBeenCalled();
     });
@@ -69,7 +69,7 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
       const result = task.update(NpcStateBuilder.default(), context);
 
       expect(result).toBe('success');

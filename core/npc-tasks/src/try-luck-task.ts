@@ -5,9 +5,6 @@ import type { NpcContext, NpcState } from '@peetland/npc';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
-/** Как часто NPC пытает удачу, в миллисекундах */
-export const TRY_LUCK_PERIOD = 1000;
-
 export type TryLuckTaskOptions = {
   /**
    * Базовый шанс, что попытка удастся, от 0 до 1, например, 1 / 60. Это шанс среднего персонажа: при
@@ -39,12 +36,15 @@ type Attempts = {
 };
 
 /**
- * Пытать удачу: раз в TRY_LUCK_PERIOD бросать шанс, пока не повезёт. Шанс поправляет психика NPC,
+ * Пытать удачу: раз в TryLuckTask.PERIOD бросать шанс, пока не повезёт. Шанс поправляет психика NPC,
  * например, удачливым везёт чаще. Когда повезло, задача завершается с 'success', и план
  * продолжается следующими задачами: что получил NPC, решают они.
  * Одну задачу могут выполнять разные NPC, поэтому попытки хранятся по акторам, а не в полях задачи
  */
 export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
+  /** Как часто NPC пытает удачу, в миллисекундах */
+  static readonly PERIOD = 1000;
+
   readonly name = 'try-luck';
 
   private readonly options: TryLuckTaskOptions;
@@ -67,7 +67,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
     return applyEffects ? applyEffects(state) : state;
   }
 
-  /** Начинает раз в TRY_LUCK_PERIOD пытать удачу и возвращает 'running' */
+  /** Начинает раз в TryLuckTask.PERIOD пытать удачу и возвращает 'running' */
   start(_state: NpcState, context: NpcContext): TaskResult {
     const { random, timer } = this.deps;
     const { chance, onAttempt } = this.options;
@@ -79,7 +79,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
     this.stopAttempts(actor);
     this.attempts.set(actor, attempts);
 
-    timer.interval(TRY_LUCK_PERIOD).subscribe(
+    timer.interval(TryLuckTask.PERIOD).subscribe(
       () => {
         onAttempt?.(context);
 

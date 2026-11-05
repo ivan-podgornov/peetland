@@ -8,11 +8,10 @@ import {
   createMockedTraitFactory,
 } from '../../dev';
 import { Deed, Feeling, Psyche, Trait } from '../../src';
-import { MAX_FEELING, MIN_FEELING } from '../../src/psyche';
 
 describe('Psyche', () => {
   describe('#react', () => {
-    it('Если чувство превысило бы MAX_FEELING, устанавливает MAX_FEELING', () => {
+    it('Если чувство превысило бы Psyche.MAX_FEELING, устанавливает Psyche.MAX_FEELING', () => {
       const state = createPsycheState({
         feelings: { [Feeling.Shame]: 90 },
       });
@@ -27,10 +26,10 @@ describe('Psyche', () => {
 
       psyche.react(Deed.Begging);
 
-      expect(psyche.getState().feelings).toStrictEqual({ [Feeling.Shame]: MAX_FEELING });
+      expect(psyche.getState().feelings).toStrictEqual({ [Feeling.Shame]: Psyche.MAX_FEELING });
     });
 
-    it('Если чувство опустилось бы ниже MIN_FEELING, устанавливает MIN_FEELING', () => {
+    it('Если чувство опустилось бы ниже Psyche.MIN_FEELING, устанавливает Psyche.MIN_FEELING', () => {
       const state = createPsycheState({
         feelings: { [Feeling.Shame]: 10 },
       });
@@ -45,7 +44,7 @@ describe('Psyche', () => {
 
       psyche.react(Deed.BottleFound);
 
-      expect(psyche.getState().feelings).toStrictEqual({ [Feeling.Shame]: MIN_FEELING });
+      expect(psyche.getState().feelings).toStrictEqual({ [Feeling.Shame]: Psyche.MIN_FEELING });
     });
 
     it('Применяет пределы к сумме вкладов, а не к каждому вкладу', () => {

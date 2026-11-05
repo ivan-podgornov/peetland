@@ -1,29 +1,28 @@
 import { describe, expect, it } from 'vitest';
 
 import { Optimism } from '../../../src/traits';
-import { MAX_OPTIMISM, MIN_OPTIMISM } from '../../../src/traits/optimism';
 
 describe('Optimism', () => {
   describe('#expectAttempts', () => {
     it('При среднем оптимизме возвращает 1 / шанс', () => {
-      const optimism = new Optimism((MIN_OPTIMISM + MAX_OPTIMISM) / 2);
+      const optimism = new Optimism((Optimism.MIN + Optimism.MAX) / 2);
 
       expect(optimism.expectAttempts(1 / 40)).toBe(40);
     });
 
-    it('При максимальном оптимизме делит 1 / шанс на OPTIMISM_ATTEMPTS_SPREAD', () => {
-      const optimism = new Optimism(MAX_OPTIMISM);
+    it('При максимальном оптимизме делит 1 / шанс на Optimism.ATTEMPTS_SPREAD', () => {
+      const optimism = new Optimism(Optimism.MAX);
 
       expect(optimism.expectAttempts(1 / 60)).toBe(40);
     });
 
-    it('При минимальном оптимизме умножает 1 / шанс на OPTIMISM_ATTEMPTS_SPREAD', () => {
-      const optimism = new Optimism(MIN_OPTIMISM);
+    it('При минимальном оптимизме умножает 1 / шанс на Optimism.ATTEMPTS_SPREAD', () => {
+      const optimism = new Optimism(Optimism.MIN);
 
       expect(optimism.expectAttempts(1 / 40)).toBe(60);
     });
 
-    it('На середине между средним и минимальным оптимизмом умножает 1 / шанс на √OPTIMISM_ATTEMPTS_SPREAD', () => {
+    it('На середине между средним и минимальным оптимизмом умножает 1 / шанс на √Optimism.ATTEMPTS_SPREAD', () => {
       const optimism = new Optimism(25);
 
       // 100 × √1.5 ≈ 122.47
@@ -31,7 +30,7 @@ describe('Optimism', () => {
     });
 
     it('Округляет ожидание до целого числа попыток', () => {
-      const optimism = new Optimism(MAX_OPTIMISM);
+      const optimism = new Optimism(Optimism.MAX);
 
       // 40 / 1.5 ≈ 26.67
       expect(optimism.expectAttempts(1 / 40)).toBe(27);

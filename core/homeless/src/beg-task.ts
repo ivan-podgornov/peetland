@@ -7,28 +7,13 @@ import type { IPlaces } from '@peetland/places';
 import { Deed, Feeling } from '@peetland/psyche';
 import type { IPsycheFactory, PsycheState } from '@peetland/psyche';
 
-import { BOOZE_PRICE } from './buy-booze-task';
-import { BOTTLE_PRICE } from './sell-bottles-task';
-
-/** Шанс выклянчить деньги за одну попытку, раз в секунду (см. TryLuckTask) */
-export const BEGGING_CHANCE = 1 / 40;
-
-/** Сколько долларов NPC получает, когда удалось выклянчить */
-export const BEGGING_REWARD = 10;
-
-/**
- * Стыд, при котором NPC перестаёт клянчить. Подобран вместе с приростом стыда за попытку (см.
- * совестливость в @peetland/psyche): при средней совестливости и нулевом стартовом стыде порог
- * достигается примерно за 600 попыток. Чтобы с пустыми карманами наклянчить на пойло, в среднем
- * нужно 400 попыток, поэтому одной сессии клянчанья хватает на пойло примерно в 93% случаев
- */
-export const BEGGING_SHAME_LIMIT = 60;
-
-/** На каком расстоянии от места для клянчанья можно считать, что NPC до него дошёл, в метрах */
-const BEGGING_SPOT_COMPLETE_RADIUS = 0.5;
-
-/** Насколько NPC может быть отвёрнут от нужного направления, чтобы клянчить, в градусах */
-const BEGGING_SPOT_FACING_TOLERANCE = 15;
+import {
+  BEGGING_CHANCE,
+  BEGGING_REWARD,
+  BEGGING_SHAME_LIMIT,
+  BOOZE_PRICE,
+  BOTTLE_PRICE,
+} from './constants';
 
 export type BegTaskDeps = {
   /** Места мира. Клянчат в местах типа PlaceType.BeggingSpot */
@@ -51,6 +36,12 @@ export type BegTaskDeps = {
  * попыток, пессимист — на большее
  */
 export class BegTask implements CompoundTask<NpcState, NpcContext> {
+  /** На каком расстоянии от места для клянчанья можно считать, что NPC до него дошёл, в метрах */
+  private static readonly SPOT_COMPLETE_RADIUS = 0.5;
+
+  /** Насколько NPC может быть отвёрнут от нужного направления, чтобы клянчить, в градусах */
+  private static readonly SPOT_FACING_TOLERANCE = 15;
+
   readonly name = 'beg';
 
   readonly methods: Method<NpcState, NpcContext>[];
@@ -96,11 +87,11 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     const tasks: Task<NpcState, NpcContext>[] = [
       npcTaskFactory.goToCoords({
         coords: spot.position,
-        completeRadius: BEGGING_SPOT_COMPLETE_RADIUS,
+        completeRadius: BegTask.SPOT_COMPLETE_RADIUS,
       }),
       npcTaskFactory.achieveAngle({
         angle: spot.angle,
-        tolerance: BEGGING_SPOT_FACING_TOLERANCE,
+        tolerance: BegTask.SPOT_FACING_TOLERANCE,
       }),
     ];
 

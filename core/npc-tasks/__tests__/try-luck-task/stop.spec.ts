@@ -3,7 +3,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TRY_LUCK_PERIOD, TryLuckTask } from '../../src/try-luck-task';
+import { TryLuckTask } from '../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#stop', () => {
@@ -21,7 +21,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       task.stop(context);
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).not.toHaveBeenCalled();
     });
@@ -41,7 +41,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), createNpcContext());
 
       task.stop(firstContext);
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).toHaveBeenCalledOnce();
     });

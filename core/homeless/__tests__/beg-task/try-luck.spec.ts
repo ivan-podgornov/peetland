@@ -13,8 +13,12 @@ import {
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
 } from '../../dev';
-import { BEGGING_CHANCE, BEGGING_REWARD, BEGGING_SHAME_LIMIT } from '../../src/beg-task';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
+import {
+  BEGGING_CHANCE,
+  BEGGING_REWARD,
+  BEGGING_SHAME_LIMIT,
+  BOOZE_PRICE,
+} from '../../src/constants';
 
 /** Планирует клянчанье на одну удачу и возвращает опции, с которыми задача пытает удачу */
 function planTryLuck(psycheFactory?: IPsycheFactory) {

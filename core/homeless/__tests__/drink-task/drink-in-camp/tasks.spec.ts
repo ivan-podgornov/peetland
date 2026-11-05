@@ -5,7 +5,7 @@ import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DRINK_PLAN, createDrinkTask, createPlacesWithCamp } from '../../../dev';
-import { DRINK_DURATION } from '../../../src/drink-task';
+import { DrinkTask } from '../../../src/drink-task';
 
 describe('DrinkTask', () => {
   describe('Метод drink-in-camp', () => {
@@ -17,14 +17,14 @@ describe('DrinkTask', () => {
         expect(planNames(task, state)).toStrictEqual(DRINK_PLAN);
       });
 
-      it('Пьёт стоя в течение DRINK_DURATION', () => {
+      it('Пьёт стоя в течение DrinkTask.DURATION', () => {
         const playAnimation = vi.fn();
 
         createDrinkTask(createPlacesWithCamp(true), createNpcTaskFactory({ playAnimation }));
 
         expect(playAnimation).toHaveBeenCalledExactlyOnceWith({
           animation: 'drink-standing-1',
-          duration: DRINK_DURATION,
+          duration: DrinkTask.DURATION,
         });
       });
 

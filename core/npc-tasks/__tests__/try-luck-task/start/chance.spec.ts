@@ -4,7 +4,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TRY_LUCK_PERIOD, TryLuckTask } from '../../../src/try-luck-task';
+import { TryLuckTask } from '../../../src/try-luck-task';
 
 describe('TryLuckTask', () => {
   describe('#start', () => {
@@ -23,7 +23,7 @@ describe('TryLuckTask', () => {
         ...createNpcContext(),
         psyche,
       });
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(psyche.adjustChance).toHaveBeenCalledExactlyOnceWith(1 / 60);
     });
@@ -45,7 +45,7 @@ describe('TryLuckTask', () => {
         ...createNpcContext(),
         psyche,
       });
-      timer.advance(TRY_LUCK_PERIOD);
+      timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).toHaveBeenCalledExactlyOnceWith(1 / 30);
     });

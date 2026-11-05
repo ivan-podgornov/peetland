@@ -6,16 +6,7 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
-import { BOOZE_PRICE } from './buy-booze-task';
-
-/** Сколько платят за одну пустую бутылку, в долларах */
-export const BOTTLE_PRICE = 10;
-
-/** На каком расстоянии от приёмки можно считать, что NPC до неё дошёл, в метрах */
-const BOTTLE_COLLECTION_COMPLETE_RADIUS = 0.5;
-
-/** Насколько NPC может быть отвёрнут от приёмщика, чтобы сдать бутылки, в градусах */
-const BOTTLE_COLLECTION_FACING_TOLERANCE = 15;
+import { BOOZE_PRICE, BOTTLE_PRICE } from './constants';
 
 export type SellBottlesTaskDeps = {
   /** Места мира. Бутылки сдаются в местах типа PlaceType.BottleCollection */
@@ -29,6 +20,12 @@ export type SellBottlesTaskDeps = {
  * что сдать и после сдачи денег хватит на пойло
  */
 export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
+  /** На каком расстоянии от приёмки можно считать, что NPC до неё дошёл, в метрах */
+  private static readonly COLLECTION_COMPLETE_RADIUS = 0.5;
+
+  /** Насколько NPC может быть отвёрнут от приёмщика, чтобы сдать бутылки, в градусах */
+  private static readonly COLLECTION_FACING_TOLERANCE = 15;
+
   readonly name = 'sell-bottles';
 
   readonly methods: Method<NpcState, NpcContext>[];
@@ -80,11 +77,11 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
     return [
       npcTaskFactory.goToCoords({
         coords: collection.position,
-        completeRadius: BOTTLE_COLLECTION_COMPLETE_RADIUS,
+        completeRadius: SellBottlesTask.COLLECTION_COMPLETE_RADIUS,
       }),
       npcTaskFactory.achieveAngle({
         angle: collection.angle,
-        tolerance: BOTTLE_COLLECTION_FACING_TOLERANCE,
+        tolerance: SellBottlesTask.COLLECTION_FACING_TOLERANCE,
       }),
       npcTaskFactory.playAnimation({ animation: 'item-give' }),
       npcTaskFactory.removeItem({

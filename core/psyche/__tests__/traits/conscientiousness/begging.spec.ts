@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { Deed, Feeling } from '../../../src';
+import { BEGGING_SHAME } from '../../../src/constants';
 import { Conscientiousness } from '../../../src/traits';
-import {
-  BEGGING_SHAME,
-  MAX_CONSCIENTIOUSNESS,
-  MIN_CONSCIENTIOUSNESS,
-} from '../../../src/traits/conscientiousness';
 
 describe('Conscientiousness', () => {
   describe('#react', () => {
@@ -20,7 +16,7 @@ describe('Conscientiousness', () => {
       });
 
       it('Если совестливость минимальная, увеличивает стыд вдвое медленнее, чем при средней', () => {
-        const conscientiousness = new Conscientiousness(MIN_CONSCIENTIOUSNESS);
+        const conscientiousness = new Conscientiousness(Conscientiousness.MIN);
 
         expect(conscientiousness.react(Deed.Begging)).toStrictEqual({
           [Feeling.Shame]: BEGGING_SHAME * 0.5,
@@ -28,7 +24,7 @@ describe('Conscientiousness', () => {
       });
 
       it('Если совестливость максимальная, увеличивает стыд в полтора раза быстрее, чем при средней', () => {
-        const conscientiousness = new Conscientiousness(MAX_CONSCIENTIOUSNESS);
+        const conscientiousness = new Conscientiousness(Conscientiousness.MAX);
 
         expect(conscientiousness.react(Deed.Begging)).toStrictEqual({
           [Feeling.Shame]: BEGGING_SHAME * 1.5,

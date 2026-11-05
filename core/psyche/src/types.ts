@@ -5,7 +5,7 @@ import type { Trait } from './trait';
 /** Значение каждой черты характера. Черты не меняются со временем */
 export type PsycheTraits = Readonly<Record<Trait, number>>;
 
-/** Значение каждого чувства от MIN_FEELING до MAX_FEELING */
+/** Значение каждого чувства от Psyche.MIN_FEELING до Psyche.MAX_FEELING */
 export type PsycheFeelings = Readonly<Record<Feeling, number>>;
 
 /** Вклад черты в чувства: на сколько изменить каждое чувство. Чувств без изменений в объекте нет */

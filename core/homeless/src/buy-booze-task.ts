@@ -6,16 +6,8 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
+import { BOOZE_PRICE } from './constants';
 import type { IHomelessTaskFactory } from './factory';
-
-/** Цена бутылки пойла, в долларах */
-export const BOOZE_PRICE = 100;
-
-/** На каком расстоянии от магазина можно считать, что NPC до него дошёл, в метрах */
-const SHOP_COMPLETE_RADIUS = 0.5;
-
-/** Насколько NPC может быть отвёрнут от прилавка, чтобы купить пойло, в градусах */
-const SHOP_FACING_TOLERANCE = 15;
 
 export type BuyBoozeTaskDeps = {
   /** Места мира. Пойло покупается в местах типа PlaceType.Shop */
@@ -30,6 +22,12 @@ export type BuyBoozeTaskDeps = {
  * на весь план
  */
 export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
+  /** На каком расстоянии от магазина можно считать, что NPC до него дошёл, в метрах */
+  private static readonly SHOP_COMPLETE_RADIUS = 0.5;
+
+  /** Насколько NPC может быть отвёрнут от прилавка, чтобы купить пойло, в градусах */
+  private static readonly SHOP_FACING_TOLERANCE = 15;
+
   readonly name = 'buy-booze';
 
   readonly methods: Method<NpcState, NpcContext>[];
@@ -68,11 +66,11 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
     return [
       npcTaskFactory.goToCoords({
         coords: shop.position,
-        completeRadius: SHOP_COMPLETE_RADIUS,
+        completeRadius: BuyBoozeTask.SHOP_COMPLETE_RADIUS,
       }),
       npcTaskFactory.achieveAngle({
         angle: shop.angle,
-        tolerance: SHOP_FACING_TOLERANCE,
+        tolerance: BuyBoozeTask.SHOP_FACING_TOLERANCE,
       }),
       homelessTaskFactory.purchase({
         item: Item.Booze,

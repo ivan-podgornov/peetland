@@ -1,12 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { Deed, Feeling } from '../../../src';
+import { BOTTLE_FOUND_SHAME_RELIEF } from '../../../src/constants';
 import { Conscientiousness } from '../../../src/traits';
-import {
-  BOTTLE_FOUND_SHAME_RELIEF,
-  MAX_CONSCIENTIOUSNESS,
-  MIN_CONSCIENTIOUSNESS,
-} from '../../../src/traits/conscientiousness';
 
 describe('Conscientiousness', () => {
   describe('#react', () => {
@@ -20,7 +16,7 @@ describe('Conscientiousness', () => {
       });
 
       it('Если совестливость минимальная, уменьшает стыд в полтора раза быстрее, чем при средней', () => {
-        const conscientiousness = new Conscientiousness(MIN_CONSCIENTIOUSNESS);
+        const conscientiousness = new Conscientiousness(Conscientiousness.MIN);
 
         expect(conscientiousness.react(Deed.BottleFound)).toStrictEqual({
           [Feeling.Shame]: -BOTTLE_FOUND_SHAME_RELIEF * 1.5,
@@ -28,7 +24,7 @@ describe('Conscientiousness', () => {
       });
 
       it('Если совестливость максимальная, уменьшает стыд вдвое медленнее, чем при средней', () => {
-        const conscientiousness = new Conscientiousness(MAX_CONSCIENTIOUSNESS);
+        const conscientiousness = new Conscientiousness(Conscientiousness.MAX);
 
         expect(conscientiousness.react(Deed.BottleFound)).toStrictEqual({
           [Feeling.Shame]: -BOTTLE_FOUND_SHAME_RELIEF * 0.5,

@@ -1,19 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { Conscientiousness } from '../../../src/traits';
-import {
-  MAX_CONSCIENTIOUSNESS,
-  MIN_CONSCIENTIOUSNESS,
-} from '../../../src/traits/conscientiousness';
 
 describe('Conscientiousness', () => {
   describe('#constructor', () => {
-    it('Если совестливость меньше MIN_CONSCIENTIOUSNESS, выбрасывает RangeError', () => {
-      expect(() => new Conscientiousness(MIN_CONSCIENTIOUSNESS - 1)).toThrow(RangeError);
+    it('Если совестливость меньше Conscientiousness.MIN, выбрасывает RangeError', () => {
+      expect(() => new Conscientiousness(Conscientiousness.MIN - 1)).toThrow(RangeError);
     });
 
-    it('Если совестливость больше MAX_CONSCIENTIOUSNESS, выбрасывает RangeError', () => {
-      expect(() => new Conscientiousness(MAX_CONSCIENTIOUSNESS + 1)).toThrow(RangeError);
+    it('Если совестливость больше Conscientiousness.MAX, выбрасывает RangeError', () => {
+      expect(() => new Conscientiousness(Conscientiousness.MAX + 1)).toThrow(RangeError);
     });
 
     it('Если совестливость не число, выбрасывает RangeError', () => {

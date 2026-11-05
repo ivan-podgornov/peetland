@@ -8,9 +8,7 @@ import {
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
 } from '../../../dev';
-import { BEGGING_REWARD } from '../../../src/beg-task';
-import { BOOZE_PRICE } from '../../../src/buy-booze-task';
-import { BOTTLE_PRICE } from '../../../src/sell-bottles-task';
+import { BEGGING_REWARD, BOOZE_PRICE, BOTTLE_PRICE } from '../../../src/constants';
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {

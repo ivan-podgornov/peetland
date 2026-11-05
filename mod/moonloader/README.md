@@ -1,4 +1,4 @@
-# Moonloader TypeScript Definitions
+# @peetland/moonloader
 
 Полные TypeScript определения для Moonloader API, обеспечивающие автодополнение и проверку типов при
 разработке скриптов на TypeScript.

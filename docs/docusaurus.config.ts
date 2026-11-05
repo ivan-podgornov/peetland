@@ -1,19 +1,26 @@
 import type { Options as PresetOptions } from '@docusaurus/preset-classic';
 import type { Config } from '@docusaurus/types';
 
-/**
- * Путь сайта на GitHub Pages. Каждая ветка публикуется в свою подпапку, поэтому в CI путь
- * передаётся через переменную окружения, например `/peetland/feat/npc/`
+/*
+ * Адреса передаются через переменные окружения, чтобы сайт не был привязан к конкретному
+ * репозиторию. В CI их собирают из контекста GitHub Actions, а локально они не нужны
  */
-const baseUrl = process.env['DOCS_BASE_URL'] ?? '/';
+const {
+  /** Адрес сайта без пути, например `https://ivan-podgornov.github.io` */
+  DOCS_URL = 'http://localhost',
+  /** Путь сайта. Каждая ветка публикуется в свою папку, например `/peetland/feat/npc/` */
+  DOCS_BASE_URL = '/',
+  /** Адрес репозитория для ссылок на GitHub и на редактирование страниц */
+  DOCS_REPOSITORY_URL,
+  /** Ветка, в которой редактируются страницы */
+  DOCS_BRANCH = 'main',
+} = process.env;
 
 const config: Config = {
   title: 'Peetland',
   tagline: 'Документация проекта',
-  url: 'https://ivan-podgornov.github.io',
-  baseUrl,
-  organizationName: 'ivan-podgornov',
-  projectName: 'peetland',
+  url: DOCS_URL,
+  baseUrl: DOCS_BASE_URL,
   trailingSlash: true,
   onBrokenLinks: 'throw',
   i18n: {
@@ -36,7 +43,9 @@ const config: Config = {
         docs: {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/ivan-podgornov/peetland/edit/main/docs/',
+          ...(DOCS_REPOSITORY_URL && {
+            editUrl: `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/docs/`,
+          }),
         },
         blog: false,
         pages: false,
@@ -46,13 +55,15 @@ const config: Config = {
   themeConfig: {
     navbar: {
       title: 'Peetland',
-      items: [
-        {
-          href: 'https://github.com/ivan-podgornov/peetland',
-          label: 'GitHub',
-          position: 'right',
-        },
-      ],
+      items: DOCS_REPOSITORY_URL
+        ? [
+            {
+              href: DOCS_REPOSITORY_URL,
+              label: 'GitHub',
+              position: 'right',
+            },
+          ]
+        : [],
     },
   },
 };

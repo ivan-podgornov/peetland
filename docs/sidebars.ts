@@ -6,7 +6,6 @@ const sidebars: SidebarsConfig = {
     'principles/index',
     'architecture/index',
     'decisions/index',
-    'packages/index',
     'npc/index',
     'process/index',
   ],

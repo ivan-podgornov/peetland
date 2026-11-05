@@ -1,3 +1,4 @@
+import type { Options as DocsPluginOptions } from '@docusaurus/plugin-content-docs';
 import type { Options as PresetOptions } from '@docusaurus/preset-classic';
 import type { Config } from '@docusaurus/types';
 
@@ -15,6 +16,31 @@ const {
   /** Ветка, в которой редактируются страницы */
   DOCS_BRANCH = 'main',
 } = process.env;
+
+type SidebarItemsGenerator = NonNullable<DocsPluginOptions['sidebarItemsGenerator']>;
+type SidebarItem = Awaited<ReturnType<SidebarItemsGenerator>>[number];
+
+/**
+ * Страницы из папки `docs` пакета показываются в сайдбаре прямо под пакетом, а не во вложенной
+ * категории `docs`
+ */
+function unwrapDocsFolders(items: SidebarItem[]): SidebarItem[] {
+  return items.flatMap((item) => {
+    if (item.type !== 'category') {
+      return [item];
+    }
+
+    const children = unwrapDocsFolders(item.items);
+
+    if (item.label === 'docs') {
+      return children;
+    }
+
+    item.items = children;
+
+    return [item];
+  });
+}
 
 const config: Config = {
   title: 'Peetland',
@@ -36,6 +62,26 @@ const config: Config = {
     },
   },
   themes: ['@docusaurus/theme-mermaid'],
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        // README пакетов остаются в пакетах, а сайт читает их оттуда: источник у них один
+        id: 'packages',
+        path: '..',
+        include: ['{toolkit,core,mod}/*/README.md', '{toolkit,core,mod}/*/docs/**/*.md'],
+        routeBasePath: 'packages',
+        sidebarPath: './sidebars-packages.ts',
+        async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+          return unwrapDocsFolders(await defaultSidebarItemsGenerator(args));
+        },
+        ...(DOCS_REPOSITORY_URL && {
+          // Путь от корня репозитория: строковый editUrl считает путь от папки сайта
+          editUrl: ({ docPath }) => `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/${docPath}`,
+        }),
+      } satisfies DocsPluginOptions,
+    ],
+  ],
   presets: [
     [
       'classic',
@@ -55,15 +101,30 @@ const config: Config = {
   themeConfig: {
     navbar: {
       title: 'Peetland',
-      items: DOCS_REPOSITORY_URL
-        ? [
-            {
-              href: DOCS_REPOSITORY_URL,
-              label: 'GitHub',
-              position: 'right',
-            },
-          ]
-        : [],
+      items: [
+        {
+          type: 'docSidebar',
+          sidebarId: 'docs',
+          label: 'Документация',
+          position: 'left',
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'packages',
+          docsPluginId: 'packages',
+          label: 'Пакеты',
+          position: 'left',
+        },
+        ...(DOCS_REPOSITORY_URL
+          ? [
+              {
+                href: DOCS_REPOSITORY_URL,
+                label: 'GitHub',
+                position: 'right',
+              },
+            ]
+          : []),
+      ],
     },
   },
 };

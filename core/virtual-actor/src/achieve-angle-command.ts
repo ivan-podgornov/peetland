@@ -3,12 +3,6 @@ import type { CommandDeps, CommandStatus } from '@peetland/actor-command';
 import type { AchieveAngleOptions, IActor } from '@peetland/game';
 import type { IGeometry } from '@peetland/geometry';
 
-/** Актор поворачивается через секунду после начала команды */
-const ACHIEVE_ANGLE = {
-  name: 'achieve-angle',
-  updatePeriod: 1000,
-};
-
 export type VirtualAchieveAngleCommandDeps = CommandDeps & {
   geometry: IGeometry;
 };
@@ -22,8 +16,14 @@ export class VirtualAchieveAngleCommand extends Command<
   AchieveAngleOptions,
   VirtualAchieveAngleCommandDeps
 > {
+  /** Актор поворачивается через секунду после начала команды */
+  private static readonly CONFIG = {
+    name: 'achieve-angle',
+    updatePeriod: 1000,
+  };
+
   constructor(actor: IActor, options: AchieveAngleOptions, deps: VirtualAchieveAngleCommandDeps) {
-    super(ACHIEVE_ANGLE, actor, options, deps);
+    super(VirtualAchieveAngleCommand.CONFIG, actor, options, deps);
   }
 
   protected onUpdate(elapsed: number): CommandStatus {

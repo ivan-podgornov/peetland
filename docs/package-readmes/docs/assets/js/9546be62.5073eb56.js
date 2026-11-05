@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_peetland_docs=self.webpackChunk_peetland_docs||[]).push([[3324],{3822(e){e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"packages"}')}}]);

@@ -95,6 +95,18 @@ const config: Config = {
       'classic',
       {
         docs: {
+          // Страницы лежат прямо в пакете, рядом с конфигом
+          path: '.',
+          exclude: [
+            // Исключения плагина по умолчанию: при exclude их нужно перечислять самим
+            '**/_*.{js,jsx,ts,tsx,md,mdx}',
+            '**/_*/**',
+            '**/*.test.{js,jsx,ts,tsx}',
+            '**/__tests__/**',
+            'node_modules/**',
+            'build/**',
+            '.docusaurus/**',
+          ],
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           ...(DOCS_REPOSITORY_URL && {

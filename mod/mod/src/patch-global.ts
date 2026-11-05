@@ -119,8 +119,10 @@ function reportError(error: unknown): void {
   }
 }
 
-globalThis.setTimeout = setTimeout;
-globalThis.clearTimeout = clearTimer;
-globalThis.setInterval = setInterval;
-globalThis.clearInterval = clearTimer;
+// В проверке типов всего репозитория таймеры из _G.d.ts объединяются с таймерами Node.js, которые
+// тянут vite и Docusaurus. В игре Node.js нет, поэтому приводим к типам глобальных таймеров
+globalThis.setTimeout = setTimeout as typeof globalThis.setTimeout;
+globalThis.clearTimeout = clearTimer as typeof globalThis.clearTimeout;
+globalThis.setInterval = setInterval as typeof globalThis.setInterval;
+globalThis.clearInterval = clearTimer as typeof globalThis.clearInterval;
 globalThis.reportError = reportError;

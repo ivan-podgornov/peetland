@@ -27,6 +27,7 @@
     "mod/mod/_G.d.ts",
     "./toolkit/**/*",
     "./core/**/*",
-    "./mod/**/*"
+    "./mod/**/*",
+    "./docs/*.ts"
   ]
 }

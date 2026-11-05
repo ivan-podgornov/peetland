@@ -1,0 +1,14 @@
+name: Lint
+description: Check types, code and formatting
+runs:
+  using: composite
+  steps:
+    - name: Check types
+      shell: bash
+      run: npm run check:types
+    - name: Lint
+      shell: bash
+      run: npm run check:code:all
+    - name: Lint formatting
+      shell: bash
+      run: npm run check:formatting:all

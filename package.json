@@ -6,7 +6,8 @@
   "workspaces": [
     "toolkit/*",
     "core/*",
-    "mod/*"
+    "mod/*",
+    "docs"
   ],
   "scripts": {
     "check:types": "tsc --noEmit",

@@ -1,0 +1,30 @@
+name: Merge
+
+# Публикует документацию main после мержа. Проверки и сборки уже прошли в пулл реквесте
+on:
+  push:
+    branches:
+      - main
+
+# Новый мерж отменяет предыдущий запуск: публиковать нужно только свежую документацию
+concurrency:
+  group: merge
+  cancel-in-progress: true
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: docs
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/docs/
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Deploy docs
+        uses: ./.github/workflows/deploy-docs
+        with:
+          branch: main
+          token: ${{ github.token }}

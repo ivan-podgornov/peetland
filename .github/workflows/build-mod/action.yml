@@ -1,0 +1,13 @@
+name: Build mod
+description: Build the mod and upload it as the peetland artifact
+runs:
+  using: composite
+  steps:
+    - name: Build
+      shell: bash
+      run: npm run build -w @peetland/mod
+    - uses: actions/upload-artifact@v7
+      with:
+        name: peetland
+        path: mod/mod/dist/peetland.lua
+        if-no-files-found: error

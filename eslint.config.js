@@ -12,6 +12,7 @@ const devFiles = [
   'eslint.config.js',
   'vitest.config.ts',
   'vitest.setup.ts',
+  'docs/*.ts',
   '{toolkit,core,mod}/**/*.test.{ts,tsx}',
   '{toolkit,core,mod}/**/*.spec.{ts,tsx}',
   '{toolkit,core,mod}/**/__tests__/**/*.{ts,tsx}',
@@ -29,7 +30,7 @@ const restrictedSyntax = [
 
 export default defineConfig([
   {
-    ignores: ['**/node_modules/', '**/dist/'],
+    ignores: ['**/node_modules/', '**/dist/', 'docs/build/', 'docs/.docusaurus/'],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -116,14 +117,14 @@ export default defineConfig([
         {
           devDependencies: devFiles,
           peerDependencies: true,
-          packageDir: ['./', ...globSync(['./toolkit/*', './core/*', './mod/*'])],
+          packageDir: ['./', './docs', ...globSync(['./toolkit/*', './core/*', './mod/*'])],
         },
       ],
     },
   },
   // Конфигурационные файлы
   {
-    files: ['**/eslint.config.js', 'vitest.config.ts'],
+    files: ['**/eslint.config.js', 'vitest.config.ts', 'docs/*.ts'],
     rules: {
       'import-x/no-default-export': 'off',
     },

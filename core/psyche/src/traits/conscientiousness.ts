@@ -1,18 +1,7 @@
+import { BEGGING_SHAME, BOTTLE_FOUND_SHAME_RELIEF } from '../constants';
 import { Deed } from '../deed';
 import { Feeling } from '../feeling';
 import type { FeelingsContribution, ITrait, ITraitFactory } from '../types';
-
-/** Минимальная совестливость */
-export const MIN_CONSCIENTIOUSNESS = 0;
-
-/** Максимальная совестливость */
-export const MAX_CONSCIENTIOUSNESS = 100;
-
-/** На сколько растёт стыд за одну попытку клянчить при средней совестливости */
-export const BEGGING_SHAME = 0.1;
-
-/** На сколько падает стыд за одну найденную бутылку при средней совестливости */
-export const BOTTLE_FOUND_SHAME_RELIEF = 2;
 
 /**
  * Совестливость. Чем она выше, тем быстрее растёт стыд, когда NPC клянчит, и тем медленнее падает,
@@ -20,10 +9,16 @@ export const BOTTLE_FOUND_SHAME_RELIEF = 2;
  * BOTTLE_FOUND_SHAME_RELIEF, а на краях — вдвое медленнее или в полтора раза быстрее
  */
 export class Conscientiousness implements ITrait {
+  /** Минимальная совестливость */
+  static readonly MIN = 0;
+
+  /** Максимальная совестливость */
+  static readonly MAX = 100;
+
   private readonly value: number;
 
   /**
-   * @param value - совестливость от MIN_CONSCIENTIOUSNESS до MAX_CONSCIENTIOUSNESS. Если она не
+   * @param value - совестливость от Conscientiousness.MIN до Conscientiousness.MAX. Если она не
    * конечное число или вне пределов, выбрасывает RangeError
    */
   constructor(value: number) {
@@ -42,13 +37,13 @@ export class Conscientiousness implements ITrait {
 
   /** Возвращает совестливость долей от 0 до 1 */
   private getShare(): number {
-    return (this.value - MIN_CONSCIENTIOUSNESS) / (MAX_CONSCIENTIOUSNESS - MIN_CONSCIENTIOUSNESS);
+    return (this.value - Conscientiousness.MIN) / (Conscientiousness.MAX - Conscientiousness.MIN);
   }
 
   private assertValue(value: number): void {
-    if (!Number.isFinite(value) || value < MIN_CONSCIENTIOUSNESS || value > MAX_CONSCIENTIOUSNESS) {
+    if (!Number.isFinite(value) || value < Conscientiousness.MIN || value > Conscientiousness.MAX) {
       throw new RangeError(
-        `Совестливость должна быть числом от ${MIN_CONSCIENTIOUSNESS} до ${MAX_CONSCIENTIOUSNESS}, получено ${value}`
+        `Совестливость должна быть числом от ${Conscientiousness.MIN} до ${Conscientiousness.MAX}, получено ${value}`
       );
     }
   }

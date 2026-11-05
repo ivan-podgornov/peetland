@@ -7,7 +7,7 @@ import {
   createPsycheState,
 } from '../dev';
 import { Deed, Feeling, Psyche, PsycheFactory, Trait } from '../src';
-import { BEGGING_SHAME } from '../src/traits/conscientiousness';
+import { BEGGING_SHAME } from '../src/constants';
 
 describe('PsycheFactory', () => {
   describe('#create', () => {

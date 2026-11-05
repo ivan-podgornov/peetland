@@ -12,12 +12,6 @@ import type {
   TraitFactories,
 } from './types';
 
-/** Минимальное значение чувства */
-export const MIN_FEELING = 0;
-
-/** Максимальное значение чувства */
-export const MAX_FEELING = 100;
-
 export interface IPsyche {
   /** Возвращает состояние психики. Из него фабрика собирает такую же психику */
   getState(): PsycheState;
@@ -43,9 +37,15 @@ export type PsycheDeps = {
 /**
  * Психика хранит черты характера и чувства. На поступок психика отвечает так: каждая черта
  * возвращает свой вклад в чувства, психика складывает вклады и держит чувства в пределах от
- * MIN_FEELING до MAX_FEELING. Психика, собранная из состояния, реагирует так же, как исходная
+ * Psyche.MIN_FEELING до Psyche.MAX_FEELING. Психика, собранная из состояния, реагирует так же, как исходная
  */
 export class Psyche implements IPsyche {
+  /** Минимальное значение чувства */
+  static readonly MIN_FEELING = 0;
+
+  /** Максимальное значение чувства */
+  static readonly MAX_FEELING = 100;
+
   private readonly traitValues: PsycheTraits;
   private readonly traits: ITrait[];
   private readonly luck: ILuck;
@@ -121,13 +121,13 @@ export class Psyche implements IPsyche {
   }
 
   private clampFeeling(value: number): number {
-    return Math.min(MAX_FEELING, Math.max(MIN_FEELING, value));
+    return Math.min(Psyche.MAX_FEELING, Math.max(Psyche.MIN_FEELING, value));
   }
 
   private assertFeeling(feeling: Feeling, value: number): void {
-    if (!Number.isFinite(value) || value < MIN_FEELING || value > MAX_FEELING) {
+    if (!Number.isFinite(value) || value < Psyche.MIN_FEELING || value > Psyche.MAX_FEELING) {
       throw new RangeError(
-        `Чувство ${feeling} должно быть числом от ${MIN_FEELING} до ${MAX_FEELING}, получено ${value}`
+        `Чувство ${feeling} должно быть числом от ${Psyche.MIN_FEELING} до ${Psyche.MAX_FEELING}, получено ${value}`
       );
     }
   }

@@ -37,7 +37,7 @@ describe('Psyche', () => {
       expect(optimism.create).toHaveBeenCalledExactlyOnceWith(80);
     });
 
-    it('Если чувство меньше MIN_FEELING, выбрасывает RangeError', () => {
+    it('Если чувство меньше Psyche.MIN_FEELING, выбрасывает RangeError', () => {
       const state = createPsycheState({
         feelings: { [Feeling.Shame]: -1 },
       });
@@ -45,7 +45,7 @@ describe('Psyche', () => {
       expect(() => new Psyche(state, createPsycheDeps())).toThrow(RangeError);
     });
 
-    it('Если чувство больше MAX_FEELING, выбрасывает RangeError', () => {
+    it('Если чувство больше Psyche.MAX_FEELING, выбрасывает RangeError', () => {
       const state = createPsycheState({
         feelings: { [Feeling.Shame]: 101 },
       });

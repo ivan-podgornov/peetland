@@ -19,27 +19,9 @@ runs:
         DOCS_BRANCH: ${{ inputs.branch }}
       run: npm run build -w @peetland/docs
     - name: Publish docs
-      shell: bash
-      working-directory: docs
-      env:
-        BRANCH: ${{ inputs.branch }}
-        REPO: https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
-      run: |
-        # gh-pages не разбирает имя бота в --user, поэтому берёт автора из конфига git
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-        # В папке ветки документация лежит в docs: рядом позже появятся другие сборки ветки.
-        # Сайты всех веток лежат в одной ветке gh-pages, поэтому пуши из параллельных запусков могут
-        # конфликтовать. Тогда gh-pages скачивает свежую ветку, и публикация повторяется
-        for attempt in 1 2 3 4 5; do
-          npx gh-pages \
-            --dist build \
-            --dest "$BRANCH/docs" \
-            --repo "$REPO" \
-            --message "Publish $BRANCH/docs ($GITHUB_SHA)" && exit 0
-          sleep $((attempt * 2))
-        done
-
-        echo "::error::Не удалось опубликовать документацию"
-        exit 1
+      uses: ./.github/workflows/publish-pages
+      with:
+        branch: ${{ inputs.branch }}
+        folder: docs
+        source: docs/build
+        token: ${{ inputs.token }}

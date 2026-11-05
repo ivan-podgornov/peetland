@@ -13,11 +13,6 @@ concurrency:
   group: pull-request-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
-env:
-  TAG: pr-${{ github.event.pull_request.number }}
-  GH_REPO: ${{ github.repository }}
-  GH_TOKEN: ${{ github.token }}
-
 jobs:
   lint:
     if: github.event.action != 'closed'
@@ -41,15 +36,23 @@ jobs:
       - name: Test
         run: npm test
 
-  build-mod:
+  mod:
     needs: [lint, test]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: mod
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/mod/peetland.lua
     steps:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Build mod
-        uses: ./.github/workflows/build-mod
+      - name: Deploy mod
+        uses: ./.github/workflows/deploy-mod
+        with:
+          branch: ${{ github.head_ref }}
+          token: ${{ github.token }}
 
   docs:
     needs: [lint, test]
@@ -68,15 +71,6 @@ jobs:
         with:
           branch: ${{ github.head_ref }}
           token: ${{ github.token }}
-
-  cleanup:
-    if: github.event.action == 'closed'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Delete pre-release
-        run: gh release delete "$TAG" --cleanup-tag --yes || true
 
   remove-pages:
     # Папку main не удаляем, даже если main была веткой закрытого пулл реквеста

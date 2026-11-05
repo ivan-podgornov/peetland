@@ -1,5 +1,4 @@
 import { AbortController } from '@peetland/events';
-import type { IActor } from '@peetland/game';
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import type { IRandom } from '@peetland/random';
@@ -29,7 +28,7 @@ export type TryLuckTaskDeps = {
   timer: ITimer;
 };
 
-/** Попытки конкретного актора */
+/** Попытки, которые начались в start */
 type Attempts = {
   lifetime: AbortController;
   isLucky: boolean;
@@ -38,8 +37,7 @@ type Attempts = {
 /**
  * Пытать удачу: раз в TryLuckTask.PERIOD бросать шанс, пока не повезёт. Шанс поправляет психика NPC,
  * например, удачливым везёт чаще. Когда повезло, задача завершается с 'success', и план
- * продолжается следующими задачами: что получил NPC, решают они.
- * Одну задачу могут выполнять разные NPC, поэтому попытки хранятся по акторам, а не в полях задачи
+ * продолжается следующими задачами: что получил NPC, решают они
  */
 export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   /** Как часто NPC пытает удачу, в миллисекундах */
@@ -49,7 +47,7 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
 
   private readonly options: TryLuckTaskOptions;
   private readonly deps: TryLuckTaskDeps;
-  private readonly attempts = new Map<IActor, Attempts>();
+  private attempts: Attempts | null = null;
 
   constructor(options: TryLuckTaskOptions, deps: TryLuckTaskDeps) {
     this.options = options;
@@ -71,13 +69,12 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
   start(_state: NpcState, context: NpcContext): TaskResult {
     const { random, timer } = this.deps;
     const { chance, onAttempt } = this.options;
-    const { actor } = context;
     const attempts: Attempts = {
       lifetime: new AbortController(),
       isLucky: false,
     };
-    this.stopAttempts(actor);
-    this.attempts.set(actor, attempts);
+    this.stopAttempts();
+    this.attempts = attempts;
 
     timer.interval(TryLuckTask.PERIOD).subscribe(
       () => {
@@ -96,33 +93,32 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
 
   /**
    * Если повезло, возвращает 'success'. Если не повезло, но выполнилось условие остановки,
-   * перестаёт пытать удачу и возвращает 'failed'. Иначе возвращает 'running'. Если задачу этим
-   * актором не начинали, возвращает 'failed'
+   * перестаёт пытать удачу и возвращает 'failed'. Иначе возвращает 'running'. Если задачу не
+   * начинали, возвращает 'failed'
    */
-  update(state: NpcState, context: NpcContext): TaskResult {
-    const { actor } = context;
-    const attempts = this.attempts.get(actor);
+  update(state: NpcState): TaskResult {
+    const { attempts } = this;
 
     if (!attempts) {
       return 'failed';
     }
 
     if (attempts.isLucky) {
-      this.attempts.delete(actor);
+      this.attempts = null;
       return 'success';
     }
 
     if (this.shouldStop(state)) {
-      this.stopAttempts(actor);
+      this.stopAttempts();
       return 'failed';
     }
 
     return 'running';
   }
 
-  /** Перестаёт пытать удачу. Если задачу этим актором не начинали, ничего не делает */
-  stop(context: NpcContext): void {
-    this.stopAttempts(context.actor);
+  /** Перестаёт пытать удачу. Если задачу не начинали, ничего не делает */
+  stop(): void {
+    this.stopAttempts();
   }
 
   private shouldStop(state: NpcState): boolean {
@@ -131,8 +127,8 @@ export class TryLuckTask implements PrimitiveTask<NpcState, NpcContext> {
     return stopWhen ? stopWhen(state) : false;
   }
 
-  private stopAttempts(actor: IActor): void {
-    this.attempts.get(actor)?.lifetime.abort();
-    this.attempts.delete(actor);
+  private stopAttempts(): void {
+    this.attempts?.lifetime.abort();
+    this.attempts = null;
   }
 }

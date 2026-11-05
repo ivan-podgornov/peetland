@@ -47,7 +47,7 @@ describe('GoToCoordsTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(1000);
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('success');
     });
@@ -68,7 +68,7 @@ describe('GoToCoordsTask', () => {
       });
       task.start(NpcStateBuilder.default(), context);
 
-      task.stop(context);
+      task.stop();
       timer.advance(1000);
 
       expect(actor.getPosition()).toEqual({

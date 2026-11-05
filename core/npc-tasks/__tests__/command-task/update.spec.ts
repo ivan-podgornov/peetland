@@ -11,7 +11,7 @@ describe('CommandTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('running');
     });
@@ -23,7 +23,7 @@ describe('CommandTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       subscriber.complete();
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('success');
     });
@@ -35,36 +35,20 @@ describe('CommandTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       subscriber.error(new Error('Не дошёл'));
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('failed');
     });
 
-    it("Если задачу этим актором не начинали, возвращает 'failed'", () => {
+    it("Если задачу не начинали, возвращает 'failed'", () => {
       const task = new TestCommandTask(() => createControlledCommand().command);
 
-      const result = task.update(NpcStateBuilder.default(), createNpcContext());
+      const result = task.update();
 
       expect(result).toBe('failed');
     });
 
-    it('Возвращает результат команды того актора, который в контексте', () => {
-      const first = createControlledCommand();
-      const second = createControlledCommand();
-      const commands = [first.command, second.command];
-      const task = new TestCommandTask(() => commands.shift()!);
-      const firstContext = createNpcContext();
-      const secondContext = createNpcContext();
-      task.start(NpcStateBuilder.default(), firstContext);
-      task.start(NpcStateBuilder.default(), secondContext);
-
-      first.subscriber.complete();
-      const result = task.update(NpcStateBuilder.default(), secondContext);
-
-      expect(result).toBe('running');
-    });
-
-    it('Если задачу этим актором уже выполняли, возвращает результат новой команды', () => {
+    it('Если задачу уже выполняли, возвращает результат новой команды', () => {
       const first = createControlledCommand();
       const second = createControlledCommand();
       const commands = [first.command, second.command];
@@ -72,10 +56,10 @@ describe('CommandTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
       first.subscriber.complete();
-      task.update(NpcStateBuilder.default(), context);
+      task.update();
       task.start(NpcStateBuilder.default(), context);
 
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('running');
     });

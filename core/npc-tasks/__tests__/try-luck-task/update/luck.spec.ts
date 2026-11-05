@@ -20,7 +20,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('running');
     });
@@ -38,12 +38,12 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('success');
     });
 
-    it("Если задачу этим актором не начинали, возвращает 'failed'", () => {
+    it("Если задачу не начинали, возвращает 'failed'", () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
         {
@@ -52,31 +52,9 @@ describe('TryLuckTask', () => {
         }
       );
 
-      const result = task.update(NpcStateBuilder.default(), createNpcContext());
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('failed');
-    });
-
-    it('Возвращает результат попыток того актора, который в контексте', () => {
-      const random = createMockedRandom(false);
-      const timer = new ManualTimer();
-      const task = new TryLuckTask(
-        { chance: 1 / 60 },
-        {
-          random,
-          timer,
-        }
-      );
-      const firstContext = createNpcContext();
-      const secondContext = createNpcContext();
-      task.start(NpcStateBuilder.default(), firstContext);
-      task.start(NpcStateBuilder.default(), secondContext);
-
-      random.chance.mockReturnValueOnce(true);
-      timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(NpcStateBuilder.default(), secondContext);
-
-      expect(result).toBe('running');
     });
 
     it("После того как вернула 'success', возвращает 'failed'", () => {
@@ -91,9 +69,9 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
       timer.advance(TryLuckTask.PERIOD);
-      task.update(NpcStateBuilder.default(), context);
+      task.update(NpcStateBuilder.default());
 
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('failed');
     });

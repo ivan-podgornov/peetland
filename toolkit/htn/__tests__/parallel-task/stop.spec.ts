@@ -62,7 +62,7 @@ describe('ParallelTask', () => {
       expect(task.update(testState, context)).toBe('failed');
     });
 
-    it('Если задачу в этом контексте не начинали, ничего не останавливает', () => {
+    it('Если задачу не начинали, ничего не останавливает', () => {
       const main = createMockedPrimitive();
       const task = new ParallelTask({
         main,

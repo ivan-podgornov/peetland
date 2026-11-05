@@ -11,23 +11,9 @@ describe('CommandTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      task.stop(context);
+      task.stop();
 
       expect(command.cancel).toHaveBeenCalledExactlyOnceWith(expect.any(Error));
-    });
-
-    it('Прерывает команду только того актора, который в контексте', () => {
-      const first = createControlledCommand();
-      const second = createControlledCommand();
-      const commands = [first.command, second.command];
-      const task = new TestCommandTask(() => commands.shift()!);
-      const firstContext = createNpcContext();
-      task.start(NpcStateBuilder.default(), firstContext);
-      task.start(NpcStateBuilder.default(), createNpcContext());
-
-      task.stop(firstContext);
-
-      expect(second.command.cancel).not.toHaveBeenCalled();
     });
 
     it("После остановки #update возвращает 'failed'", () => {
@@ -36,16 +22,16 @@ describe('CommandTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      task.stop(context);
-      const result = task.update(NpcStateBuilder.default(), context);
+      task.stop();
+      const result = task.update();
 
       expect(result).toBe('failed');
     });
 
-    it('Если задачу этим актором не начинали, не выбрасывает ошибку', () => {
+    it('Если задачу не начинали, не выбрасывает ошибку', () => {
       const task = new TestCommandTask(() => createControlledCommand().command);
 
-      expect(() => task.stop(createNpcContext())).not.toThrow();
+      expect(() => task.stop()).not.toThrow();
     });
   });
 });

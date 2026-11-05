@@ -20,30 +20,10 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      task.stop(context);
+      task.stop();
       timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).not.toHaveBeenCalled();
-    });
-
-    it('Перестаёт бросать шанс только для того актора, который в контексте', () => {
-      const random = createMockedRandom(false);
-      const timer = new ManualTimer();
-      const task = new TryLuckTask(
-        { chance: 1 / 60 },
-        {
-          random,
-          timer,
-        }
-      );
-      const firstContext = createNpcContext();
-      task.start(NpcStateBuilder.default(), firstContext);
-      task.start(NpcStateBuilder.default(), createNpcContext());
-
-      task.stop(firstContext);
-      timer.advance(TryLuckTask.PERIOD);
-
-      expect(random.chance).toHaveBeenCalledOnce();
     });
 
     it("После остановки #update возвращает 'failed'", () => {
@@ -57,13 +37,13 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      task.stop(context);
-      const result = task.update(NpcStateBuilder.default(), context);
+      task.stop();
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('failed');
     });
 
-    it('Если задачу этим актором не начинали, не выбрасывает ошибку', () => {
+    it('Если задачу не начинали, не выбрасывает ошибку', () => {
       const task = new TryLuckTask(
         { chance: 1 / 60 },
         {
@@ -72,7 +52,7 @@ describe('TryLuckTask', () => {
         }
       );
 
-      expect(() => task.stop(createNpcContext())).not.toThrow();
+      expect(() => task.stop()).not.toThrow();
     });
   });
 });

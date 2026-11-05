@@ -83,31 +83,13 @@ describe('ParallelTask', () => {
       expect(main.stop).toHaveBeenCalledExactlyOnceWith(context);
     });
 
-    it("Если задачу в этом контексте не начинали, возвращает 'failed'", () => {
+    it("Если задачу не начинали, возвращает 'failed'", () => {
       const task = new ParallelTask({
         main: createMockedPrimitive(),
         background: createMockedPrimitive(),
       });
 
       expect(task.update(testState, createContext())).toBe('failed');
-    });
-
-    it('Обновляет фоновую задачу только того контекста, в котором её начали заново', () => {
-      const background = createMockedPrimitive({ start: vi.fn(() => 'success' as const) });
-      const task = new ParallelTask({
-        main: createMockedPrimitive(),
-        background,
-      });
-      const firstContext = createContext();
-      const secondContext = createContext();
-      task.start(testState, firstContext);
-      task.start(testState, secondContext);
-      background.start.mockReturnValue('running');
-      task.update(testState, firstContext);
-
-      task.update(testState, secondContext);
-
-      expect(background.start).toHaveBeenLastCalledWith(testState, secondContext);
     });
   });
 });

@@ -6,12 +6,6 @@ const sidebars: SidebarsConfig = {
     'principles/index',
     'architecture/index',
     'decisions/index',
-    // README пакетов собирает отдельный инстанс плагина документации со своим сайдбаром
-    {
-      type: 'link',
-      label: 'Пакеты',
-      href: '/packages/',
-    },
     'npc/index',
     'process/index',
   ],

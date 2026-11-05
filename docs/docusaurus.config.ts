@@ -42,6 +42,33 @@ function unwrapDocsFolders(items: SidebarItem[]): SidebarItem[] {
   });
 }
 
+/** Слои монорепозитория, README пакетов которых попадают в раздел «Пакеты» */
+const LAYERS = ['toolkit', 'core', 'mod'];
+
+/**
+ * Инстанс плагина документации, который читает README пакетов слоя прямо из пакетов: источник у
+ * них один. На каждый слой свой инстанс, потому что инстанс компилирует все Markdown-файлы в своей
+ * папке, и инстанс с корнем репозитория скомпилировал бы страницы основной документации ещё раз
+ */
+function packagesPlugin(layer: string): [string, DocsPluginOptions] {
+  return [
+    '@docusaurus/plugin-content-docs',
+    {
+      id: layer,
+      path: `../${layer}`,
+      include: ['*/README.md', '*/docs/**/*.md'],
+      routeBasePath: `packages/${layer}`,
+      async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+        return unwrapDocsFolders(await defaultSidebarItemsGenerator(args));
+      },
+      ...(DOCS_REPOSITORY_URL && {
+        // Путь от корня репозитория: строковый editUrl считает путь от папки сайта
+        editUrl: ({ docPath }) => `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/${layer}/${docPath}`,
+      }),
+    },
+  ];
+}
+
 const config: Config = {
   title: 'Peetland',
   tagline: 'Документация проекта',
@@ -62,26 +89,7 @@ const config: Config = {
     },
   },
   themes: ['@docusaurus/theme-mermaid'],
-  plugins: [
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        // README пакетов остаются в пакетах, а сайт читает их оттуда: источник у них один
-        id: 'packages',
-        path: '..',
-        include: ['{toolkit,core,mod}/*/README.md', '{toolkit,core,mod}/*/docs/**/*.md'],
-        routeBasePath: 'packages',
-        sidebarPath: './sidebars-packages.ts',
-        async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
-          return unwrapDocsFolders(await defaultSidebarItemsGenerator(args));
-        },
-        ...(DOCS_REPOSITORY_URL && {
-          // Путь от корня репозитория: строковый editUrl считает путь от папки сайта
-          editUrl: ({ docPath }) => `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/${docPath}`,
-        }),
-      } satisfies DocsPluginOptions,
-    ],
-  ],
+  plugins: LAYERS.map(packagesPlugin),
   presets: [
     [
       'classic',
@@ -109,11 +117,15 @@ const config: Config = {
           position: 'left',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'packages',
-          docsPluginId: 'packages',
+          type: 'dropdown',
           label: 'Пакеты',
           position: 'left',
+          items: LAYERS.map((layer) => ({
+            type: 'docSidebar',
+            sidebarId: 'defaultSidebar',
+            docsPluginId: layer,
+            label: layer,
+          })),
         },
         ...(DOCS_REPOSITORY_URL
           ? [

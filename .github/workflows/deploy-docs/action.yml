@@ -1,0 +1,44 @@
+name: Deploy docs
+description: Build the docs of a branch and publish them to its folder of the gh-pages branch
+inputs:
+  branch:
+    description: Branch whose docs are published, for example main or feat/npc
+    required: true
+  token:
+    description: Token with contents write permission
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Build docs
+      shell: bash
+      env:
+        DOCS_URL: https://${{ github.repository_owner }}.github.io
+        DOCS_BASE_URL: /${{ github.event.repository.name }}/${{ inputs.branch }}/
+        DOCS_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+        DOCS_BRANCH: ${{ inputs.branch }}
+      run: npm run build -w @peetland/docs
+    - name: Publish docs
+      shell: bash
+      working-directory: docs
+      env:
+        BRANCH: ${{ inputs.branch }}
+        REPO: https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
+      run: |
+        # gh-pages не разбирает имя бота в --user, поэтому берёт автора из конфига git
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # Сайты всех веток лежат в одной ветке gh-pages, поэтому пуши из параллельных запусков могут
+        # конфликтовать. Тогда gh-pages скачивает свежую ветку, и публикация повторяется
+        for attempt in 1 2 3 4 5; do
+          npx gh-pages \
+            --dist build \
+            --dest "$BRANCH" \
+            --repo "$REPO" \
+            --message "Publish $BRANCH ($GITHUB_SHA)" && exit 0
+          sleep $((attempt * 2))
+        done
+
+        echo "::error::Не удалось опубликовать документацию"
+        exit 1

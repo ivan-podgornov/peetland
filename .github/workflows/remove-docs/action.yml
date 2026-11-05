@@ -1,0 +1,40 @@
+name: Remove docs
+description: Remove the docs of a branch from the gh-pages branch
+inputs:
+  branch:
+    description: Branch whose docs are removed, for example feat/npc
+    required: true
+  token:
+    description: Token with contents write permission
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Remove docs
+      shell: bash
+      env:
+        BRANCH: ${{ inputs.branch }}
+        REPO: https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
+      run: |
+        # gh-pages не разбирает имя бота в --user, поэтому берёт автора из конфига git
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+        # gh-pages не публикует пустую папку, поэтому публикуем .nojekyll, который и так лежит в
+        # корне gh-pages, а папку ветки удаляем через --remove
+        dist="$RUNNER_TEMP/remove-docs"
+        mkdir -p "$dist"
+        touch "$dist/.nojekyll"
+
+        for attempt in 1 2 3 4 5; do
+          npx gh-pages \
+            --dist "$dist" \
+            --dotfiles \
+            --remove "$BRANCH/**" \
+            --repo "$REPO" \
+            --message "Remove $BRANCH ($GITHUB_SHA)" && exit 0
+          sleep $((attempt * 2))
+        done
+
+        echo "::error::Не удалось удалить документацию"
+        exit 1

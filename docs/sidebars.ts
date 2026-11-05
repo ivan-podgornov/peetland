@@ -20,7 +20,24 @@ const sidebars: SidebarsConfig = {
       ],
     },
     'npc/index',
-    'process/index',
+    {
+      type: 'category',
+      label: 'Процесс',
+      link: {
+        type: 'doc',
+        id: 'process',
+      },
+      items: [
+        'process/setup',
+        'process/planning',
+        'process/commits',
+        'process/testing',
+        'process/review',
+        'process/docs',
+        'process/ci',
+        'process/in-game',
+      ],
+    },
   ],
 };
 

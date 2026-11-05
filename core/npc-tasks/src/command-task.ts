@@ -3,7 +3,7 @@ import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
 
-/** Выполнение команды конкретным актором */
+/** Выполнение команды */
 type Execution = {
   command: IActorCommand;
   result: TaskResult;
@@ -11,14 +11,13 @@ type Execution = {
 
 /**
  * Примитивная задача, которая отдаёт команду актору из контекста и выполняется, пока выполняется
- * команда: успешное завершение команды — 'success', ошибка — 'failed'. Одну задачу могут выполнять
- * разные NPC, поэтому выполнения хранятся по акторам, а не в полях задачи. Наследнику остаётся
- * описать, какую команду отдать актору и какие эффекты применить к состоянию
+ * команда: успешное завершение команды — 'success', ошибка — 'failed'. Наследнику остаётся описать,
+ * какую команду отдать актору и какие эффекты применить к состоянию
  */
 export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext> {
   abstract readonly name: string;
 
-  private readonly executions = new Map<IActor, Execution>();
+  private execution: Execution | null = null;
 
   canExecute(): boolean {
     return true;
@@ -31,12 +30,11 @@ export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext>
    * сразу, возвращает её результат
    */
   start(_state: NpcState, context: NpcContext): TaskResult {
-    const { actor } = context;
     const execution: Execution = {
-      command: this.createCommand(actor),
+      command: this.createCommand(context.actor),
       result: 'running',
     };
-    this.executions.set(actor, execution);
+    this.execution = execution;
 
     execution.command.execute().subscribe({
       complete: () => {
@@ -47,31 +45,29 @@ export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext>
       },
     });
 
-    return this.finishIfDone(actor, execution);
+    return this.finishIfDone(execution);
   }
 
-  /** Возвращает результат команды актора. Если задачу этим актором не начинали, возвращает 'failed' */
-  update(_state: NpcState, context: NpcContext): TaskResult {
-    const { actor } = context;
-    const execution = this.executions.get(actor);
+  /** Возвращает результат команды. Если задачу не начинали, возвращает 'failed' */
+  update(): TaskResult {
+    const { execution } = this;
 
     if (!execution) {
       return 'failed';
     }
 
-    return this.finishIfDone(actor, execution);
+    return this.finishIfDone(execution);
   }
 
-  /** Прерывает команду актора. Если задачу этим актором не начинали, ничего не делает */
-  stop(context: NpcContext): void {
-    const { actor } = context;
-    const execution = this.executions.get(actor);
+  /** Прерывает команду. Если задачу не начинали, ничего не делает */
+  stop(): void {
+    const { execution } = this;
 
     if (!execution) {
       return;
     }
 
-    this.executions.delete(actor);
+    this.execution = null;
     execution.command.cancel(new Error(`Задача ${this.name} остановлена`));
   }
 
@@ -79,9 +75,9 @@ export abstract class CommandTask implements PrimitiveTask<NpcState, NpcContext>
   protected abstract createCommand(actor: IActor): IActorCommand;
 
   /** Забывает выполнение, если команда завершилась, и возвращает результат */
-  private finishIfDone(actor: IActor, execution: Execution): TaskResult {
+  private finishIfDone(execution: Execution): TaskResult {
     if (execution.result !== 'running') {
-      this.executions.delete(actor);
+      this.execution = null;
     }
 
     return execution.result;

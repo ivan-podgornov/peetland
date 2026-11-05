@@ -10,7 +10,7 @@ export type ParallelTaskOptions<TState, TContext> = {
   background: PrimitiveTask<TState, TContext>;
 };
 
-/** Выполнение параллельной задачи в конкретном контексте */
+/** Выполнение параллельной задачи, которое началось в start */
 type Execution = {
   /** Выполняется ли фоновая задача. Если нет, в следующем update её нужно запустить заново */
   isBackgroundRunning: boolean;
@@ -21,14 +21,13 @@ type Execution = {
  * с результатом основной и тогда же останавливает фоновую. Если фоновая завершилась ошибкой,
  * останавливает основную и завершается с 'failed'. Например, ждать, пока повезёт, и всё это время
  * проигрывать анимацию. Задачи не должны мешать друг другу: например, нельзя одновременно идти в
- * две стороны. Одну задачу могут выполнять в разных контекстах, поэтому выполнения хранятся по
- * контекстам, а не в полях задачи
+ * две стороны
  */
 export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TContext> {
   readonly name = 'parallel';
 
   private readonly options: ParallelTaskOptions<TState, TContext>;
-  private readonly executions = new Map<TContext, Execution>();
+  private execution: Execution | null = null;
 
   constructor(options: ParallelTaskOptions<TState, TContext>) {
     this.options = options;
@@ -59,18 +58,18 @@ export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TCo
     }
 
     const execution: Execution = { isBackgroundRunning: false };
-    this.executions.set(context, execution);
+    this.execution = execution;
 
     return this.updateBackground(state, context, execution);
   }
 
   /**
-   * Обновляет основную задачу и, если она ещё выполняется, фоновую. Если задачу в этом контексте
-   * не начинали, возвращает 'failed'
+   * Обновляет основную задачу и, если она ещё выполняется, фоновую. Если задачу не начинали,
+   * возвращает 'failed'
    */
   update(state: TState, context: TContext): TaskResult {
     const { main } = this.options;
-    const execution = this.executions.get(context);
+    const { execution } = this;
 
     if (!execution) {
       return 'failed';
@@ -86,9 +85,9 @@ export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TCo
     return this.updateBackground(state, context, execution);
   }
 
-  /** Останавливает обе задачи. Если задачу в этом контексте не начинали, ничего не делает */
+  /** Останавливает обе задачи. Если задачу не начинали, ничего не делает */
   stop(context: TContext): void {
-    const execution = this.executions.get(context);
+    const { execution } = this;
 
     if (!execution) {
       return;
@@ -115,7 +114,7 @@ export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TCo
     execution.isBackgroundRunning = result === 'running';
 
     if (result === 'failed') {
-      this.executions.delete(context);
+      this.execution = null;
       main.stop(context);
       return 'failed';
     }
@@ -125,7 +124,7 @@ export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TCo
 
   /** Останавливает фоновую задачу, если она выполняется, и забывает выполнение */
   private stopBackground(context: TContext, execution: Execution): void {
-    this.executions.delete(context);
+    this.execution = null;
 
     if (execution.isBackgroundRunning) {
       this.options.background.stop(context);

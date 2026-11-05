@@ -30,7 +30,7 @@ describe('PlayAnimationTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(VIRTUAL_ANIMATIONS.pay.duration);
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update();
 
       expect(result).toBe('success');
     });

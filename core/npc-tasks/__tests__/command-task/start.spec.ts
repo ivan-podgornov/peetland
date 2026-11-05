@@ -39,7 +39,7 @@ describe('CommandTask', () => {
       expect(result).toBe('failed');
     });
 
-    it('Если задачу этим актором уже выполняли, отдаёт актору новую команду', () => {
+    it('Если задачу уже выполняли, отдаёт актору новую команду', () => {
       const first = createControlledCommand();
       const second = createControlledCommand();
       const commands = [first.command, second.command];
@@ -47,7 +47,7 @@ describe('CommandTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
       first.subscriber.complete();
-      task.update(NpcStateBuilder.default(), context);
+      task.update();
 
       task.start(NpcStateBuilder.default(), context);
 

@@ -24,10 +24,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(
-        new NpcStateBuilder().withFeeling(Feeling.Shame, 80).build(),
-        context
-      );
+      const result = task.update(new NpcStateBuilder().withFeeling(Feeling.Shame, 80).build());
 
       expect(result).toBe('failed');
     });
@@ -48,7 +45,7 @@ describe('TryLuckTask', () => {
       const context = createNpcContext();
       task.start(NpcStateBuilder.default(), context);
 
-      task.update(NpcStateBuilder.default(), context);
+      task.update(NpcStateBuilder.default());
       timer.advance(TryLuckTask.PERIOD);
 
       expect(random.chance).not.toHaveBeenCalled();
@@ -70,7 +67,7 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(NpcStateBuilder.default(), context);
+      const result = task.update(NpcStateBuilder.default());
 
       expect(result).toBe('success');
     });

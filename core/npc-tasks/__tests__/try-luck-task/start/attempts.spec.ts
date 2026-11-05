@@ -72,7 +72,7 @@ describe('TryLuckTask', () => {
       expect(random.chance).toHaveBeenCalledOnce();
     });
 
-    it('Если задачу этим актором уже начали, прекращает прежние попытки', () => {
+    it('Если задачу уже начали, прекращает прежние попытки', () => {
       const random = createMockedRandom(false);
       const timer = new ManualTimer();
       const task = new TryLuckTask(

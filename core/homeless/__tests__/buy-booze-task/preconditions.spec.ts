@@ -6,7 +6,7 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBuyBoozeTask, createPlacesWithShop } from '../../dev';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
+import { BOOZE_PRICE } from '../../src/constants';
 
 describe('BuyBoozeTask', () => {
   describe('Метод buy-in-nearest-shop', () => {

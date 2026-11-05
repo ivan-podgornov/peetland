@@ -16,7 +16,8 @@ import {
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { BEGGING_CHANCE, BegTask } from '../src/beg-task';
+import { BegTask } from '../src/beg-task';
+import { BEGGING_CHANCE } from '../src/constants';
 
 /**
  * Создаёт оптимизм, который при шансе BEGGING_CHANCE ожидает attempts попыток до удачи. Если его

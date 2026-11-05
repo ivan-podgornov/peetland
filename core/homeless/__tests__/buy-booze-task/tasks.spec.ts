@@ -8,7 +8,7 @@ import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBuyBoozeTask, createHomelessTaskFactory, createPlacesWithShop } from '../../dev';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
+import { BOOZE_PRICE } from '../../src/constants';
 
 /** Создаёт состояние NPC, у которого хватает денег на пойло: без них план не составляется */
 function createStateWithMoney() {

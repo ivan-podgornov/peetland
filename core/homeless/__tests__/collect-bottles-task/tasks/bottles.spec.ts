@@ -7,11 +7,7 @@ import { Deed } from '@peetland/psyche';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../../dev';
-import {
-  BOTTLE_FIND_CHANCE,
-  MAX_BOTTLES,
-  MAX_BOTTLES_PER_VISIT,
-} from '../../../src/collect-bottles-task';
+import { BOTTLE_FIND_CHANCE, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from '../../../src/constants';
 
 /** Планирует заход за одной бутылкой фабрикой примитивов, в которой подменены переданные методы */
 function planOneBottle(overrides: Parameters<typeof createNpcTaskFactory>[0]) {

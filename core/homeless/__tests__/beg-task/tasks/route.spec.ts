@@ -8,8 +8,7 @@ import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBegTask, createPlacesWithBeggingSpot } from '../../../dev';
-import { BEGGING_REWARD } from '../../../src/beg-task';
-import { BOOZE_PRICE } from '../../../src/buy-booze-task';
+import { BEGGING_REWARD, BOOZE_PRICE } from '../../../src/constants';
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {

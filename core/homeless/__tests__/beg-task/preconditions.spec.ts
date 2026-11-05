@@ -12,9 +12,12 @@ import {
   createBegTask,
   createPlacesWithBeggingSpot,
 } from '../../dev';
-import { BEGGING_REWARD, BEGGING_SHAME_LIMIT } from '../../src/beg-task';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
-import { BOTTLE_PRICE } from '../../src/sell-bottles-task';
+import {
+  BEGGING_REWARD,
+  BEGGING_SHAME_LIMIT,
+  BOOZE_PRICE,
+  BOTTLE_PRICE,
+} from '../../src/constants';
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {

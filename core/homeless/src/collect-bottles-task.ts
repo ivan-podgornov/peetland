@@ -7,20 +7,7 @@ import type { IPlaces } from '@peetland/places';
 import { Deed } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 
-/** Шанс найти бутылку за одну попытку, раз в секунду (см. TryLuckTask) */
-export const BOTTLE_FIND_CHANCE = 1 / 60;
-
-/** Сколько бутылок NPC ищет в мусорке за один заход */
-export const MAX_BOTTLES_PER_VISIT = 5;
-
-/** Сколько бутылок NPC может унести */
-export const MAX_BOTTLES = 15;
-
-/** На каком расстоянии от мусорки можно считать, что NPC до неё дошёл, в метрах */
-const TRASH_BIN_COMPLETE_RADIUS = 0.5;
-
-/** Насколько NPC может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
-const TRASH_BIN_FACING_TOLERANCE = 15;
+import { BOTTLE_FIND_CHANCE, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from './constants';
 
 export type CollectBottlesTaskDeps = {
   /** Места мира. Бутылки собираются в местах типа PlaceType.TrashBin */
@@ -36,6 +23,12 @@ export type CollectBottlesTaskDeps = {
  * определяются при планировании, один раз на весь план. Следующий заход — следующий план
  */
 export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
+  /** На каком расстоянии от мусорки можно считать, что NPC до неё дошёл, в метрах */
+  private static readonly TRASH_BIN_COMPLETE_RADIUS = 0.5;
+
+  /** Насколько NPC может быть отвёрнут от мусорки, чтобы в ней рыться, в градусах */
+  private static readonly TRASH_BIN_FACING_TOLERANCE = 15;
+
   readonly name = 'collect-bottles';
 
   readonly methods: Method<NpcState, NpcContext>[];
@@ -70,11 +63,11 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
     const tasks: Task<NpcState, NpcContext>[] = [
       npcTaskFactory.goToCoords({
         coords: bin.position,
-        completeRadius: TRASH_BIN_COMPLETE_RADIUS,
+        completeRadius: CollectBottlesTask.TRASH_BIN_COMPLETE_RADIUS,
       }),
       npcTaskFactory.achieveAngle({
         angle: bin.angle,
-        tolerance: TRASH_BIN_FACING_TOLERANCE,
+        tolerance: CollectBottlesTask.TRASH_BIN_FACING_TOLERANCE,
       }),
       npcTaskFactory.playAnimation({ animation: 'trash-search-start' }),
     ];

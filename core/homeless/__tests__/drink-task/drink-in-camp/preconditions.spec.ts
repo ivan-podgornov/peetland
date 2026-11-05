@@ -5,7 +5,7 @@ import { PlaceType } from '@peetland/places';
 import { describe, expect, it } from 'vitest';
 
 import { createDrinkTask, createPlacesWithCamp } from '../../../dev';
-import { HOMELESS_CAMP_RADIUS } from '../../../src/drink-task';
+import { DrinkTask } from '../../../src/drink-task';
 
 describe('DrinkTask', () => {
   describe('Метод drink-in-camp', () => {
@@ -23,7 +23,7 @@ describe('DrinkTask', () => {
         expect(planNames(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
       });
 
-      it('Проверяет, что NPC в бомжарне, по его позиции и HOMELESS_CAMP_RADIUS', () => {
+      it('Проверяет, что NPC в бомжарне, по его позиции и DrinkTask.CAMP_RADIUS', () => {
         const places = createPlacesWithCamp(true);
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
@@ -39,7 +39,7 @@ describe('DrinkTask', () => {
             z: 0,
           },
           PlaceType.HomelessCamp,
-          HOMELESS_CAMP_RADIUS
+          DrinkTask.CAMP_RADIUS
         );
       });
     });

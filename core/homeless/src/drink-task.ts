@@ -6,15 +6,6 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
-/** Сколько NPC пьёт одну бутылку пойла, в миллисекундах */
-export const DRINK_DURATION = 10000;
-
-/** На каком расстоянии от бомжарни NPC считается в бомжарне, в метрах */
-export const HOMELESS_CAMP_RADIUS = 3;
-
-/** На каком расстоянии от бомжарни можно считать, что NPC до неё дошёл, в метрах */
-const HOMELESS_CAMP_COMPLETE_RADIUS = 0.5;
-
 export type DrinkTaskDeps = {
   /** Места мира. Пьёт NPC в местах типа PlaceType.HomelessCamp */
   places: IPlaces;
@@ -26,6 +17,15 @@ export type DrinkTaskDeps = {
  * идёт к ближайшей. Когда NPC допил, пойло отнимается, а пустая бутылка остаётся в инвентаре
  */
 export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
+  /** Сколько NPC пьёт одну бутылку пойла, в миллисекундах */
+  static readonly DURATION = 10000;
+
+  /** На каком расстоянии от бомжарни NPC считается в бомжарне, в метрах */
+  static readonly CAMP_RADIUS = 3;
+
+  /** На каком расстоянии от бомжарни можно считать, что NPC до неё дошёл, в метрах */
+  private static readonly CAMP_COMPLETE_RADIUS = 0.5;
+
   readonly name = 'drink';
 
   readonly methods: Method<NpcState, NpcContext>[];
@@ -38,7 +38,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
     const drink: PrimitiveTask<NpcState, NpcContext>[] = [
       npcTaskFactory.playAnimation({
         animation: 'drink-standing-1',
-        duration: DRINK_DURATION,
+        duration: DrinkTask.DURATION,
       }),
       npcTaskFactory.removeItem({
         item: Item.Booze,
@@ -67,12 +67,12 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
     ];
   }
 
-  /** Находится ли NPC в радиусе HOMELESS_CAMP_RADIUS от какой-нибудь бомжарни */
+  /** Находится ли NPC в радиусе DrinkTask.CAMP_RADIUS от какой-нибудь бомжарни */
   private isInCamp(state: NpcState): boolean {
     return this.places.isNear(
       state.self.actor.position,
       PlaceType.HomelessCamp,
-      HOMELESS_CAMP_RADIUS
+      DrinkTask.CAMP_RADIUS
     );
   }
 
@@ -87,7 +87,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
     return npcTaskFactory.goToCoords({
       coords: camp.position,
-      completeRadius: HOMELESS_CAMP_COMPLETE_RADIUS,
+      completeRadius: DrinkTask.CAMP_COMPLETE_RADIUS,
     });
   }
 }

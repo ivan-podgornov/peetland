@@ -6,8 +6,7 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } from '../../dev';
-import { BOOZE_PRICE } from '../../src/buy-booze-task';
-import { BOTTLE_PRICE } from '../../src/sell-bottles-task';
+import { BOOZE_PRICE, BOTTLE_PRICE } from '../../src/constants';
 
 describe('SellBottlesTask', () => {
   describe('Метод sell-in-nearest-collection', () => {

@@ -8,7 +8,7 @@ import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../../dev';
-import { MAX_BOTTLES } from '../../../src/collect-bottles-task';
+import { MAX_BOTTLES } from '../../../src/constants';
 
 describe('CollectBottlesTask', () => {
   describe('Метод search-random-trash-bin', () => {

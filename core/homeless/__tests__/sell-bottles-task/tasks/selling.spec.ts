@@ -5,7 +5,7 @@ import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
-import { BOTTLE_PRICE } from '../../../src/sell-bottles-task';
+import { BOTTLE_PRICE } from '../../../src/constants';
 
 describe('SellBottlesTask', () => {
   describe('Метод sell-in-nearest-collection', () => {

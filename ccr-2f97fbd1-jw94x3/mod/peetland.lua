@@ -3451,24 +3451,57 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["toolkit.events.src.observable.inspect-observer"] = function(...) 
+["toolkit.events.src.observable.from-executors"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Promise = ____lualib.__TS__Promise
+local ____exports = {}
+--- Executor для Observable.from из массива: выдаёт элементы синхронно при подписке и завершается.
+-- Массив читается при каждой подписке, а не при вызове from, как того требует спецификация
+function ____exports.createArrayExecutor(values)
+    return function(subscriber)
+        for ____, value in ipairs(values) do
+            if not subscriber.active then
+                return
+            end
+            subscriber:next(value)
+        end
+        subscriber:complete()
+    end
+end
+--- Executor для Observable.from из промиса: выдаёт значение, с которым промис выполнился, и
+-- завершается, а если промис отклонён, завершается с ошибкой
+function ____exports.createPromiseExecutor(promise)
+    return function(subscriber)
+        promise["then"](
+            promise,
+            function(____, value)
+                subscriber:next(value)
+                subscriber:complete()
+            end,
+            function(____, reason) return subscriber:error(reason) end
+        )
+    end
+end
+return ____exports
+ end,
+["toolkit.events.src.observable.inspect-operator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
---- Наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
+--- Оператор inspect: наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
 -- инспектора и передаёт события подписчику без изменений. Исключение в колбэке инспектора
 -- завершает поток с этим исключением.
-____exports.InspectObserver = __TS__Class()
-local InspectObserver = ____exports.InspectObserver
-InspectObserver.name = "InspectObserver"
-function InspectObserver.prototype.____constructor(self, options)
+____exports.InspectOperator = __TS__Class()
+local InspectOperator = ____exports.InspectOperator
+InspectOperator.name = "InspectOperator"
+function InspectOperator.prototype.____constructor(self, options)
     self.subscriber = options.subscriber
     local ____options_0 = options
     local inspector = ____options_0.inspector
     self.inspector = type(inspector) == "function" and ({next = function(____, value) return inspector(value) end}) or inspector
     self.abortListener = function() return self:callAbort() end
 end
-function InspectObserver.prototype.observe(self, source)
+function InspectOperator.prototype.observe(self, source)
     do
         local function ____catch(____error)
             self.subscriber:error(____error)
@@ -3492,7 +3525,7 @@ function InspectObserver.prototype.observe(self, source)
     self.subscriber.signal:addEventListener("abort", self.abortListener)
     source:subscribe(self, {signal = self.subscriber.signal})
 end
-function InspectObserver.prototype.next(self, value)
+function InspectOperator.prototype.next(self, value)
     do
         local function ____catch(____error)
             self:finish(function() return self.subscriber:error(____error) end)
@@ -3515,7 +3548,7 @@ function InspectObserver.prototype.next(self, value)
     end
     self.subscriber:next(value)
 end
-function InspectObserver.prototype.error(self, ____error)
+function InspectOperator.prototype.error(self, ____error)
     self:finish(function()
         local ____this_6
         ____this_6 = self.inspector
@@ -3526,7 +3559,7 @@ function InspectObserver.prototype.error(self, ____error)
         self.subscriber:error(____error)
     end)
 end
-function InspectObserver.prototype.complete(self)
+function InspectOperator.prototype.complete(self)
     self:finish(function()
         local ____this_8
         ____this_8 = self.inspector
@@ -3537,7 +3570,7 @@ function InspectObserver.prototype.complete(self)
         self.subscriber:complete()
     end)
 end
-function InspectObserver.prototype.finish(self, finishing)
+function InspectOperator.prototype.finish(self, finishing)
     self.subscriber.signal:removeEventListener("abort", self.abortListener)
     do
         local function ____catch(____error)
@@ -3551,7 +3584,7 @@ function InspectObserver.prototype.finish(self, finishing)
         end
     end
 end
-function InspectObserver.prototype.callAbort(self)
+function InspectOperator.prototype.callAbort(self)
     do
         local function ____catch(____error)
             reportError(____error)
@@ -3571,7 +3604,7 @@ function InspectObserver.prototype.callAbort(self)
 end
 return ____exports
  end,
-["toolkit.events.src.observable.switch-map-observer"] = function(...) 
+["toolkit.events.src.observable.switch-map-operator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
@@ -3580,13 +3613,13 @@ local ____abort_2Dcontroller = require("toolkit.events.src.abort-controller.inde
 local AbortController = ____abort_2Dcontroller.AbortController
 local ____abort_2Dsignal = require("toolkit.events.src.abort-signal.index")
 local AbortSignal = ____abort_2Dsignal.AbortSignal
---- Наблюдатель исходного Observable в одной подписке на результат switchMap. На каждое значение
+--- Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap. На каждое значение
 -- отписывается от предыдущего внутреннего Observable и подписывается на новый, полученный из
 -- mapper. Результат завершается, когда завершились и исходный Observable, и последний внутренний.
-____exports.SwitchMapObserver = __TS__Class()
-local SwitchMapObserver = ____exports.SwitchMapObserver
-SwitchMapObserver.name = "SwitchMapObserver"
-function SwitchMapObserver.prototype.____constructor(self, options)
+____exports.SwitchMapOperator = __TS__Class()
+local SwitchMapOperator = ____exports.SwitchMapOperator
+SwitchMapOperator.name = "SwitchMapOperator"
+function SwitchMapOperator.prototype.____constructor(self, options)
     self.subscriber = options.subscriber
     self.mapper = options.mapper
     self.toObservable = options.toObservable
@@ -3594,7 +3627,10 @@ function SwitchMapObserver.prototype.____constructor(self, options)
     self.sourceCompleted = false
     self.innerController = nil
 end
-function SwitchMapObserver.prototype.next(self, value)
+function SwitchMapOperator.prototype.observe(self, source)
+    source:subscribe(self, {signal = self.subscriber.signal})
+end
+function SwitchMapOperator.prototype.next(self, value)
     local ____opt_0 = self.innerController
     if ____opt_0 ~= nil then
         ____opt_0:abort()
@@ -3620,16 +3656,16 @@ function SwitchMapObserver.prototype.next(self, value)
     self.index = self.index + 1
     self:subscribeToInner(inner, controller.signal)
 end
-function SwitchMapObserver.prototype.error(self, ____error)
+function SwitchMapOperator.prototype.error(self, ____error)
     self.subscriber:error(____error)
 end
-function SwitchMapObserver.prototype.complete(self)
+function SwitchMapOperator.prototype.complete(self)
     self.sourceCompleted = true
     if not self.innerController then
         self.subscriber:complete()
     end
 end
-function SwitchMapObserver.prototype.subscribeToInner(self, inner, innerSignal)
+function SwitchMapOperator.prototype.subscribeToInner(self, inner, innerSignal)
     inner:subscribe(
         {
             next = function(____, value) return self.subscriber:next(value) end,
@@ -3639,7 +3675,7 @@ function SwitchMapObserver.prototype.subscribeToInner(self, inner, innerSignal)
         {signal = AbortSignal:any({self.subscriber.signal, innerSignal})}
     )
 end
-function SwitchMapObserver.prototype.completeInner(self)
+function SwitchMapOperator.prototype.completeInner(self)
     if self.sourceCompleted then
         self.subscriber:complete()
     else
@@ -3653,6 +3689,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__InstanceOf = ____lualib.__TS__InstanceOf
 local __TS__ArrayIsArray = ____lualib.__TS__ArrayIsArray
+local __TS__New = ____lualib.__TS__New
 local __TS__Promise = ____lualib.__TS__Promise
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
@@ -3660,46 +3697,18 @@ local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local fromArray, fromPromise
 local ____multicast_2Dobserver = require("toolkit.events.src.multicast-observer.index")
 local MulticastObserver = ____multicast_2Dobserver.MulticastObserver
 local ____subscriber = require("toolkit.events.src.subscriber.index")
 local Subscriber = ____subscriber.Subscriber
-local ____inspect_2Dobserver = require("toolkit.events.src.observable.inspect-observer")
-local InspectObserver = ____inspect_2Dobserver.InspectObserver
-local ____switch_2Dmap_2Dobserver = require("toolkit.events.src.observable.switch-map-observer")
-local SwitchMapObserver = ____switch_2Dmap_2Dobserver.SwitchMapObserver
-function fromArray(values)
-    return __TS__New(
-        ____exports.Observable,
-        function(subscriber)
-            for ____, value in ipairs(values) do
-                if not subscriber.active then
-                    return
-                end
-                subscriber:next(value)
-            end
-            subscriber:complete()
-        end
-    )
-end
-function fromPromise(promise)
-    return __TS__New(
-        ____exports.Observable,
-        function(subscriber)
-            promise["then"](
-                promise,
-                function(____, value)
-                    subscriber:next(value)
-                    subscriber:complete()
-                end,
-                function(____, reason) return subscriber:error(reason) end
-            )
-        end
-    )
-end
+local ____from_2Dexecutors = require("toolkit.events.src.observable.from-executors")
+local createArrayExecutor = ____from_2Dexecutors.createArrayExecutor
+local createPromiseExecutor = ____from_2Dexecutors.createPromiseExecutor
+local ____inspect_2Doperator = require("toolkit.events.src.observable.inspect-operator")
+local InspectOperator = ____inspect_2Doperator.InspectOperator
+local ____switch_2Dmap_2Doperator = require("toolkit.events.src.observable.switch-map-operator")
+local SwitchMapOperator = ____switch_2Dmap_2Doperator.SwitchMapOperator
 ____exports.Observable = __TS__Class()
 local Observable = ____exports.Observable
 Observable.name = "Observable"
@@ -3713,10 +3722,16 @@ function Observable.from(self, value)
         return value
     end
     if __TS__ArrayIsArray(value) then
-        return fromArray(value)
+        return __TS__New(
+            ____exports.Observable,
+            createArrayExecutor(value)
+        )
     end
     if __TS__InstanceOf(value, __TS__Promise) then
-        return fromPromise(value)
+        return __TS__New(
+            ____exports.Observable,
+            createPromiseExecutor(value)
+        )
     end
     error(
         __TS__New(TypeError, "Observable.from поддерживает только Observable, массивы и промисы"),
@@ -3754,15 +3769,15 @@ function Observable.prototype.switchMap(self, mapper)
     return __TS__New(
         ____exports.Observable,
         function(subscriber)
-            local observer = __TS__New(
-                SwitchMapObserver,
+            local operator = __TS__New(
+                SwitchMapOperator,
                 {
                     subscriber = subscriber,
                     mapper = mapper,
                     toObservable = function(____, input) return ____exports.Observable:from(input) end
                 }
             )
-            self:subscribe(observer, {signal = subscriber.signal})
+            operator:observe(self)
         end
     )
 end
@@ -3773,8 +3788,8 @@ function Observable.prototype.inspect(self, inspector)
     return __TS__New(
         ____exports.Observable,
         function(subscriber)
-            local observer = __TS__New(InspectObserver, {subscriber = subscriber, inspector = inspector})
-            observer:observe(self)
+            local operator = __TS__New(InspectOperator, {subscriber = subscriber, inspector = inspector})
+            operator:observe(self)
         end
     )
 end

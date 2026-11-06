@@ -3613,16 +3613,16 @@ local ____abort_2Dcontroller = require("toolkit.events.src.abort-controller.inde
 local AbortController = ____abort_2Dcontroller.AbortController
 local ____abort_2Dsignal = require("toolkit.events.src.abort-signal.index")
 local AbortSignal = ____abort_2Dsignal.AbortSignal
---- Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap. На каждое значение
--- отписывается от предыдущего внутреннего Observable и подписывается на новый, полученный из
--- mapper. Результат завершается, когда завершились и исходный Observable, и последний внутренний.
+--- Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap.
+-- На каждое значение отписывается от предыдущего внутреннего Observable и подписывается на новый,
+-- полученный из mapper. Результат завершается, когда завершились и исходный Observable, и
+-- последний внутренний.
 ____exports.SwitchMapOperator = __TS__Class()
 local SwitchMapOperator = ____exports.SwitchMapOperator
 SwitchMapOperator.name = "SwitchMapOperator"
 function SwitchMapOperator.prototype.____constructor(self, options)
     self.subscriber = options.subscriber
     self.mapper = options.mapper
-    self.toObservable = options.toObservable
     self.index = 0
     self.sourceCompleted = false
     self.innerController = nil
@@ -3644,7 +3644,7 @@ function SwitchMapOperator.prototype.next(self, value)
             return true
         end
         local ____try, ____hasReturned, ____returnValue = pcall(function()
-            inner = self:toObservable(self.mapper(value, self.index))
+            inner = self.mapper(value, self.index)
         end)
         if not ____try then
             ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -3773,8 +3773,7 @@ function Observable.prototype.switchMap(self, mapper)
                 SwitchMapOperator,
                 {
                     subscriber = subscriber,
-                    mapper = mapper,
-                    toObservable = function(____, input) return ____exports.Observable:from(input) end
+                    mapper = function(value, index) return ____exports.Observable:from(mapper(value, index)) end
                 }
             )
             operator:observe(self)

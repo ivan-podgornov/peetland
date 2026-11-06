@@ -1,0 +1,1 @@
+{"id":"6fe723637a487943d108e7dab4c2940d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-timer/interval.spec.ts#ManualTimer #interval Если period равен нулю, выбрасывает RangeError","name":"Если period равен нулю, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"2a5bdb4bf35dfb87818610b1445325e0"}}

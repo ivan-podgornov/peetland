@@ -1,0 +1,1 @@
+{"id":"01e5ef74164a9d717dd14fd10027f4a6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-within-radius-3d.spec.ts#Geometry #isWithinRadius3d Если точка ровно на границе радиуса, возвращает true","name":"Если точка ровно на границе радиуса, возвращает true","status":"passed","testResultsByEnv":{"default":"c8e2b333cee3b17073a8a1d4af5c69a9"}}

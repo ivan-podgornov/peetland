@@ -1,0 +1,1 @@
+{"id":"859ec667db942fac3139c6933e7c1192.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/optimism/expect-attempts.spec.ts#Optimism #expectAttempts Если шанс NaN, выбрасывает RangeError","name":"Если шанс NaN, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"312eaed8a444059eae94db7167e54c39"}}

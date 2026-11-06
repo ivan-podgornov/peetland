@@ -1,0 +1,1 @@
+{"id":"b028ac0e88a2f0a63156612432ad63fc.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/update.spec.ts#CommandTask #update Если задачу не начинали, возвращает 'failed'","name":"Если задачу не начинали, возвращает 'failed'","status":"passed","testResultsByEnv":{"default":"127f5bf65599e505583bdeac457e3fe9"}}

@@ -150,13 +150,6 @@ const config: Config = {
           position: 'left',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'product',
-          docsPluginId: 'core',
-          label: 'Продукт',
-          position: 'left',
-        },
-        {
           type: 'dropdown',
           label: 'Пакеты',
           position: 'left',

@@ -13,7 +13,7 @@
     "check:types": "tsc --noEmit",
     "check:code": "eslint",
     "check:code:all": "npm run check:code \".\"",
-    "fix:code": "npm run check:code --fix",
+    "fix:code": "eslint --fix",
     "fix:code:all": "npm run fix:code \".\"",
     "check:formatting": "prettier --check",
     "check:formatting:all": "npm run check:formatting \"**/*.{ts,js,md,yml,json}\"",

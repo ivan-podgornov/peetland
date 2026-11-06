@@ -29,12 +29,26 @@ jobs:
   test:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: tests
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/tests/
     steps:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        run: npm test
+        run: npm run test:report
+      - name: Publish test report
+        # Отчёт публикуется и при упавших тестах: на ревью он нужен, чтобы увидеть, что сломалось
+        if: ${{ !cancelled() }}
+        uses: ./.github/workflows/publish-pages
+        with:
+          branch: ${{ github.head_ref }}
+          folder: tests
+          source: .vitest
+          token: ${{ github.token }}
 
   mod:
     needs: [lint, test]

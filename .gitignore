@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 /docs/build/
 /docs/.docusaurus/
+/.vitest/

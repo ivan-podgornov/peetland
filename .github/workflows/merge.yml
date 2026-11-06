@@ -1,6 +1,7 @@
 name: Merge
 
-# Публикует сборку мода и документацию main после мержа. Проверки уже прошли в пулл реквесте
+# Публикует сборку мода, документацию и отчёт о тестах main после мержа. Проверки уже прошли в пулл
+# реквесте, а тесты запускаются только ради отчёта
 on:
   push:
     branches:
@@ -44,4 +45,27 @@ jobs:
         uses: ./.github/workflows/deploy-docs
         with:
           branch: main
+          token: ${{ github.token }}
+
+  tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: tests
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/tests/
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Test
+        run: npm run test:report
+      - name: Publish test report
+        # Отчёт публикуется и при упавших тестах, чтобы было видно, что сломалось
+        if: ${{ !cancelled() }}
+        uses: ./.github/workflows/publish-pages
+        with:
+          branch: main
+          folder: tests
+          source: .vitest
           token: ${{ github.token }}

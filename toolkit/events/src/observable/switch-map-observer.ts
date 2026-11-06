@@ -3,15 +3,14 @@ import type { IAbortSignal } from '../abort-signal';
 import { AbortSignal } from '../abort-signal';
 import type { IObserverObject, ISubscriber } from '../subscriber';
 
-import type { Observable } from './observable';
-import type { Mapper, ObservableInput } from './types';
+import type { ISubscribable, Mapper } from './types';
 
-export type SwitchMapObserverOptions<T, R> = {
+export type SwitchMapObserverOptions<T, R, I> = {
   /** Подписчик результата switchMap, которому передаются значения внутренних Observable */
   subscriber: ISubscriber<R>;
-  mapper: Mapper<T, ObservableInput<R>>;
+  mapper: Mapper<T, I>;
   /** Превращает результат mapper в Observable */
-  toObservable: (input: ObservableInput<R>) => Observable<R>;
+  toObservable: (input: I) => ISubscribable<R>;
 };
 
 /**
@@ -19,15 +18,15 @@ export type SwitchMapObserverOptions<T, R> = {
  * отписывается от предыдущего внутреннего Observable и подписывается на новый, полученный из
  * mapper. Результат завершается, когда завершились и исходный Observable, и последний внутренний.
  */
-export class SwitchMapObserver<T, R> implements IObserverObject<T> {
+export class SwitchMapObserver<T, R, I> implements IObserverObject<T> {
   private readonly subscriber: ISubscriber<R>;
-  private readonly mapper: Mapper<T, ObservableInput<R>>;
-  private readonly toObservable: (input: ObservableInput<R>) => Observable<R>;
+  private readonly mapper: Mapper<T, I>;
+  private readonly toObservable: (input: I) => ISubscribable<R>;
   private index: number;
   private sourceCompleted: boolean;
   private innerController: AbortController | null;
 
-  constructor(options: SwitchMapObserverOptions<T, R>) {
+  constructor(options: SwitchMapObserverOptions<T, R, I>) {
     this.subscriber = options.subscriber;
     this.mapper = options.mapper;
     this.toObservable = options.toObservable;
@@ -42,7 +41,7 @@ export class SwitchMapObserver<T, R> implements IObserverObject<T> {
     const controller = new AbortController();
     this.innerController = controller;
 
-    let inner: Observable<R>;
+    let inner: ISubscribable<R>;
     try {
       inner = this.toObservable(this.mapper(value, this.index));
     } catch (error) {
@@ -66,7 +65,7 @@ export class SwitchMapObserver<T, R> implements IObserverObject<T> {
     }
   }
 
-  private subscribeToInner(inner: Observable<R>, innerSignal: IAbortSignal): void {
+  private subscribeToInner(inner: ISubscribable<R>, innerSignal: IAbortSignal): void {
     inner.subscribe(
       {
         next: (value) => this.subscriber.next(value),

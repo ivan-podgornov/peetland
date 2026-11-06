@@ -1,8 +1,7 @@
 import type { AbortListener } from '../abort-signal';
 import type { IObserverObject, ISubscriber } from '../subscriber';
 
-import type { Observable } from './observable';
-import type { Inspector, InspectorObject } from './types';
+import type { Inspector, InspectorObject, ISubscribable } from './types';
 
 export type InspectObserverOptions<T> = {
   /** Подписчик результата inspect, которому передаются события исходного Observable */
@@ -31,7 +30,7 @@ export class InspectObserver<T> implements IObserverObject<T> {
   }
 
   /** Вызывает inspector.subscribe и, если он не выбросил исключение, подписывается на source */
-  observe(source: Observable<T>): void {
+  observe(source: ISubscribable<T>): void {
     try {
       this.inspector.subscribe?.();
     } catch (error) {

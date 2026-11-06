@@ -21,6 +21,7 @@
   },
   "exclude": ["node_modules", "dist"],
   "include": [
+    ".dependency-cruiser.js",
     "eslint.config.js",
     "vitest.config.ts",
     "vitest.setup.ts",

@@ -2,12 +2,14 @@ import { MulticastObserver } from '../multicast-observer';
 import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
-import { ObservableFactory } from './factory';
 import { InspectObserver } from './inspect-observer';
 import { SwitchMapObserver } from './switch-map-observer';
-import type { Executor, Inspector, Mapper, ObservableInput, SubscribeOptions } from './types';
+import type { Executor, Inspector, ISubscribable, Mapper, SubscribeOptions } from './types';
 
-export class Observable<T> extends ObservableFactory {
+/** Значения, которые Observable.from умеет превращать в Observable */
+export type ObservableInput<T> = Observable<T> | ReadonlyArray<T> | Promise<T>;
+
+export class Observable<T> implements ISubscribable<T> {
   private readonly executor: Executor<T>;
   private multicast: MulticastObserver<T> | null;
   private subscriber: ISubscriber<T> | null;
@@ -17,10 +19,31 @@ export class Observable<T> extends ObservableFactory {
    * Функция принимает подписчика и может сгенерировать новые значения в этом подписчике.
    */
   constructor(executor: Executor<T>) {
-    super();
     this.executor = executor;
     this.multicast = null;
     this.subscriber = null;
+  }
+
+  /**
+   * Превращает значение в Observable. Если передан Observable, возвращает его же. Массив выдаёт
+   * свои элементы синхронно при подписке и завершается. Промис выдаёт значение, с которым
+   * выполнился, и завершается, а если отклонён, завершается с ошибкой.
+   * Для остальных значений выбрасывает TypeError.
+   */
+  static from<T>(value: ObservableInput<T>): Observable<T> {
+    if (value instanceof Observable) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      return fromArray<T>(value);
+    }
+
+    if (value instanceof Promise) {
+      return fromPromise(value);
+    }
+
+    throw new TypeError('Observable.from поддерживает только Observable, массивы и промисы');
   }
 
   /**
@@ -107,4 +130,31 @@ export class Observable<T> extends ObservableFactory {
 
     return this.subscriber;
   }
+}
+
+function fromArray<T>(values: ReadonlyArray<T>): Observable<T> {
+  return new Observable<T>((subscriber) => {
+    // Массив читается при каждой подписке, а не при вызове from, как того требует спецификация
+    for (const value of values) {
+      if (!subscriber.active) {
+        return;
+      }
+
+      subscriber.next(value);
+    }
+
+    subscriber.complete();
+  });
+}
+
+function fromPromise<T>(promise: Promise<T>): Observable<T> {
+  return new Observable<T>((subscriber) => {
+    promise.then(
+      (value) => {
+        subscriber.next(value);
+        subscriber.complete();
+      },
+      (reason: unknown) => subscriber.error(reason)
+    );
+  });
 }

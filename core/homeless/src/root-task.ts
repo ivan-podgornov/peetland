@@ -2,7 +2,7 @@ import type { CompoundTask, Method } from '@peetland/htn';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
 
-import type { IHomelessTaskFactory } from './factory';
+import type { IHomelessTaskFactory } from './types';
 
 export type HomelessRootTaskDeps = {
   homelessTaskFactory: IHomelessTaskFactory;

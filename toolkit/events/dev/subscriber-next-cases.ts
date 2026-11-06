@@ -1,6 +1,7 @@
 import type { IObserver, IObserverFunction } from '../src/subscriber';
 
-import { createMockedObserver, createDeactivator } from '.';
+import { createMockedObserver } from './observer';
+import { createDeactivator } from './subscriber';
 
 export function getCasesAfterDeactivation() {
   return [

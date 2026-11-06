@@ -29,12 +29,23 @@ jobs:
   test:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    environment:
+      name: tests
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/tests/
     steps:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        run: npm test
+        uses: ./.github/workflows/deploy-tests
+        with:
+          branch: ${{ github.head_ref }}
+          # История main показывает, какие тесты в пулл реквесте новые и какие нестабильны в main.
+          # Прогон пулл реквеста в историю main не попадает
+          history-branch: main
+          token: ${{ github.token }}
 
   mod:
     needs: [lint, test]

@@ -30,7 +30,14 @@ const restrictedSyntax = [
 
 export default defineConfig([
   {
-    ignores: ['**/node_modules/', '**/dist/', 'docs/build/', 'docs/.docusaurus/'],
+    ignores: [
+      '**/node_modules/',
+      '**/dist/',
+      '.allure/',
+      'allure-results/',
+      'docs/build/',
+      'docs/.docusaurus/',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

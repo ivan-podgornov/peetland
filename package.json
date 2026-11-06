@@ -22,13 +22,17 @@
     "prepare": "husky",
     "pre-commit": "lint-staged",
     "postinstall": "husky",
-    "test": "vitest"
+    "test": "vitest",
+    "test:report": "vitest run --reporter=default --reporter=allure-vitest/reporter",
+    "test:report:generate": "allure generate allure-results"
   },
   "devDependencies": {
     "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
     "@eslint/js": "^10.0.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@vitest/eslint-plugin": "^1.6.27",
+    "allure": "^3.33.0",
+    "allure-vitest": "^3.14.0",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",

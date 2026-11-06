@@ -1,0 +1,58 @@
+name: Deploy tests
+description: Run tests and publish the Allure report to <branch>/tests in the gh-pages branch
+inputs:
+  branch:
+    description: Branch whose test report is published, for example main or feat/npc
+    required: true
+  history-branch:
+    description: Branch whose report history is shown in this report, for example main. Empty for no history
+    required: false
+    default: ''
+  publish-history:
+    description: Whether to publish the history with this run appended, 'true' or 'false'
+    required: false
+    default: 'false'
+  token:
+    description: Token with contents write permission
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Download history
+      if: ${{ inputs.history-branch != '' }}
+      shell: bash
+      env:
+        BRANCH: ${{ inputs.history-branch }}
+      run: |
+        # История прошлых прогонов лежит рядом с прошлым отчётом. Берём её из ветки gh-pages, а не
+        # с GitHub Pages: там она может быть закэширована. Если отчёта ещё нет, история начинается
+        # с этого прогона
+        mkdir -p .allure
+        if git fetch --depth 1 origin gh-pages &&
+          git show "FETCH_HEAD:$BRANCH/tests/history.jsonl" > .allure/history.jsonl; then
+          echo "История: $(wc -l < .allure/history.jsonl) прогонов"
+        else
+          rm -f .allure/history.jsonl
+          echo "Истории ещё нет"
+        fi
+    - name: Test
+      shell: bash
+      run: npm run test:report
+    # Дальше шаги идут и при упавших тестах: отчёт нужен, чтобы увидеть, что сломалось. Джоба при
+    # этом всё равно остаётся красной
+    - name: Generate report
+      if: ${{ !cancelled() }}
+      shell: bash
+      run: npm run test:report:generate
+    - name: Keep history
+      if: ${{ !cancelled() && inputs.publish-history == 'true' }}
+      shell: bash
+      run: cp .allure/history.jsonl .allure/report/history.jsonl
+    - name: Publish report
+      if: ${{ !cancelled() }}
+      uses: ./.github/workflows/publish-pages
+      with:
+        branch: ${{ inputs.branch }}
+        folder: tests
+        source: .allure/report
+        token: ${{ inputs.token }}

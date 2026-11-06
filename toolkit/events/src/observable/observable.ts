@@ -2,8 +2,9 @@ import { MulticastObserver } from '../multicast-observer';
 import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
-import { InspectObserver } from './inspect-observer';
-import { SwitchMapObserver } from './switch-map-observer';
+import { createArrayExecutor, createPromiseExecutor } from './from-executors';
+import { InspectOperator } from './inspect-operator';
+import { SwitchMapOperator } from './switch-map-operator';
 import type { Executor, Inspector, ISubscribable, Mapper, SubscribeOptions } from './types';
 
 /** Значения, которые Observable.from умеет превращать в Observable */
@@ -36,11 +37,11 @@ export class Observable<T> implements ISubscribable<T> {
     }
 
     if (Array.isArray(value)) {
-      return fromArray<T>(value);
+      return new Observable(createArrayExecutor<T>(value));
     }
 
     if (value instanceof Promise) {
-      return fromPromise(value);
+      return new Observable(createPromiseExecutor(value));
     }
 
     throw new TypeError('Observable.from поддерживает только Observable, массивы и промисы');
@@ -74,14 +75,14 @@ export class Observable<T> implements ISubscribable<T> {
    */
   switchMap<R>(mapper: Mapper<T, ObservableInput<R>>): Observable<R> {
     return new Observable<R>((subscriber) => {
-      // Наблюдатель создаётся на каждую подписку, потому что хранит её состояние
-      const observer = new SwitchMapObserver({
+      // Оператор создаётся на каждую подписку, потому что хранит её состояние
+      const operator = new SwitchMapOperator({
         subscriber,
         mapper,
         toObservable: (input) => Observable.from(input),
       });
 
-      this.subscribe(observer, { signal: subscriber.signal });
+      operator.observe(this);
     });
   }
 
@@ -92,12 +93,12 @@ export class Observable<T> implements ISubscribable<T> {
    */
   inspect(inspector: Inspector<T> = {}): Observable<T> {
     return new Observable<T>((subscriber) => {
-      const observer = new InspectObserver({
+      const operator = new InspectOperator({
         subscriber,
         inspector,
       });
 
-      observer.observe(this);
+      operator.observe(this);
     });
   }
 
@@ -130,31 +131,4 @@ export class Observable<T> implements ISubscribable<T> {
 
     return this.subscriber;
   }
-}
-
-function fromArray<T>(values: ReadonlyArray<T>): Observable<T> {
-  return new Observable<T>((subscriber) => {
-    // Массив читается при каждой подписке, а не при вызове from, как того требует спецификация
-    for (const value of values) {
-      if (!subscriber.active) {
-        return;
-      }
-
-      subscriber.next(value);
-    }
-
-    subscriber.complete();
-  });
-}
-
-function fromPromise<T>(promise: Promise<T>): Observable<T> {
-  return new Observable<T>((subscriber) => {
-    promise.then(
-      (value) => {
-        subscriber.next(value);
-        subscriber.complete();
-      },
-      (reason: unknown) => subscriber.error(reason)
-    );
-  });
 }

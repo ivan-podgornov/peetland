@@ -1,11 +1,27 @@
 import type { IAbortSignal } from '../abort-signal';
-import type { IObserver, ISubscriber } from '../subscriber';
+import type { IObserver, IObserverObject, ISubscriber } from '../subscriber';
 
 export type Executor<T> = (subscriber: ISubscriber<T>) => void;
 
-/** То, на что можно подписаться. Наблюдатели Observable знают о нём только через этот интерфейс */
+/**
+ * То, на что можно подписаться. Операторы знают об Observable только через этот интерфейс: Observable
+ * сам создаёт операторы, и если бы они импортировали его, появилась бы циклическая зависимость. В
+ * спецификации Observable своего названия для этого нет, а называется он так же, как похожий
+ * интерфейс в RxJS. IObservable не подошло бы: так назывался бы интерфейс со всеми методами
+ * Observable, а здесь только subscribe
+ */
 export interface ISubscribable<T> {
   subscribe(observer?: IObserver<T>, options?: SubscribeOptions): void;
+}
+
+/**
+ * Оператор Observable, например inspect или switchMap. Создаётся на каждую подписку на результат
+ * оператора, потому что хранит её состояние: подписывается на исходный Observable и передаёт его
+ * события, изменённые по-своему, подписчику результата
+ */
+export interface IOperator<T> extends IObserverObject<T> {
+  /** Подписывает оператор на исходный Observable */
+  observe(source: ISubscribable<T>): void;
 }
 
 /** Функция, которая превращает значение Observable и его порядковый номер в новое значение */

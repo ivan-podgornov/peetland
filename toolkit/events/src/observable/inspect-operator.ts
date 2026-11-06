@@ -1,25 +1,25 @@
 import type { AbortListener } from '../abort-signal';
-import type { IObserverObject, ISubscriber } from '../subscriber';
+import type { ISubscriber } from '../subscriber';
 
-import type { Inspector, InspectorObject, ISubscribable } from './types';
+import type { Inspector, InspectorObject, IOperator, ISubscribable } from './types';
 
-export type InspectObserverOptions<T> = {
+export type InspectOperatorOptions<T> = {
   /** Подписчик результата inspect, которому передаются события исходного Observable */
   subscriber: ISubscriber<T>;
   inspector: Inspector<T>;
 };
 
 /**
- * Наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
+ * Оператор inspect: наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
  * инспектора и передаёт события подписчику без изменений. Исключение в колбэке инспектора
  * завершает поток с этим исключением.
  */
-export class InspectObserver<T> implements IObserverObject<T> {
+export class InspectOperator<T> implements IOperator<T> {
   private readonly subscriber: ISubscriber<T>;
   private readonly inspector: InspectorObject<T>;
   private readonly abortListener: AbortListener;
 
-  constructor(options: InspectObserverOptions<T>) {
+  constructor(options: InspectOperatorOptions<T>) {
     this.subscriber = options.subscriber;
     const { inspector } = options;
     // Функцию оборачиваем, а не кладём как есть: в Lua next вызывается как метод, и функция без

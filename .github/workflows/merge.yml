@@ -62,6 +62,8 @@ jobs:
         uses: ./.github/workflows/deploy-tests
         with:
           branch: main
-          # История прогонов main: из неё отчёт строит тренды и находит нестабильные тесты
-          history: 'true'
+          # История прогонов main: из неё отчёт строит тренды и находит нестабильные тесты. Отчёт main
+          # дописывает в неё свой прогон и публикует
+          history-branch: main
+          publish-history: 'true'
           token: ${{ github.token }}

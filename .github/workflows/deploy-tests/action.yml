@@ -4,8 +4,12 @@ inputs:
   branch:
     description: Branch whose test report is published, for example main or feat/npc
     required: true
-  history:
-    description: Whether to keep the history of runs between reports, 'true' or 'false'
+  history-branch:
+    description: Branch whose report history is shown in this report, for example main. Empty for no history
+    required: false
+    default: ''
+  publish-history:
+    description: Whether to publish the history with this run appended, 'true' or 'false'
     required: false
     default: 'false'
   token:
@@ -15,10 +19,10 @@ runs:
   using: composite
   steps:
     - name: Download history
-      if: ${{ inputs.history == 'true' }}
+      if: ${{ inputs.history-branch != '' }}
       shell: bash
       env:
-        BRANCH: ${{ inputs.branch }}
+        BRANCH: ${{ inputs.history-branch }}
       run: |
         # История прошлых прогонов лежит рядом с прошлым отчётом. Берём её из ветки gh-pages, а не
         # с GitHub Pages: там она может быть закэширована. Если отчёта ещё нет, история начинается
@@ -41,7 +45,7 @@ runs:
       shell: bash
       run: npm run test:report:generate
     - name: Keep history
-      if: ${{ !cancelled() && inputs.history == 'true' }}
+      if: ${{ !cancelled() && inputs.publish-history == 'true' }}
       shell: bash
       run: cp .allure/history.jsonl .allure/report/history.jsonl
     - name: Publish report

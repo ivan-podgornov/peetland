@@ -42,6 +42,9 @@ jobs:
         uses: ./.github/workflows/deploy-tests
         with:
           branch: ${{ github.head_ref }}
+          # История main показывает, какие тесты в пулл реквесте новые и какие нестабильны в main.
+          # Прогон пулл реквеста в историю main не попадает
+          history-branch: main
           token: ${{ github.token }}
 
   mod:

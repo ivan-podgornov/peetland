@@ -1,1 +1,0 @@
-{"id":"8953afe10a7d3bb79c1ab49d0222f8a6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/constructor.spec.ts#Psyche #constructor Если чувство не число, выбрасывает RangeError","name":"Если чувство не число, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"08f4dc83dd5a6d96bc964b7fc7721614"}}

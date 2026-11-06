@@ -1,1 +1,0 @@
-{"id":"f83fd70fe9678e902c05421d4048ab5a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/random/__tests__/chance.spec.ts#Random #chance Если probability равно -0.1, выбрасывает RangeError","name":"Если probability равно -0.1, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"c0fefb6e857eea7ffacb1c82a558b167"}}

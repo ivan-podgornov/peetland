@@ -1,1 +1,0 @@
-{"id":"f6e3cce6d507c4dbc880fbed85c1f5f2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили до подписки При подписке не вызывает onFinish","name":"При подписке не вызывает onFinish","status":"passed","testResultsByEnv":{"default":"6d007efc17fc7ac6548181c7d8897295"}}

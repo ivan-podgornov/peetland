@@ -1,0 +1,30 @@
+name: Upload pages
+description: Upload a build as an artifact for publish-pages, which publishes it to <branch>/<folder> in the gh-pages branch
+inputs:
+  folder:
+    description: Folder inside the branch folder, for example docs or mod
+    required: true
+  source:
+    description: Folder with the files to publish, relative to the repository root
+    required: true
+runs:
+  using: composite
+  steps:
+    # Сборка кладётся в подпапку, чтобы publish-pages собрал артефакты всех сборок в одну папку
+    # ветки, не переименовывая их
+    - name: Stage
+      shell: bash
+      env:
+        STAGE: ${{ runner.temp }}/pages-${{ inputs.folder }}
+        FOLDER: ${{ inputs.folder }}
+        SOURCE: ${{ inputs.source }}
+      run: |
+        mkdir -p "$STAGE"
+        cp -R "$SOURCE" "$STAGE/$FOLDER"
+    - name: Upload
+      uses: actions/upload-artifact@v7
+      with:
+        name: pages-${{ inputs.folder }}
+        path: ${{ runner.temp }}/pages-${{ inputs.folder }}
+        if-no-files-found: error
+        retention-days: 1

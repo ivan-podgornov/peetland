@@ -29,8 +29,6 @@ jobs:
   test:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: tests
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/tests/
@@ -39,19 +37,15 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        uses: ./.github/workflows/deploy-tests
+        uses: ./.github/workflows/build-tests
         with:
-          branch: ${{ github.head_ref }}
           # История main показывает, какие тесты в пулл реквесте новые и какие нестабильны в main.
           # Прогон пулл реквеста в историю main не попадает
           history-branch: main
-          token: ${{ github.token }}
 
   mod:
     needs: [lint, test]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: mod
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/mod/peetland.lua
@@ -59,17 +53,12 @@ jobs:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Deploy mod
-        uses: ./.github/workflows/deploy-mod
-        with:
-          branch: ${{ github.head_ref }}
-          token: ${{ github.token }}
+      - name: Build mod
+        uses: ./.github/workflows/build-mod
 
   docs:
     needs: [lint, test]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: docs
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.head_ref }}/docs/
@@ -77,8 +66,25 @@ jobs:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Deploy docs
-        uses: ./.github/workflows/deploy-docs
+      - name: Build docs
+        uses: ./.github/workflows/build-docs
+        with:
+          branch: ${{ github.head_ref }}
+
+  # Публикует одним пушем всё, что собрали test, mod и docs. Запускается, даже если они упали или
+  # пропущены: отчёт о тестах нужен и при упавших тестах
+  publish:
+    needs: [test, mod, docs]
+    if: ${{ !cancelled() && github.event.action != 'closed' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Publish pages
+        uses: ./.github/workflows/publish-pages
         with:
           branch: ${{ github.head_ref }}
           token: ${{ github.token }}

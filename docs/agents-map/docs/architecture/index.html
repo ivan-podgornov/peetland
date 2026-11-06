@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ru" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-architecture/index" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.2">
+<title data-rh="true">Архитектура | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/docs/agents-map/docs/architecture/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Архитектура | Peetland"><meta data-rh="true" name="description" content="Чистота архитектуры"><meta data-rh="true" property="og:description" content="Чистота архитектуры"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/docs/agents-map/docs/architecture/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/docs/agents-map/docs/architecture/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/docs/agents-map/docs/architecture/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Архитектура","item":"https://ivan-podgornov.github.io/peetland/docs/agents-map/docs/architecture/"}]}</script><link rel="stylesheet" href="/peetland/docs/agents-map/docs/assets/css/styles.3f58d634.css">
+<script src="/peetland/docs/agents-map/docs/assets/js/runtime~main.063a362c.js" defer="defer"></script>
+<script src="/peetland/docs/agents-map/docs/assets/js/main.25ba6d98.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Перейти к основному содержимому"><a class="skipToContent_oPtH" href="#__docusaurus_skipToContent_fallback">Перейти к основному содержимому</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Переключить навигационную панель" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/peetland/docs/agents-map/docs/"><b class="navbar__title text--truncate">Peetland</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/peetland/docs/agents-map/docs/">Проект</a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">Пакеты</a><ul class="dropdown__menu"><li><a class="dropdown__link" href="/peetland/docs/agents-map/docs/packages/toolkit/events/">toolkit</a></li><li><a class="dropdown__link" href="/peetland/docs/agents-map/docs/packages/core/actor-command/">core</a></li><li><a class="dropdown__link" href="/peetland/docs/agents-map/docs/packages/mod/moonloader/">mod</a></li></ul></div></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/ivan-podgornov/peetland" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPrP"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_ki11 colorModeToggle_Hewu"><button class="clean-btn toggleButton_MMFG toggleButtonDisabled_Uw7m" type="button" disabled="" title="system mode" aria-label="Переключение между темным и светлым режимом (сейчас используется system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_k9hJ lightToggleIcon_lgto"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_k9hJ darkToggleIcon_U96C"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_k9hJ systemToggleIcon_E5c0"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_bzqh"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_MB5r"><div class="docsWrapper__sE8"><button aria-label="Прокрутка к началу" class="clean-btn theme-back-to-top-button backToTopButton_iEvu" type="button"></button><div class="docRoot_DfVB"><aside class="theme-doc-sidebar-container docSidebarContainer_c7NB"><div class="sidebarViewport_KYo0"><div class="sidebar_CUen"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_jmj1"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/peetland/docs/agents-map/docs/"><span class="linkLabel_fEdy">Обзор</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/peetland/docs/agents-map/docs/glossary/"><span class="linkLabel_fEdy">Глоссарий</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/peetland/docs/agents-map/docs/architecture/"><span class="linkLabel_fEdy">Архитектура</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/peetland/docs/agents-map/docs/decisions/"><span class="linkLabel_fEdy">Решения</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/peetland/docs/agents-map/docs/npc/"><span class="linkLabel_fEdy">NPC</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="categoryLink_ROYx menu__link menu__link--sublist" href="/peetland/docs/agents-map/docs/process/"><span class="categoryLinkLabel_ufhF">Процесс</span></a><button aria-label="Expand sidebar category &#x27;Процесс&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></nav></div></div></aside><main class="docMainContainer_a9sJ"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_Qr34"><div class="docItemContainer_tjFy"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_T5ub" aria-label="Навигационная цепочка текущей страницы"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Главная страница" class="breadcrumbs__link" href="/peetland/docs/agents-map/docs/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_sfvy"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">Архитектура</span></li></ul></nav><div class="tocCollapsible_wXna theme-doc-toc-mobile tocMobile_Ojys"><button type="button" class="clean-btn tocCollapsibleButton_iI2p">Содержание этой страницы</button></div><div class="theme-doc-markdown markdown"><header><h1>Архитектура</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="чистота-архитектуры">Чистота архитектуры<a href="#чистота-архитектуры" class="hash-link" aria-label="Прямая ссылка на Чистота архитектуры" title="Прямая ссылка на Чистота архитектуры" translate="no">​</a></h2>
+<p>Архитектура чистая, если решение соблюдает все правила ниже. Чистота архитектуры стоит на первом
+месте среди приоритетов проекта (см. <a class="" href="/peetland/docs/agents-map/docs/#%D0%B7%D0%B0%D1%87%D0%B5%D0%BC-%D0%BF%D1%80%D0%BE%D0%B5%D0%BA%D1%82">Зачем проект</a>).</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="слоистость">Слоистость<a href="#слоистость" class="hash-link" aria-label="Прямая ссылка на Слоистость" title="Прямая ссылка на Слоистость" translate="no">​</a></h3>
+<p>Слоистость соблюдается: нижний слой не знает о верхних (см. <a href="#%D1%81%D0%BB%D0%BE%D0%B8" class="">Слои</a>).</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="независимые-сущности">Независимые сущности<a href="#независимые-сущности" class="hash-link" aria-label="Прямая ссылка на Независимые сущности" title="Прямая ссылка на Независимые сущности" translate="no">​</a></h3>
+<p>Сущности core не знают друг о друге. То, что сущности нужно от другой, передаётся ей снаружи через
+интерфейсы и события, а не берётся у той напрямую.</p>
+<p>Например, NPC не знает о мире: время суток он получает через <code>INpcWorldKnowledge</code>, которое ему
+передаёт мир.</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="инверсия-зависимостей">Инверсия зависимостей<a href="#инверсия-зависимостей" class="hash-link" aria-label="Прямая ссылка на Инверсия зависимостей" title="Прямая ссылка на Инверсия зависимостей" translate="no">​</a></h3>
+<p>Класс получает объекты с поведением в зависимостях, а если пакету нужно что-то от пакета выше, он
+сам объявляет интерфейс, а реализацию ему передают (см.
+<a href="#%D0%B2%D0%BD%D0%B5%D0%B4%D1%80%D0%B5%D0%BD%D0%B8%D0%B5-%D0%B7%D0%B0%D0%B2%D0%B8%D1%81%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D0%B5%D0%B9" class="">Внедрение зависимостей</a>).</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="пакет-собирает-себя-сам">Пакет собирает себя сам<a href="#пакет-собирает-себя-сам" class="hash-link" aria-label="Прямая ссылка на Пакет собирает себя сам" title="Прямая ссылка на Пакет собирает себя сам" translate="no">​</a></h3>
+<p>Пакет собирает себя в своей точке сборки и требует снаружи только то, что ему взять неоткуда, а
+наружу показывает только публичный API (см. <a href="#%D0%BF%D0%B0%D0%BA%D0%B5%D1%82-%D1%81%D0%BE%D0%B1%D0%B8%D1%80%D0%B0%D0%B5%D1%82-%D1%81%D0%B5%D0%B1%D1%8F-%D1%81%D0%B0%D0%BC" class="">Пакет собирает себя сам</a> и
+<a href="#%D1%82%D0%BE%D1%87%D0%BA%D0%B0-%D0%B2%D1%85%D0%BE%D0%B4%D0%B0-%D0%BF%D0%B0%D0%BA%D0%B5%D1%82%D0%B0" class="">Точка входа пакета</a>).</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="одна-ответственность">Одна ответственность<a href="#одна-ответственность" class="hash-link" aria-label="Прямая ссылка на Одна ответственность" title="Прямая ссылка на Одна ответственность" translate="no">​</a></h3>
+<p>Класс или пакет делает одну вещь и меняется по одной причине. Если для описания класса нужно
+«и», это повод его разделить.</p>
+<p>Например, актор только выполняет команды, а решает, что делать, NPC. Психика решает, как поступки
+меняют чувства, а задача только сообщает ей о поступке.</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="тестируемость">Тестируемость<a href="#тестируемость" class="hash-link" aria-label="Прямая ссылка на Тестируемость" title="Прямая ссылка на Тестируемость" translate="no">​</a></h3>
+<p>Всё поведение core и toolkit проверяется тестами без игры, а тесты — это спецификация: по ним
+видно, что и почему делает код. Если код трудно протестировать, это признак нарушения правил выше,
+а не повод обойтись без тестов.</p>
+<p>Например, задачи и NPC тестируются на виртуальном акторе, а время и шансы тесты задают сами.</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="обходы-платформы--только-в-mod">Обходы платформы — только в mod<a href="#обходы-платформы--только-в-mod" class="hash-link" aria-label="Прямая ссылка на Обходы платформы — только в mod" title="Прямая ссылка на Обходы платформы — только в mod" translate="no">​</a></h3>
+<p>Ограничения платформы, например MoonLoader и сборки в Lua, обходятся в слое mod и не протекают в
+core и toolkit. Если обход платформы требует менять core или toolkit, ищется другой обход (см.
+<a href="#%D1%80%D0%B0%D0%BD%D1%82%D0%B0%D0%B9%D0%BC-%D0%BC%D0%BE%D0%B4%D0%B0" class="">Рантайм мода</a>).</p>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="слои">Слои<a href="#слои" class="hash-link" aria-label="Прямая ссылка на Слои" title="Прямая ссылка на Слои" translate="no">​</a></h2>
+<p>Приложение разделено на три слоя:</p>
+<ul>
+<li class=""><strong>toolkit</strong> — утилиты, которые не зависят от бизнес-логики и могут использоваться в любой другой
+игре без изменений: планировщик HTN, события, геометрия, таймеры.</li>
+<li class=""><strong>core</strong> — бизнес-логика, актуальная конкретно для этого мира: мир, места, NPC, их психика,
+инвентарь и задачи. При этом сущности должны быть максимально независимыми друг от друга.
+Например, NPC не должен ничего знать о мире. Если ему нужно подписаться на тики, мир должен в
+конструкторе передать событие, на которое можно подписаться и которое будет вызываться каждый тик.
+Но не должно быть такого, что NPC подписывается на мир.</li>
+<li class=""><strong>mod</strong> — слой, который реализует сущности из core и заставляет их работать в игре. Мод собирает
+только то, что связано с игрой, и передаёт это миру вместе с данными: местами и NPC. Всё остальное
+мир собирает сам.</li>
+</ul>
+<p>Слой более нижнего уровня не должен знать о слоях выше.</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="пакеты-и-зависимости">Пакеты и зависимости<a href="#пакеты-и-зависимости" class="hash-link" aria-label="Прямая ссылка на Пакеты и зависимости" title="Прямая ссылка на Пакеты и зависимости" translate="no">​</a></h3>
+<p>Стрелка ведёт от пакета к пакету, от которого он зависит. Пакеты toolkit не зависят от других
+слоёв, а внутри toolkit от другого пакета зависят только таймеры: им нужны события.</p>
+<!-- -->
+<p>На схеме показаны не все связи: прямые зависимости, которые уже следуют из других стрелок, опущены.
+Например, <code>world</code> зависит и от <code>npc</code>, и от <code>psyche</code>, а <code>homeless</code> — от <code>npc</code> и <code>psyche</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="внедрение-зависимостей">Внедрение зависимостей<a href="#внедрение-зависимостей" class="hash-link" aria-label="Прямая ссылка на Внедрение зависимостей" title="Прямая ссылка на Внедрение зависимостей" translate="no">​</a></h2>
+<p>Класс не создаёт через <code>new</code> классы с поведением, а получает их фабрики в зависимостях. Так
+поведение созданных объектов не попадает в тесты класса, который их создаёт, а сами объекты можно
+заменить моками. Через <code>new</code> можно создавать только:</p>
+<ul>
+<li class="">примитивы toolkit, например, <code>AbortController</code> и <code>EventTarget</code>;</li>
+<li class="">объекты-данные, у которых нет поведения;</li>
+<li class="">зависимости по умолчанию в точке сборки (см. ниже).</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="пакет-собирает-себя-сам-1">Пакет собирает себя сам<a href="#пакет-собирает-себя-сам-1" class="hash-link" aria-label="Прямая ссылка на Пакет собирает себя сам" title="Прямая ссылка на Пакет собирает себя сам" translate="no">​</a></h3>
+<p>Каждый пакет core умеет собрать себя сам. Тому, кто им пользуется, не нужно знать, как пакет
+устроен внутри, а нужно передать только то, что пакет взять неоткуда. Так мод не знает, что NPC
+планируют через HTN, мир не знает, что у NPC есть инвентарь, а что бомж умеет клянчить, знает
+только пакет бомжа. Пакетов toolkit правило не касается: в них нет бизнес-логики, которую нужно
+собирать.</p>
+<p>Собирает пакет его точка сборки — класс, который создают снаружи. Обычно это фабрика, например
+фабрика NPC, фабрика психики или фабрика корневой задачи бомжа, а у всего приложения точка сборки —
+мир.</p>
+<ul>
+<li class="">Снаружи точка сборки требует только то, что не может создать сама:
+<ul>
+<li class="">то, что приходит из игры: акторов, геометрию, кадры;</li>
+<li class="">время и случайные числа, чтобы тесты ими управляли;</li>
+<li class="">реализации своих интерфейсов из пакетов выше. Например, фабрика NPC требует фабрику корневых
+задач, потому что задачи лежат в пакетах, которые зависят от npc.</li>
+</ul>
+</li>
+<li class="">Всё остальное точка сборки создаёт по умолчанию через <code>new</code>, а снаружи любую зависимость можно
+передать, и тогда она заменит значение по умолчанию.</li>
+<li class="">Значения по умолчанию собираются снизу вверх с учётом переданных зависимостей: если передана
+нижняя зависимость, верхние по умолчанию собираются с ней.</li>
+<li class="">Если зависимость должна быть общей для нескольких пакетов, её создаёт тот, кто собирает эти
+пакеты, и передаёт им одну и ту же. Например, мир передаёт одну фабрику психики и NPC, и задачам,
+чтобы задачи предсказывали реакцию такой же психики, как у NPC.</li>
+<li class="">Тесты точки сборки проверяют сборку так: передают зависимость моком и проверяют, что она дошла до
+того, кто ей пользуется, а без неё — что по умолчанию собралось то, что нужно.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="точка-входа-пакета">Точка входа пакета<a href="#точка-входа-пакета" class="hash-link" aria-label="Прямая ссылка на Точка входа пакета" title="Прямая ссылка на Точка входа пакета" translate="no">​</a></h2>
+<p>Точка входа пакета (<code>src/index.ts</code>) экспортирует только его публичный API — то, чем пакетом
+пользуются снаружи:</p>
+<ul>
+<li class="">точку сборки и типы её опций и зависимостей;</li>
+<li class="">то, что возвращают её методы;</li>
+<li class="">интерфейсы, через которые с пакетом работают снаружи или которые можно передать ему в
+зависимостях;</li>
+<li class="">перечисления и типы данных.</li>
+</ul>
+<p>Детали реализации не экспортируются: классы, которые пакет создаёт внутри, их опции и зависимости,
+константы. Например, <code>homeless</code> экспортирует <code>HomelessRootTaskFactory</code>, но не <code>DrinkTask</code>. Тесты и
+<code>dev</code> импортируют детали реализации своего пакета напрямую из файлов, например
+<code>../src/drink-task</code>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="константы">Константы<a href="#константы" class="hash-link" aria-label="Прямая ссылка на Константы" title="Прямая ссылка на Константы" translate="no">​</a></h2>
+<p>Константы бывают двух видов:</p>
+<ul>
+<li class=""><strong>Свойства модели</strong> — то, что не настраивается: пределы чувств и черт, период попыток в задаче
+«пытать удачу», радиусы и допуски, с которыми NPC подходит к месту. Объявляются статическими
+полями класса, к которому относятся (<code>static readonly</code>), например <code>Psyche.MAX_FEELING</code> или
+<code>TryLuckTask.PERIOD</code>. Если поле нужно только самому классу, оно приватное.</li>
+<li class=""><strong>Баланс</strong> — то, что подбирается, чтобы игра шла как задумано: шансы, цены, награды, пороги,
+прирост и падение чувств. Лежит в <code>src/constants.ts</code> своего пакета, например цена пойла — в
+<code>homeless</code>, а прирост стыда — в <code>psyche</code>. Калибровка баланса — правка этого файла, а не классов.</li>
+</ul>
+<p>Константы не экспортируются из точки входа пакета: это детали реализации.</p>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="жизненный-цикл">Жизненный цикл<a href="#жизненный-цикл" class="hash-link" aria-label="Прямая ссылка на Жизненный цикл" title="Прямая ссылка на Жизненный цикл" translate="no">​</a></h2>
+<p>Жизнь в игре проходит путь мир → NPC → HTN:</p>
+<!-- -->
+<ol>
+<li class=""><strong>Большой взрыв.</strong> Мод создаёт игру и мир и вызывает <code>World.bigBang</code>. Мир загружает места,
+собирает зависимости по умолчанию и на каждую запись из репозитория NPC создаёт NPC фабрикой
+NPC.</li>
+<li class=""><strong>Рождение NPC.</strong> NPC создаёт актора (тот появляется в игре), инвентарь, психику и HTN-агента с
+корневой задачей своего типа. После этого NPC подписывается на тики игры.</li>
+<li class=""><strong>Тик.</strong> На каждый тик NPC собирает состояние — слепок актора, инвентаря, психики и знания о мире
+— и передаёт его агенту вместе с контекстом. Если плана нет, агент планирует корневую задачу, а
+затем продвигает текущую задачу плана.</li>
+<li class=""><strong>Перепланирование.</strong> Когда план закончился или задача не удалась, агент забывает план и на
+следующем тике планирует заново с новым состоянием.</li>
+<li class=""><strong>Конец.</strong> Когда игра завершается, её сигнал прерывается: NPC перестаёт слушать тики,
+останавливает агента, а тот — текущую задачу, и деспавнит актора.</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="рантайм-мода">Рантайм мода<a href="#рантайм-мода" class="hash-link" aria-label="Прямая ссылка на Рантайм мода" title="Прямая ссылка на Рантайм мода" translate="no">​</a></h2>
+<p>Мод пишется на TypeScript, а работает в MoonLoader — загрузчике Lua-скриптов для GTA San Andreas.</p>
+<ul>
+<li class=""><strong>Сборка.</strong> TypeScriptToLua собирает мод в один файл <code>peetland.lua</code> (<code>mod/mod/tsconfig.build.json</code>).
+MoonLoader запускает функцию <code>main</code>, которую мод кладёт в глобальную область.</li>
+<li class=""><strong>Запуск.</strong> <code>main</code> ждёт, пока игра загрузится, запускает таймеры и по клавишам вызывает
+отладочные действия: H — большой взрыв, G — печать координат игрока, J — телепорт к бомжарне.</li>
+<li class=""><strong>Тики.</strong> Игра (<code>GtaGame</code>) сообщает о тике раз в 250 мс по таймеру. Пока игра на паузе или не
+загружена, таймеры не срабатывают, и тиков нет. Когда скрипт выгружают, сигнал игры прерывается.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="полифилы">Полифилы<a href="#полифилы" class="hash-link" aria-label="Прямая ссылка на Полифилы" title="Прямая ссылка на Полифилы" translate="no">​</a></h3>
+<p>В Lua нет того, к чему привык код на TypeScript, поэтому часть окружения проект делает сам:</p>
+<ul>
+<li class=""><strong>Таймеры.</strong> <code>setTimeout</code>, <code>setInterval</code> и их <code>clear*</code> реализованы в моде (<code>patch-global.ts</code>) и
+кладутся в глобальную область. Все таймеры работают в одном потоке MoonLoader: поток, созданный
+из колбэка другого таймера, после первого <code>wait</code> не продолжается.</li>
+<li class=""><strong><code>reportError</code>.</strong> Сообщает об ошибке, которую некому обработать, например об исключении в
+обработчике события. Мод печатает её в <code>moonloader.log</code>, а в тестах это мок.</li>
+<li class=""><strong>События.</strong> <code>EventTarget</code>, <code>AbortController</code>, <code>AbortSignal</code> и <code>Observable</code> реализованы в
+<code>@peetland/events</code> по образцу браузерных API, потому что в Lua их нет.</li>
+</ul>
+<p>Типы глобальных функций описаны в <code>mod/mod/_G.d.ts</code>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_tleR" id="ограничения-lua">Ограничения Lua<a href="#ограничения-lua" class="hash-link" aria-label="Прямая ссылка на Ограничения Lua" title="Прямая ссылка на Ограничения Lua" translate="no">​</a></h3>
+<ul>
+<li class=""><strong><code>self</code>.</strong> В Lua у функции либо есть <code>self</code>, либо нет. TypeScriptToLua проверяет это при сборке,
+но не видит, если метод передали без объекта или вызвали через <code>bind</code>, <code>call</code> и <code>apply</code>. Поэтому
+они запрещены линтером: вызов оборачивается в стрелочную функцию.</li>
+<li class=""><strong>Потоки MoonLoader.</strong> Поток нельзя создавать изнутри async-функции: он тихо портит память
+скрипта, и игра зависает или вылетает без ошибки в логе.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_QeZL"><a href="https://github.com/ivan-podgornov/peetland/edit/docs/agents-map/docs/architecture/index.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_bHB7" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Отредактировать эту страницу</a></div><div class="col lastUpdated_ydrU"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Страница документа"><a class="pagination-nav__link pagination-nav__link--prev" href="/peetland/docs/agents-map/docs/glossary/"><div class="pagination-nav__sublabel">Предыдущая страница</div><div class="pagination-nav__label">Глоссарий</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/peetland/docs/agents-map/docs/decisions/"><div class="pagination-nav__sublabel">Следующая страница</div><div class="pagination-nav__label">Решения</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_XG6w thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#чистота-архитектуры" class="table-of-contents__link toc-highlight">Чистота архитектуры</a><ul><li><a href="#слоистость" class="table-of-contents__link toc-highlight">Слоистость</a></li><li><a href="#независимые-сущности" class="table-of-contents__link toc-highlight">Независимые сущности</a></li><li><a href="#инверсия-зависимостей" class="table-of-contents__link toc-highlight">Инверсия зависимостей</a></li><li><a href="#пакет-собирает-себя-сам" class="table-of-contents__link toc-highlight">Пакет собирает себя сам</a></li><li><a href="#одна-ответственность" class="table-of-contents__link toc-highlight">Одна ответственность</a></li><li><a href="#тестируемость" class="table-of-contents__link toc-highlight">Тестируемость</a></li><li><a href="#обходы-платформы--только-в-mod" class="table-of-contents__link toc-highlight">Обходы платформы — только в mod</a></li></ul></li><li><a href="#слои" class="table-of-contents__link toc-highlight">Слои</a><ul><li><a href="#пакеты-и-зависимости" class="table-of-contents__link toc-highlight">Пакеты и зависимости</a></li></ul></li><li><a href="#внедрение-зависимостей" class="table-of-contents__link toc-highlight">Внедрение зависимостей</a><ul><li><a href="#пакет-собирает-себя-сам-1" class="table-of-contents__link toc-highlight">Пакет собирает себя сам</a></li></ul></li><li><a href="#точка-входа-пакета" class="table-of-contents__link toc-highlight">Точка входа пакета</a></li><li><a href="#константы" class="table-of-contents__link toc-highlight">Константы</a></li><li><a href="#жизненный-цикл" class="table-of-contents__link toc-highlight">Жизненный цикл</a></li><li><a href="#рантайм-мода" class="table-of-contents__link toc-highlight">Рантайм мода</a><ul><li><a href="#полифилы" class="table-of-contents__link toc-highlight">Полифилы</a></li><li><a href="#ограничения-lua" class="table-of-contents__link toc-highlight">Ограничения Lua</a></li></ul></li></ul></div></div></div></div></main></div></div></div></div>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"id":"49261e97bfe1dcffa89ad4bb6bddddb9.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-actor/__tests__/set-angle.spec.ts#VirtualActor #setAngle Приводит переданный угол к диапазону [0, 360)","name":"Приводит переданный угол к диапазону [0, 360)","status":"passed","testResultsByEnv":{"default":"336826ac4ce3c80658e68d53a743b6af"}}

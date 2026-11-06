@@ -1,0 +1,1 @@
+{"id":"a205dbaf4752272da6b2d49e327d5d86.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/execute.spec.ts#Command #execute При подписке сразу вызывает onUpdate с нулём","name":"При подписке сразу вызывает onUpdate с нулём","status":"passed","testResultsByEnv":{"default":"1415ffa59fb71cefe93961653c7eb2a6"}}

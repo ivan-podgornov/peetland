@@ -1,0 +1,1 @@
+{"id":"4eedde725de9293cf79151fe9de1897c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/subscriber/complete.spec.ts#Subscriber #complete Если observer указан в виде объекта с методом complete Вызывает observer.complete","name":"Вызывает observer.complete","status":"passed","testResultsByEnv":{"default":"1b06a7f25d3ee58ff7a59a2d07ff1b70"}}

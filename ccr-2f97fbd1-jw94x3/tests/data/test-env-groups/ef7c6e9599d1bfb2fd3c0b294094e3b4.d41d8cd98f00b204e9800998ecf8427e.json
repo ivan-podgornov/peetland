@@ -1,1 +1,0 @@
-{"id":"ef7c6e9599d1bfb2fd3c0b294094e3b4.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/luck/constructor.spec.ts#Luck #constructor Если удачливость меньше Luck.MIN, выбрасывает RangeError","name":"Если удачливость меньше Luck.MIN, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"38a3a4faa488ddd91328681b7d791b77"}}

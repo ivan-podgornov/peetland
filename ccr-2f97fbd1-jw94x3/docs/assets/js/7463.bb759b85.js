@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_peetland_docs=self.webpackChunk_peetland_docs||[]).push([[7463],{7463(e,c,s){s.d(c,{createArchitectureServices:()=>t.S});var t=s(7998);s(6088)}}]);

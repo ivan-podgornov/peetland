@@ -1,1 +1,0 @@
-{"id":"a65d767f9d48ce873cf4f961affa25d3.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/world/big-bang/default-npc-deps.spec.ts#World #bigBang Если npcFactory не передана NPC создаёт актора фабрикой акторов игры","name":"NPC создаёт актора фабрикой акторов игры","status":"passed","testResultsByEnv":{"default":"68dd84903a75dddbbecb80b695a6b903"}}

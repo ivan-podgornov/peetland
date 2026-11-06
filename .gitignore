@@ -7,4 +7,5 @@ tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 /docs/build/
 /docs/.docusaurus/
-/.vitest/
+/.allure/
+/allure-results/

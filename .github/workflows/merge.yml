@@ -59,13 +59,9 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        run: npm run test:report
-      - name: Publish test report
-        # Отчёт публикуется и при упавших тестах, чтобы было видно, что сломалось
-        if: ${{ !cancelled() }}
-        uses: ./.github/workflows/publish-pages
+        uses: ./.github/workflows/deploy-tests
         with:
           branch: main
-          folder: tests
-          source: .vitest
+          # История прогонов main: из неё отчёт строит тренды и находит нестабильные тесты
+          history: 'true'
           token: ${{ github.token }}

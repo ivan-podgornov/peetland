@@ -39,15 +39,9 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        run: npm run test:report
-      - name: Publish test report
-        # Отчёт публикуется и при упавших тестах: на ревью он нужен, чтобы увидеть, что сломалось
-        if: ${{ !cancelled() }}
-        uses: ./.github/workflows/publish-pages
+        uses: ./.github/workflows/deploy-tests
         with:
           branch: ${{ github.head_ref }}
-          folder: tests
-          source: .vitest
           token: ${{ github.token }}
 
   mod:

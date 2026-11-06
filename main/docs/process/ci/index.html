@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">CI и сборки | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="CI и сборки | Peetland"><meta data-rh="true" name="description" content="CI работает на GitHub Actions. Workflow два: один на пулл реквесты, другой на мерж в main."><meta data-rh="true" property="og:description" content="CI работает на GitHub Actions. Workflow два: один на пулл реквесты, другой на мерж в main."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Процесс","item":"https://ivan-podgornov.github.io/peetland/main/docs/process"},{"@type":"ListItem","position":2,"name":"CI и сборки","item":"https://ivan-podgornov.github.io/peetland/main/docs/process/ci"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.a649358c.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.aac933bf.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.3674edfb.js" defer="defer"></script>
 </head>
 <body>
@@ -19,26 +19,32 @@
 <!-- -->
 <ul>
 <li class=""><strong>lint</strong> — проверка типов, eslint и prettier по всему репозиторию.</li>
-<li class=""><strong>test</strong> — тесты.</li>
+<li class=""><strong>test</strong> — тесты. Отчёт Allure о тестах публикуется на GitHub Pages, даже если тесты упали: на
+ревью он нужен, чтобы увидеть, что сломалось. В отчёт подкладывается история прогонов <code>main</code>, и по
+ней видно, какие тесты в пулл реквесте новые и какие нестабильны. Прогон пулл реквеста в историю
+<code>main</code> не попадает. Ссылка на отчёт — в окружении <code>tests</code> пулл реквеста.</li>
 <li class=""><strong>mod</strong> — собирает мод и публикует сборку ветки на GitHub Pages. Ссылка на неё — в окружении
 <code>mod</code> пулл реквеста.</li>
 <li class=""><strong>docs</strong> — собирает документацию и публикует её на GitHub Pages. Ссылка на неё — в окружении
 <code>docs</code> пулл реквеста.</li>
 </ul>
-<p>Сборки публикуются, только если проверки и тесты прошли. Когда пулл реквест закрывают или мержат,
-джоба <strong>remove-pages</strong> удаляет с GitHub Pages папку его ветки вместе со всеми сборками. Папка <code>main</code>
-не удаляется, даже если <code>main</code> была веткой закрытого пулл реквеста.</p>
+<p>Сборки мода и документации публикуются, только если проверки и тесты прошли. Когда пулл реквест
+закрывают или мержат, джоба <strong>remove-pages</strong> удаляет с GitHub Pages папку его ветки вместе со всеми
+сборками. Папка <code>main</code> не удаляется, даже если <code>main</code> была веткой закрытого пулл реквеста.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="мерж-в-main">Мерж в main<a href="#мерж-в-main" class="hash-link" aria-label="Прямая ссылка на Мерж в main" title="Прямая ссылка на Мерж в main" translate="no">​</a></h2>
 <p><code>merge.yml</code> запускается на каждый пуш в <code>main</code>. Проверки и тесты уже прошли в пулл реквесте,
-поэтому здесь только сборки: <strong>mod</strong> и <strong>docs</strong> публикуют сборку мода и документацию <code>main</code>. Новый
-мерж отменяет предыдущий запуск.</p>
+поэтому здесь только публикации: <strong>mod</strong> и <strong>docs</strong> публикуют сборку мода и документацию <code>main</code>, а
+<strong>tests</strong> запускает тесты ради отчёта о тестах <code>main</code>. Отчёт <code>main</code> хранит историю прогонов:
+перед генерацией джоба берёт <code>history.jsonl</code> из прошлого отчёта в ветке <code>gh-pages</code>, Allure
+дописывает в неё новый прогон, и история публикуется вместе с отчётом. Новый мерж отменяет
+предыдущий запуск.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="github-pages">GitHub Pages<a href="#github-pages" class="hash-link" aria-label="Прямая ссылка на GitHub Pages" title="Прямая ссылка на GitHub Pages" translate="no">​</a></h2>
 <p>Сборки всех веток лежат в ветке <code>gh-pages</code>, у каждой ветки своя папка:</p>
-<div class="language-text codeBlockContainer_mQmQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_t_Hd"><pre tabindex="0" class="prism-code language-text codeBlock_RMoD thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_AclH"><div class="token-line" style="color:#bfc7d5"><span class="token plain">gh-pages</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── index.html        перенаправляет на main/docs/</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── .nojekyll         без него GitHub Pages не отдаёт файлы, которые начинаются с _</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── docs          документация main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── mod           сборка мода main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">└── feat</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">    └── npc</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">        ├── docs</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">        └── mod</span><br></div></code></pre></div></div>
+<div class="language-text codeBlockContainer_mQmQ theme-code-block" style="--prism-color:#bfc7d5;--prism-background-color:#292d3e"><div class="codeBlockContent_t_Hd"><pre tabindex="0" class="prism-code language-text codeBlock_RMoD thin-scrollbar" style="color:#bfc7d5;background-color:#292d3e"><code class="codeBlockLines_AclH"><div class="token-line" style="color:#bfc7d5"><span class="token plain">gh-pages</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── index.html        перенаправляет на main/docs/</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── .nojekyll         без него GitHub Pages не отдаёт файлы, которые начинаются с _</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">├── main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── docs          документация main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">│   ├── mod           сборка мода main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">│   └── tests         отчёт о тестах main</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">└── feat</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">    └── npc</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">        ├── docs</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">        ├── mod</span><br></div><div class="token-line" style="color:#bfc7d5"><span class="token plain">        └── tests</span><br></div></code></pre></div></div>
 <p>Адрес сборки — <code>&lt;адрес GitHub Pages репозитория&gt;/&lt;ветка&gt;/&lt;сборка&gt;/</code>, например
-<code>&lt;адрес&gt;/feat/npc/docs/</code> или <code>&lt;адрес&gt;/main/mod/peetland.lua</code>. <code>index.html</code> и <code>.nojekyll</code> лежат в
-корне ветки <code>gh-pages</code> с самого начала, и публикация их не трогает. В настройках репозитория
-GitHub Pages публикуется из ветки <code>gh-pages</code>.</p>
+<code>&lt;адрес&gt;/feat/npc/docs/</code>, <code>&lt;адрес&gt;/main/mod/peetland.lua</code> или <code>&lt;адрес&gt;/main/tests/</code>. <code>index.html</code> и
+<code>.nojekyll</code> лежат в корне ветки <code>gh-pages</code> с самого начала, и публикация их не трогает. В настройках
+репозитория GitHub Pages публикуется из ветки <code>gh-pages</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="общие-шаги">Общие шаги<a href="#общие-шаги" class="hash-link" aria-label="Прямая ссылка на Общие шаги" title="Прямая ссылка на Общие шаги" translate="no">​</a></h2>
 <p>Шаги, которые нужны обоим workflow, вынесены в композитные actions в <code>.github/workflows</code>:</p>
 <ul>
@@ -49,6 +55,9 @@ publish-pages;</li>
 <li class=""><strong>publish-pages</strong> — публикует папку в <code>&lt;ветка&gt;/&lt;сборка&gt;</code> ветки <code>gh-pages</code> пакетом <code>gh-pages</code>.
 Сборки всех веток лежат в одной ветке, поэтому пуши параллельных запусков могут конфликтовать:
 тогда публикация повторяется со свежей веткой;</li>
+<li class=""><strong>deploy-tests</strong> — запускает тесты, собирает отчёт Allure с историей прогонов <code>main</code> и публикует
+его через publish-pages, в том числе при упавших тестах. Отчёт <code>main</code> дописывает в историю свой
+прогон и публикует её;</li>
 <li class=""><strong>remove-pages</strong> — удаляет папку ветки из <code>gh-pages</code>.</li>
 </ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_QeZL"><a href="https://github.com/ivan-podgornov/peetland/edit/main/docs/process/ci.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_bHB7" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Отредактировать эту страницу</a></div><div class="col lastUpdated_ydrU"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Страница документа"><a class="pagination-nav__link pagination-nav__link--prev" href="/peetland/main/docs/process/docs/"><div class="pagination-nav__sublabel">Предыдущая страница</div><div class="pagination-nav__label">Документация</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/peetland/main/docs/process/in-game/"><div class="pagination-nav__sublabel">Следующая страница</div><div class="pagination-nav__label">Проверка в игре</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_XG6w thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#пулл-реквест" class="table-of-contents__link toc-highlight">Пулл реквест</a></li><li><a href="#мерж-в-main" class="table-of-contents__link toc-highlight">Мерж в main</a></li><li><a href="#github-pages" class="table-of-contents__link toc-highlight">GitHub Pages</a></li><li><a href="#общие-шаги" class="table-of-contents__link toc-highlight">Общие шаги</a></li></ul></div></div></div></div></main></div></div></div></div>
 </body>

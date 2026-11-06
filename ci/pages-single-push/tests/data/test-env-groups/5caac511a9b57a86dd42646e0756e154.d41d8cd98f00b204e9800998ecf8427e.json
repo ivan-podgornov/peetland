@@ -1,0 +1,1 @@
+{"id":"5caac511a9b57a86dd42646e0756e154.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/parallel-task/start.spec.ts#ParallelTask #start Если основная задача завершилась сразу, фоновую не начинает","name":"Если основная задача завершилась сразу, фоновую не начинает","status":"passed","testResultsByEnv":{"default":"d9fa149fd1a242ec1f204d8496a686dd"}}

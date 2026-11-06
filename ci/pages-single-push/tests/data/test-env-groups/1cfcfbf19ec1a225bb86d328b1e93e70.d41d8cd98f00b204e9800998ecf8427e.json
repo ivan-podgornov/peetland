@@ -1,0 +1,1 @@
+{"id":"1cfcfbf19ec1a225bb86d328b1e93e70.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/move-towards.spec.ts#Geometry #moveTowards Если maxDistance равен 0, возвращает текущую точку","name":"Если maxDistance равен 0, возвращает текущую точку","status":"passed","testResultsByEnv":{"default":"d88b267a41cf5414b2bf250559a76e33"}}

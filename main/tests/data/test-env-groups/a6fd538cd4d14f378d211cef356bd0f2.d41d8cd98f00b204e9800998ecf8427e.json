@@ -1,0 +1,1 @@
+{"id":"a6fd538cd4d14f378d211cef356bd0f2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/constructor.spec.ts#Inventory #constructor Если количество не передано, создаёт пустой инвентарь","name":"Если количество не передано, создаёт пустой инвентарь","status":"passed","testResultsByEnv":{"default":"e0c8208c387453088d5494b17865c0ea"}}

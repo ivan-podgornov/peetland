@@ -1,0 +1,1 @@
+{"id":"1cd49194b1f00d031f5871a58b53f38a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/get.spec.ts#Inventory #get Если предмета нет, возвращает 0","name":"Если предмета нет, возвращает 0","status":"passed","testResultsByEnv":{"default":"de92b98b2c530d00a0a47583a179d1cf"}}

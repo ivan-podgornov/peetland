@@ -1,0 +1,1 @@
+{"id":"0b74935c94e0b6c5cffbd840e916f863.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/parallel-task/can-execute.spec.ts#ParallelTask #canExecute Если фоновую задачу выполнить нельзя, возвращает false","name":"Если фоновую задачу выполнить нельзя, возвращает false","status":"passed","testResultsByEnv":{"default":"d964349000c683e30bea772930c335fa"}}

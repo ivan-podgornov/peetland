@@ -1,0 +1,1 @@
+{"id":"d7531d5dc689b37332b6d84dc3a10277.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/constructor.spec.ts#Psyche #constructor Если чувство больше Psyche.MAX_FEELING, выбрасывает RangeError","name":"Если чувство больше Psyche.MAX_FEELING, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"53309d712f5cd7f974683aff4a0cc8f2"}}

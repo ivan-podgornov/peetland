@@ -1,0 +1,1 @@
+{"id":"ad7315ef37930ccb61da2d5abdfafb10.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/unsubscribe.spec.ts#Command Если от Observable отписались Вызывает onFinish с 'cancelled'","name":"Вызывает onFinish с 'cancelled'","status":"passed","testResultsByEnv":{"default":"a2e28eecc3c15c7d2607c50a0f3fc111"}}

@@ -21,16 +21,21 @@ type SidebarItemsGenerator = NonNullable<DocsPluginOptions['sidebarItemsGenerato
 type SidebarItem = Awaited<ReturnType<SidebarItemsGenerator>>[number];
 
 /**
- * Страницы из папки `docs` пакета показываются в сайдбаре прямо под пакетом, а не во вложенной
- * категории `docs`
+ * Оставляет в автоматическом сайдбаре пакетов только техническую документацию: README — продуктовая
+ * документация, она стоит в сайдбаре «Продукт». Страницы из папки `docs` пакета показываются прямо
+ * под пакетом, а не во вложенной категории `docs`
  */
-function unwrapDocsFolders(items: SidebarItem[]): SidebarItem[] {
+function technicalItems(items: SidebarItem[]): SidebarItem[] {
   return items.flatMap((item) => {
+    if (item.type === 'doc' && /(^|\/)README$/.test(item.id)) {
+      return [];
+    }
+
     if (item.type !== 'category') {
       return [item];
     }
 
-    const children = unwrapDocsFolders(item.items);
+    const children = technicalItems(item.items);
 
     if (item.label === 'docs') {
       return children;
@@ -42,24 +47,40 @@ function unwrapDocsFolders(items: SidebarItem[]): SidebarItem[] {
   });
 }
 
-/** Слои монорепозитория, README пакетов которых попадают в раздел «Пакеты» */
+/** Слои монорепозитория. Документацию пакетов каждого слоя читает свой инстанс плагина */
 const LAYERS = ['toolkit', 'core', 'mod'];
 
 /**
- * Инстанс плагина документации, который читает README пакетов слоя прямо из пакетов: источник у
- * них один. На каждый слой свой инстанс, потому что инстанс компилирует все Markdown-файлы в своей
- * папке, и инстанс с корнем репозитория скомпилировал бы страницы основной документации ещё раз
+ * Сайдбары слоёв. У каждого слоя есть автоматический сайдбар «Пакеты», а у core ещё и сайдбар
+ * «Продукт» (см. sidebars-core.ts)
  */
-function packagesPlugin(layer: string): [string, DocsPluginOptions] {
+const LAYER_SIDEBARS: Record<string, string> = {
+  core: './sidebars-core.ts',
+};
+
+/**
+ * Инстанс плагина документации, который читает документацию пакетов слоя прямо из пакетов:
+ * продуктовую в README и техническую в CONTRIBUTING и папке docs. Источник у неё один. На каждый
+ * слой свой инстанс, потому что инстанс компилирует все Markdown-файлы в своей папке, и инстанс с
+ * корнем репозитория скомпилировал бы страницы основной документации ещё раз
+ */
+function layerPlugin(layer: string): [string, DocsPluginOptions] {
   return [
     '@docusaurus/plugin-content-docs',
     {
       id: layer,
       path: `../${layer}`,
-      include: ['*/README.md', '*/docs/**/*.md'],
-      routeBasePath: `packages/${layer}`,
+      include: ['*/README.md', '*/CONTRIBUTING.md', '*/docs/**/*.md'],
+      routeBasePath: layer,
+      ...(LAYER_SIDEBARS[layer] && { sidebarPath: LAYER_SIDEBARS[layer] }),
       async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
-        return unwrapDocsFolders(await defaultSidebarItemsGenerator(args));
+        return technicalItems(
+          await defaultSidebarItemsGenerator({
+            ...args,
+            // В сайдбаре пакетов главная страница пакета — CONTRIBUTING, а не README
+            isCategoryIndex: (doc) => doc.fileName.toLowerCase() === 'contributing',
+          })
+        );
       },
       ...(DOCS_REPOSITORY_URL && {
         // Путь от корня репозитория: строковый editUrl считает путь от папки сайта
@@ -89,7 +110,7 @@ const config: Config = {
     },
   },
   themes: ['@docusaurus/theme-mermaid'],
-  plugins: LAYERS.map(packagesPlugin),
+  plugins: LAYERS.map(layerPlugin),
   presets: [
     [
       'classic',
@@ -129,12 +150,20 @@ const config: Config = {
           position: 'left',
         },
         {
+          type: 'docSidebar',
+          sidebarId: 'product',
+          docsPluginId: 'core',
+          label: 'Продукт',
+          position: 'left',
+        },
+        {
           type: 'dropdown',
           label: 'Пакеты',
           position: 'left',
           items: LAYERS.map((layer) => ({
             type: 'docSidebar',
-            sidebarId: 'defaultSidebar',
+            // Без своего файла сайдбаров у слоя один автоматический сайдбар defaultSidebar
+            sidebarId: LAYER_SIDEBARS[layer] ? 'packages' : 'defaultSidebar',
             docsPluginId: layer,
             label: layer,
           })),

@@ -19,7 +19,6 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
-    'npc/index',
     {
       type: 'category',
       label: 'Процесс',

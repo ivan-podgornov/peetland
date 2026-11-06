@@ -33,8 +33,8 @@ Peetland — учебный мод для GTA San Andreas, в котором NPC
 
 - `npm install` — поставить зависимости.
 - `npm test` — тесты.
-- `npm run check:types`, `npm run check:code:all`, `npm run check:formatting:all` — проверка
-  типов, кода и форматирования, как в CI.
+- `npm run check:types`, `npm run check:code:all`, `npm run check:deps`,
+  `npm run check:formatting:all` — проверка типов, кода, зависимостей и форматирования, как в CI.
 - `npm run fix:code:all`, `npm run fix:formatting:all` — исправить код и форматирование.
 - `npm run build -w @peetland/mod` — собрать мод.
 - `npm start -w @peetland/docs` — запустить сайт документации локально.

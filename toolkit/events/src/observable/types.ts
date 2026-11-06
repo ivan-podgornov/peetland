@@ -1,12 +1,22 @@
 import type { IAbortSignal } from '../abort-signal';
-import type { ISubscriber } from '../subscriber';
-
-import type { Observable } from './observable';
+import type { IObserver, IObserverObject, ISubscriber } from '../subscriber';
 
 export type Executor<T> = (subscriber: ISubscriber<T>) => void;
 
-/** Значения, которые Observable.from умеет превращать в Observable */
-export type ObservableInput<T> = Observable<T> | ReadonlyArray<T> | Promise<T>;
+/** То, на что можно подписаться. Через этот интерфейс операторы подписываются на Observable */
+export interface ISubscribable<T> {
+  subscribe(observer?: IObserver<T>, options?: SubscribeOptions): void;
+}
+
+/**
+ * Оператор Observable, например inspect или switchMap. Создаётся на каждую подписку на результат
+ * оператора, потому что хранит её состояние: подписывается на исходный Observable и передаёт его
+ * события, изменённые по-своему, подписчику результата
+ */
+export interface IOperator<T> extends IObserverObject<T> {
+  /** Подписывает оператор на исходный Observable */
+  observe(source: ISubscribable<T>): void;
+}
 
 /** Функция, которая превращает значение Observable и его порядковый номер в новое значение */
 export type Mapper<T, R> = (value: T, index: number) => R;

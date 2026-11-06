@@ -1,5 +1,5 @@
 name: Lint
-description: Check types, code and formatting
+description: Check types, code, dependencies and formatting
 runs:
   using: composite
   steps:
@@ -9,6 +9,9 @@ runs:
     - name: Lint
       shell: bash
       run: npm run check:code:all
+    - name: Check dependencies
+      shell: bash
+      run: npm run check:deps
     - name: Lint formatting
       shell: bash
       run: npm run check:formatting:all

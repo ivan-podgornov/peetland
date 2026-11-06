@@ -7,7 +7,7 @@ import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
 import { BOOZE_PRICE } from './constants';
-import type { IHomelessTaskFactory } from './factory';
+import type { IHomelessTaskFactory } from './types';
 
 export type BuyBoozeTaskDeps = {
   /** Места мира. Пойло покупается в местах типа PlaceType.Shop */

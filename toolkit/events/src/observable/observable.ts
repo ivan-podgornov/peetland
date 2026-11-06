@@ -2,12 +2,15 @@ import { MulticastObserver } from '../multicast-observer';
 import { Subscriber } from '../subscriber';
 import type { IObserver, ISubscriber, SubscriberConstructorOptions } from '../subscriber';
 
-import { ObservableFactory } from './factory';
-import { InspectObserver } from './inspect-observer';
-import { SwitchMapObserver } from './switch-map-observer';
-import type { Executor, Inspector, Mapper, ObservableInput, SubscribeOptions } from './types';
+import { createArrayExecutor, createPromiseExecutor } from './from-executors';
+import { InspectOperator } from './inspect-operator';
+import { SwitchMapOperator } from './switch-map-operator';
+import type { Executor, Inspector, ISubscribable, Mapper, SubscribeOptions } from './types';
 
-export class Observable<T> extends ObservableFactory {
+/** Значения, которые Observable.from умеет превращать в Observable */
+export type ObservableInput<T> = Observable<T> | ReadonlyArray<T> | Promise<T>;
+
+export class Observable<T> implements ISubscribable<T> {
   private readonly executor: Executor<T>;
   private multicast: MulticastObserver<T> | null;
   private subscriber: ISubscriber<T> | null;
@@ -17,10 +20,31 @@ export class Observable<T> extends ObservableFactory {
    * Функция принимает подписчика и может сгенерировать новые значения в этом подписчике.
    */
   constructor(executor: Executor<T>) {
-    super();
     this.executor = executor;
     this.multicast = null;
     this.subscriber = null;
+  }
+
+  /**
+   * Превращает значение в Observable. Если передан Observable, возвращает его же. Массив выдаёт
+   * свои элементы синхронно при подписке и завершается. Промис выдаёт значение, с которым
+   * выполнился, и завершается, а если отклонён, завершается с ошибкой.
+   * Для остальных значений выбрасывает TypeError.
+   */
+  static from<T>(value: ObservableInput<T>): Observable<T> {
+    if (value instanceof Observable) {
+      return value;
+    }
+
+    if (Array.isArray(value)) {
+      return new Observable(createArrayExecutor<T>(value));
+    }
+
+    if (value instanceof Promise) {
+      return new Observable(createPromiseExecutor(value));
+    }
+
+    throw new TypeError('Observable.from поддерживает только Observable, массивы и промисы');
   }
 
   /**
@@ -51,14 +75,13 @@ export class Observable<T> extends ObservableFactory {
    */
   switchMap<R>(mapper: Mapper<T, ObservableInput<R>>): Observable<R> {
     return new Observable<R>((subscriber) => {
-      // Наблюдатель создаётся на каждую подписку, потому что хранит её состояние
-      const observer = new SwitchMapObserver({
+      // Оператор создаётся на каждую подписку, потому что хранит её состояние
+      const operator = new SwitchMapOperator<T, R>({
         subscriber,
-        mapper,
-        toObservable: (input) => Observable.from(input),
+        mapper: (value, index) => Observable.from(mapper(value, index)),
       });
 
-      this.subscribe(observer, { signal: subscriber.signal });
+      operator.observe(this);
     });
   }
 
@@ -69,12 +92,12 @@ export class Observable<T> extends ObservableFactory {
    */
   inspect(inspector: Inspector<T> = {}): Observable<T> {
     return new Observable<T>((subscriber) => {
-      const observer = new InspectObserver({
+      const operator = new InspectOperator({
         subscriber,
         inspector,
       });
 
-      observer.observe(this);
+      operator.observe(this);
     });
   }
 

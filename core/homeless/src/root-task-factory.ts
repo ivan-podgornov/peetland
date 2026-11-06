@@ -9,8 +9,8 @@ import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
 import { HomelessTaskFactory } from './factory';
-import type { IHomelessTaskFactory } from './factory';
 import { HomelessRootTask } from './root-task';
+import type { IHomelessTaskFactory } from './types';
 
 export type HomelessRootTaskFactoryDeps = {
   geometry: IGeometry;

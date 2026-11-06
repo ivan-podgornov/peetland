@@ -19,7 +19,15 @@ const sidebars: SidebarsConfig = {
         },
       ],
     },
-    'npc/index',
+    {
+      type: 'category',
+      label: 'NPC',
+      link: {
+        type: 'doc',
+        id: 'npc',
+      },
+      items: ['npc/homeless'],
+    },
     {
       type: 'category',
       label: 'Процесс',

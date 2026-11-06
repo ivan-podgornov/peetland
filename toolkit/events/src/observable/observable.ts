@@ -76,10 +76,9 @@ export class Observable<T> implements ISubscribable<T> {
   switchMap<R>(mapper: Mapper<T, ObservableInput<R>>): Observable<R> {
     return new Observable<R>((subscriber) => {
       // Оператор создаётся на каждую подписку, потому что хранит её состояние
-      const operator = new SwitchMapOperator({
+      const operator = new SwitchMapOperator<T, R>({
         subscriber,
-        mapper,
-        toObservable: (input) => Observable.from(input),
+        mapper: (value, index) => Observable.from(mapper(value, index)),
       });
 
       operator.observe(this);

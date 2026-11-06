@@ -5,31 +5,29 @@ import type { ISubscriber } from '../subscriber';
 
 import type { IOperator, ISubscribable, Mapper } from './types';
 
-export type SwitchMapOperatorOptions<T, R, I> = {
+export type SwitchMapOperatorOptions<T, R> = {
   /** Подписчик результата switchMap, которому передаются значения внутренних Observable */
   subscriber: ISubscriber<R>;
-  mapper: Mapper<T, I>;
-  /** Превращает результат mapper в Observable */
-  toObservable: (input: I) => ISubscribable<R>;
+  /** Превращает значение исходного Observable и его порядковый номер во внутренний Observable */
+  mapper: Mapper<T, ISubscribable<R>>;
 };
 
 /**
- * Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap. На каждое значение
- * отписывается от предыдущего внутреннего Observable и подписывается на новый, полученный из
- * mapper. Результат завершается, когда завершились и исходный Observable, и последний внутренний.
+ * Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap.
+ * На каждое значение отписывается от предыдущего внутреннего Observable и подписывается на новый,
+ * полученный из mapper. Результат завершается, когда завершились и исходный Observable, и
+ * последний внутренний.
  */
-export class SwitchMapOperator<T, R, I> implements IOperator<T> {
+export class SwitchMapOperator<T, R> implements IOperator<T> {
   private readonly subscriber: ISubscriber<R>;
-  private readonly mapper: Mapper<T, I>;
-  private readonly toObservable: (input: I) => ISubscribable<R>;
+  private readonly mapper: Mapper<T, ISubscribable<R>>;
   private index: number;
   private sourceCompleted: boolean;
   private innerController: AbortController | null;
 
-  constructor(options: SwitchMapOperatorOptions<T, R, I>) {
+  constructor(options: SwitchMapOperatorOptions<T, R>) {
     this.subscriber = options.subscriber;
     this.mapper = options.mapper;
-    this.toObservable = options.toObservable;
     this.index = 0;
     this.sourceCompleted = false;
     this.innerController = null;
@@ -47,7 +45,7 @@ export class SwitchMapOperator<T, R, I> implements IOperator<T> {
 
     let inner: ISubscribable<R>;
     try {
-      inner = this.toObservable(this.mapper(value, this.index));
+      inner = this.mapper(value, this.index);
     } catch (error) {
       this.subscriber.error(error);
       return;

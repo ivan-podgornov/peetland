@@ -1,1 +1,0 @@
-{"id":"045bf77e3a4892e530eee70657017fa7.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/start.spec.ts#CommandTask #start Если задачу уже выполняли, отдаёт актору новую команду","name":"Если задачу уже выполняли, отдаёт актору новую команду","status":"passed","testResultsByEnv":{"default":"1a50938022fe5677ced8a8b1bab2940f"}}

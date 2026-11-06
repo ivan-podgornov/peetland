@@ -1,1 +1,0 @@
-{"id":"6b5c099c323a768f4d8de39a491e2146.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/observable/subscribe/subscribe.spec.ts#Observable #subscribe Если observer не задан, не выбрасывает ошибку","name":"Если observer не задан, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"0feb9870d81c7b76d6d44100e923924a"}}

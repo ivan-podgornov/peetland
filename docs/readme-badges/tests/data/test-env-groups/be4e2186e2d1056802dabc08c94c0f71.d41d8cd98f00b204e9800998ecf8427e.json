@@ -1,1 +1,0 @@
-{"id":"be4e2186e2d1056802dabc08c94c0f71.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/constructor.spec.ts#Npc #constructor Вызывает rootTaskFactory.create с типом NPC из данных","name":"Вызывает rootTaskFactory.create с типом NPC из данных","status":"passed","testResultsByEnv":{"default":"84b8140dc6e7c127efaa5de13aaade86"}}

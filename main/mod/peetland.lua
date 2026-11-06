@@ -3451,90 +3451,57 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["toolkit.events.src.observable.factory"] = function(...) 
+["toolkit.events.src.observable.from-executors"] = function(...) 
 local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__InstanceOf = ____lualib.__TS__InstanceOf
-local __TS__ArrayIsArray = ____lualib.__TS__ArrayIsArray
 local __TS__Promise = ____lualib.__TS__Promise
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local fromArray, fromPromise
-function fromArray(ObservableClass, values)
-    return __TS__New(
-        ObservableClass,
-        function(subscriber)
-            for ____, value in ipairs(values) do
-                if not subscriber.active then
-                    return
-                end
-                subscriber:next(value)
+--- Executor для Observable.from из массива: выдаёт элементы синхронно при подписке и завершается.
+-- Массив читается при каждой подписке, а не при вызове from, как того требует спецификация
+function ____exports.createArrayExecutor(values)
+    return function(subscriber)
+        for ____, value in ipairs(values) do
+            if not subscriber.active then
+                return
             end
-            subscriber:complete()
+            subscriber:next(value)
         end
-    )
-end
-function fromPromise(ObservableClass, promise)
-    return __TS__New(
-        ObservableClass,
-        function(subscriber)
-            promise["then"](
-                promise,
-                function(____, value)
-                    subscriber:next(value)
-                    subscriber:complete()
-                end,
-                function(____, reason) return subscriber:error(reason) end
-            )
-        end
-    )
-end
-____exports.ObservableFactory = __TS__Class()
-local ObservableFactory = ____exports.ObservableFactory
-ObservableFactory.name = "ObservableFactory"
-function ObservableFactory.prototype.____constructor(self)
-end
-function ObservableFactory.from(self, value)
-    if __TS__InstanceOf(value, self) then
-        return value
+        subscriber:complete()
     end
-    if __TS__ArrayIsArray(value) then
-        return fromArray(self, value)
+end
+--- Executor для Observable.from из промиса: выдаёт значение, с которым промис выполнился, и
+-- завершается, а если промис отклонён, завершается с ошибкой
+function ____exports.createPromiseExecutor(promise)
+    return function(subscriber)
+        promise["then"](
+            promise,
+            function(____, value)
+                subscriber:next(value)
+                subscriber:complete()
+            end,
+            function(____, reason) return subscriber:error(reason) end
+        )
     end
-    if __TS__InstanceOf(value, __TS__Promise) then
-        return fromPromise(self, value)
-    end
-    error(
-        __TS__New(TypeError, "Observable.from поддерживает только Observable, массивы и промисы"),
-        0
-    )
 end
 return ____exports
  end,
-["toolkit.events.src.observable.inspect-observer"] = function(...) 
+["toolkit.events.src.observable.inspect-operator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
---- Наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
+--- Оператор inspect: наблюдатель исходного Observable в одной подписке на результат inspect. Вызывает колбэки
 -- инспектора и передаёт события подписчику без изменений. Исключение в колбэке инспектора
 -- завершает поток с этим исключением.
-____exports.InspectObserver = __TS__Class()
-local InspectObserver = ____exports.InspectObserver
-InspectObserver.name = "InspectObserver"
-function InspectObserver.prototype.____constructor(self, options)
+____exports.InspectOperator = __TS__Class()
+local InspectOperator = ____exports.InspectOperator
+InspectOperator.name = "InspectOperator"
+function InspectOperator.prototype.____constructor(self, options)
     self.subscriber = options.subscriber
     local ____options_0 = options
     local inspector = ____options_0.inspector
     self.inspector = type(inspector) == "function" and ({next = function(____, value) return inspector(value) end}) or inspector
     self.abortListener = function() return self:callAbort() end
 end
-function InspectObserver.prototype.observe(self, source)
+function InspectOperator.prototype.observe(self, source)
     do
         local function ____catch(____error)
             self.subscriber:error(____error)
@@ -3558,7 +3525,7 @@ function InspectObserver.prototype.observe(self, source)
     self.subscriber.signal:addEventListener("abort", self.abortListener)
     source:subscribe(self, {signal = self.subscriber.signal})
 end
-function InspectObserver.prototype.next(self, value)
+function InspectOperator.prototype.next(self, value)
     do
         local function ____catch(____error)
             self:finish(function() return self.subscriber:error(____error) end)
@@ -3581,7 +3548,7 @@ function InspectObserver.prototype.next(self, value)
     end
     self.subscriber:next(value)
 end
-function InspectObserver.prototype.error(self, ____error)
+function InspectOperator.prototype.error(self, ____error)
     self:finish(function()
         local ____this_6
         ____this_6 = self.inspector
@@ -3592,7 +3559,7 @@ function InspectObserver.prototype.error(self, ____error)
         self.subscriber:error(____error)
     end)
 end
-function InspectObserver.prototype.complete(self)
+function InspectOperator.prototype.complete(self)
     self:finish(function()
         local ____this_8
         ____this_8 = self.inspector
@@ -3603,7 +3570,7 @@ function InspectObserver.prototype.complete(self)
         self.subscriber:complete()
     end)
 end
-function InspectObserver.prototype.finish(self, finishing)
+function InspectOperator.prototype.finish(self, finishing)
     self.subscriber.signal:removeEventListener("abort", self.abortListener)
     do
         local function ____catch(____error)
@@ -3617,7 +3584,7 @@ function InspectObserver.prototype.finish(self, finishing)
         end
     end
 end
-function InspectObserver.prototype.callAbort(self)
+function InspectOperator.prototype.callAbort(self)
     do
         local function ____catch(____error)
             reportError(____error)
@@ -3637,7 +3604,7 @@ function InspectObserver.prototype.callAbort(self)
 end
 return ____exports
  end,
-["toolkit.events.src.observable.switch-map-observer"] = function(...) 
+["toolkit.events.src.observable.switch-map-operator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
@@ -3646,21 +3613,24 @@ local ____abort_2Dcontroller = require("toolkit.events.src.abort-controller.inde
 local AbortController = ____abort_2Dcontroller.AbortController
 local ____abort_2Dsignal = require("toolkit.events.src.abort-signal.index")
 local AbortSignal = ____abort_2Dsignal.AbortSignal
---- Наблюдатель исходного Observable в одной подписке на результат switchMap. На каждое значение
--- отписывается от предыдущего внутреннего Observable и подписывается на новый, полученный из
--- mapper. Результат завершается, когда завершились и исходный Observable, и последний внутренний.
-____exports.SwitchMapObserver = __TS__Class()
-local SwitchMapObserver = ____exports.SwitchMapObserver
-SwitchMapObserver.name = "SwitchMapObserver"
-function SwitchMapObserver.prototype.____constructor(self, options)
+--- Оператор switchMap: наблюдатель исходного Observable в одной подписке на результат switchMap.
+-- На каждое значение отписывается от предыдущего внутреннего Observable и подписывается на новый,
+-- полученный из mapper. Результат завершается, когда завершились и исходный Observable, и
+-- последний внутренний.
+____exports.SwitchMapOperator = __TS__Class()
+local SwitchMapOperator = ____exports.SwitchMapOperator
+SwitchMapOperator.name = "SwitchMapOperator"
+function SwitchMapOperator.prototype.____constructor(self, options)
     self.subscriber = options.subscriber
     self.mapper = options.mapper
-    self.toObservable = options.toObservable
     self.index = 0
     self.sourceCompleted = false
     self.innerController = nil
 end
-function SwitchMapObserver.prototype.next(self, value)
+function SwitchMapOperator.prototype.observe(self, source)
+    source:subscribe(self, {signal = self.subscriber.signal})
+end
+function SwitchMapOperator.prototype.next(self, value)
     local ____opt_0 = self.innerController
     if ____opt_0 ~= nil then
         ____opt_0:abort()
@@ -3674,7 +3644,7 @@ function SwitchMapObserver.prototype.next(self, value)
             return true
         end
         local ____try, ____hasReturned, ____returnValue = pcall(function()
-            inner = self:toObservable(self.mapper(value, self.index))
+            inner = self.mapper(value, self.index)
         end)
         if not ____try then
             ____hasReturned, ____returnValue = ____catch(____hasReturned)
@@ -3686,16 +3656,16 @@ function SwitchMapObserver.prototype.next(self, value)
     self.index = self.index + 1
     self:subscribeToInner(inner, controller.signal)
 end
-function SwitchMapObserver.prototype.error(self, ____error)
+function SwitchMapOperator.prototype.error(self, ____error)
     self.subscriber:error(____error)
 end
-function SwitchMapObserver.prototype.complete(self)
+function SwitchMapOperator.prototype.complete(self)
     self.sourceCompleted = true
     if not self.innerController then
         self.subscriber:complete()
     end
 end
-function SwitchMapObserver.prototype.subscribeToInner(self, inner, innerSignal)
+function SwitchMapOperator.prototype.subscribeToInner(self, inner, innerSignal)
     inner:subscribe(
         {
             next = function(____, value) return self.subscriber:next(value) end,
@@ -3705,7 +3675,7 @@ function SwitchMapObserver.prototype.subscribeToInner(self, inner, innerSignal)
         {signal = AbortSignal:any({self.subscriber.signal, innerSignal})}
     )
 end
-function SwitchMapObserver.prototype.completeInner(self)
+function SwitchMapOperator.prototype.completeInner(self)
     if self.sourceCompleted then
         self.subscriber:complete()
     else
@@ -3717,28 +3687,56 @@ return ____exports
 ["toolkit.events.src.observable.observable"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__InstanceOf = ____lualib.__TS__InstanceOf
+local __TS__ArrayIsArray = ____lualib.__TS__ArrayIsArray
 local __TS__New = ____lualib.__TS__New
+local __TS__Promise = ____lualib.__TS__Promise
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
 local ____exports = {}
 local ____multicast_2Dobserver = require("toolkit.events.src.multicast-observer.index")
 local MulticastObserver = ____multicast_2Dobserver.MulticastObserver
 local ____subscriber = require("toolkit.events.src.subscriber.index")
 local Subscriber = ____subscriber.Subscriber
-local ____factory = require("toolkit.events.src.observable.factory")
-local ObservableFactory = ____factory.ObservableFactory
-local ____inspect_2Dobserver = require("toolkit.events.src.observable.inspect-observer")
-local InspectObserver = ____inspect_2Dobserver.InspectObserver
-local ____switch_2Dmap_2Dobserver = require("toolkit.events.src.observable.switch-map-observer")
-local SwitchMapObserver = ____switch_2Dmap_2Dobserver.SwitchMapObserver
+local ____from_2Dexecutors = require("toolkit.events.src.observable.from-executors")
+local createArrayExecutor = ____from_2Dexecutors.createArrayExecutor
+local createPromiseExecutor = ____from_2Dexecutors.createPromiseExecutor
+local ____inspect_2Doperator = require("toolkit.events.src.observable.inspect-operator")
+local InspectOperator = ____inspect_2Doperator.InspectOperator
+local ____switch_2Dmap_2Doperator = require("toolkit.events.src.observable.switch-map-operator")
+local SwitchMapOperator = ____switch_2Dmap_2Doperator.SwitchMapOperator
 ____exports.Observable = __TS__Class()
 local Observable = ____exports.Observable
 Observable.name = "Observable"
-__TS__ClassExtends(Observable, ObservableFactory)
 function Observable.prototype.____constructor(self, executor)
-    ObservableFactory.prototype.____constructor(self)
     self.executor = executor
     self.multicast = nil
     self.subscriber = nil
+end
+function Observable.from(self, value)
+    if __TS__InstanceOf(value, ____exports.Observable) then
+        return value
+    end
+    if __TS__ArrayIsArray(value) then
+        return __TS__New(
+            ____exports.Observable,
+            createArrayExecutor(value)
+        )
+    end
+    if __TS__InstanceOf(value, __TS__Promise) then
+        return __TS__New(
+            ____exports.Observable,
+            createPromiseExecutor(value)
+        )
+    end
+    error(
+        __TS__New(TypeError, "Observable.from поддерживает только Observable, массивы и промисы"),
+        0
+    )
 end
 function Observable.prototype.subscribe(self, observer, options)
     if options == nil then
@@ -3771,15 +3769,14 @@ function Observable.prototype.switchMap(self, mapper)
     return __TS__New(
         ____exports.Observable,
         function(subscriber)
-            local observer = __TS__New(
-                SwitchMapObserver,
+            local operator = __TS__New(
+                SwitchMapOperator,
                 {
                     subscriber = subscriber,
-                    mapper = mapper,
-                    toObservable = function(____, input) return ____exports.Observable:from(input) end
+                    mapper = function(value, index) return ____exports.Observable:from(mapper(value, index)) end
                 }
             )
-            self:subscribe(observer, {signal = subscriber.signal})
+            operator:observe(self)
         end
     )
 end
@@ -3790,8 +3787,8 @@ function Observable.prototype.inspect(self, inspector)
     return __TS__New(
         ____exports.Observable,
         function(subscriber)
-            local observer = __TS__New(InspectObserver, {subscriber = subscriber, inspector = inspector})
-            observer:observe(self)
+            local operator = __TS__New(InspectOperator, {subscriber = subscriber, inspector = inspector})
+            operator:observe(self)
         end
     )
 end
@@ -7800,6 +7797,88 @@ do
 end
 return ____exports
  end,
+["core.homeless.src.purchase-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+--- Купить предмет там, где NPC стоит: заплатить и получить предмет. Деньги и предмет меняются, только
+-- когда NPC расплатился. Купить можно, только если денег хватает
+____exports.PurchaseTask = __TS__Class()
+local PurchaseTask = ____exports.PurchaseTask
+PurchaseTask.name = "PurchaseTask"
+function PurchaseTask.prototype.____constructor(self, options, deps)
+    self.name = "purchase"
+    local ____options_0 = options
+    local item = ____options_0.item
+    local count = ____options_0.count
+    local price = ____options_0.price
+    local ____deps_1 = deps
+    local npcTaskFactory = ____deps_1.npcTaskFactory
+    self.methods = {{
+        name = "pay",
+        preconditions = function(____, state) return (state.self.inventory[Item.Money] or 0) >= price end,
+        tasks = {
+            npcTaskFactory:playAnimation({animation = "pay"}),
+            npcTaskFactory:removeItem({item = Item.Money, count = price}),
+            npcTaskFactory:addItem({item = item, count = count})
+        }
+    }}
+end
+return ____exports
+ end,
+["core.homeless.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.homeless.src.root-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Корневая задача бомжа: жить. Методы перечислены по приоритету: бухать, а если не получается —
+-- купить пойло, а если и это не получается — сдать бутылки, а если и это не получается — клянчить, а
+-- иначе — собирать бутылки. Когда что получается, решают предусловия самих задач: бухать можно,
+-- если есть пойло, купить — если хватает денег, сдать — если за бутылки хватит на пойло, клянчить —
+-- если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
+____exports.HomelessRootTask = __TS__Class()
+local HomelessRootTask = ____exports.HomelessRootTask
+HomelessRootTask.name = "HomelessRootTask"
+function HomelessRootTask.prototype.____constructor(self, deps)
+    self.name = "live"
+    local ____deps_0 = deps
+    local homelessTaskFactory = ____deps_0.homelessTaskFactory
+    self.methods = {
+        {
+            name = "drink",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:drink()}
+        },
+        {
+            name = "buy-booze",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:buyBooze()}
+        },
+        {
+            name = "sell-bottles",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:sellBottles()}
+        },
+        {
+            name = "beg",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:beg()}
+        },
+        {
+            name = "collect-bottles",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:collectBottles()}
+        }
+    }
+end
+return ____exports
+ end,
 ["core.homeless.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -8164,37 +8243,6 @@ DrinkTask.CAMP_RADIUS = 3
 DrinkTask.CAMP_COMPLETE_RADIUS = 0.5
 return ____exports
  end,
-["core.homeless.src.purchase-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Item = ____inventory.Item
---- Купить предмет там, где NPC стоит: заплатить и получить предмет. Деньги и предмет меняются, только
--- когда NPC расплатился. Купить можно, только если денег хватает
-____exports.PurchaseTask = __TS__Class()
-local PurchaseTask = ____exports.PurchaseTask
-PurchaseTask.name = "PurchaseTask"
-function PurchaseTask.prototype.____constructor(self, options, deps)
-    self.name = "purchase"
-    local ____options_0 = options
-    local item = ____options_0.item
-    local count = ____options_0.count
-    local price = ____options_0.price
-    local ____deps_1 = deps
-    local npcTaskFactory = ____deps_1.npcTaskFactory
-    self.methods = {{
-        name = "pay",
-        preconditions = function(____, state) return (state.self.inventory[Item.Money] or 0) >= price end,
-        tasks = {
-            npcTaskFactory:playAnimation({animation = "pay"}),
-            npcTaskFactory:removeItem({item = Item.Money, count = price}),
-            npcTaskFactory:addItem({item = item, count = count})
-        }
-    }}
-end
-return ____exports
- end,
 ["core.homeless.src.sell-bottles-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8319,52 +8367,6 @@ function HomelessTaskFactory.prototype.beg(self)
     local places = ____self_deps_5.places
     local psycheFactory = ____self_deps_5.psycheFactory
     return __TS__New(BegTask, {npcTaskFactory = npcTaskFactory, places = places, psycheFactory = psycheFactory})
-end
-return ____exports
- end,
-["core.homeless.src.root-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
---- Корневая задача бомжа: жить. Методы перечислены по приоритету: бухать, а если не получается —
--- купить пойло, а если и это не получается — сдать бутылки, а если и это не получается — клянчить, а
--- иначе — собирать бутылки. Когда что получается, решают предусловия самих задач: бухать можно,
--- если есть пойло, купить — если хватает денег, сдать — если за бутылки хватит на пойло, клянчить —
--- если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
-____exports.HomelessRootTask = __TS__Class()
-local HomelessRootTask = ____exports.HomelessRootTask
-HomelessRootTask.name = "HomelessRootTask"
-function HomelessRootTask.prototype.____constructor(self, deps)
-    self.name = "live"
-    local ____deps_0 = deps
-    local homelessTaskFactory = ____deps_0.homelessTaskFactory
-    self.methods = {
-        {
-            name = "drink",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:drink()}
-        },
-        {
-            name = "buy-booze",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:buyBooze()}
-        },
-        {
-            name = "sell-bottles",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:sellBottles()}
-        },
-        {
-            name = "beg",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:beg()}
-        },
-        {
-            name = "collect-bottles",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:collectBottles()}
-        }
-    }
 end
 return ____exports
  end,

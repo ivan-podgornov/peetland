@@ -7,3 +7,6 @@ tsconfig.tsbuildinfo
 tsconfig.build.tsbuildinfo
 /docs/build/
 /docs/.docusaurus/
+
+# Копии продуктовых страниц из README пакетов (см. PRODUCT_PAGES в docs/docusaurus.config.ts)
+/docs/npc/homeless.md

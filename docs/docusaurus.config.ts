@@ -2,6 +2,9 @@ import type { Options as DocsPluginOptions } from '@docusaurus/plugin-content-do
 import type { Options as PresetOptions } from '@docusaurus/preset-classic';
 import type { Config } from '@docusaurus/types';
 
+import { copyFileSync, mkdirSync } from 'node:fs';
+import { dirname, relative, resolve } from 'node:path';
+
 /*
  * Адреса передаются через переменные окружения, чтобы сайт не был привязан к конкретному
  * репозиторию. В CI их собирают из контекста GitHub Actions, а локально они не нужны
@@ -42,12 +45,49 @@ function unwrapDocsFolders(items: SidebarItem[]): SidebarItem[] {
   });
 }
 
-/** Слои монорепозитория, README пакетов которых попадают в раздел «Пакеты» */
+/** Корень репозитория */
+const ROOT = resolve(__dirname, '..');
+
+/**
+ * Продуктовые страницы: страница сайта и README пакета, из которого она берётся. Продуктовое
+ * описание живёт в пакете, а на сайте показывается в разделах для игрока, поэтому страница — копия
+ * README. Копии создаются при каждом запуске сайта и не хранятся в git (см. .gitignore)
+ */
+const PRODUCT_PAGES: Record<string, string> = {
+  'npc/homeless.md': 'core/homeless/README.md',
+};
+
+/** Копирует README пакетов на места продуктовых страниц */
+function copyProductPages(): void {
+  for (const [page, source] of Object.entries(PRODUCT_PAGES)) {
+    const target = resolve(__dirname, page);
+
+    mkdirSync(dirname(target), { recursive: true });
+    copyFileSync(resolve(ROOT, source), target);
+  }
+}
+
+// Копии нужны до того, как плагин документации прочитает страницы
+copyProductPages();
+
+/**
+ * Плагин, который при правке README продуктовых страниц в `npm start` обновляет их копии. Копию
+ * замечает плагин документации и перезагружает страницу
+ */
+function productPagesPlugin() {
+  return {
+    name: 'product-pages',
+    getPathsToWatch: () => Object.values(PRODUCT_PAGES).map((source) => resolve(ROOT, source)),
+    loadContent: copyProductPages,
+  };
+}
+
+/** Слои монорепозитория, CONTRIBUTING пакетов которых попадают в раздел «Пакеты» */
 const LAYERS = ['toolkit', 'core', 'mod'];
 
 /**
- * Инстанс плагина документации, который читает README пакетов слоя прямо из пакетов: источник у
- * них один. На каждый слой свой инстанс, потому что инстанс компилирует все Markdown-файлы в своей
+ * Инстанс плагина документации, который читает техническую документацию пакетов слоя прямо из
+ * пакетов: CONTRIBUTING и папку docs. Источник у неё один. На каждый слой свой инстанс, потому что инстанс компилирует все Markdown-файлы в своей
  * папке, и инстанс с корнем репозитория скомпилировал бы страницы основной документации ещё раз
  */
 function packagesPlugin(layer: string): [string, DocsPluginOptions] {
@@ -56,10 +96,17 @@ function packagesPlugin(layer: string): [string, DocsPluginOptions] {
     {
       id: layer,
       path: `../${layer}`,
-      include: ['*/README.md', '*/docs/**/*.md'],
+      include: ['*/CONTRIBUTING.md', '*/docs/**/*.md'],
       routeBasePath: `packages/${layer}`,
-      async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
-        return unwrapDocsFolders(await defaultSidebarItemsGenerator(args));
+      async sidebarItemsGenerator({ defaultSidebarItemsGenerator, isCategoryIndex, ...args }) {
+        return unwrapDocsFolders(
+          await defaultSidebarItemsGenerator({
+            ...args,
+            // CONTRIBUTING — главная страница пакета, как README или index
+            isCategoryIndex: (doc) =>
+              doc.fileName.toLowerCase() === 'contributing' || isCategoryIndex(doc),
+          })
+        );
       },
       ...(DOCS_REPOSITORY_URL && {
         // Путь от корня репозитория: строковый editUrl считает путь от папки сайта
@@ -85,11 +132,23 @@ const config: Config = {
     format: 'md',
     mermaid: true,
     hooks: {
-      onBrokenMarkdownLinks: 'throw',
+      // Ссылка на продуктовый README пакета ведёт на его страницу на сайте, а другие битые ссылки
+      // ломают сборку
+      onBrokenMarkdownLinks: ({ sourceFilePath, url }) => {
+        const [path = '', hash] = url.split('#');
+        const target = relative(ROOT, resolve(__dirname, dirname(sourceFilePath), path));
+        const page = Object.keys(PRODUCT_PAGES).find((key) => PRODUCT_PAGES[key] === target);
+
+        if (!page) {
+          throw new Error(`Битая ссылка ${url} в ${sourceFilePath}`);
+        }
+
+        return `/${page.replace(/\.md$/, '/')}${hash ? `#${hash}` : ''}`;
+      },
     },
   },
   themes: ['@docusaurus/theme-mermaid'],
-  plugins: LAYERS.map(packagesPlugin),
+  plugins: [productPagesPlugin, ...LAYERS.map(packagesPlugin)],
   presets: [
     [
       'classic',
@@ -110,7 +169,12 @@ const config: Config = {
           routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           ...(DOCS_REPOSITORY_URL && {
-            editUrl: `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/docs/`,
+            // Продуктовая страница редактируется в README пакета, а не в своей копии
+            editUrl: ({ docPath }) => {
+              const path = PRODUCT_PAGES[docPath] ?? relative(ROOT, resolve(__dirname, docPath));
+
+              return `${DOCS_REPOSITORY_URL}/edit/${DOCS_BRANCH}/${path}`;
+            },
           }),
         },
         blog: false,

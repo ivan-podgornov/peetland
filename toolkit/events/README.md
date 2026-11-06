@@ -3,45 +3,4 @@
 Инструменты для работы с событиями и отменой асинхронных операций. API повторяет браузерный,
 поэтому если вы работали с `EventTarget` и `AbortController`, всё будет знакомо.
 
-## Что внутри
-
-- [`EventTarget`](./docs/event-target.md) — типизированный эмиттер событий.
-- [`AbortController`](./docs/abort-controller.md) — позволяет прервать асинхронную операцию.
-- [`AbortSignal`](./docs/abort-signal.md) — сообщает операции, что её нужно прервать.
-- [`Observable`](./docs/observable.md) - абстракция для работы с потоками данных.
-
-## Быстрый старт
-
-Таргет рассылает события подписчикам, а сигнал позволяет отписаться от них, когда подписка
-больше не нужна:
-
-```ts
-import { AbortController, EventTarget } from '@peetland/events';
-
-type Events = {
-  npcDied: number;
-};
-
-const target = new EventTarget<Events>();
-const controller = new AbortController();
-
-target.addEventListener('npcDied', (npcId) => console.log('Погиб NPC', npcId), {
-  signal: controller.signal,
-});
-
-target.dispatchEvent('npcDied', 42); // Погиб NPC 42
-
-controller.abort();
-
-target.dispatchEvent('npcDied', 43); // обработчик уже отписан
-```
-
-## Для тестов
-
-`@peetland/events/dev` даёт то, что нужно тестам с событиями и Observable:
-
-- `createMockedObserver()` — наблюдатель, все методы которого — моки;
-- `createControlledObservable(options?)` — Observable, который запоминает своих подписчиков, чтобы
-  тест управлял ими;
-- `createMockedAbortSignal(aborted)` — сигнал в переданном состоянии;
-- `flushPromises()` — ждёт, пока выполнятся запланированные микрозадачи.
+Как пакет устроен и как с ним работать, описано в [CONTRIBUTING.md](./CONTRIBUTING.md).

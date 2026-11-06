@@ -1,0 +1,1 @@
+{"id":"422189513462b41ceef3574e88c0c000.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/places/__tests__/is-near.spec.ts#Places #isNear Если рядом только место другого типа, возвращает false","name":"Если рядом только место другого типа, возвращает false","status":"passed","testResultsByEnv":{"default":"74d3488bee4ef4cd9fe5b9d02f51e2d7"}}

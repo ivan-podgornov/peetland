@@ -1,0 +1,1 @@
+{"id":"ca8f274d933bcab0098b3121c1b76328.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/parallel-task/can-execute.spec.ts#ParallelTask #canExecute Если основную задачу выполнить нельзя, возвращает false","name":"Если основную задачу выполнить нельзя, возвращает false","status":"passed","testResultsByEnv":{"default":"475839209ed233195857b4b5265e077b"}}

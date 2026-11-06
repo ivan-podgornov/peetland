@@ -16,8 +16,8 @@
 ## Процесс
 
 - [Развернуть проект](./docs/process/setup.md)
-- [Планирование](./docs/process/planning.md) — milestone, issue, лейблы, шаблоны, связи между issue
-  и когда писать ADR.
+- [Планирование](./docs/process/planning.md) — milestone, issue, лейблы, шаблоны, связи между issue,
+  sub-issues и когда писать ADR.
 - [Коммиты и ветки](./docs/process/commits.md)
 - [Тестирование](./docs/process/testing.md)
 - [Ревью](./docs/process/review.md)

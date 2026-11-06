@@ -14,47 +14,47 @@ title: Глоссарий
   NPC создаёт NPC.
 - **Большой взрыв** (`World.bigBang`) — запуск мира: мир загружает места, собирает зависимости и
   создаёт NPC.
-- **Место** (`PlaceData`, [`@peetland/places`](/packages/core/places/CONTRIBUTING/)) — точка мира, которой NPC
+- **Место** (`PlaceData`, [`@peetland/places`](/core/places/CONTRIBUTING/)) — точка мира, которой NPC
   пользуется: где встать и куда повернуться. Тип места (`PlaceType`) — бомжарня, магазин, приёмка,
   мусорка или место для клянчанья.
-- **Знание о мире** (`INpcWorldKnowledge`, [`@peetland/npc`](/packages/core/npc/CONTRIBUTING/)) — то, что NPC
+- **Знание о мире** (`INpcWorldKnowledge`, [`@peetland/npc`](/core/npc/CONTRIBUTING/)) — то, что NPC
   знает о мире, например, который час. Одно на всех NPC.
-- **Игра** (`IGame`, [`@peetland/game`](/packages/core/game/CONTRIBUTING/)) — интерфейсы игры, которые реализует
+- **Игра** (`IGame`, [`@peetland/game`](/core/game/CONTRIBUTING/)) — интерфейсы игры, которые реализует
   мод: акторы, объекты и геометрия. Через них core управляет игрой, ничего не зная о ней.
 - **Мод** — слой, который реализует интерфейсы игры для GTA San Andreas и запускает мир. Работает в
   MoonLoader.
-- **MoonLoader** ([`@peetland/moonloader`](/packages/mod/moonloader/CONTRIBUTING/)) — загрузчик Lua-скриптов для
+- **MoonLoader** ([`@peetland/moonloader`](/mod/moonloader/CONTRIBUTING/)) — загрузчик Lua-скриптов для
   GTA San Andreas, в котором работает мод. Мод пишется на TypeScript и собирается в Lua.
 
 ## Акторы
 
-- **Актор** (`IActor`, [`@peetland/game`](/packages/core/game/CONTRIBUTING/)) — тело персонажа в игре: ходит,
+- **Актор** (`IActor`, [`@peetland/game`](/core/game/CONTRIBUTING/)) — тело персонажа в игре: ходит,
   поворачивается и проигрывает анимации. Решений не принимает: что ему делать, говорит NPC.
-- **Виртуальный актор** ([`@peetland/virtual-actor`](/packages/core/virtual-actor/CONTRIBUTING/)) — актор,
+- **Виртуальный актор** ([`@peetland/virtual-actor`](/core/virtual-actor/CONTRIBUTING/)) — актор,
   который работает без игры и хранит всё в памяти. На нём тестируются задачи, NPC и мир.
 - **Команда актора** (`IActorCommand`, `Command`,
-  [`@peetland/actor-command`](/packages/core/actor-command/CONTRIBUTING/)) — то, что актор делает со временем:
+  [`@peetland/actor-command`](/core/actor-command/CONTRIBUTING/)) — то, что актор делает со временем:
   идёт к точке, поворачивается, проигрывает анимацию. Начинает выполняться, когда на неё
   подписываются, и её можно прервать.
-- **Анимация** (`AnimationId`, [`@peetland/animation-manager`](/packages/core/animation-manager/CONTRIBUTING/))
+- **Анимация** (`AnimationId`, [`@peetland/animation-manager`](/core/animation-manager/CONTRIBUTING/))
   — то, что делает персонаж, например «рыться в мусорке» или «пить стоя», а не конкретная анимация
   игры. Загрузкой анимаций занимается менеджер анимаций.
 
 ## NPC
 
-- **NPC** (`Npc`, [`@peetland/npc`](/packages/core/npc/CONTRIBUTING/)) — персонаж, который живёт сам: склеивает
+- **NPC** (`Npc`, [`@peetland/npc`](/core/npc/CONTRIBUTING/)) — персонаж, который живёт сам: склеивает
   актора, инвентарь, психику и HTN-агента, который каждый тик планирует и исполняет задачи.
 - **Тип NPC** (`NpcKind`) — кто он такой. От типа зависит корневая задача. Пока тип один — бомж.
 - **Состояние NPC** (`NpcState`) — слепок того, что есть у NPC и вокруг него: позиция, психика,
   инвентарь, время. Только данные: на нём планировщик проверяет предусловия и применяет эффекты.
 - **Контекст NPC** (`NpcContext`) — живые актор, инвентарь и психика, которым задачи отдают
   команды.
-- **Инвентарь** (`Inventory`, [`@peetland/inventory`](/packages/core/inventory/CONTRIBUTING/)) — сколько у
+- **Инвентарь** (`Inventory`, [`@peetland/inventory`](/core/inventory/CONTRIBUTING/)) — сколько у
   персонажа каких предметов. Предметы (`Item`) — деньги, бутылки и пойло.
 
 ## Психика
 
-- **Психика** (`IPsyche`, [`@peetland/psyche`](/packages/core/psyche/CONTRIBUTING/)) — черты характера и чувства
+- **Психика** (`IPsyche`, [`@peetland/psyche`](/core/psyche/CONTRIBUTING/)) — черты характера и чувства
   персонажа и то, как поступки меняют чувства.
 - **Черта** (`Trait`) — значение, которое не меняется со временем: совестливость, удачливость и
   оптимизм. Шкала от 0 до 100, 50 — нейтральный персонаж.
@@ -67,7 +67,7 @@ title: Глоссарий
 
 ## Задачи HTN
 
-- **HTN** ([`@peetland/htn`](/packages/toolkit/htn/CONTRIBUTING/)) — Hierarchical Task Network, подход к
+- **HTN** ([`@peetland/htn`](/toolkit/htn/CONTRIBUTING/)) — Hierarchical Task Network, подход к
   планированию: большая задача раскладывается на задачи поменьше, пока не останутся простые
   действия.
 - **Примитивная задача** (`PrimitiveTask`) — простое действие без своей цели, например «идти к
@@ -84,17 +84,17 @@ title: Глоссарий
 - **Исполнитель** (`Executor`) — выполняет задачи плана по очереди. Если задача не удалась, отдаёт
   управление планировщику, и тот строит новый план.
 - **HTN-агент** (`HTN`) — планировщик и исполнитель одного NPC вместе.
-- **Корневая задача** (`IRootTaskFactory`, [`@peetland/npc`](/packages/core/npc/CONTRIBUTING/)) — задача
+- **Корневая задача** (`IRootTaskFactory`, [`@peetland/npc`](/core/npc/CONTRIBUTING/)) — задача
   верхнего уровня, которую планирует агент, например «жить» у бомжа. NPC получает её от фабрики и
   ничего не знает о задачах.
 - **Параллельная задача** (`ParallelTask`) — выполняет основную задачу и одновременно с ней фоновую,
   например, пытает удачу под анимацию поиска в мусорке.
-- **Пытать удачу** (`TryLuckTask`, [`@peetland/npc-tasks`](/packages/core/npc-tasks/CONTRIBUTING/)) — бросать
+- **Пытать удачу** (`TryLuckTask`, [`@peetland/npc-tasks`](/core/npc-tasks/CONTRIBUTING/)) — бросать
   шанс, пока не повезёт.
 
 ## Бомж-алкаш
 
-- **Бомж** (`NpcKind.Homeless`, [`@peetland/homeless`](/packages/core/homeless/CONTRIBUTING/)) — пока
+- **Бомж** (`NpcKind.Homeless`, [`@peetland/homeless`](/core/homeless/CONTRIBUTING/)) — пока
   единственный тип NPC. Его корневая задача — жить: бухать, а если не получается — купить пойло,
   сдать бутылки, клянчить или собирать бутылки.
 - **Бомжарня** (`PlaceType.HomelessCamp`) — лагерь бездомных, где бомж бухает.

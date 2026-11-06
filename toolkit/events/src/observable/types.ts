@@ -3,13 +3,7 @@ import type { IObserver, IObserverObject, ISubscriber } from '../subscriber';
 
 export type Executor<T> = (subscriber: ISubscriber<T>) => void;
 
-/**
- * То, на что можно подписаться. Операторы знают об Observable только через этот интерфейс: Observable
- * сам создаёт операторы, и если бы они импортировали его, появилась бы циклическая зависимость. В
- * спецификации Observable своего названия для этого нет, а называется он так же, как похожий
- * интерфейс в RxJS. IObservable не подошло бы: так назывался бы интерфейс со всеми методами
- * Observable, а здесь только subscribe
- */
+/** То, на что можно подписаться. Через этот интерфейс операторы подписываются на Observable */
 export interface ISubscribable<T> {
   subscribe(observer?: IObserver<T>, options?: SubscribeOptions): void;
 }

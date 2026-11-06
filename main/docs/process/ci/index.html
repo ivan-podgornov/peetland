@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">CI и сборки | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="CI и сборки | Peetland"><meta data-rh="true" name="description" content="CI работает на GitHub Actions. Workflow два: один на пулл реквесты, другой на мерж в main."><meta data-rh="true" property="og:description" content="CI работает на GitHub Actions. Workflow два: один на пулл реквесты, другой на мерж в main."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/process/ci/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Процесс","item":"https://ivan-podgornov.github.io/peetland/main/docs/process"},{"@type":"ListItem","position":2,"name":"CI и сборки","item":"https://ivan-podgornov.github.io/peetland/main/docs/process/ci"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.aac933bf.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.c8d39e83.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.3674edfb.js" defer="defer"></script>
 </head>
 <body>
@@ -18,7 +18,9 @@
 пуш отменяет предыдущий запуск.</p>
 <!-- -->
 <ul>
-<li class=""><strong>lint</strong> — проверка типов, eslint и prettier по всему репозиторию.</li>
+<li class=""><strong>lint</strong> — проверка типов, eslint, dependency-cruiser и prettier по всему репозиторию.
+dependency-cruiser проверяет направление зависимостей между слоями и запрещает циклические
+зависимости (см. <a class="" href="/peetland/main/docs/architecture/#%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-%D1%81%D0%BB%D0%BE%D1%91%D0%B2">Проверка слоёв</a>).</li>
 <li class=""><strong>test</strong> — тесты. Отчёт Allure о тестах публикуется на GitHub Pages, даже если тесты упали: на
 ревью он нужен, чтобы увидеть, что сломалось. В отчёт подкладывается история прогонов <code>main</code>, и по
 ней видно, какие тесты в пулл реквесте новые и какие нестабильны. Прогон пулл реквеста в историю
@@ -49,7 +51,7 @@
 <p>Шаги, которые нужны обоим workflow, вынесены в композитные actions в <code>.github/workflows</code>:</p>
 <ul>
 <li class=""><strong>prepare-environment</strong> — ставит Node.js и зависимости;</li>
-<li class=""><strong>lint</strong> — проверяет типы, код и форматирование;</li>
+<li class=""><strong>lint</strong> — проверяет типы, код, зависимости и форматирование;</li>
 <li class=""><strong>deploy-mod</strong> и <strong>deploy-docs</strong> — собирают мод и документацию ветки и публикуют их через
 publish-pages;</li>
 <li class=""><strong>publish-pages</strong> — публикует папку в <code>&lt;ветка&gt;/&lt;сборка&gt;</code> ветки <code>gh-pages</code> пакетом <code>gh-pages</code>.

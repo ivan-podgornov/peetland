@@ -1,0 +1,1 @@
+{"id":"a355561d5dc5578e66a6dfcabe29db05.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/optimism/constructor.spec.ts#Optimism #constructor Если оптимизм не число, выбрасывает RangeError","name":"Если оптимизм не число, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"49ff3997e83ce70dea275b48ec5b1eeb"}}

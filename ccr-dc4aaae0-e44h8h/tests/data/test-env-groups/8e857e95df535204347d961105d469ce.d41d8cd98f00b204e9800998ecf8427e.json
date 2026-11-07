@@ -1,0 +1,1 @@
+{"id":"8e857e95df535204347d961105d469ce.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/apply-effects.spec.ts#TryLuckTask #applyEffects Если эффекты не переданы, возвращает то же состояние","name":"Если эффекты не переданы, возвращает то же состояние","status":"passed","testResultsByEnv":{"default":"ab0f60d0f2c8b1c7e30f084f5bfd7cc9"}}

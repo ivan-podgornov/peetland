@@ -1,0 +1,1 @@
+{"id":"7b56d14f28987f18a8ff87852c3612d8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-within-radius-3d.spec.ts#Geometry #isWithinRadius3d Если точка дальше радиуса, возвращает false","name":"Если точка дальше радиуса, возвращает false","status":"passed","testResultsByEnv":{"default":"2a589e9a58d739d9b999ebe878e3e95d"}}

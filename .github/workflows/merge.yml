@@ -1,7 +1,7 @@
 name: Merge
 
-# Публикует сборку мода, документацию и отчёт о тестах main после мержа. Проверки уже прошли в пулл
-# реквесте, а тесты запускаются только ради отчёта
+# Публикует сборку мода, документацию и отчёт о тестах main после мержа одним пушем. Проверки уже
+# прошли в пулл реквесте, а тесты запускаются только ради отчёта
 on:
   push:
     branches:
@@ -15,8 +15,6 @@ concurrency:
 jobs:
   mod:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: mod
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/mod/peetland.lua
@@ -24,16 +22,11 @@ jobs:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Deploy mod
-        uses: ./.github/workflows/deploy-mod
-        with:
-          branch: main
-          token: ${{ github.token }}
+      - name: Build mod
+        uses: ./.github/workflows/build-mod
 
   docs:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: docs
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/docs/
@@ -41,16 +34,13 @@ jobs:
       - uses: actions/checkout@v7
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
-      - name: Deploy docs
-        uses: ./.github/workflows/deploy-docs
+      - name: Build docs
+        uses: ./.github/workflows/build-docs
         with:
           branch: main
-          token: ${{ github.token }}
 
   tests:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     environment:
       name: tests
       url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/main/tests/
@@ -59,11 +49,26 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Test
-        uses: ./.github/workflows/deploy-tests
+        uses: ./.github/workflows/build-tests
         with:
-          branch: main
           # История прогонов main: из неё отчёт строит тренды и находит нестабильные тесты. Отчёт main
           # дописывает в неё свой прогон и публикует
           history-branch: main
           publish-history: 'true'
+
+  # Публикует одним пушем всё, что собрали mod, docs и tests, даже если что-то из них упало
+  publish:
+    needs: [mod, docs, tests]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Prepare environment
+        uses: ./.github/workflows/prepare-environment
+      - name: Publish pages
+        uses: ./.github/workflows/publish-pages
+        with:
+          branch: main
           token: ${{ github.token }}

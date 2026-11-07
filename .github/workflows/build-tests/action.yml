@@ -1,9 +1,6 @@
-name: Deploy tests
-description: Run tests and publish the Allure report to <branch>/tests in the gh-pages branch
+name: Build tests
+description: Run tests and upload the Allure report for publish-pages
 inputs:
-  branch:
-    description: Branch whose test report is published, for example main or feat/npc
-    required: true
   history-branch:
     description: Branch whose report history is shown in this report, for example main. Empty for no history
     required: false
@@ -12,9 +9,6 @@ inputs:
     description: Whether to publish the history with this run appended, 'true' or 'false'
     required: false
     default: 'false'
-  token:
-    description: Token with contents write permission
-    required: true
 runs:
   using: composite
   steps:
@@ -48,11 +42,9 @@ runs:
       if: ${{ !cancelled() && inputs.publish-history == 'true' }}
       shell: bash
       run: cp .allure/history.jsonl .allure/report/history.jsonl
-    - name: Publish report
+    - name: Upload report
       if: ${{ !cancelled() }}
-      uses: ./.github/workflows/publish-pages
+      uses: ./.github/workflows/upload-pages
       with:
-        branch: ${{ inputs.branch }}
         folder: tests
         source: .allure/report
-        token: ${{ inputs.token }}

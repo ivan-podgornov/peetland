@@ -1,0 +1,13 @@
+name: Build mod
+description: Build the mod and upload it for publish-pages
+runs:
+  using: composite
+  steps:
+    - name: Build mod
+      shell: bash
+      run: npm run build -w @peetland/mod
+    - name: Upload mod
+      uses: ./.github/workflows/upload-pages
+      with:
+        folder: mod
+        source: mod/mod/dist

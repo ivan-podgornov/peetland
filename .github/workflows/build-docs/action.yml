@@ -1,11 +1,8 @@
-name: Deploy docs
-description: Build the docs of a branch and publish them to <branch>/docs in the gh-pages branch
+name: Build docs
+description: Build the docs of a branch and upload them for publish-pages
 inputs:
   branch:
-    description: Branch whose docs are published, for example main or feat/npc
-    required: true
-  token:
-    description: Token with contents write permission
+    description: Branch whose docs are built, for example main or feat/npc
     required: true
 runs:
   using: composite
@@ -18,10 +15,8 @@ runs:
         DOCS_REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
         DOCS_BRANCH: ${{ inputs.branch }}
       run: npm run build -w @peetland/docs
-    - name: Publish docs
-      uses: ./.github/workflows/publish-pages
+    - name: Upload docs
+      uses: ./.github/workflows/upload-pages
       with:
-        branch: ${{ inputs.branch }}
         folder: docs
         source: docs/build
-        token: ${{ inputs.token }}

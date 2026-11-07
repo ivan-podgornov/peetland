@@ -1,14 +1,8 @@
 name: Publish pages
-description: Publish a folder to <branch>/<folder> in the gh-pages branch
+description: Publish the builds uploaded by upload-pages to <branch> in the gh-pages branch with one push
 inputs:
   branch:
-    description: Branch whose build is published, for example main or feat/npc
-    required: true
-  folder:
-    description: Folder inside the branch folder, for example docs or mod
-    required: true
-  source:
-    description: Folder with the files to publish, relative to the repository root
+    description: Branch whose builds are published, for example main or feat/npc
     required: true
   token:
     description: Token with contents write permission
@@ -16,13 +10,35 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Download builds
+      uses: actions/download-artifact@v8
+      with:
+        pattern: pages-*
+        path: ${{ runner.temp }}/pages
+        merge-multiple: true
     - name: Publish
       shell: bash
       env:
-        DEST: ${{ inputs.branch }}/${{ inputs.folder }}
-        SOURCE: ${{ inputs.source }}
+        BRANCH: ${{ inputs.branch }}
+        DIST: ${{ runner.temp }}/pages
         REPO: https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
       run: |
+        # Сборки, которые не дошли до публикации, например мод при упавших тестах, не загружаются.
+        # Их прошлые версии в gh-pages остаются, а заменяются только папки загруженных сборок
+        mkdir -p "$DIST"
+        folders=$(find "$DIST" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | paste -sd, -)
+        if [ -z "$folders" ]; then
+          echo "Публиковать нечего"
+          exit 0
+        fi
+
+        # Фигурные скобки с одним элементом glob не раскрывает
+        if [[ "$folders" == *,* ]]; then
+          remove="{$folders}/**"
+        else
+          remove="$folders/**"
+        fi
+
         # gh-pages не разбирает имя бота в --user, поэтому берёт автора из конфига git
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -31,12 +47,13 @@ runs:
         # конфликтовать. Тогда gh-pages скачивает свежую ветку, и публикация повторяется
         for attempt in 1 2 3 4 5; do
           npx gh-pages \
-            --dist "$SOURCE" \
-            --dest "$DEST" \
+            --dist "$DIST" \
+            --dest "$BRANCH" \
+            --remove "$remove" \
             --repo "$REPO" \
-            --message "Publish $DEST ($GITHUB_SHA)" && exit 0
+            --message "Publish $BRANCH: ${folders//,/, } ($GITHUB_SHA)" && exit 0
           sleep $((attempt * 2))
         done
 
-        echo "::error::Не удалось опубликовать $DEST"
+        echo "::error::Не удалось опубликовать $BRANCH"
         exit 1

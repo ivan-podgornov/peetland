@@ -1,1 +1,0 @@
-{"id":"16551c42fef78b5d02b286fbde62e6af.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/cancel.spec.ts#Command #cancel Если на Observable ещё не подписались При подписке не вызывает onFinish","name":"При подписке не вызывает onFinish","status":"passed","testResultsByEnv":{"default":"5ef33c960b865b1b7dbb8b148914d9ac"}}

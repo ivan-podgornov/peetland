@@ -1,1 +1,0 @@
-{"id":"24997f4841326d62dde3abfa6c5d7663.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/on-failed.spec.ts#Command Если onUpdate вернул 'failed' Вызывает onFinish с 'failed'","name":"Вызывает onFinish с 'failed'","status":"passed","testResultsByEnv":{"default":"bf3691c8c29017a2ff672a22ffea388c"}}

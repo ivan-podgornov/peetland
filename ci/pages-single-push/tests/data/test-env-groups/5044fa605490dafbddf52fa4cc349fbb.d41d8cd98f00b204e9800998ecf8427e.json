@@ -1,1 +1,0 @@
-{"id":"5044fa605490dafbddf52fa4cc349fbb.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-timer/interval.spec.ts#ManualTimer #interval Если period равен Infinity, выбрасывает RangeError","name":"Если period равен Infinity, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"fb2fb828ad096bca06755982732baf69"}}

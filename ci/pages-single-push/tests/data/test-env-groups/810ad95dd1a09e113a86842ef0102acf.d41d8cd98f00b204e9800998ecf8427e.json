@@ -1,1 +1,0 @@
-{"id":"810ad95dd1a09e113a86842ef0102acf.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/update/luck.spec.ts#TryLuckTask #update Если задачу не начинали, возвращает 'failed'","name":"Если задачу не начинали, возвращает 'failed'","status":"passed","testResultsByEnv":{"default":"289c0901b9f92fccc9f4cdfe7d4d2f7a"}}

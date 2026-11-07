@@ -1,1 +1,0 @@
-{"id":"28793f33715fae39ddc6d8a577ba258c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/stop.spec.ts#CommandTask #stop После остановки #update возвращает 'failed'","name":"После остановки #update возвращает 'failed'","status":"passed","testResultsByEnv":{"default":"a7ebb61d52e03a84752e5b37d2b2cb3e"}}

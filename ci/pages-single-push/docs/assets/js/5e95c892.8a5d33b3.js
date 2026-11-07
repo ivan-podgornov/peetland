@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_peetland_docs=self.webpackChunk_peetland_docs||[]).push([[9647],{415(e,s,r){r.r(s),r.d(s,{default:()=>l});r(3696);var a=r(1750),c=r(3237),d=r(8586),n=r(3971),t=r(7041),u=r(2540);function l(e){return(0,u.jsx)(d.e3,{className:(0,a.A)(c.G.wrapper.docsPages),children:(0,u.jsx)(t.A,{children:(0,n.v)(e.route.routes)})})}}}]);

@@ -1,1 +1,0 @@
-{"id":"54322dda7bd57b8a1b28136594bd757c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-time/set/range-error.spec.ts#ManualTime #set Если минуты меньше 0, выбрасывает RangeError","name":"Если минуты меньше 0, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"b58f5145968a5f48d25134c6b77d6b8d"}}

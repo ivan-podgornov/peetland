@@ -1,3 +1,4 @@
+export { PsycheBuilder } from './builder';
 export { createMockedPsyche, createMockedPsycheFactory } from './factory';
 export {
   createMockedLuck,

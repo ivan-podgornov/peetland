@@ -1,6 +1,6 @@
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed } from '@peetland/psyche';
-import { createMockedPsyche, createMockedPsycheFactory } from '@peetland/psyche/dev';
+import { createMockedPsyche } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
 import { PsycheReactTask } from '../src/psyche-react-task';
@@ -34,9 +34,7 @@ describe('PsycheReactTask', () => {
       const copy = createMockedPsyche();
       const psyche = createMockedPsyche();
       psyche.clone.mockReturnValue(copy);
-      const state = new NpcStateBuilder()
-        .withPsycheFactory(createMockedPsycheFactory(psyche))
-        .build();
+      const state = new NpcStateBuilder().withPsyche(() => psyche).build();
       const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
       task.applyEffects(state);
@@ -50,9 +48,7 @@ describe('PsycheReactTask', () => {
       psyche.clone.mockReturnValue(copy);
       const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
-      const state = task.applyEffects(
-        new NpcStateBuilder().withPsycheFactory(createMockedPsycheFactory(psyche)).build()
-      );
+      const state = task.applyEffects(new NpcStateBuilder().withPsyche(() => psyche).build());
 
       expect(state.self.psyche).toBe(copy);
     });

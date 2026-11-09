@@ -7,10 +7,10 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createBeggingOptimism,
-  createBeggingPsycheFactory,
   createBegTask,
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
+  withBeggingTraits,
 } from '../../dev';
 import {
   BEGGING_CHANCE,
@@ -49,14 +49,18 @@ describe('BegTask', () => {
       });
 
       it('Если стыд достиг BEGGING_SHAME_LIMIT, останавливает клянчанье', () => {
-        const state = new NpcStateBuilder().withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build();
+        const state = new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build())
+          .build();
 
         expect(planTryLuck()?.stopWhen?.(state)).toBe(true);
       });
 
       it('Если стыд ниже BEGGING_SHAME_LIMIT, не останавливает клянчанье', () => {
         const state = new NpcStateBuilder()
-          .withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT - 1)
+          .withPsyche((psyche) =>
+            psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT - 1).build()
+          )
           .build();
 
         expect(planTryLuck()?.stopWhen?.(state)).toBe(false);
@@ -67,8 +71,11 @@ describe('BegTask', () => {
 
         const after = options?.applyEffects?.(
           new NpcStateBuilder()
-            .withPsycheFactory(createBeggingPsycheFactory(0.5, createBeggingOptimism(10)))
-            .withFeeling(Feeling.Shame, 10)
+            .withPsyche((psyche) =>
+              withBeggingTraits(psyche, 0.5, createBeggingOptimism(10))
+                .withFeeling(Feeling.Shame, 10)
+                .build()
+            )
             .build()
         );
 

@@ -1,29 +1,24 @@
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
-import { PsycheFactory } from '@peetland/psyche';
-import type {
-  Feeling,
-  IPsycheFactory,
-  PsycheFeelings,
-  PsycheTraits,
-  Trait,
-} from '@peetland/psyche';
-import { createPsycheState } from '@peetland/psyche/dev';
+import type { IPsyche } from '@peetland/psyche';
+import { PsycheBuilder } from '@peetland/psyche/dev';
 import type { TimeState } from '@peetland/timings';
 
 import type { NpcState } from '../src';
 
+/** Собирает психику из переданного билдера психики */
+type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
+
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC стоит
- * в начале координат, смотрит под углом 0, инвентарь пуст, черты и чувства как в createPsycheState,
- * а в мире полночь первого дня. Психику собирает PsycheFactory с
- * фабриками черт по умолчанию. Каждый вызов build возвращает новое состояние
+ * в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder по
+ * умолчанию, а в мире полночь первого дня. Каждый вызов build возвращает новое состояние
  *
  * @example
  * const state = new NpcStateBuilder()
  *   .withInventory({ [Item.Money]: 50 })
- *   .withFeeling(Feeling.Shame, 30)
+ *   .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, 30).build())
  *   .build();
  */
 export class NpcStateBuilder {
@@ -34,9 +29,7 @@ export class NpcStateBuilder {
   };
   private angle = 0;
   private inventory: InventoryCounts = {};
-  private traits: PsycheTraits;
-  private feelings: PsycheFeelings;
-  private psycheFactory: IPsycheFactory = new PsycheFactory();
+  private psyche: PsycheBuild = (builder) => builder.build();
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -46,12 +39,6 @@ export class NpcStateBuilder {
   /** Возвращает состояние, в котором тесту ничего не важно: всё заполнено значениями по умолчанию */
   static default(): NpcState {
     return new NpcStateBuilder().build();
-  }
-
-  constructor() {
-    const psyche = createPsycheState();
-    this.traits = psyche.traits;
-    this.feelings = psyche.feelings;
   }
 
   /** Задаёт позицию актора */
@@ -81,30 +68,12 @@ export class NpcStateBuilder {
     return this.withInventory({});
   }
 
-  /** Задаёт значение черты характера */
-  withTrait(trait: Trait, value: number): this {
-    this.traits = {
-      ...this.traits,
-      [trait]: value,
-    };
-    return this;
-  }
-
-  /** Задаёт значение чувства */
-  withFeeling(feeling: Feeling, value: number): this {
-    this.feelings = {
-      ...this.feelings,
-      [feeling]: value,
-    };
-    return this;
-  }
-
   /**
-   * Задаёт фабрику, которой собирается психика из черт и чувств. Нужна, когда для теста важно, как
-   * психика реагирует на поступки
+   * Задаёт психику: функция получает новый билдер психики и возвращает психику, которая ляжет в
+   * состояние. Функция вызывается на каждый build, поэтому каждое состояние получает свою психику
    */
-  withPsycheFactory(psycheFactory: IPsycheFactory): this {
-    this.psycheFactory = psycheFactory;
+  withPsyche(psyche: PsycheBuild): this {
+    this.psyche = psyche;
     return this;
   }
 
@@ -123,10 +92,7 @@ export class NpcStateBuilder {
           angle: this.angle,
         },
         inventory: new Inventory(this.inventory),
-        psyche: this.psycheFactory.create({
-          traits: this.traits,
-          feelings: this.feelings,
-        }),
+        psyche: this.psyche(new PsycheBuilder()),
       },
       world: {
         time: { ...this.time },

@@ -95,7 +95,9 @@ describe('NpcTaskFactory', () => {
       const task = factory.psycheReact({ deed: Deed.Begging });
 
       const state = task.applyEffects(
-        new NpcStateBuilder().withTrait(Trait.Conscientiousness, 100).build()
+        new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withTrait(Trait.Conscientiousness, 100).build())
+          .build()
       );
 
       expect(state.self.psyche.getState().feelings[Feeling.Shame]).toBeGreaterThan(0);

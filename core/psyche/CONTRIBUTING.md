@@ -95,3 +95,14 @@
 
 Точка входа `@peetland/psyche/dev` даёт моки черт, их фабрик и фабрики психики, а также функции,
 которые собирают состояние и зависимости психики с незначимыми значениями по умолчанию.
+
+`PsycheBuilder` собирает психику по шагам: задаёте только то, что важно для теста, а остальное
+заполняется незначимыми значениями. Черты собирают фабрики `PsycheFactory` по умолчанию, а
+`withTraitFactory` подменяет фабрику черты, когда тесту важно, как черта реагирует на поступки.
+
+```ts
+import { Feeling, Trait } from '@peetland/psyche';
+import { PsycheBuilder } from '@peetland/psyche/dev';
+
+const psyche = new PsycheBuilder().withTrait(Trait.Luck, 80).withFeeling(Feeling.Shame, 30).build();
+```

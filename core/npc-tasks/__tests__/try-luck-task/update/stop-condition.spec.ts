@@ -24,7 +24,11 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(new NpcStateBuilder().withFeeling(Feeling.Shame, 80).build());
+      const result = task.update(
+        new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, 80).build())
+          .build()
+      );
 
       expect(result).toBe('failed');
     });

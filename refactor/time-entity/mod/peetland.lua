@@ -4001,6 +4001,7 @@ return ____exports
 ["toolkit.timings.src.manual-time"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local __TS__NumberIsInteger = ____lualib.__TS__NumberIsInteger
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
@@ -4008,7 +4009,6 @@ local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 --- Первый день в полночь
@@ -4031,6 +4031,12 @@ function ManualTime.prototype.getState(self)
     local hours = ____self_state_0.hours
     local minutes = ____self_state_0.minutes
     return {day = day, hours = hours, minutes = minutes}
+end
+function ManualTime.prototype.clone(self)
+    return __TS__New(
+        ____exports.ManualTime,
+        self:getState()
+    )
 end
 function ManualTime.prototype.set(self, state)
     local ____state_1 = state
@@ -5792,10 +5798,13 @@ return ____exports
 ["gta-sa.src.time"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____moonloader = require("moonloader.src.index")
 local getTimeOfDay = ____moonloader.getTimeOfDay
+local ____timings = require("toolkit.timings.src.index")
+local ManualTime = ____timings.ManualTime
 --- Время GTA. Часы и минуты берутся из игры, а дни игра не считает, поэтому их считает время: каждый
 -- тик и при каждом чтении сверяется с игрой и, если час стал меньше прошлого, значит наступила
 -- полночь. Считается, что за один тик игровое время не уходит вперёд на сутки
@@ -5814,6 +5823,12 @@ function GtaTime.prototype.getState(self)
     local hours = ____self_state_0.hours
     local minutes = ____self_state_0.minutes
     return {day = day, hours = hours, minutes = minutes}
+end
+function GtaTime.prototype.clone(self)
+    return __TS__New(
+        ManualTime,
+        self:getState()
+    )
 end
 function GtaTime.prototype.sync(self)
     local hours, minutes = getTimeOfDay()

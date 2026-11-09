@@ -1,1 +1,0 @@
-{"id":"a939bca440013a8fb702ba498300fa8a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили после завершения команды Не вызывает onFinish повторно","name":"Не вызывает onFinish повторно","status":"passed","testResultsByEnv":{"default":"8549c2f6ce692282f6a07831db6a236a"}}

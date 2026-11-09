@@ -1,1 +1,0 @@
-{"id":"edae74fa34c6a2600b5d21e230d26893.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-time/set/range-error.spec.ts#ManualTime #set Если день меньше 1, выбрасывает RangeError","name":"Если день меньше 1, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"0eae427baec8322fdf8a9d6e554ab1da"}}

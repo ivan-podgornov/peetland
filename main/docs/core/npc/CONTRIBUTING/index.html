@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/npc | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/npc | Peetland"><meta data-rh="true" name="description" content="NPC: склеивает свои данные, актора, инвентарь, психику и HTN-агента, который каждый тик планирует"><meta data-rh="true" property="og:description" content="NPC: склеивает свои данные, актора, инвентарь, психику и HTN-агента, который каждый тик планирует"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/npc","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.19ef632b.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.6aa04d17.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
 </head>
 <body>
@@ -16,10 +16,11 @@
 и исполняет задачи.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="состояние-и-контекст">Состояние и контекст<a href="#состояние-и-контекст" class="hash-link" aria-label="Прямая ссылка на Состояние и контекст" title="Прямая ссылка на Состояние и контекст" translate="no">​</a></h2>
 <ul>
-<li class=""><strong>Состояние</strong> (<code>NpcState</code>) — слепок актора и сами инвентарь и психика, доступные только на
-чтение (<code>IReadonlyInventory</code>, <code>IReadonlyPsyche</code>). С ним HTN-агент планирует задачи. Эффекты задач
-состояние не меняют: сущность, которую нужно поменять, задача клонирует (<code>clone()</code>) и кладёт
-копию в новое состояние.</li>
+<li class=""><strong>Состояние</strong> (<code>NpcState</code>) — слепок актора и сами инвентарь, психика и время, доступные только
+на чтение (<code>IReadonlyInventory</code>, <code>IReadonlyPsyche</code>, <code>IReadonlyTime</code>). С ним HTN-агент планирует
+задачи. Эффекты задач состояние не меняют: сущность, которую нужно поменять, задача клонирует
+(<code>clone()</code>) и кладёт копию в новое состояние. Время идёт, и его геттеры могут вернуть разное даже
+за одно планирование, а копия времени стоит на месте, пока её не выставят.</li>
 <li class=""><strong>Контекст</strong> (<code>NpcContext</code>) — живые актор, инвентарь и психика, которым задачи отдают команды.</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="корневая-задача">Корневая задача<a href="#корневая-задача" class="hash-link" aria-label="Прямая ссылка на Корневая задача" title="Прямая ссылка на Корневая задача" translate="no">​</a></h2>

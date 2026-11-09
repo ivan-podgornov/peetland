@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/main/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.19ef632b.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.6aa04d17.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
 </head>
 <body>
@@ -53,8 +53,8 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 актора, инвентарь, психику и HTN-агента, который каждый тик планирует и исполняет задачи.</li>
 <li class=""><strong>Тип NPC</strong> (<code>NpcKind</code>) — кто он такой. От типа зависит корневая задача. Пока тип один — бомж.</li>
 <li class=""><strong>Состояние NPC</strong> (<code>NpcState</code>) — то, что есть у NPC и вокруг него: позиция, психика, инвентарь,
-время. На нём планировщик проверяет предусловия и применяет эффекты. Сущности, например
-инвентарь и психика, лежат в нём доступными только на чтение, остальное — слепками (см.
+время. На нём планировщик проверяет предусловия и применяет эффекты. Инвентарь, психика
+и время лежат в нём доступными только на чтение, позиция — слепком (см.
 <a class="" href="/peetland/main/docs/decisions/npc-state-entities/">решение 0001</a>).</li>
 <li class=""><strong>Контекст NPC</strong> (<code>NpcContext</code>) — живые актор, инвентарь и психика, которым задачи отдают
 команды.</li>

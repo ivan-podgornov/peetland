@@ -1,7 +1,6 @@
 import { NpcTaskFactory } from '@peetland/npc-tasks';
 import { createNpcTaskFactoryDeps } from '@peetland/npc-tasks/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
-import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 
 import type { IHomelessTaskFactory } from '../src';
@@ -18,7 +17,6 @@ export function createHomelessTaskFactoryDeps(
   return {
     npcTaskFactory: new NpcTaskFactory(createNpcTaskFactoryDeps()),
     places: createMockedPlaces(),
-    psycheFactory: createMockedPsycheFactory(),
     random: createMockedRandom(false),
     ...deps,
   };

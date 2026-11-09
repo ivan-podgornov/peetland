@@ -2,7 +2,6 @@ import type { Task } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import type { IPlaces } from '@peetland/places';
-import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 
 import { BegTask } from './beg-task';
@@ -21,8 +20,6 @@ export type HomelessTaskFactoryDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Места мира, которые получают создаваемые задачи */
   places: IPlaces;
-  /** Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах */
-  psycheFactory: IPsycheFactory;
   random: IRandom;
 };
 
@@ -78,12 +75,11 @@ export class HomelessTaskFactory implements IHomelessTaskFactory {
   }
 
   beg(): NpcTask {
-    const { npcTaskFactory, places, psycheFactory } = this.deps;
+    const { npcTaskFactory, places } = this.deps;
 
     return new BegTask({
       npcTaskFactory,
       places,
-      psycheFactory,
     });
   }
 }

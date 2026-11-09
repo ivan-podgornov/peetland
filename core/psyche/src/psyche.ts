@@ -12,11 +12,13 @@ import type {
   TraitFactories,
 } from './types';
 
-export interface IPsyche {
+/**
+ * Психика только на чтение. Так психика лежит в состоянии NPC: планирование читает её, а эффекты
+ * задач пишут в копию из clone()
+ */
+export interface ReadonlyPsyche {
   /** Возвращает состояние психики. Из него фабрика собирает такую же психику */
   getState(): PsycheState;
-  /** Прогоняет поступок через черты и меняет чувства на сумму их вкладов */
-  react(deed: Deed): void;
   /**
    * Возвращает шанс, с которым персонажу везёт на самом деле: базовый шанс поправляет удачливость
    * @param chance - базовый шанс среднего персонажа от 0 до 1, например, 1 / 40
@@ -27,6 +29,16 @@ export interface IPsyche {
    * @param chance - шанс удачи за одну попытку от 0 до 1, например, 1 / 40
    */
   expectAttempts(chance: number): number;
+  /**
+   * Возвращает копию психики, в которую можно писать: с теми же чертами и чувствами. Исходную
+   * психику копия не меняет
+   */
+  clone(): IPsyche;
+}
+
+export interface IPsyche extends ReadonlyPsyche {
+  /** Прогоняет поступок через черты и меняет чувства на сумму их вкладов */
+  react(deed: Deed): void;
 }
 
 export type PsycheDeps = {
@@ -46,6 +58,7 @@ export class Psyche implements IPsyche {
   /** Максимальное значение чувства */
   static readonly MAX_FEELING = 100;
 
+  private readonly deps: PsycheDeps;
   private readonly traitValues: PsycheTraits;
   private readonly traits: ITrait[];
   private readonly luck: ILuck;
@@ -60,6 +73,7 @@ export class Psyche implements IPsyche {
   constructor(state: PsycheState, deps: PsycheDeps) {
     const { traitFactories } = deps;
 
+    this.deps = deps;
     Object.values(Feeling).forEach((feeling) =>
       this.assertFeeling(feeling, state.feelings[feeling])
     );
@@ -100,6 +114,11 @@ export class Psyche implements IPsyche {
         [feeling]: this.clampFeeling(feelings[feeling] + change),
       };
     }, this.feelings);
+  }
+
+  /** Черты копии собираются теми же фабриками черт, что и черты исходной психики */
+  clone(): IPsyche {
+    return new Psyche(this.getState(), this.deps);
   }
 
   adjustChance(chance: number): number {

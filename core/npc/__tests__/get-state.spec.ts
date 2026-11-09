@@ -1,11 +1,6 @@
 import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
-import { Feeling, Psyche } from '@peetland/psyche';
-import {
-  createMockedPsycheFactory,
-  createPsycheDeps,
-  createPsycheState,
-} from '@peetland/psyche/dev';
+import { createMockedPsyche, createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -77,19 +72,14 @@ describe('Npc', () => {
       });
     });
 
-    it('Возвращает слепок психики NPC', () => {
-      const psyche = new Psyche(
-        createPsycheState({
-          feelings: { [Feeling.Shame]: 30 },
-        }),
-        createPsycheDeps()
-      );
+    it('Возвращает психику NPC', () => {
+      const psyche = createMockedPsyche();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ psycheFactory: createMockedPsycheFactory(psyche) })
       );
 
-      expect(npc.getState().self.psyche).toStrictEqual(psyche.getState());
+      expect(npc.getState().self.psyche).toBe(psyche);
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {

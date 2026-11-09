@@ -1,10 +1,6 @@
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
-import { Deed, Feeling } from '@peetland/psyche';
-import {
-  createMockedPsyche,
-  createMockedPsycheFactory,
-  createPsycheState,
-} from '@peetland/psyche/dev';
+import { Deed } from '@peetland/psyche';
+import { createMockedPsyche, createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
 import { PsycheReactTask } from '../src/psyche-react-task';
@@ -17,10 +13,7 @@ describe('PsycheReactTask', () => {
         ...createNpcContext(),
         psyche,
       };
-      const task = new PsycheReactTask(
-        { deed: Deed.BottleFound },
-        { psycheFactory: createMockedPsycheFactory() }
-      );
+      const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
       task.start(NpcStateBuilder.default(), context);
 
@@ -28,10 +21,7 @@ describe('PsycheReactTask', () => {
     });
 
     it("Возвращает 'success'", () => {
-      const task = new PsycheReactTask(
-        { deed: Deed.BottleFound },
-        { psycheFactory: createMockedPsycheFactory() }
-      );
+      const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
       const result = task.start(NpcStateBuilder.default(), createNpcContext());
 
@@ -40,33 +30,35 @@ describe('PsycheReactTask', () => {
   });
 
   describe('#applyEffects', () => {
-    it('Собирает психику фабрикой из слепка психики в состоянии', () => {
-      const psycheFactory = createMockedPsycheFactory();
-      const state = new NpcStateBuilder().withFeeling(Feeling.Shame, 30).build();
-      const task = new PsycheReactTask({ deed: Deed.BottleFound }, { psycheFactory });
+    it('Сообщает о поступке копии психики из состояния', () => {
+      const copy = createMockedPsyche();
+      const psyche = createMockedPsyche();
+      psyche.clone.mockReturnValue(copy);
+      const state = new NpcStateBuilder()
+        .withPsycheFactory(createMockedPsycheFactory(psyche))
+        .build();
+      const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
       task.applyEffects(state);
 
-      expect(psycheFactory.create).toHaveBeenCalledExactlyOnceWith(state.self.psyche);
+      expect(copy.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
     });
 
-    it('Сообщает собранной психике о поступке', () => {
+    it('Кладёт в состояние копию психики', () => {
+      const copy = createMockedPsyche();
       const psyche = createMockedPsyche();
-      const task = new PsycheReactTask(
-        { deed: Deed.BottleFound },
-        { psycheFactory: createMockedPsycheFactory(psyche) }
+      psyche.clone.mockReturnValue(copy);
+      const task = new PsycheReactTask({ deed: Deed.BottleFound });
+
+      const state = task.applyEffects(
+        new NpcStateBuilder().withPsycheFactory(createMockedPsycheFactory(psyche)).build()
       );
 
-      task.applyEffects(NpcStateBuilder.default());
-
-      expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.BottleFound);
+      expect(state.self.psyche).toBe(copy);
     });
 
     it('Не меняет то, что NPC знает о мире', () => {
-      const task = new PsycheReactTask(
-        { deed: Deed.BottleFound },
-        { psycheFactory: createMockedPsycheFactory(createMockedPsyche()) }
-      );
+      const task = new PsycheReactTask({ deed: Deed.BottleFound });
 
       const state = task.applyEffects(
         new NpcStateBuilder()
@@ -85,20 +77,6 @@ describe('PsycheReactTask', () => {
           minutes: 0,
         },
       });
-    });
-
-    it('Кладёт в состояние слепок собранной психики', () => {
-      const after = createPsycheState({
-        feelings: { [Feeling.Shame]: 28 },
-      });
-      const task = new PsycheReactTask(
-        { deed: Deed.BottleFound },
-        { psycheFactory: createMockedPsycheFactory(createMockedPsyche(after)) }
-      );
-
-      const state = task.applyEffects(NpcStateBuilder.default());
-
-      expect(state.self.psyche).toBe(after);
     });
   });
 });

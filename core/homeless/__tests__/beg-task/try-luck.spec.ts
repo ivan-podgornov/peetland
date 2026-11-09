@@ -2,7 +2,6 @@ import { plan } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling } from '@peetland/psyche';
-import type { IPsycheFactory } from '@peetland/psyche';
 import { createMockedPsyche } from '@peetland/psyche/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -21,10 +20,10 @@ import {
 } from '../../src/constants';
 
 /** Планирует клянчанье на одну удачу и возвращает опции, с которыми задача пытает удачу */
-function planTryLuck(psycheFactory?: IPsycheFactory) {
+function planTryLuck() {
   const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
   plan(
-    createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory, psycheFactory),
+    createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory),
     new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD }).build()
   );
 
@@ -64,14 +63,17 @@ describe('BegTask', () => {
       });
 
       it('Предсказывает стыд так, будто клянчил столько раз, сколько психика NPC ожидает попыток до удачи при BEGGING_CHANCE', () => {
-        const options = planTryLuck(createBeggingPsycheFactory(0.5, createBeggingOptimism(10)));
+        const options = planTryLuck();
 
         const after = options?.applyEffects?.(
-          new NpcStateBuilder().withFeeling(Feeling.Shame, 10).build()
+          new NpcStateBuilder()
+            .withPsycheFactory(createBeggingPsycheFactory(0.5, createBeggingOptimism(10)))
+            .withFeeling(Feeling.Shame, 10)
+            .build()
         );
 
         // 10 + 10 попыток по 0.5
-        expect(after?.self.psyche.feelings).toStrictEqual({ [Feeling.Shame]: 15 });
+        expect(after?.self.psyche.getState().feelings).toStrictEqual({ [Feeling.Shame]: 15 });
       });
 
       it('Предсказание стыда не меняет то, что NPC знает о мире', () => {

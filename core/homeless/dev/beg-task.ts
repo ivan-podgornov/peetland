@@ -58,13 +58,11 @@ export function createBeggingPsycheFactory(
 /** Создаёт задачу клянчанья с настоящей фабрикой примитивов, если другая не передана */
 export function createBegTask(
   places: IPlaces,
-  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory(),
-  psycheFactory: IPsycheFactory = createBeggingPsycheFactory()
+  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
 ): BegTask {
   return new BegTask({
     npcTaskFactory,
     places,
-    psycheFactory,
   });
 }
 

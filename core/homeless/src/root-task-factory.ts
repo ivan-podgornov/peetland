@@ -3,8 +3,6 @@ import type { IKindRootTaskFactory } from '@peetland/npc';
 import { NpcTaskFactory } from '@peetland/npc-tasks';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import type { IPlaces } from '@peetland/places';
-import { PsycheFactory } from '@peetland/psyche';
-import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -16,11 +14,6 @@ export type HomelessRootTaskFactoryDeps = {
   geometry: IGeometry;
   /** Места мира, которые получают задачи бомжа */
   places: IPlaces;
-  /**
-   * Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах. По
-   * умолчанию — PsycheFactory
-   */
-  psycheFactory?: IPsycheFactory;
   random: IRandom;
   timer: ITimer;
   /** Фабрика примитивов, которую получают задачи бомжа. По умолчанию — NpcTaskFactory */
@@ -40,19 +33,16 @@ export class HomelessRootTaskFactory implements IKindRootTaskFactory {
     const {
       geometry,
       places,
-      psycheFactory = new PsycheFactory(),
       random,
       timer,
       npcTaskFactory = new NpcTaskFactory({
         geometry,
-        psycheFactory,
         random,
         timer,
       }),
       homelessTaskFactory = new HomelessTaskFactory({
         npcTaskFactory,
         places,
-        psycheFactory,
         random,
       }),
     } = deps;

@@ -101,7 +101,7 @@ export class Npc {
           angle: this.actor.getAngle(),
         },
         inventory: this.inventory,
-        psyche: this.psyche.getState(),
+        psyche: this.psyche,
       },
       world: this.worldKnowledge.getState(),
     };

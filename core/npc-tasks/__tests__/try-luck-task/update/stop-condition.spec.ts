@@ -13,7 +13,7 @@ describe('TryLuckTask', () => {
       const task = new TryLuckTask(
         {
           chance: 1 / 60,
-          stopWhen: (state) => state.self.psyche.feelings[Feeling.Shame] >= 80,
+          stopWhen: (state) => state.self.psyche.getState().feelings[Feeling.Shame] >= 80,
         },
         {
           random: createMockedRandom(false),

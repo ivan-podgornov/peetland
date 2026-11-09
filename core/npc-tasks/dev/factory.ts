@@ -1,5 +1,4 @@
 import { Geometry } from '@peetland/geometry';
-import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 
@@ -10,7 +9,6 @@ import type { INpcTaskFactory, NpcTaskFactoryDeps } from '../src';
 export function createNpcTaskFactoryDeps(): NpcTaskFactoryDeps {
   return {
     geometry: new Geometry(),
-    psycheFactory: createMockedPsycheFactory(),
     random: createMockedRandom(false),
     timer: new ManualTimer(),
   };

@@ -1,7 +1,14 @@
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
-import type { Feeling, PsycheFeelings, PsycheTraits, Trait } from '@peetland/psyche';
+import { PsycheFactory } from '@peetland/psyche';
+import type {
+  Feeling,
+  IPsycheFactory,
+  PsycheFeelings,
+  PsycheTraits,
+  Trait,
+} from '@peetland/psyche';
 import { createPsycheState } from '@peetland/psyche/dev';
 import type { TimeState } from '@peetland/timings';
 
@@ -10,7 +17,8 @@ import type { NpcState } from '../src';
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC стоит
  * в начале координат, смотрит под углом 0, инвентарь пуст, черты и чувства как в createPsycheState,
- * а в мире полночь первого дня. Каждый вызов build возвращает новое состояние
+ * а в мире полночь первого дня. Психику собирает PsycheFactory с
+ * фабриками черт по умолчанию. Каждый вызов build возвращает новое состояние
  *
  * @example
  * const state = new NpcStateBuilder()
@@ -28,6 +36,7 @@ export class NpcStateBuilder {
   private inventory: InventoryCounts = {};
   private traits: PsycheTraits;
   private feelings: PsycheFeelings;
+  private psycheFactory: IPsycheFactory = new PsycheFactory();
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -90,6 +99,15 @@ export class NpcStateBuilder {
     return this;
   }
 
+  /**
+   * Задаёт фабрику, которой собирается психика из черт и чувств. Нужна, когда для теста важно, как
+   * психика реагирует на поступки
+   */
+  withPsycheFactory(psycheFactory: IPsycheFactory): this {
+    this.psycheFactory = psycheFactory;
+    return this;
+  }
+
   /** Задаёт время суток в мире */
   withTime(time: TimeState): this {
     this.time = time;
@@ -105,10 +123,10 @@ export class NpcStateBuilder {
           angle: this.angle,
         },
         inventory: new Inventory(this.inventory),
-        psyche: {
-          traits: { ...this.traits },
-          feelings: { ...this.feelings },
-        },
+        psyche: this.psycheFactory.create({
+          traits: this.traits,
+          feelings: this.feelings,
+        }),
       },
       world: {
         time: { ...this.time },

@@ -6155,6 +6155,12 @@ function Inventory.prototype.getAll(self)
     end)
     return counts
 end
+function Inventory.prototype.clone(self)
+    return __TS__New(
+        ____exports.Inventory,
+        self:getAll()
+    )
+end
 function Inventory.prototype.set(self, item, count)
     assertCount(count)
     self:write(item, count)
@@ -7074,7 +7080,7 @@ function Npc.prototype.getState(self)
                 position = self.actor:getPosition(),
                 angle = self.actor:getAngle()
             },
-            inventory = self.inventory:getAll(),
+            inventory = self.inventory,
             psyche = self.psyche:getState()
         },
         world = self.worldKnowledge:getState()
@@ -7420,11 +7426,8 @@ return ____exports
 ["core.npc-tasks.src.add-item-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Inventory = ____inventory.Inventory
 --- Добавить предмет в инвентарь. Задача мгновенная: завершается прямо в start
 ____exports.AddItemTask = __TS__Class()
 local AddItemTask = ____exports.AddItemTask
@@ -7440,16 +7443,12 @@ function AddItemTask.prototype.applyEffects(self, state)
     local ____self_options_0 = self.options
     local item = ____self_options_0.item
     local count = ____self_options_0.count
-    local inventory = __TS__New(Inventory, state.self.inventory)
+    local inventory = state.self.inventory:clone()
     inventory:add(item, count)
     return __TS__ObjectAssign(
         {},
         state,
-        {self = __TS__ObjectAssign(
-            {},
-            state.self,
-            {inventory = inventory:getAll()}
-        )}
+        {self = __TS__ObjectAssign({}, state.self, {inventory = inventory})}
     )
 end
 function AddItemTask.prototype.start(self, _state, context)
@@ -7578,11 +7577,8 @@ return ____exports
 ["core.npc-tasks.src.remove-item-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Inventory = ____inventory.Inventory
 --- Отнять предмет из инвентаря. Выполнить можно, только если предмета хватает. Задача мгновенная:
 -- завершается прямо в start
 ____exports.RemoveItemTask = __TS__Class()
@@ -7596,22 +7592,18 @@ function RemoveItemTask.prototype.canExecute(self, state)
     local ____self_options_0 = self.options
     local item = ____self_options_0.item
     local count = ____self_options_0.count
-    return (state.self.inventory[item] or 0) >= count
+    return state.self.inventory:get(item) >= count
 end
 function RemoveItemTask.prototype.applyEffects(self, state)
     local ____self_options_1 = self.options
     local item = ____self_options_1.item
     local count = ____self_options_1.count
-    local inventory = __TS__New(Inventory, state.self.inventory)
+    local inventory = state.self.inventory:clone()
     inventory:remove(item, count)
     return __TS__ObjectAssign(
         {},
         state,
-        {self = __TS__ObjectAssign(
-            {},
-            state.self,
-            {inventory = inventory:getAll()}
-        )}
+        {self = __TS__ObjectAssign({}, state.self, {inventory = inventory})}
     )
 end
 function RemoveItemTask.prototype.start(self, _state, context)
@@ -7818,7 +7810,7 @@ function PurchaseTask.prototype.____constructor(self, options, deps)
     local npcTaskFactory = ____deps_1.npcTaskFactory
     self.methods = {{
         name = "pay",
-        preconditions = function(____, state) return (state.self.inventory[Item.Money] or 0) >= price end,
+        preconditions = function(____, state) return state.self.inventory:get(Item.Money) >= price end,
         tasks = {
             npcTaskFactory:playAnimation({animation = "pay"}),
             npcTaskFactory:removeItem({item = Item.Money, count = price}),
@@ -8002,8 +7994,8 @@ function BegTask.prototype.begAtNearestSpot(self, state)
     return tasks
 end
 function BegTask.prototype.countNeededRewards(self, state)
-    local money = state.self.inventory[Item.Money] or 0
-    local bottles = state.self.inventory[Item.Bottles] or 0
+    local money = state.self.inventory:get(Item.Money)
+    local bottles = state.self.inventory:get(Item.Bottles)
     local shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE
     return math.max(
         0,
@@ -8073,7 +8065,7 @@ function BuyBoozeTask.prototype.____constructor(self, deps)
     }}
 end
 function BuyBoozeTask.prototype.canBuy(self, state)
-    local money = state.self.inventory[Item.Money] or 0
+    local money = state.self.inventory:get(Item.Money)
     return money >= BOOZE_PRICE and #self.places:ofType(PlaceType.Shop) > 0
 end
 function BuyBoozeTask.prototype.buyInNearestShop(self, state)
@@ -8166,7 +8158,7 @@ function CollectBottlesTask.prototype.searchRandomTrashBin(self, state)
     return tasks
 end
 function CollectBottlesTask.prototype.countBottles(self, state)
-    return state.self.inventory[Item.Bottles] or 0
+    return state.self.inventory:get(Item.Bottles)
 end
 CollectBottlesTask.TRASH_BIN_COMPLETE_RADIUS = 0.5
 CollectBottlesTask.TRASH_BIN_FACING_TOLERANCE = 15
@@ -8189,7 +8181,7 @@ local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
 function hasBooze(state)
-    return (state.self.inventory[Item.Booze] or 0) > 0
+    return state.self.inventory:get(Item.Booze) > 0
 end
 --- Бухать: выпить бутылку пойла в бомжарне, если пойло есть. Если NPC не в бомжарне, сначала он
 -- идёт к ближайшей. Когда NPC допил, пойло отнимается, а пустая бутылка остаётся в инвентаре
@@ -8278,7 +8270,7 @@ function SellBottlesTask.prototype.____constructor(self, deps)
     }}
 end
 function SellBottlesTask.prototype.canSell(self, state)
-    local money = state.self.inventory[Item.Money] or 0
+    local money = state.self.inventory:get(Item.Money)
     local bottles = self:countBottles(state)
     return bottles > 0 and money + bottles * BOTTLE_PRICE >= BOOZE_PRICE and #self.places:ofType(PlaceType.BottleCollection) > 0
 end
@@ -8302,7 +8294,7 @@ function SellBottlesTask.prototype.sellInNearestCollection(self, state)
     }
 end
 function SellBottlesTask.prototype.countBottles(self, state)
-    return state.self.inventory[Item.Bottles] or 0
+    return state.self.inventory:get(Item.Bottles)
 end
 SellBottlesTask.COLLECTION_COMPLETE_RADIUS = 0.5
 SellBottlesTask.COLLECTION_FACING_TOLERANCE = 15

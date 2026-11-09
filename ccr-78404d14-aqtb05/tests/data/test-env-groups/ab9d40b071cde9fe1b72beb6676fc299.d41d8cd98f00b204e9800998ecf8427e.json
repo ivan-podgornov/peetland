@@ -1,1 +1,0 @@
-{"id":"ab9d40b071cde9fe1b72beb6676fc299.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/time-span/has-passed.spec.ts#TimeSpan #hasPassed Если прошло меньше минут, возвращает false","name":"Если прошло меньше минут, возвращает false","status":"passed","testResultsByEnv":{"default":"da7b2b1db20e4bc8e79825b6e4756fb5"}}

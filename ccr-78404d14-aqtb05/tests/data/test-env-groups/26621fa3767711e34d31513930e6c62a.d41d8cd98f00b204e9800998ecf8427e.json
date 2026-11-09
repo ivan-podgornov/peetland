@@ -1,1 +1,0 @@
-{"id":"26621fa3767711e34d31513930e6c62a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/time-span/elapsed-minutes.spec.ts#TimeSpan #elapsedMinutes Если to раньше from, возвращает отрицательное число","name":"Если to раньше from, возвращает отрицательное число","status":"passed","testResultsByEnv":{"default":"a2cd8c2012d179de9f3e770c9d549e0a"}}

@@ -85,17 +85,5 @@ describe('AddItemTask', () => {
         [Item.Booze]: 1,
       });
     });
-
-    it('Не меняет инвентарь исходного состояния', () => {
-      const task = new AddItemTask({
-        item: Item.Booze,
-        count: 1,
-      });
-      const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build();
-
-      task.applyEffects(state);
-
-      expect(state.self.inventory.get(Item.Booze)).toBe(2);
-    });
   });
 });

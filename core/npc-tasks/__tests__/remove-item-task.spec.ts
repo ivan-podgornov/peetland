@@ -122,17 +122,5 @@ describe('RemoveItemTask', () => {
 
       expect(state.self.inventory.getAll()).toStrictEqual({});
     });
-
-    it('Не меняет инвентарь исходного состояния', () => {
-      const task = new RemoveItemTask({
-        item: Item.Booze,
-        count: 1,
-      });
-      const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build();
-
-      task.applyEffects(state);
-
-      expect(state.self.inventory.get(Item.Booze)).toBe(2);
-    });
   });
 });

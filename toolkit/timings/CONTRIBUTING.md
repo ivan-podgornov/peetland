@@ -52,3 +52,22 @@ timer.advance(2500); // 1000, 1000
 
 `clone()` возвращает копию времени на момент вызова — `ITime`. Так HTN-задачи предсказывают, сколько будет времени после них, не трогая
 время игры. `ManualTime` нужен и в тестах: время такое, какое нужно тесту.
+
+## Интервалы времени
+
+`TimeSpan` считает, сколько игрового времени прошло между двумя слепками `TimeState`, с учётом смены
+дня. `elapsedMinutes(from, to)` возвращает число минут, а `hasPassed(from, to, minutes)` — прошло ли
+не меньше `minutes`. Если `to` раньше `from`, минут прошло отрицательное число, и `hasPassed`
+возвращает `false`:
+
+```ts
+import { TimeSpan } from '@peetland/timings';
+
+const span = new TimeSpan();
+
+span.elapsedMinutes({ day: 1, hours: 23, minutes: 50 }, { day: 2, hours: 0, minutes: 5 }); // 15
+span.hasPassed({ day: 1, hours: 23, minutes: 50 }, { day: 2, hours: 0, minutes: 5 }, 15); // true
+```
+
+Слепки проверяет `TimeStateValidator` — тот же, что проверяет время в `ManualTime.set`: если слепок
+не момент времени, выбрасывается `RangeError`.

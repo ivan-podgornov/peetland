@@ -1,3 +1,4 @@
+import { TimeStateValidator } from './time-state-validator';
 import type { ITime, TimeState } from './types';
 
 /** Первый день в полночь */
@@ -12,6 +13,7 @@ const DEFAULT_STATE: TimeState = {
  * воссоздать из слепка другого времени (см. IReadonlyTime.getState)
  */
 export class ManualTime implements ITime {
+  private readonly validator = new TimeStateValidator();
   private state: TimeState;
 
   /**
@@ -56,19 +58,9 @@ export class ManualTime implements ITime {
    * @param state - слепок времени, которое нужно выставить
    */
   set(state: TimeState): void {
+    this.validator.validate(state);
+
     const { day, hours, minutes } = state;
-
-    if (!Number.isInteger(day) || day < 1) {
-      throw new RangeError('День должен быть целым числом от 1');
-    }
-
-    if (!Number.isInteger(hours) || hours < 0 || hours > 23) {
-      throw new RangeError('Час должен быть целым числом от 0 до 23');
-    }
-
-    if (!Number.isInteger(minutes) || minutes < 0 || minutes > 59) {
-      throw new RangeError('Минуты должны быть целым числом от 0 до 59');
-    }
 
     this.state = {
       day,

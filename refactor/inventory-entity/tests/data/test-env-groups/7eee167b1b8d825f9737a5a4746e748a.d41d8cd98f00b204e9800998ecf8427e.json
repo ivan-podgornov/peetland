@@ -1,1 +1,0 @@
-{"id":"7eee167b1b8d825f9737a5a4746e748a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/constructor.spec.ts#Inventory #constructor Не добавляет предметы с нулевым количеством","name":"Не добавляет предметы с нулевым количеством","status":"passed","testResultsByEnv":{"default":"5c923ddcd75297ec445cb4b57fce4fe9"}}

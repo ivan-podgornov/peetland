@@ -1,4 +1,4 @@
-import { createStubTask } from '@peetland/htn/dev';
+import { createStubTask, methodTasks } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { describe, expect, it } from 'vitest';
 
@@ -14,11 +14,6 @@ function createLayers(deps: Partial<RootTaskDeps> = {}): RootTaskDeps {
     activity: createStubTask<NpcState, NpcContext>('activity'),
     ...deps,
   };
-}
-
-/** Возвращает задачи метода корневой задачи по имени метода */
-function methodTasks(task: RootTask, name: string) {
-  return task.methods.find((method) => method.name === name)?.tasks;
 }
 
 describe('RootTask', () => {

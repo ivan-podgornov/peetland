@@ -1,6 +1,6 @@
 import { Geometry } from '@peetland/geometry';
 import { HomelessActivityTask } from '@peetland/homeless';
-import { createStubTask } from '@peetland/htn/dev';
+import { createStubTask, methodTasks } from '@peetland/htn/dev';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -26,11 +26,6 @@ function createDeps(deps: Partial<RootTaskFactoryDeps> = {}): RootTaskFactoryDep
 /** Создаёт фабрику слоя, которая возвращает задачу с переданным именем */
 function createLayerTaskFactory(name: string) {
   return { create: vi.fn(() => createStubTask<NpcState, NpcContext>(name)) };
-}
-
-/** Возвращает задачи метода корневой задачи по имени метода */
-function methodTasks(task: RootTask, name: string) {
-  return task.methods.find((method) => method.name === name)?.tasks;
 }
 
 describe('RootTaskFactory', () => {

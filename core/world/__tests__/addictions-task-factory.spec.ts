@@ -1,18 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
+import { AddictionsTask } from '../src/addictions-task';
 import { AddictionsTaskFactory } from '../src/addictions-task-factory';
 
 describe('AddictionsTaskFactory', () => {
   describe('#create', () => {
-    it('Пока зависимостей нет, возвращает составную задачу без методов', () => {
+    it('Возвращает экземпляр AddictionsTask', () => {
       const factory = new AddictionsTaskFactory();
 
       const task = factory.create();
 
-      expect(task).toStrictEqual({
-        name: 'addictions',
-        methods: [],
-      });
+      expect(task).toBeInstanceOf(AddictionsTask);
     });
   });
 });

@@ -1,18 +1,9 @@
-import type { CompoundTask } from '@peetland/htn';
-import type { NpcContext, NpcState } from '@peetland/npc';
-
+import { AddictionsTask } from './addictions-task';
 import type { ILayerTaskFactory } from './types';
 
-/**
- * Создаёт слой зависимостей корневой задачи NPC: то, без чего NPC жить не хочет. Пока зависимостей
- * нет ни у кого, поэтому слой — составная задача без методов, и планировщик переходит к следующему
- * слою
- */
+/** Создаёт слой зависимостей корневой задачи NPC (см. AddictionsTask) */
 export class AddictionsTaskFactory implements ILayerTaskFactory {
-  create(): CompoundTask<NpcState, NpcContext> {
-    return {
-      name: 'addictions',
-      methods: [],
-    };
+  create(): AddictionsTask {
+    return new AddictionsTask();
   }
 }

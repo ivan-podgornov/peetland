@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import type { PrimitiveTask, Task } from '../src';
+import type { CompoundTask, MethodTasks, PrimitiveTask, Task } from '../src';
 
 /** Создаёт примитивную задачу с названием, которая всегда может выполниться и ничего не меняет */
 export function createStubPrimitiveTask<TState, TContext>(
@@ -33,4 +33,12 @@ export function createStubTask<TState, TContext>(
   }
 
   return createStubPrimitiveTask(name);
+}
+
+/** Возвращает задачи метода составной задачи по имени метода или undefined, если метода нет */
+export function methodTasks<TState, TContext>(
+  task: CompoundTask<TState, TContext>,
+  name: string
+): MethodTasks<TState, TContext> | undefined {
+  return task.methods.find((method) => method.name === name)?.tasks;
 }

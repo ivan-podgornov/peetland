@@ -9,38 +9,43 @@ import type { ITimer } from '@peetland/timings';
 
 import type { ILayerTaskFactory } from './types';
 
-/** Фабрика деятельности для каждого типа NPC */
-export type KindActivityTaskFactories = Readonly<Record<NpcKind, IActivityTaskFactory>>;
-
 export type ActivityTaskFactoryDeps = {
   geometry: IGeometry;
   /** Места мира, которые получают задачи NPC */
   places: IPlaces;
   random: IRandom;
   timer: ITimer;
-  /**
-   * Фабрики деятельности, которые заменяют фабрики по умолчанию. По умолчанию у каждого типа NPC
-   * фабрика из его пакета с задачами
-   */
-  kindFactories?: Partial<KindActivityTaskFactories>;
+  /** Фабрика деятельности бомжа. По умолчанию — HomelessActivityTaskFactory */
+  homelessActivityTaskFactory?: IActivityTaskFactory;
 };
 
-/** Создаёт слой деятельности корневой задачи NPC фабрикой его типа */
+/** Создаёт слой деятельности корневой задачи NPC фабрикой деятельности его типа */
 export class ActivityTaskFactory implements ILayerTaskFactory {
-  private readonly kindFactories: KindActivityTaskFactories;
+  private readonly homelessActivityTaskFactory: IActivityTaskFactory;
 
   constructor(deps: ActivityTaskFactoryDeps) {
-    const { kindFactories = {}, ...shared } = deps;
+    const {
+      geometry,
+      places,
+      random,
+      timer,
+      homelessActivityTaskFactory = new HomelessActivityTaskFactory({
+        geometry,
+        places,
+        random,
+        timer,
+      }),
+    } = deps;
 
-    this.kindFactories = {
-      [NpcKind.Homeless]:
-        kindFactories[NpcKind.Homeless] ?? new HomelessActivityTaskFactory(shared),
-    };
+    this.homelessActivityTaskFactory = homelessActivityTaskFactory;
   }
 
   create(kind: NpcKind): Task<NpcState, NpcContext> {
-    const { kindFactories } = this;
+    const { homelessActivityTaskFactory } = this;
 
-    return kindFactories[kind].create();
+    switch (kind) {
+      case NpcKind.Homeless:
+        return homelessActivityTaskFactory.create();
+    }
   }
 }

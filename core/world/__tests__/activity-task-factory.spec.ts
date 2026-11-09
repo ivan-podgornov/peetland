@@ -11,7 +11,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ActivityTaskFactory } from '../src/activity-task-factory';
 import type { ActivityTaskFactoryDeps } from '../src/activity-task-factory';
 
-/** Создаёт зависимости фабрики деятельности. Фабрики типов NPC — по умолчанию */
+/** Создаёт зависимости фабрики деятельности. Фабрики деятельности типов NPC — по умолчанию */
 function createDeps(deps: Partial<ActivityTaskFactoryDeps> = {}): ActivityTaskFactoryDeps {
   return {
     geometry: new Geometry(),
@@ -24,29 +24,27 @@ function createDeps(deps: Partial<ActivityTaskFactoryDeps> = {}): ActivityTaskFa
 
 describe('ActivityTaskFactory', () => {
   describe('#create', () => {
-    it('Вызывает create у фабрики переданного типа из kindFactories', () => {
-      const homelessFactory = {
+    it('Для бомжа вызывает create у homelessActivityTaskFactory', () => {
+      const homelessActivityTaskFactory = {
         create: vi.fn(() => ({
           name: 'activity',
           methods: [],
         })),
       };
-      const factory = new ActivityTaskFactory(
-        createDeps({ kindFactories: { [NpcKind.Homeless]: homelessFactory } })
-      );
+      const factory = new ActivityTaskFactory(createDeps({ homelessActivityTaskFactory }));
 
       factory.create(NpcKind.Homeless);
 
-      expect(homelessFactory.create).toHaveBeenCalledExactlyOnceWith();
+      expect(homelessActivityTaskFactory.create).toHaveBeenCalledExactlyOnceWith();
     });
 
-    it('Возвращает задачу, которую вернула фабрика переданного типа', () => {
+    it('Для бомжа возвращает задачу, которую вернула homelessActivityTaskFactory', () => {
       const activityTask: Task<NpcState, NpcContext> = {
         name: 'activity',
         methods: [],
       };
       const factory = new ActivityTaskFactory(
-        createDeps({ kindFactories: { [NpcKind.Homeless]: { create: () => activityTask } } })
+        createDeps({ homelessActivityTaskFactory: { create: () => activityTask } })
       );
 
       const task = factory.create(NpcKind.Homeless);
@@ -54,7 +52,7 @@ describe('ActivityTaskFactory', () => {
       expect(task).toBe(activityTask);
     });
 
-    it('Если фабрика бомжа не передана, для бомжа возвращает экземпляр HomelessActivityTask', () => {
+    it('Если homelessActivityTaskFactory не передана, для бомжа возвращает экземпляр HomelessActivityTask', () => {
       const factory = new ActivityTaskFactory(createDeps());
 
       const task = factory.create(NpcKind.Homeless);

@@ -84,15 +84,9 @@ describe('BegTask', () => {
       });
 
       it('Предсказание стыда не меняет то, что NPC знает о мире', () => {
-        const time = {
-          day: 1,
-          hours: 20,
-          minutes: 0,
-        };
+        const state = NpcStateBuilder.default();
 
-        const after = planTryLuck()?.applyEffects?.(new NpcStateBuilder().withTime(time).build());
-
-        expect(after?.world).toStrictEqual({ time });
+        expect(planTryLuck()?.applyEffects?.(state).world).toBe(state.world);
       });
     });
   });

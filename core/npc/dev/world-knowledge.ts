@@ -1,3 +1,4 @@
+import { ManualTime } from '@peetland/timings';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
@@ -8,13 +9,7 @@ import type { INpcWorldKnowledge, NpcWorldState } from '../src';
  * передано, в мире полночь
  */
 export function createMockedNpcWorldKnowledge(
-  state: NpcWorldState = {
-    time: {
-      day: 1,
-      hours: 0,
-      minutes: 0,
-    },
-  }
+  state: NpcWorldState = { time: new ManualTime() }
 ): Mocked<INpcWorldKnowledge> {
   return { getState: vi.fn(() => state) };
 }

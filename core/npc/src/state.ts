@@ -1,7 +1,7 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { IReadonlyInventory } from '@peetland/inventory';
 import type { IReadonlyPsyche } from '@peetland/psyche';
-import type { TimeState } from '@peetland/timings';
+import type { ITime } from '@peetland/timings';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
 export type NpcActorState = Readonly<{
@@ -17,10 +17,13 @@ export type NpcSelfState = Readonly<{
   psyche: IReadonlyPsyche;
 }>;
 
-/** Что NPC знает о мире на момент сбора состояния */
+/** Что NPC знает о мире */
 export type NpcWorldState = Readonly<{
-  /** Слепок времени суток */
-  time: TimeState;
+  /**
+   * Время суток. Время идёт, поэтому геттеры могут вернуть разное даже за одно планирование.
+   * Эффекты задач время не меняют, поэтому копировать его не нужно
+   */
+  time: ITime;
 }>;
 
 /**

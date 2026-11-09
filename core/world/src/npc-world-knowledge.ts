@@ -14,10 +14,10 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
     this.deps = deps;
   }
 
-  /** Возвращает слепок мира с текущим временем суток */
+  /** Возвращает мир с временем суток */
   getState(): NpcWorldState {
     const { time } = this.deps;
 
-    return { time: time.getState() };
+    return { time };
   }
 }

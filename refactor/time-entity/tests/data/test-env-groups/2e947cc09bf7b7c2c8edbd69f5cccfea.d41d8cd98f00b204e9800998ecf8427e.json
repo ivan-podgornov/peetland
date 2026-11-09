@@ -1,0 +1,1 @@
+{"id":"2e947cc09bf7b7c2c8edbd69f5cccfea.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/update.spec.ts#CommandTask #update Если команда выполнена, возвращает 'success'","name":"Если команда выполнена, возвращает 'success'","status":"passed","testResultsByEnv":{"default":"3ad20d4504ccfb430a738a7d5cd5ae45"}}

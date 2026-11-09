@@ -1,0 +1,1 @@
+{"id":"625e7082dbfd377f5f3fd636ec50d3c2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/optimism/expect-attempts.spec.ts#Optimism #expectAttempts Если шанс 0, выбрасывает RangeError","name":"Если шанс 0, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"187c643df6d9cdb8fa90ca97cdf8a48c"}}

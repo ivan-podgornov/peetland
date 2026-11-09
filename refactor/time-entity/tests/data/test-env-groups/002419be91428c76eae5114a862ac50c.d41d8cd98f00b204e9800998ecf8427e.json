@@ -1,0 +1,1 @@
+{"id":"002419be91428c76eae5114a862ac50c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/animation-manager/__tests__/resolve.spec.ts#AnimationManager #resolve Для незацикленной анимации не возвращает loop","name":"Для незацикленной анимации не возвращает loop","status":"passed","testResultsByEnv":{"default":"b864246f54eb3f02b89fe45f471ae693"}}

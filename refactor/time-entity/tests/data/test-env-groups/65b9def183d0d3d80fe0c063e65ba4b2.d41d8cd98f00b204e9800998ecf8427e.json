@@ -1,0 +1,1 @@
+{"id":"65b9def183d0d3d80fe0c063e65ba4b2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/can-execute.spec.ts#TryLuckTask #canExecute Если условие остановки не выполнилось, возвращает true","name":"Если условие остановки не выполнилось, возвращает true","status":"passed","testResultsByEnv":{"default":"7026b1c8da54236215e2f6374c3c2812"}}

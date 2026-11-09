@@ -1,6 +1,7 @@
 import type { Observable } from '@peetland/events';
 import { getTimeOfDay } from '@peetland/moonloader';
-import type { ITime, TimeState } from '@peetland/timings';
+import { ManualTime } from '@peetland/timings';
+import type { IManualTime, ITime, TimeState } from '@peetland/timings';
 
 export type GtaTimeDeps = {
   /** Тики мира, на которых время замечает, что наступила полночь */
@@ -48,6 +49,10 @@ export class GtaTime implements ITime {
       hours,
       minutes,
     };
+  }
+
+  clone(): IManualTime {
+    return new ManualTime(this.getState());
   }
 
   /** Берёт часы и минуты из игры и, если наступила полночь, переходит на следующий день */

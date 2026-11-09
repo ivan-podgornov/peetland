@@ -1,4 +1,4 @@
-import type { ITime, TimeState } from './types';
+import type { IManualTime, TimeState } from './types';
 
 /** Первый день в полночь */
 const DEFAULT_STATE: TimeState = {
@@ -11,7 +11,7 @@ const DEFAULT_STATE: TimeState = {
  * Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
  * воссоздать из слепка другого времени (см. ITime.getState)
  */
-export class ManualTime implements ITime {
+export class ManualTime implements IManualTime {
   private state: TimeState;
 
   /**
@@ -43,6 +43,10 @@ export class ManualTime implements ITime {
       hours,
       minutes,
     };
+  }
+
+  clone(): IManualTime {
+    return new ManualTime(this.getState());
   }
 
   /**

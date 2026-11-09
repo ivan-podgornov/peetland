@@ -4014,7 +4014,7 @@ local ____exports = {}
 --- Первый день в полночь
 local DEFAULT_STATE = {day = 1, hours = 0, minutes = 0}
 --- Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
--- воссоздать из слепка другого времени (см. ITime.getState)
+-- воссоздать из слепка другого времени (см. IReadonlyTime.getState)
 ____exports.ManualTime = __TS__Class()
 local ManualTime = ____exports.ManualTime
 ManualTime.name = "ManualTime"

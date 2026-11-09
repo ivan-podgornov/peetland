@@ -6,16 +6,17 @@ export type RootTaskDeps = {
   needs: Task<NpcState, NpcContext>;
   /** Слой зависимостей: то, без чего NPC жить не хочет */
   addictions: Task<NpcState, NpcContext>;
-  /** Слой хобби: то, чем NPC занимается для души */
-  hobbies: Task<NpcState, NpcContext>;
   /** Слой деятельности: то, чем NPC занят по своему типу */
   activity: Task<NpcState, NpcContext>;
+  /** Слой хобби: то, чем NPC занимается для души */
+  hobbies: Task<NpcState, NpcContext>;
 };
 
 /**
  * Корневая задача NPC: жить. Методы — слои, перечисленные по приоритету: потребности, а если
- * планировать нечего — зависимости, а если и их нечего — хобби, а иначе — деятельность. Когда
- * слою есть что планировать, решают предусловия его задач
+ * планировать нечего — зависимости, а если и их нечего — деятельность, а иначе — хобби. Когда
+ * слою есть что планировать, решают предусловия его задач: например, деятельность ограничена своим
+ * расписанием, а хобби занимает свободное от неё время
  */
 export class RootTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'live';
@@ -23,7 +24,7 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
   readonly methods: Method<NpcState, NpcContext>[];
 
   constructor(deps: RootTaskDeps) {
-    const { needs, addictions, hobbies, activity } = deps;
+    const { needs, addictions, activity, hobbies } = deps;
 
     this.methods = [
       {
@@ -37,14 +38,14 @@ export class RootTask implements CompoundTask<NpcState, NpcContext> {
         tasks: [addictions],
       },
       {
-        name: 'hobbies',
-        preconditions: () => true,
-        tasks: [hobbies],
-      },
-      {
         name: 'activity',
         preconditions: () => true,
         tasks: [activity],
+      },
+      {
+        name: 'hobbies',
+        preconditions: () => true,
+        tasks: [hobbies],
       },
     ];
   }

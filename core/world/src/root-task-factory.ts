@@ -21,18 +21,18 @@ export type RootTaskFactoryDeps = {
   needsTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
   addictionsTaskFactory?: ILayerTaskFactory;
-  /** Фабрика слоя хобби. По умолчанию — HobbiesTaskFactory */
-  hobbiesTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
   activityTaskFactory?: ILayerTaskFactory;
+  /** Фабрика слоя хобби. По умолчанию — HobbiesTaskFactory */
+  hobbiesTaskFactory?: ILayerTaskFactory;
 };
 
 /** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
   private readonly needsTaskFactory: ILayerTaskFactory;
   private readonly addictionsTaskFactory: ILayerTaskFactory;
-  private readonly hobbiesTaskFactory: ILayerTaskFactory;
   private readonly activityTaskFactory: ILayerTaskFactory;
+  private readonly hobbiesTaskFactory: ILayerTaskFactory;
 
   constructor(deps: RootTaskFactoryDeps) {
     const {
@@ -42,30 +42,30 @@ export class RootTaskFactory implements IRootTaskFactory {
       timer,
       needsTaskFactory = new NeedsTaskFactory(),
       addictionsTaskFactory = new AddictionsTaskFactory(),
-      hobbiesTaskFactory = new HobbiesTaskFactory(),
       activityTaskFactory = new ActivityTaskFactory({
         geometry,
         places,
         random,
         timer,
       }),
+      hobbiesTaskFactory = new HobbiesTaskFactory(),
     } = deps;
 
     this.needsTaskFactory = needsTaskFactory;
     this.addictionsTaskFactory = addictionsTaskFactory;
-    this.hobbiesTaskFactory = hobbiesTaskFactory;
     this.activityTaskFactory = activityTaskFactory;
+    this.hobbiesTaskFactory = hobbiesTaskFactory;
   }
 
   create(kind: NpcKind): RootTask {
-    const { needsTaskFactory, addictionsTaskFactory, hobbiesTaskFactory, activityTaskFactory } =
+    const { needsTaskFactory, addictionsTaskFactory, activityTaskFactory, hobbiesTaskFactory } =
       this;
 
     return new RootTask({
       needs: needsTaskFactory.create(kind),
       addictions: addictionsTaskFactory.create(kind),
-      hobbies: hobbiesTaskFactory.create(kind),
       activity: activityTaskFactory.create(kind),
+      hobbies: hobbiesTaskFactory.create(kind),
     });
   }
 }

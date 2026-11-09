@@ -10,8 +10,8 @@ function createLayers(deps: Partial<RootTaskDeps> = {}): RootTaskDeps {
   return {
     needs: createStubTask<NpcState, NpcContext>('needs'),
     addictions: createStubTask<NpcState, NpcContext>('addictions'),
-    hobbies: createStubTask<NpcState, NpcContext>('hobbies'),
     activity: createStubTask<NpcState, NpcContext>('activity'),
+    hobbies: createStubTask<NpcState, NpcContext>('hobbies'),
     ...deps,
   };
 }
@@ -41,18 +41,6 @@ describe('RootTask', () => {
     });
   });
 
-  describe('Метод hobbies', () => {
-    describe('Задачи', () => {
-      it('Состоит из слоя хобби', () => {
-        const hobbies = createStubTask<NpcState, NpcContext>('hobbies');
-
-        const task = new RootTask(createLayers({ hobbies }));
-
-        expect(methodTasks(task, 'hobbies')).toStrictEqual([hobbies]);
-      });
-    });
-  });
-
   describe('Метод activity', () => {
     describe('Задачи', () => {
       it('Состоит из слоя деятельности', () => {
@@ -61,6 +49,18 @@ describe('RootTask', () => {
         const task = new RootTask(createLayers({ activity }));
 
         expect(methodTasks(task, 'activity')).toStrictEqual([activity]);
+      });
+    });
+  });
+
+  describe('Метод hobbies', () => {
+    describe('Задачи', () => {
+      it('Состоит из слоя хобби', () => {
+        const hobbies = createStubTask<NpcState, NpcContext>('hobbies');
+
+        const task = new RootTask(createLayers({ hobbies }));
+
+        expect(methodTasks(task, 'hobbies')).toStrictEqual([hobbies]);
       });
     });
   });

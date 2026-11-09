@@ -56,15 +56,6 @@ describe('RootTaskFactory', () => {
       expect(addictionsTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
     });
 
-    it('Создаёт слой хобби фабрикой hobbiesTaskFactory с типом NPC', () => {
-      const hobbiesTaskFactory = createLayerTaskFactory('hobbies');
-      const factory = new RootTaskFactory(createDeps({ hobbiesTaskFactory }));
-
-      factory.create(NpcKind.Homeless);
-
-      expect(hobbiesTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
-    });
-
     it('Создаёт слой деятельности фабрикой activityTaskFactory с типом NPC', () => {
       const activityTaskFactory = createLayerTaskFactory('activity');
       const factory = new RootTaskFactory(createDeps({ activityTaskFactory }));
@@ -72,6 +63,15 @@ describe('RootTaskFactory', () => {
       factory.create(NpcKind.Homeless);
 
       expect(activityTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
+    });
+
+    it('Создаёт слой хобби фабрикой hobbiesTaskFactory с типом NPC', () => {
+      const hobbiesTaskFactory = createLayerTaskFactory('hobbies');
+      const factory = new RootTaskFactory(createDeps({ hobbiesTaskFactory }));
+
+      factory.create(NpcKind.Homeless);
+
+      expect(hobbiesTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
     });
 
     it('Если activityTaskFactory не передана, слой деятельности бомжа — экземпляр HomelessActivityTask', () => {

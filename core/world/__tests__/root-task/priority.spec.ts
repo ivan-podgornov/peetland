@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { RootTask } from '../../src/root-task';
 
-type LayerName = 'needs' | 'addictions' | 'hobbies' | 'activity';
+type LayerName = 'needs' | 'addictions' | 'activity' | 'hobbies';
 
 /** Создаёт корневую задачу, в которой можно спланировать любой слой, кроме переданных */
 function createRootTask(unavailable: LayerName[] = []): RootTask {
@@ -16,8 +16,8 @@ function createRootTask(unavailable: LayerName[] = []): RootTask {
   return new RootTask({
     needs: stub('needs'),
     addictions: stub('addictions'),
-    hobbies: stub('hobbies'),
     activity: stub('activity'),
+    hobbies: stub('hobbies'),
   });
 }
 
@@ -35,24 +35,24 @@ describe('RootTask', () => {
       expect(names).toStrictEqual(['addictions']);
     });
 
-    it('Если и зависимости спланировать нельзя, планирует хобби', () => {
+    it('Если и зависимости спланировать нельзя, планирует деятельность', () => {
       const names = planNames(createRootTask(['needs', 'addictions']), NpcStateBuilder.default());
-
-      expect(names).toStrictEqual(['hobbies']);
-    });
-
-    it('Если и хобби спланировать нельзя, планирует деятельность', () => {
-      const names = planNames(
-        createRootTask(['needs', 'addictions', 'hobbies']),
-        NpcStateBuilder.default()
-      );
 
       expect(names).toStrictEqual(['activity']);
     });
 
-    it('Если и деятельность спланировать нельзя, план не составляется', () => {
+    it('Если и деятельность спланировать нельзя, планирует хобби', () => {
       const names = planNames(
-        createRootTask(['needs', 'addictions', 'hobbies', 'activity']),
+        createRootTask(['needs', 'addictions', 'activity']),
+        NpcStateBuilder.default()
+      );
+
+      expect(names).toStrictEqual(['hobbies']);
+    });
+
+    it('Если и хобби спланировать нельзя, план не составляется', () => {
+      const names = planNames(
+        createRootTask(['needs', 'addictions', 'activity', 'hobbies']),
         NpcStateBuilder.default()
       );
 

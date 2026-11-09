@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/htn | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" property="og:title" content="@peetland/htn | Peetland"><meta data-rh="true" name="description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><meta data-rh="true" property="og:description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/htn","item":"https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.e4791a1e.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.3674edfb.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.d861c7da.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -35,9 +35,10 @@
 ближе всего к NPC. Тогда вместо списка подзадач метод задаёт функцию, которая собирает их по
 состоянию. Планировщик вызывает её, только если предусловия метода подошли.</li>
 <li class=""><strong>World State</strong> - текущее состояние мира, на котором как раз и будут проверяться предусловия и
-при котором будет выполняться задача.</li>
+при котором будет выполняться задача. В состоянии лежат данные и сущности за интерфейсами только
+на чтение. Задачи их не меняют: эффекты пишут в копию и возвращают новое состояние.</li>
 <li class=""><strong>Context</strong> - контекст исполнения: мутабельные сущности, которым задачи отдают команды, например
-актор или инвентарь. Состояние мира содержит только данные, а контекст - живые сущности.
+актор или инвентарь. Состояние мира задачи только читают, а командам подчиняется контекст.
 Контекст получают только методы задачи, которые что-то меняют: <code>start</code>, <code>update</code> и <code>stop</code>.
 <code>canExecute</code>, <code>applyEffects</code> и предусловия методов контекст не получают: они только читают
 состояние и считают эффекты, и живые сущности им не нужны.</li>

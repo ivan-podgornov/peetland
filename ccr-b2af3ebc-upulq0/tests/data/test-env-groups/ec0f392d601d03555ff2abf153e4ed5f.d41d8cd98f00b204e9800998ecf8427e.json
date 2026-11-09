@@ -1,0 +1,1 @@
+{"id":"ec0f392d601d03555ff2abf153e4ed5f.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/cancel.spec.ts#Command #cancel Больше не вызывает onUpdate","name":"Больше не вызывает onUpdate","status":"passed","testResultsByEnv":{"default":"f85c1ac4b84cd1112ae5cda052182747"}}

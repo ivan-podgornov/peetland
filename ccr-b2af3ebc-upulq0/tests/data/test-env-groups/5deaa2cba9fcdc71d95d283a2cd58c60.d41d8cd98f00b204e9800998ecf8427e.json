@@ -1,0 +1,1 @@
+{"id":"5deaa2cba9fcdc71d95d283a2cd58c60.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/update.spec.ts#CommandTask #update Если команда выполняется, возвращает 'running'","name":"Если команда выполняется, возвращает 'running'","status":"passed","testResultsByEnv":{"default":"0334e86ae6c115f6b42bda04dcdaff47"}}

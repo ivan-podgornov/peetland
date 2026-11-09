@@ -1,0 +1,1 @@
+{"id":"7556856bef5e22fa4cbafd8121757f4e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-within-angle.spec.ts#Geometry #isWithinAngle Если углы совпадают и допуск равен 0, возвращает true","name":"Если углы совпадают и допуск равен 0, возвращает true","status":"passed","testResultsByEnv":{"default":"85b58cbb6f361ef125c4820d54e3290a"}}

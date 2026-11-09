@@ -1,0 +1,1 @@
+{"id":"4225022b2392ddf81f980631da0b71dd.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/on-success.spec.ts#Command Если onUpdate вернул 'success' Успешно завершает Observable","name":"Успешно завершает Observable","status":"passed","testResultsByEnv":{"default":"5473b21a8c5b2726e378517fab5a2ad1"}}

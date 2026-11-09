@@ -1,0 +1,1 @@
+{"id":"77b7f1e084e0699b4abfbb412cff73c6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/ticks.spec.ts#Npc Каждый тик Вызывает htn.update с контекстом, в котором психика NPC","name":"Вызывает htn.update с контекстом, в котором психика NPC","status":"passed","testResultsByEnv":{"default":"60559715d50ebf004dc94089509d4a02"}}

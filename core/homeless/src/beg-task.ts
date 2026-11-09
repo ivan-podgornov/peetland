@@ -5,7 +5,7 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { Deed, Feeling } from '@peetland/psyche';
-import type { IPsyche, ReadonlyPsyche } from '@peetland/psyche';
+import type { IPsyche, IReadonlyPsyche } from '@peetland/psyche';
 
 import {
   BEGGING_CHANCE,
@@ -136,7 +136,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
    * Сколько удач, но не больше limit, успеет случиться, пока стыд, по предсказанию, не достиг
    * порога: удача случается, если перед ней стыд ещё ниже порога
    */
-  private countRewardsBeforeShame(psyche: ReadonlyPsyche, limit: number): number {
+  private countRewardsBeforeShame(psyche: IReadonlyPsyche, limit: number): number {
     let rewards = 0;
     let current = psyche;
 
@@ -152,7 +152,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
    * Предсказывает психику после одной удачи: клянчил столько раз, сколько NPC ожидает до удачи.
    * Возвращает копию психики, а переданную не меняет
    */
-  private predictReward(current: ReadonlyPsyche): IPsyche {
+  private predictReward(current: IReadonlyPsyche): IPsyche {
     const psyche = current.clone();
     const attempts = psyche.expectAttempts(BEGGING_CHANCE);
 
@@ -163,7 +163,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     return psyche;
   }
 
-  private isAshamed(psyche: ReadonlyPsyche): boolean {
+  private isAshamed(psyche: IReadonlyPsyche): boolean {
     return psyche.getState().feelings[Feeling.Shame] >= BEGGING_SHAME_LIMIT;
   }
 }

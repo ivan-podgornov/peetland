@@ -1,6 +1,6 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { ReadonlyInventory } from '@peetland/inventory';
-import type { ReadonlyPsyche } from '@peetland/psyche';
+import type { IReadonlyPsyche } from '@peetland/psyche';
 import type { TimeState } from '@peetland/timings';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
@@ -14,7 +14,7 @@ export type NpcActorState = Readonly<{
 export type NpcSelfState = Readonly<{
   actor: NpcActorState;
   inventory: ReadonlyInventory;
-  psyche: ReadonlyPsyche;
+  psyche: IReadonlyPsyche;
 }>;
 
 /** Что NPC знает о мире на момент сбора состояния */

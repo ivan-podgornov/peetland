@@ -16,7 +16,7 @@ import type {
  * Психика только на чтение. Так психика лежит в состоянии NPC: планирование читает её, а эффекты
  * задач пишут в копию из clone()
  */
-export interface ReadonlyPsyche {
+export interface IReadonlyPsyche {
   /** Возвращает состояние психики. Из него фабрика собирает такую же психику */
   getState(): PsycheState;
   /**
@@ -36,7 +36,7 @@ export interface ReadonlyPsyche {
   clone(): IPsyche;
 }
 
-export interface IPsyche extends ReadonlyPsyche {
+export interface IPsyche extends IReadonlyPsyche {
   /** Прогоняет поступок через черты и меняет чувства на сумму их вкладов */
   react(deed: Deed): void;
 }

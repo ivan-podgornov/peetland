@@ -83,7 +83,7 @@
 
 ## Только на чтение
 
-`ReadonlyPsyche` — психика только на чтение: `getState`, `adjustChance`, `expectAttempts` и
+`IReadonlyPsyche` — психика только на чтение: `getState`, `adjustChance`, `expectAttempts` и
 `clone()`. Такой психика лежит в состоянии NPC, и при планировании её только читают. `IPsyche`
 добавляет к нему `react`.
 

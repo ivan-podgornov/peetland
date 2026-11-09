@@ -15,7 +15,7 @@ describe('TimeSpan', () => {
       expect(span.elapsedMinutes(moment, moment)).toBe(0);
     });
 
-    it('Возвращает разницу в минутах внутри одного часа', () => {
+    it('Если моменты в одном часе, возвращает разницу их минут', () => {
       const span = new TimeSpan();
 
       const elapsed = span.elapsedMinutes(
@@ -34,7 +34,7 @@ describe('TimeSpan', () => {
       expect(elapsed).toBe(15);
     });
 
-    it('Учитывает смену часа', () => {
+    it('Если между моментами сменился час, возвращает сумму минут до смены часа и после неё', () => {
       const span = new TimeSpan();
 
       const elapsed = span.elapsedMinutes(
@@ -53,7 +53,7 @@ describe('TimeSpan', () => {
       expect(elapsed).toBe(15);
     });
 
-    it('Учитывает переход через полночь', () => {
+    it('Если между моментами наступила полночь, возвращает сумму минут до полуночи и после неё', () => {
       const span = new TimeSpan();
 
       const elapsed = span.elapsedMinutes(
@@ -72,7 +72,7 @@ describe('TimeSpan', () => {
       expect(elapsed).toBe(15);
     });
 
-    it('Учитывает несколько дней', () => {
+    it('Если моменты в одно время суток разных дней, возвращает 1440 минут за каждый день между ними', () => {
       const span = new TimeSpan();
 
       const elapsed = span.elapsedMinutes(
@@ -91,7 +91,7 @@ describe('TimeSpan', () => {
       expect(elapsed).toBe(2 * 24 * 60);
     });
 
-    it('Если to раньше from, возвращает отрицательное число', () => {
+    it('Если to раньше from, возвращает минуты от to до from со знаком минус', () => {
       const span = new TimeSpan();
 
       const elapsed = span.elapsedMinutes(

@@ -16,7 +16,7 @@ describe('ManualTime', () => {
       ).toThrow(RangeError);
     });
 
-    it('Если слепок не момент времени, время не меняется', () => {
+    it('Если слепок не момент времени, не меняет время', () => {
       const time = new ManualTime({
         day: 3,
         hours: 20,

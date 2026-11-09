@@ -4,7 +4,7 @@ import { TimeSpan } from '../../src';
 
 describe('TimeSpan', () => {
   describe('#hasPassed', () => {
-    it('Если прошло больше минут, возвращает true', () => {
+    it('Если от from до to прошло больше minutes минут, возвращает true', () => {
       const span = new TimeSpan();
 
       const passed = span.hasPassed(
@@ -24,7 +24,7 @@ describe('TimeSpan', () => {
       expect(passed).toBe(true);
     });
 
-    it('Если прошло ровно столько минут, возвращает true', () => {
+    it('Если от from до to прошло ровно minutes минут, возвращает true', () => {
       const span = new TimeSpan();
 
       const passed = span.hasPassed(
@@ -44,7 +44,7 @@ describe('TimeSpan', () => {
       expect(passed).toBe(true);
     });
 
-    it('Если прошло меньше минут, возвращает false', () => {
+    it('Если от from до to прошло меньше minutes минут, возвращает false', () => {
       const span = new TimeSpan();
 
       const passed = span.hasPassed(
@@ -64,7 +64,7 @@ describe('TimeSpan', () => {
       expect(passed).toBe(false);
     });
 
-    it('Учитывает переход через полночь', () => {
+    it('Если minutes минут прошло через полночь, возвращает true', () => {
       const span = new TimeSpan();
 
       const passed = span.hasPassed(
@@ -104,7 +104,7 @@ describe('TimeSpan', () => {
       expect(passed).toBe(false);
     });
 
-    it('Если момент не момент времени, выбрасывает RangeError', () => {
+    it('Если from не момент времени, выбрасывает RangeError', () => {
       const span = new TimeSpan();
 
       expect(() =>

@@ -1,0 +1,1 @@
+{"id":"d1f2a09e07f1d58f7a00b165bf4ab0a8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили во время выполнения Завершает Observable ошибкой из сигнала актора","name":"Завершает Observable ошибкой из сигнала актора","status":"passed","testResultsByEnv":{"default":"1d5714793ff4f29f548e413808611fde"}}

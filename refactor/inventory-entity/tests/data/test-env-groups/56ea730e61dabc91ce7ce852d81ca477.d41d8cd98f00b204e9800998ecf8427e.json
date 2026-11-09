@@ -1,0 +1,1 @@
+{"id":"56ea730e61dabc91ce7ce852d81ca477.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/multicast-observer/complete.spec.ts#MulticastObserver #complete Сигнал после вызова complete Переходит в состояние aborted","name":"Переходит в состояние aborted","status":"passed","testResultsByEnv":{"default":"e7c46f64b3d0ebfaa55a085260126314"}}

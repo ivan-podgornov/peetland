@@ -1,0 +1,1 @@
+{"id":"a3bbc3633a13e1749cd376091c9f02ab.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/start/attempts.spec.ts#TryLuckTask #start Если задачу уже начали, прекращает прежние попытки","name":"Если задачу уже начали, прекращает прежние попытки","status":"passed","testResultsByEnv":{"default":"b6685a4cc423215da5679ffcfc4edbfa"}}

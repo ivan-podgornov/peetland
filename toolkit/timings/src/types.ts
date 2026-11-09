@@ -20,8 +20,11 @@ export type TimeState = Readonly<{
   minutes: number;
 }>;
 
-/** Текущий момент времени: день и время суток */
-export interface ITime {
+/**
+ * Время только на чтение: день и время суток. Так время лежит в состоянии NPC: планирование читает
+ * его, а эффекты задач пишут в копию из clone()
+ */
+export interface IReadonlyTime {
   /** Номер дня по счёту, с 1. Растёт на 1 каждую полночь */
   readonly day: number;
   /** Час, от 0 до 23 */
@@ -39,11 +42,11 @@ export interface ITime {
    * Возвращает копию времени на момент вызова, которую можно менять. Копия стоит на месте, пока её
    * не выставят, а исходное время копия не меняет
    */
-  clone(): IManualTime;
+  clone(): ITime;
 }
 
-/** Время, которое стоит на месте, пока его не выставят */
-export interface IManualTime extends ITime {
+/** Время, которое можно выставить. Стоит на месте, пока его не выставят (см. ManualTime) */
+export interface ITime extends IReadonlyTime {
   /**
    * Выставляет время.
    * Выбрасывает RangeError, если day не целое от 1, hours не целое от 0 до 23 или minutes не целое

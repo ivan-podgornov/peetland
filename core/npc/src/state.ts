@@ -1,7 +1,7 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { IReadonlyInventory } from '@peetland/inventory';
 import type { IReadonlyPsyche } from '@peetland/psyche';
-import type { ITime } from '@peetland/timings';
+import type { IReadonlyTime } from '@peetland/timings';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
 export type NpcActorState = Readonly<{
@@ -23,7 +23,7 @@ export type NpcWorldState = Readonly<{
    * Время суток. Время идёт, поэтому геттеры могут вернуть разное даже за одно планирование. Если
    * эффекту задачи нужно поменять время, задача кладёт в новое состояние копию из clone()
    */
-  time: ITime;
+  time: IReadonlyTime;
 }>;
 
 /**

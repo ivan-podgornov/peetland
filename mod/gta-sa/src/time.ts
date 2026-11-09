@@ -1,7 +1,7 @@
 import type { Observable } from '@peetland/events';
 import { getTimeOfDay } from '@peetland/moonloader';
 import { ManualTime } from '@peetland/timings';
-import type { IManualTime, ITime, TimeState } from '@peetland/timings';
+import type { IReadonlyTime, ITime, TimeState } from '@peetland/timings';
 
 export type GtaTimeDeps = {
   /** Тики мира, на которых время замечает, что наступила полночь */
@@ -13,7 +13,7 @@ export type GtaTimeDeps = {
  * тик и при каждом чтении сверяется с игрой и, если час стал меньше прошлого, значит наступила
  * полночь. Считается, что за один тик игровое время не уходит вперёд на сутки
  */
-export class GtaTime implements ITime {
+export class GtaTime implements IReadonlyTime {
   private state: TimeState;
 
   constructor(deps: GtaTimeDeps) {
@@ -51,7 +51,7 @@ export class GtaTime implements ITime {
     };
   }
 
-  clone(): IManualTime {
+  clone(): ITime {
     return new ManualTime(this.getState());
   }
 

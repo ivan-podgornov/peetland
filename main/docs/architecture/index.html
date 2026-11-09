@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Архитектура | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Архитектура | Peetland"><meta data-rh="true" name="description" content="Чистота архитектуры"><meta data-rh="true" property="og:description" content="Чистота архитектуры"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Архитектура","item":"https://ivan-podgornov.github.io/peetland/main/docs/architecture/"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.6aa04d17.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.508d372b.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.3fc104ef.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -90,7 +90,7 @@ core и toolkit. Если обход платформы требует меня�
 только пакет бомжа. Пакетов toolkit правило не касается: в них нет бизнес-логики, которую нужно
 собирать.</p>
 <p>Собирает пакет его точка сборки — класс, который создают снаружи. Обычно это фабрика, например
-фабрика NPC, фабрика психики или фабрика корневой задачи бомжа, а у всего приложения точка сборки —
+фабрика NPC, фабрика психики или фабрика деятельности бомжа, а у всего приложения точка сборки —
 мир.</p>
 <ul>
 <li class="">Снаружи точка сборки требует только то, что не может создать сама:
@@ -122,7 +122,7 @@ core и toolkit. Если обход платформы требует меня�
 <li class="">перечисления и типы данных.</li>
 </ul>
 <p>Детали реализации не экспортируются: классы, которые пакет создаёт внутри, их опции и зависимости,
-константы. Например, <code>homeless</code> экспортирует <code>HomelessRootTaskFactory</code>, но не <code>DrinkTask</code>. Тесты и
+константы. Например, <code>homeless</code> экспортирует <code>HomelessActivityTaskFactory</code>, но не <code>DrinkTask</code>. Тесты и
 <code>dev</code> импортируют детали реализации своего пакета напрямую из файлов, например
 <code>../src/drink-task</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="константы">Константы<a href="#константы" class="hash-link" aria-label="Прямая ссылка на Константы" title="Прямая ссылка на Константы" translate="no">​</a></h2>
@@ -145,7 +145,8 @@ core и toolkit. Если обход платформы требует меня�
 собирает зависимости по умолчанию и на каждую запись из репозитория NPC создаёт NPC фабрикой
 NPC.</li>
 <li class=""><strong>Рождение NPC.</strong> NPC создаёт актора (тот появляется в игре), инвентарь, психику и HTN-агента с
-корневой задачей своего типа. После этого NPC подписывается на тики игры.</li>
+корневой задачей, которую мир собрал из слоёв для его типа. После этого NPC подписывается на
+тики игры.</li>
 <li class=""><strong>Тик.</strong> На каждый тик NPC собирает состояние — слепок актора, сами инвентарь и психику только
 на чтение и время из знания о мире — и передаёт его агенту вместе с контекстом. Если плана нет, агент
 планирует корневую задачу, а затем продвигает текущую задачу плана.</li>

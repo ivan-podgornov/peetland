@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/main/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.6aa04d17.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.508d372b.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.3fc104ef.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -51,7 +51,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <ul>
 <li class=""><strong>NPC</strong> (<code>Npc</code>, <a class="" href="/peetland/main/docs/core/npc/CONTRIBUTING/"><code>@peetland/npc</code></a>) — персонаж, который живёт сам: склеивает
 актора, инвентарь, психику и HTN-агента, который каждый тик планирует и исполняет задачи.</li>
-<li class=""><strong>Тип NPC</strong> (<code>NpcKind</code>) — кто он такой. От типа зависит корневая задача. Пока тип один — бомж.</li>
+<li class=""><strong>Тип NPC</strong> (<code>NpcKind</code>) — кто он такой. От типа зависит деятельность NPC. Пока тип один — бомж.</li>
 <li class=""><strong>Состояние NPC</strong> (<code>NpcState</code>) — то, что есть у NPC и вокруг него: позиция, психика, инвентарь,
 время. На нём планировщик проверяет предусловия и применяет эффекты. Инвентарь, психика
 и время лежат в нём доступными только на чтение, позиция — слепком (см.
@@ -93,9 +93,15 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <li class=""><strong>Исполнитель</strong> (<code>Executor</code>) — выполняет задачи плана по очереди. Если задача не удалась, отдаёт
 управление планировщику, и тот строит новый план.</li>
 <li class=""><strong>HTN-агент</strong> (<code>HTN</code>) — планировщик и исполнитель одного NPC вместе.</li>
-<li class=""><strong>Корневая задача</strong> (<code>IRootTaskFactory</code>, <a class="" href="/peetland/main/docs/core/npc/CONTRIBUTING/"><code>@peetland/npc</code></a>) — задача
-верхнего уровня, которую планирует агент, например «жить» у бомжа. NPC получает её от фабрики и
-ничего не знает о задачах.</li>
+<li class=""><strong>Корневая задача</strong> (<code>RootTask</code>, <a class="" href="/peetland/main/docs/core/world/CONTRIBUTING/"><code>@peetland/world</code></a>) — задача
+верхнего уровня, которую планирует агент: жить. Собирается из слоёв по приоритету: потребности,
+зависимости, деятельность и хобби. NPC получает её от фабрики <code>IRootTaskFactory</code> и ничего не знает
+о задачах.</li>
+<li class=""><strong>Слой корневой задачи</strong> — часть корневой задачи, которую планировщик пробует, только если в слоях
+выше планировать нечего.</li>
+<li class=""><strong>Деятельность</strong> (<code>IActivityTaskFactory</code>) — слой корневой задачи: то, чем NPC занят по своему
+типу, например у бомжа — напиться. Ограничена своим расписанием, а свободное от неё время занимают
+хобби.</li>
 <li class=""><strong>Параллельная задача</strong> (<code>ParallelTask</code>) — выполняет основную задачу и одновременно с ней фоновую,
 например, пытает удачу под анимацию поиска в мусорке.</li>
 <li class=""><strong>Пытать удачу</strong> (<code>TryLuckTask</code>, <a class="" href="/peetland/main/docs/core/npc-tasks/CONTRIBUTING/"><code>@peetland/npc-tasks</code></a>) — бросать
@@ -104,7 +110,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="бомж-алкаш">Бомж-алкаш<a href="#бомж-алкаш" class="hash-link" aria-label="Прямая ссылка на Бомж-алкаш" title="Прямая ссылка на Бомж-алкаш" translate="no">​</a></h2>
 <ul>
 <li class=""><strong>Бомж</strong> (<code>NpcKind.Homeless</code>, <a class="" href="/peetland/main/docs/core/homeless/CONTRIBUTING/"><code>@peetland/homeless</code></a>) — пока
-единственный тип NPC. Его корневая задача — жить: бухать, а если не получается — купить пойло,
+единственный тип NPC. Его деятельность — напиться: бухать, а если не получается — купить пойло,
 сдать бутылки, клянчить или собирать бутылки.</li>
 <li class=""><strong>Бомжарня</strong> (<code>PlaceType.HomelessCamp</code>) — лагерь бездомных, где бомж бухает.</li>
 <li class=""><strong>Пойло</strong> (<code>Item.Booze</code>) — бутылка выпивки. Бомж покупает её в магазине и выпивает в бомжарне, а

@@ -1,1 +1,0 @@
-{"id":"b0a9c724b8200d8fbf5eb29eba44f02b.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/has.spec.ts#Inventory #has Если количество предмета больше нуля, возвращает true","name":"Если количество предмета больше нуля, возвращает true","status":"passed","testResultsByEnv":{"default":"85d00da767ba6491dc875ead30e42d70"}}

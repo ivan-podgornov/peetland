@@ -1,1 +1,0 @@
-{"id":"e249f157d4d3e524cd3d6841702d11b7.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/parallel-task/update/main.spec.ts#ParallelTask #update Если обе задачи выполняются, возвращает 'running'","name":"Если обе задачи выполняются, возвращает 'running'","status":"passed","testResultsByEnv":{"default":"1be5a92a862d585ee0e84aa98b03a222"}}

@@ -4,7 +4,7 @@ import type { IPsyche } from '@peetland/psyche';
 
 /**
  * Контекст исполнения задач NPC: живые сущности, которым задачи отдают команды в start, update и
- * stop. В состоянии NPC (см. NpcState) этих сущностей нет, только их слепки
+ * stop. В состоянии NPC (см. NpcState) задачи их только читают, а меняют через контекст
  */
 export type NpcContext = Readonly<{
   actor: IActor;

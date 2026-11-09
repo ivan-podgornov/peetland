@@ -67,7 +67,7 @@ describe('AddItemTask', () => {
         new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build()
       );
 
-      expect(state.self.inventory).toStrictEqual({ [Item.Booze]: 3 });
+      expect(state.self.inventory.getAll()).toStrictEqual({ [Item.Booze]: 3 });
     });
 
     it('Если предмета в состоянии не было, добавляет его', () => {
@@ -80,7 +80,7 @@ describe('AddItemTask', () => {
         new NpcStateBuilder().withInventory({ [Item.Money]: 5 }).build()
       );
 
-      expect(state.self.inventory).toStrictEqual({
+      expect(state.self.inventory.getAll()).toStrictEqual({
         [Item.Money]: 5,
         [Item.Booze]: 1,
       });

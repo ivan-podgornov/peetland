@@ -34,7 +34,7 @@ describe('PurchaseTask', () => {
 
         const after = applyPlanEffects(task, state);
 
-        expect(after.self.inventory).toStrictEqual({
+        expect(after.self.inventory.getAll()).toStrictEqual({
           [Item.Money]: 50,
           [Item.Booze]: 2,
         });

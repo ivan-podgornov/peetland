@@ -94,5 +94,5 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
 /** Есть ли у NPC пойло */
 function hasBooze(state: NpcState): boolean {
-  return (state.self.inventory[Item.Booze] ?? 0) > 0;
+  return state.self.inventory.get(Item.Booze) > 0;
 }

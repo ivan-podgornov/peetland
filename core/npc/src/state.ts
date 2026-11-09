@@ -1,5 +1,5 @@
 import type { Vector3 } from '@peetland/geometry';
-import type { InventoryCounts } from '@peetland/inventory';
+import type { ReadonlyInventory } from '@peetland/inventory';
 import type { PsycheState } from '@peetland/psyche';
 import type { TimeState } from '@peetland/timings';
 
@@ -10,10 +10,10 @@ export type NpcActorState = Readonly<{
   angle: number;
 }>;
 
-/** Слепок самого NPC: актора, инвентаря и психики */
+/** Сам NPC: слепки актора и психики и инвентарь только на чтение */
 export type NpcSelfState = Readonly<{
   actor: NpcActorState;
-  inventory: Readonly<InventoryCounts>;
+  inventory: ReadonlyInventory;
   psyche: PsycheState;
 }>;
 
@@ -25,7 +25,7 @@ export type NpcWorldState = Readonly<{
 
 /**
  * Состояние NPC, с которым HTN-агент планирует и исполняет задачи: сам NPC и то, что он знает о
- * мире. В нём лежат данные и сущности за интерфейсами только на чтение. Эффекты задач не меняют
+ * мире. В нём лежат данные и сущности, доступные только на чтение. Эффекты задач не меняют
  * состояние: сущность, которую нужно поменять, задача клонирует и кладёт копию в новое состояние.
  * Команды живым актору, инвентарю и психике задачи отдают через контекст (см. NpcContext и ADR
  * «Состояние NPC из живых сущностей»)

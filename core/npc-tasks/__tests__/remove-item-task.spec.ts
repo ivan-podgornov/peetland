@@ -107,7 +107,7 @@ describe('RemoveItemTask', () => {
         new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build()
       );
 
-      expect(state.self.inventory).toStrictEqual({ [Item.Money]: 50 });
+      expect(state.self.inventory.getAll()).toStrictEqual({ [Item.Money]: 50 });
     });
 
     it('Если предмета не осталось, убирает его из состояния', () => {
@@ -120,7 +120,7 @@ describe('RemoveItemTask', () => {
         new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build()
       );
 
-      expect(state.self.inventory).toStrictEqual({});
+      expect(state.self.inventory.getAll()).toStrictEqual({});
     });
   });
 });

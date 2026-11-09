@@ -1,1 +1,0 @@
-{"id":"a44f76ec5eeb17f8c09ae821b76d8659.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/places/__tests__/find-nearest.spec.ts#Places #findNearest Если мест переданного типа нет, возвращает undefined","name":"Если мест переданного типа нет, возвращает undefined","status":"passed","testResultsByEnv":{"default":"b6869f8c2c5591d7315c88a23fa266b8"}}

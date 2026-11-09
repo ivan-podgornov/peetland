@@ -1,1 +1,0 @@
-{"id":"4d6d1262ed39af7766b3ee0b82f97f87.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/world/big-bang/default-npc-deps.spec.ts#World #bigBang Если npcFactory не передана NPC создаёт психику фабрикой psycheFactory","name":"NPC создаёт психику фабрикой psycheFactory","status":"passed","testResultsByEnv":{"default":"0f5deff1109af53de3fde9af8451b923"}}

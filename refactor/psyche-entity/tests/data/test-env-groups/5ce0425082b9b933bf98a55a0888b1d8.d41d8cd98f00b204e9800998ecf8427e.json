@@ -1,1 +1,0 @@
-{"id":"5ce0425082b9b933bf98a55a0888b1d8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/stop.spec.ts#TryLuckTask #stop После остановки #update возвращает 'failed'","name":"После остановки #update возвращает 'failed'","status":"passed","testResultsByEnv":{"default":"8b1e7c8c035742a244ce5327b20a51d1"}}

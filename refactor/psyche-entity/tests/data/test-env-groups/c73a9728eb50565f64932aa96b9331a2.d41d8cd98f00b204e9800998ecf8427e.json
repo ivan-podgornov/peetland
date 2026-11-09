@@ -1,1 +1,0 @@
-{"id":"c73a9728eb50565f64932aa96b9331a2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/places/__tests__/is-near.spec.ts#Places #isNear Если место переданного типа ровно на радиусе, возвращает true","name":"Если место переданного типа ровно на радиусе, возвращает true","status":"passed","testResultsByEnv":{"default":"6f0a642d7c17320b01127c84a524f8bc"}}

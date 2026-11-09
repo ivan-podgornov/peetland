@@ -28,13 +28,13 @@ inventory.get(Item.Bottles); // 0
 
 ## Только на чтение
 
-`ReadonlyInventory` — инвентарь только на чтение: `get`, `getAll`, `has` и `clone()`. Таким
+`IReadonlyInventory` — инвентарь только на чтение: `get`, `getAll`, `has` и `clone()`. Таким
 инвентарь лежит в состоянии NPC, и при планировании его только читают. `clone()` возвращает
 копию — обычный `Inventory`, в который можно писать: так эффекты задач меняют инвентарь, не трогая
 живой.
 
 ```ts
-const readonly: ReadonlyInventory = inventory;
+const readonly: IReadonlyInventory = inventory;
 const copy = readonly.clone();
 
 copy.add(Item.Money, 10); // инвентарь не изменился

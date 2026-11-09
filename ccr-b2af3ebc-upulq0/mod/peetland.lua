@@ -8493,8 +8493,8 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
---- Слой хобби корневой задачи NPC: то, чем NPC занимается для души. Пока хобби нет ни у кого,
--- поэтому методов нет, и планировщик переходит к следующему слою
+--- Слой хобби корневой задачи NPC: то, чем NPC занимается для души в свободное от деятельности
+-- время. Пока хобби нет ни у кого, поэтому методов нет, и план из этого слоя не составляется
 ____exports.HobbiesTask = __TS__Class()
 local HobbiesTask = ____exports.HobbiesTask
 HobbiesTask.name = "HobbiesTask"
@@ -8560,8 +8560,9 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
 --- Корневая задача NPC: жить. Методы — слои, перечисленные по приоритету: потребности, а если
--- планировать нечего — зависимости, а если и их нечего — хобби, а иначе — деятельность. Когда
--- слою есть что планировать, решают предусловия его задач
+-- планировать нечего — зависимости, а если и их нечего — деятельность, а иначе — хобби. Когда
+-- слою есть что планировать, решают предусловия его задач: например, деятельность ограничена своим
+-- расписанием, а хобби занимает свободное от неё время
 ____exports.RootTask = __TS__Class()
 local RootTask = ____exports.RootTask
 RootTask.name = "RootTask"
@@ -8570,8 +8571,8 @@ function RootTask.prototype.____constructor(self, deps)
     local ____deps_0 = deps
     local needs = ____deps_0.needs
     local addictions = ____deps_0.addictions
-    local hobbies = ____deps_0.hobbies
     local activity = ____deps_0.activity
+    local hobbies = ____deps_0.hobbies
     self.methods = {
         {
             name = "needs",
@@ -8584,14 +8585,14 @@ function RootTask.prototype.____constructor(self, deps)
             tasks = {addictions}
         },
         {
-            name = "hobbies",
-            preconditions = function() return true end,
-            tasks = {hobbies}
-        },
-        {
             name = "activity",
             preconditions = function() return true end,
             tasks = {activity}
+        },
+        {
+            name = "hobbies",
+            preconditions = function() return true end,
+            tasks = {hobbies}
         }
     }
 end
@@ -8630,31 +8631,31 @@ function RootTaskFactory.prototype.____constructor(self, deps)
     if addictionsTaskFactory == nil then
         addictionsTaskFactory = __TS__New(AddictionsTaskFactory)
     end
-    local hobbiesTaskFactory = ____deps_0.hobbiesTaskFactory
-    if hobbiesTaskFactory == nil then
-        hobbiesTaskFactory = __TS__New(HobbiesTaskFactory)
-    end
     local activityTaskFactory = ____deps_0.activityTaskFactory
     if activityTaskFactory == nil then
         activityTaskFactory = __TS__New(ActivityTaskFactory, {geometry = geometry, places = places, random = random, timer = timer})
     end
+    local hobbiesTaskFactory = ____deps_0.hobbiesTaskFactory
+    if hobbiesTaskFactory == nil then
+        hobbiesTaskFactory = __TS__New(HobbiesTaskFactory)
+    end
     self.needsTaskFactory = needsTaskFactory
     self.addictionsTaskFactory = addictionsTaskFactory
-    self.hobbiesTaskFactory = hobbiesTaskFactory
     self.activityTaskFactory = activityTaskFactory
+    self.hobbiesTaskFactory = hobbiesTaskFactory
 end
 function RootTaskFactory.prototype.create(self, kind)
     local needsTaskFactory = self.needsTaskFactory
     local addictionsTaskFactory = self.addictionsTaskFactory
-    local hobbiesTaskFactory = self.hobbiesTaskFactory
     local activityTaskFactory = self.activityTaskFactory
+    local hobbiesTaskFactory = self.hobbiesTaskFactory
     return __TS__New(
         RootTask,
         {
             needs = needsTaskFactory:create(kind),
             addictions = addictionsTaskFactory:create(kind),
-            hobbies = hobbiesTaskFactory:create(kind),
-            activity = activityTaskFactory:create(kind)
+            activity = activityTaskFactory:create(kind),
+            hobbies = hobbiesTaskFactory:create(kind)
         }
     )
 end

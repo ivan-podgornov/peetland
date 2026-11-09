@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/world | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/ccr-b2af3ebc-upulq0/docs/core/world/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/world | Peetland"><meta data-rh="true" name="description" content="Мир — точка сборки всего приложения. World.bigBang загружает места, собирает зависимости по"><meta data-rh="true" property="og:description" content="Мир — точка сборки всего приложения. World.bigBang загружает места, собирает зависимости по"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/ccr-b2af3ebc-upulq0/docs/core/world/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/ccr-b2af3ebc-upulq0/docs/core/world/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/ccr-b2af3ebc-upulq0/docs/core/world/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/world","item":"https://ivan-podgornov.github.io/peetland/ccr-b2af3ebc-upulq0/docs/core/world/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/ccr-b2af3ebc-upulq0/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/ccr-b2af3ebc-upulq0/docs/assets/js/runtime~main.fb9fa4f1.js" defer="defer"></script>
+<script src="/peetland/ccr-b2af3ebc-upulq0/docs/assets/js/runtime~main.0343567a.js" defer="defer"></script>
 <script src="/peetland/ccr-b2af3ebc-upulq0/docs/assets/js/main.a01c04a8.js" defer="defer"></script>
 </head>
 <body>
@@ -20,14 +20,14 @@
 <ol>
 <li class=""><strong>Потребности</strong> (<code>NeedsTask</code>) — то, без чего NPC не может жить.</li>
 <li class=""><strong>Зависимости</strong> (<code>AddictionsTask</code>) — то, без чего NPC жить не хочет.</li>
-<li class=""><strong>Хобби</strong> (<code>HobbiesTask</code>) — то, чем NPC занимается для души.</li>
 <li class=""><strong>Деятельность</strong> — то, чем NPC занят по своему типу.</li>
+<li class=""><strong>Хобби</strong> (<code>HobbiesTask</code>) — то, чем NPC занимается для души в свободное от деятельности время.</li>
 </ol>
 <p>Планировщик берёт первый слой, в котором есть что планировать, а когда есть, решают предусловия
 задач слоя. Пока потребностей, зависимостей и хобби нет ни у кого, их слои — составные задачи без
 методов, и NPC занят своей деятельностью.</p>
 <p>Каждый слой создаёт своя фабрика слоя <code>ILayerTaskFactory</code> по типу NPC: <code>NeedsTaskFactory</code>,
-<code>AddictionsTaskFactory</code>, <code>HobbiesTaskFactory</code> и <code>ActivityTaskFactory</code>. Деятельность
+<code>AddictionsTaskFactory</code>, <code>ActivityTaskFactory</code> и <code>HobbiesTaskFactory</code>. Деятельность
 <code>ActivityTaskFactory</code> по типу NPC берёт у фабрики деятельности этого типа (<code>IActivityTaskFactory</code>
 из <code>@peetland/npc</code>), например у <code>HomelessActivityTaskFactory</code> из <code>@peetland/homeless</code>. Любую
 фабрику слоя и фабрику деятельности типа можно передать в зависимостях вместо фабрики по

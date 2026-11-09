@@ -25,6 +25,12 @@ jobs:
         uses: ./.github/workflows/prepare-environment
       - name: Lint
         uses: ./.github/workflows/lint
+      # Только коммиты пулл реквеста: squash-коммит в main собирает GitHub, и его не проверяем
+      - name: Lint commits
+        run: >
+          npx commitlint
+          --from ${{ github.event.pull_request.base.sha }}
+          --to ${{ github.event.pull_request.head.sha }}
 
   test:
     if: github.event.action != 'closed'

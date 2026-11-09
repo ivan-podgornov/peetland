@@ -1,1 +1,0 @@
-{"id":"0b9848c2be2209e01bdfa823a439a1dc.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/stop.spec.ts#TryLuckTask #stop Если задачу не начинали, не выбрасывает ошибку","name":"Если задачу не начинали, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"2320405b3cea07ee74a87dfaf5271f44"}}

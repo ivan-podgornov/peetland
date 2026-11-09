@@ -1,1 +1,0 @@
-{"id":"5b7c09c5eaf6e38c4dc5d8c57a4f8a43.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/observable/constructor.spec.ts#Observable #constructor Не вызывает переданный callback-executor","name":"Не вызывает переданный callback-executor","status":"passed","testResultsByEnv":{"default":"5b7d4313bce0334876860b0a3428750e"}}

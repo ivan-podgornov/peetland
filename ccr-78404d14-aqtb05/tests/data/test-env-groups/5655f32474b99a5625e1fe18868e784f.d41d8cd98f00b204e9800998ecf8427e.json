@@ -1,1 +1,0 @@
-{"id":"5655f32474b99a5625e1fe18868e784f.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/multicast-observer/next.spec.ts#MulticastObserver #next При наблюдателе, заданном в виде функции При вызове после error observer не вызывается","name":"observer не вызывается","status":"passed","testResultsByEnv":{"default":"cb8a29657415f36b8282a1ee1c99a42a"}}

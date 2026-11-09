@@ -1,1 +1,0 @@
-{"id":"7115ad1e1f1a73ef35bc98c9d91f0d89.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/get-state.spec.ts#Npc #getState Возвращает слепок актора, который не меняется, когда актор двигается","name":"Возвращает слепок актора, который не меняется, когда актор двигается","status":"passed","testResultsByEnv":{"default":"9370064e10ddc94bb8266820f0439205"}}

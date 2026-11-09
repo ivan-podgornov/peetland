@@ -1,11 +1,11 @@
 export { createHomelessTaskFactoryDeps, createHomelessTaskFactory } from './factory';
 export { createBuyBoozeTask, createPlacesWithShop } from './buy-booze-task';
 export {
-  createBeggingPsycheFactory,
   createBeggingOptimism,
   createBegTask,
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
+  withBeggingTraits,
 } from './beg-task';
 export { createCollectBottlesTask, createPlacesWithTrashBins } from './collect-bottles-task';
 export {

@@ -4,7 +4,6 @@ import type { Task } from '@peetland/htn';
 import { NpcKind } from '@peetland/npc';
 import type { IKindRootTaskFactory, IRootTaskFactory, NpcContext, NpcState } from '@peetland/npc';
 import type { IPlaces } from '@peetland/places';
-import type { IPsycheFactory } from '@peetland/psyche';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
@@ -15,11 +14,6 @@ export type RootTaskFactoryDeps = {
   geometry: IGeometry;
   /** Места мира, которые получают задачи NPC */
   places: IPlaces;
-  /**
-   * Фабрика, которой задачи собирают психику из слепка, чтобы предсказать её реакцию в эффектах. По
-   * умолчанию каждый тип NPC собирает свою
-   */
-  psycheFactory?: IPsycheFactory;
   random: IRandom;
   timer: ITimer;
   /**

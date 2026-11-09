@@ -1,15 +1,10 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import type { Deed, IPsycheFactory } from '@peetland/psyche';
+import type { Deed } from '@peetland/psyche';
 
 export type PsycheReactTaskOptions = {
   /** Поступок, о котором задача сообщает психике */
   deed: Deed;
-};
-
-export type PsycheReactTaskDeps = {
-  /** Фабрика, которой задача собирает психику из слепка, чтобы предсказать её реакцию */
-  psycheFactory: IPsycheFactory;
 };
 
 /**
@@ -21,28 +16,25 @@ export class PsycheReactTask implements PrimitiveTask<NpcState, NpcContext> {
   readonly name = 'psyche-react';
 
   private readonly options: PsycheReactTaskOptions;
-  private readonly deps: PsycheReactTaskDeps;
 
-  constructor(options: PsycheReactTaskOptions, deps: PsycheReactTaskDeps) {
+  constructor(options: PsycheReactTaskOptions) {
     this.options = options;
-    this.deps = deps;
   }
 
   canExecute(): boolean {
     return true;
   }
 
-  /** Собирает психику из слепка в состоянии, сообщает ей о поступке и кладёт в состояние её новый слепок */
+  /** Сообщает о поступке копии психики из состояния и кладёт копию в новое состояние */
   applyEffects(state: NpcState): NpcState {
-    const { psycheFactory } = this.deps;
-    const psyche = psycheFactory.create(state.self.psyche);
+    const psyche = state.self.psyche.clone();
     psyche.react(this.options.deed);
 
     return {
       ...state,
       self: {
         ...state.self,
-        psyche: psyche.getState(),
+        psyche,
       },
     };
   }

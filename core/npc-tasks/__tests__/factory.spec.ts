@@ -90,20 +90,17 @@ describe('NpcTaskFactory', () => {
       expect(task).toBeInstanceOf(PsycheReactTask);
     });
 
-    it('Если psycheFactory не передана, эффекты задачи меняют чувства по чертам психики', () => {
-      const { geometry, random, timer } = createNpcTaskFactoryDeps();
-      const factory = new NpcTaskFactory({
-        geometry,
-        random,
-        timer,
-      });
+    it('Эффекты задачи меняют чувства по чертам психики из состояния', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
       const task = factory.psycheReact({ deed: Deed.Begging });
 
       const state = task.applyEffects(
-        new NpcStateBuilder().withTrait(Trait.Conscientiousness, 100).build()
+        new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withTrait(Trait.Conscientiousness, 100).build())
+          .build()
       );
 
-      expect(state.self.psyche.feelings[Feeling.Shame]).toBeGreaterThan(0);
+      expect(state.self.psyche.getState().feelings[Feeling.Shame]).toBeGreaterThan(0);
     });
   });
 

@@ -30,10 +30,7 @@ export type WorldOptions = {
 export type WorldDeps = {
   random: IRandom;
   timer: ITimer;
-  /**
-   * Фабрика, которой задачи предсказывают реакцию психики, а NPC создают свои психики. Одна на
-   * всех, чтобы задачи предсказывали реакцию такой же психики, как у NPC
-   */
+  /** Фабрика, которой NPC создают свои психики */
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой мир создаёт запросы к загруженным местам */
   placesFactory: IPlacesFactory;
@@ -72,7 +69,6 @@ export class World {
       rootTaskFactory = new RootTaskFactory({
         geometry: game.geometry,
         places: worldPlaces,
-        psycheFactory,
         random,
         timer,
       }),

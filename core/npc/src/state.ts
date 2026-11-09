@@ -1,6 +1,6 @@
 import type { Vector3 } from '@peetland/geometry';
-import type { ReadonlyInventory } from '@peetland/inventory';
-import type { PsycheState } from '@peetland/psyche';
+import type { IReadonlyInventory } from '@peetland/inventory';
+import type { IReadonlyPsyche } from '@peetland/psyche';
 import type { TimeState } from '@peetland/timings';
 
 /** Слепок состояния актора NPC на момент сбора состояния */
@@ -10,11 +10,11 @@ export type NpcActorState = Readonly<{
   angle: number;
 }>;
 
-/** Сам NPC: слепки актора и психики и инвентарь только на чтение */
+/** Сам NPC: слепок актора, инвентарь и психика только на чтение */
 export type NpcSelfState = Readonly<{
   actor: NpcActorState;
-  inventory: ReadonlyInventory;
-  psyche: PsycheState;
+  inventory: IReadonlyInventory;
+  psyche: IReadonlyPsyche;
 }>;
 
 /** Что NPC знает о мире на момент сбора состояния */

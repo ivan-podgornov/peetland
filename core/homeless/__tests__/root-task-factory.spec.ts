@@ -3,7 +3,6 @@ import { createStubPrimitiveTask, createStubTask } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
-import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -17,7 +16,6 @@ function createDeps(deps: Partial<HomelessRootTaskFactoryDeps> = {}): HomelessRo
   return {
     geometry: new Geometry(),
     places: createMockedPlaces(),
-    psycheFactory: createMockedPsycheFactory(),
     random: createMockedRandom(false),
     timer: new ManualTimer(),
     ...deps,

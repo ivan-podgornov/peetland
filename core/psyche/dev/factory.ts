@@ -8,7 +8,7 @@ import { createPsycheDeps, createPsycheState } from './psyche';
 
 /**
  * Создаёт психику, которая ничего не делает на поступки, всегда возвращает переданное состояние, не
- * меняет шанс и ожидает попыток как реалист: 1 / шанс
+ * меняет шанс и ожидает попыток как реалист: 1 / шанс. Копия из clone — такая же психика
  */
 export function createMockedPsyche(state: PsycheState = createPsycheState()): Mocked<IPsyche> {
   return {
@@ -16,6 +16,7 @@ export function createMockedPsyche(state: PsycheState = createPsycheState()): Mo
     react: vi.fn(),
     adjustChance: vi.fn((chance: number) => chance),
     expectAttempts: vi.fn((chance: number) => Math.round(1 / chance)),
+    clone: vi.fn(() => createMockedPsyche(state)),
   };
 }
 

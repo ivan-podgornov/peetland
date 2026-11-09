@@ -1,16 +1,15 @@
 import { planNames } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { Feeling } from '@peetland/psyche';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
   createBeggingOptimism,
-  createBeggingPsycheFactory,
   createBegTask,
   createPlacesWithBeggingSpot,
+  withBeggingTraits,
 } from '../../dev';
 import {
   BEGGING_REWARD,
@@ -36,7 +35,9 @@ describe('BegTask', () => {
 
       it('Если стыд достиг BEGGING_SHAME_LIMIT, план не составляется', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
-        const state = new NpcStateBuilder().withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build();
+        const state = new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build())
+          .build();
 
         expect(planNames(task, state)).toBeNull();
       });
@@ -48,12 +49,9 @@ describe('BegTask', () => {
       });
 
       it('Если по ожиданию психики NPC успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, планирует клянчить', () => {
-        const task = createBegTask(
-          createPlacesWithBeggingSpot(),
-          createNpcTaskFactory(),
-          createBeggingPsycheFactory(0.5, createBeggingOptimism(30))
-        );
+        const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
+          .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(30)).build())
           .withInventory({ [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD })
           .build();
 
@@ -62,12 +60,9 @@ describe('BegTask', () => {
       });
 
       it('Если по ожиданию психики NPC не успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, план не составляется', () => {
-        const task = createBegTask(
-          createPlacesWithBeggingSpot(),
-          createNpcTaskFactory(),
-          createBeggingPsycheFactory(0.5, createBeggingOptimism(60))
-        );
+        const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
+          .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(60)).build())
           .withInventory({ [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD })
           .build();
 

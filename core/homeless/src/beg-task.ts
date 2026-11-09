@@ -5,7 +5,7 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { Deed, Feeling } from '@peetland/psyche';
-import type { IPsycheFactory, PsycheState } from '@peetland/psyche';
+import type { IPsyche, IReadonlyPsyche } from '@peetland/psyche';
 
 import {
   BEGGING_CHANCE,
@@ -19,8 +19,6 @@ export type BegTaskDeps = {
   /** Места мира. Клянчат в местах типа PlaceType.BeggingSpot */
   places: IPlaces;
   npcTaskFactory: INpcTaskFactory;
-  /** Фабрика, которой задача собирает психику из слепка, чтобы предсказать стыд */
-  psycheFactory: IPsycheFactory;
 };
 
 /**
@@ -138,7 +136,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
    * Сколько удач, но не больше limit, успеет случиться, пока стыд, по предсказанию, не достиг
    * порога: удача случается, если перед ней стыд ещё ниже порога
    */
-  private countRewardsBeforeShame(psyche: PsycheState, limit: number): number {
+  private countRewardsBeforeShame(psyche: IReadonlyPsyche, limit: number): number {
     let rewards = 0;
     let current = psyche;
 
@@ -150,21 +148,22 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
     return rewards;
   }
 
-  /** Предсказывает психику после одной удачи: клянчил столько раз, сколько NPC ожидает до удачи */
-  private predictReward(state: PsycheState): PsycheState {
-    const { psycheFactory } = this.deps;
-    const psyche = psycheFactory.create(state);
-
+  /**
+   * Предсказывает психику после одной удачи: клянчил столько раз, сколько NPC ожидает до удачи.
+   * Возвращает копию психики, а переданную не меняет
+   */
+  private predictReward(current: IReadonlyPsyche): IPsyche {
+    const psyche = current.clone();
     const attempts = psyche.expectAttempts(BEGGING_CHANCE);
 
     for (let attempt = 0; attempt < attempts; attempt++) {
       psyche.react(Deed.Begging);
     }
 
-    return psyche.getState();
+    return psyche;
   }
 
-  private isAshamed(psyche: PsycheState): boolean {
-    return psyche.feelings[Feeling.Shame] >= BEGGING_SHAME_LIMIT;
+  private isAshamed(psyche: IReadonlyPsyche): boolean {
+    return psyche.getState().feelings[Feeling.Shame] >= BEGGING_SHAME_LIMIT;
   }
 }

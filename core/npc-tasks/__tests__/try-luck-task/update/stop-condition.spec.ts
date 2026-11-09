@@ -13,7 +13,7 @@ describe('TryLuckTask', () => {
       const task = new TryLuckTask(
         {
           chance: 1 / 60,
-          stopWhen: (state) => state.self.psyche.feelings[Feeling.Shame] >= 80,
+          stopWhen: (state) => state.self.psyche.getState().feelings[Feeling.Shame] >= 80,
         },
         {
           random: createMockedRandom(false),
@@ -24,7 +24,11 @@ describe('TryLuckTask', () => {
       task.start(NpcStateBuilder.default(), context);
 
       timer.advance(TryLuckTask.PERIOD);
-      const result = task.update(new NpcStateBuilder().withFeeling(Feeling.Shame, 80).build());
+      const result = task.update(
+        new NpcStateBuilder()
+          .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, 80).build())
+          .build()
+      );
 
       expect(result).toBe('failed');
     });

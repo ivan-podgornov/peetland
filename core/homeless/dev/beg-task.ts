@@ -5,14 +5,14 @@ import { PlaceType } from '@peetland/places';
 import type { IPlaces, PlaceData } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
-import { Feeling, PsycheFactory, Trait } from '@peetland/psyche';
-import type { IOptimism, IPsycheFactory } from '@peetland/psyche';
+import { Feeling, Trait } from '@peetland/psyche';
+import type { IOptimism } from '@peetland/psyche';
 import {
   createMockedOptimism,
   createMockedTrait,
   createMockedTraitFactory,
-  createPsycheDeps,
 } from '@peetland/psyche/dev';
+import type { PsycheBuilder } from '@peetland/psyche/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
@@ -37,34 +37,31 @@ export function createBeggingOptimism(attempts: number): Mocked<IOptimism> {
 }
 
 /**
- * Создаёт фабрику психики, у которой каждая попытка клянчить меняет стыд на shame, а сколько
- * попыток NPC ожидает до удачи, решает переданный оптимизм. По умолчанию NPC ожидает как реалист:
- * 1 / шанс
+ * Настраивает билдер психики так, чтобы каждая попытка клянчить меняла стыд на shame, а сколько
+ * попыток NPC ожидает до удачи, решал переданный оптимизм. По умолчанию NPC ожидает как реалист:
+ * 1 / шанс. Возвращает тот же билдер
  */
-export function createBeggingPsycheFactory(
+export function withBeggingTraits(
+  builder: PsycheBuilder,
   shame = 0,
   optimism: IOptimism = createMockedOptimism()
-): IPsycheFactory {
-  return new PsycheFactory(
-    createPsycheDeps({
-      [Trait.Conscientiousness]: createMockedTraitFactory(
-        createMockedTrait({ [Feeling.Shame]: shame })
-      ),
-      [Trait.Optimism]: createMockedTraitFactory(optimism),
-    })
-  );
+): PsycheBuilder {
+  return builder
+    .withTraitFactory(
+      Trait.Conscientiousness,
+      createMockedTraitFactory(createMockedTrait({ [Feeling.Shame]: shame }))
+    )
+    .withTraitFactory(Trait.Optimism, createMockedTraitFactory(optimism));
 }
 
 /** Создаёт задачу клянчанья с настоящей фабрикой примитивов, если другая не передана */
 export function createBegTask(
   places: IPlaces,
-  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory(),
-  psycheFactory: IPsycheFactory = createBeggingPsycheFactory()
+  npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
 ): BegTask {
   return new BegTask({
     npcTaskFactory,
     places,
-    psycheFactory,
   });
 }
 

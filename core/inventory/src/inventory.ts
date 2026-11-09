@@ -7,7 +7,7 @@ export type InventoryCounts = Partial<Record<Item, number>>;
  * Инвентарь только на чтение. Так инвентарь лежит в состоянии NPC: планирование читает его, а
  * эффекты задач пишут в копию из clone()
  */
-export interface ReadonlyInventory {
+export interface IReadonlyInventory {
   /** Возвращает количество предмета или 0, если его нет */
   get(item: Item): number;
   /** Возвращает количество всех предметов, которые есть в инвентаре */
@@ -22,7 +22,7 @@ export interface ReadonlyInventory {
  * Хранит количество каждого предмета. Количество — конечное неотрицательное число, в том числе
  * дробное. Предметы с нулевым количеством не хранятся
  */
-export class Inventory implements ReadonlyInventory {
+export class Inventory implements IReadonlyInventory {
   private readonly counts = new Map<Item, number>();
 
   /** @param counts - начальное количество предметов, например восстановленное из сохранения */

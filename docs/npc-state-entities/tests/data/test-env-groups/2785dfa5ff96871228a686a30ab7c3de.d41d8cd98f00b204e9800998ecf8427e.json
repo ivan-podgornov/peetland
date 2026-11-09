@@ -1,0 +1,1 @@
+{"id":"2785dfa5ff96871228a686a30ab7c3de.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/despawn.spec.ts#Npc #despawn После деспавна тики не вызывают htn.update","name":"После деспавна тики не вызывают htn.update","status":"passed","testResultsByEnv":{"default":"9fc3321fd0152a1eb287f6c0844220d9"}}

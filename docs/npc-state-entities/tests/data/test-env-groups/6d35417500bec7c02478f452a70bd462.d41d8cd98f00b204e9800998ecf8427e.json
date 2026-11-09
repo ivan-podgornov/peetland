@@ -1,0 +1,1 @@
+{"id":"6d35417500bec7c02478f452a70bd462.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-timer/interval.spec.ts#ManualTimer #interval Если period отрицательный, выбрасывает RangeError","name":"Если period отрицательный, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"3fbb8135df5685645e7629180187373f"}}

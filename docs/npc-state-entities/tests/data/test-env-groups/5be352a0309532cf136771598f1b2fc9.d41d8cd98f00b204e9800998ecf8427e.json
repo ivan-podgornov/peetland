@@ -1,0 +1,1 @@
+{"id":"5be352a0309532cf136771598f1b2fc9.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/get-angle-to.spec.ts#Geometry #getAngleTo Если цель на северо-западе, возвращает 45","name":"Если цель на северо-западе, возвращает 45","status":"passed","testResultsByEnv":{"default":"5b8716160a928e2fc209ef34083d714a"}}

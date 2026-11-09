@@ -1,0 +1,1 @@
+{"id":"ed2ec82284da8c9bd6acfd52449af1d0.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/get-angle-to.spec.ts#Geometry #getAngleTo Если цель на юге (−Y), возвращает 180","name":"Если цель на юге (−Y), возвращает 180","status":"passed","testResultsByEnv":{"default":"f7fe51a484b37fdac30ff65a39d7bd0c"}}

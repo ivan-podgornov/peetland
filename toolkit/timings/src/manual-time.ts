@@ -9,7 +9,7 @@ const DEFAULT_STATE: TimeState = {
 
 /**
  * Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
- * воссоздать из слепка другого времени (см. ITime.getState)
+ * воссоздать из слепка другого времени (см. IReadonlyTime.getState)
  */
 export class ManualTime implements ITime {
   private state: TimeState;
@@ -43,6 +43,10 @@ export class ManualTime implements ITime {
       hours,
       minutes,
     };
+  }
+
+  clone(): ITime {
+    return new ManualTime(this.getState());
   }
 
   /**

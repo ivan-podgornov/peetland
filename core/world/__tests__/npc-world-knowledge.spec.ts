@@ -5,15 +5,11 @@ import { NpcWorldKnowledge } from '../src/npc-world-knowledge';
 
 describe('NpcWorldKnowledge', () => {
   describe('#getState', () => {
-    it('Возвращает слепок времени суток', () => {
-      const time = new ManualTime({
-        day: 1,
-        hours: 20,
-        minutes: 15,
-      });
+    it('Возвращает время суток', () => {
+      const time = new ManualTime();
       const knowledge = new NpcWorldKnowledge({ time });
 
-      expect(knowledge.getState().time).toStrictEqual(time.getState());
+      expect(knowledge.getState().time).toBe(time);
     });
   });
 });

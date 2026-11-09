@@ -1,6 +1,7 @@
 import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { createMockedPsyche, createMockedPsycheFactory } from '@peetland/psyche/dev';
+import { ManualTime } from '@peetland/timings';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -83,22 +84,11 @@ describe('Npc', () => {
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledge({
-        time: {
-          day: 1,
-          hours: 20,
-          minutes: 15,
-        },
-      });
+      const world = { time: new ManualTime() };
+      const worldKnowledge = createMockedNpcWorldKnowledge(world);
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      expect(npc.getState().world).toStrictEqual({
-        time: {
-          day: 1,
-          hours: 20,
-          minutes: 15,
-        },
-      });
+      expect(npc.getState().world).toBe(world);
     });
   });
 });

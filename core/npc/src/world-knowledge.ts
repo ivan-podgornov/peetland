@@ -5,6 +5,6 @@ import type { NpcWorldState } from './state';
  * не зависит от мира
  */
 export interface INpcWorldKnowledge {
-  /** Возвращает слепок того, что NPC знает о мире сейчас */
+  /** Возвращает то, что NPC знает о мире */
   getState(): NpcWorldState;
 }

@@ -7,7 +7,7 @@ import type { IGeometry } from '@peetland/geometry';
 import type { ILogger } from '@peetland/logger';
 import { addEventHandler, thisScript } from '@peetland/moonloader';
 import { Timer } from '@peetland/timings';
-import type { ITime } from '@peetland/timings';
+import type { IReadonlyTime } from '@peetland/timings';
 
 import { GTA_ANIMATIONS, GtaActorFactory, GtaAnimationLoader } from './actor';
 
@@ -30,7 +30,7 @@ export type GtaGameDeps = {
  */
 export class GtaGame implements IGame {
   readonly actorFactory: IActorFactory;
-  readonly time: ITime;
+  readonly time: IReadonlyTime;
   readonly objectFactory: IGtaObjectFactory;
   readonly geometry: IGeometry;
   readonly ticks: Observable<unknown>;

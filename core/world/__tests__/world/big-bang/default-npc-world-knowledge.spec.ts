@@ -12,19 +12,14 @@ describe('World', () => {
       it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
         const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
+        const npcWorld = { time: new ManualTime() };
         const world = new World(
           createWorldOptions({
             game: createGame({ ticks: ticks.observable }),
             npcs: [createNpcData()],
           }),
           {
-            worldKnowledge: createMockedNpcWorldKnowledge({
-              time: {
-                day: 1,
-                hours: 20,
-                minutes: 15,
-              },
-            }),
+            worldKnowledge: createMockedNpcWorldKnowledge(npcWorld),
             rootTaskFactory: createMockedRootTaskFactory({
               name: 'root',
               methods: [
@@ -41,30 +36,17 @@ describe('World', () => {
 
         ticks.subscriber.next(undefined);
 
-        expect(preconditions).toHaveBeenCalledWith(
-          expect.objectContaining({
-            world: {
-              time: {
-                day: 1,
-                hours: 20,
-                minutes: 15,
-              },
-            },
-          })
-        );
+        expect(preconditions).toHaveBeenCalledWith(expect.objectContaining({ world: npcWorld }));
       });
 
-      it('Если worldKnowledge не передано, NPC планирует с временем суток игры', async () => {
+      it('Если worldKnowledge не передано, NPC планирует со временем суток игры', async () => {
         const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
+        const time = new ManualTime();
         const world = new World(
           createWorldOptions({
             game: createGame({
-              time: new ManualTime({
-                day: 1,
-                hours: 20,
-                minutes: 15,
-              }),
+              time,
               ticks: ticks.observable,
             }),
             npcs: [createNpcData()],
@@ -86,17 +68,7 @@ describe('World', () => {
 
         ticks.subscriber.next(undefined);
 
-        expect(preconditions).toHaveBeenCalledWith(
-          expect.objectContaining({
-            world: {
-              time: {
-                day: 1,
-                hours: 20,
-                minutes: 15,
-              },
-            },
-          })
-        );
+        expect(preconditions).toHaveBeenCalledWith(expect.objectContaining({ world: { time } }));
       });
     });
   });

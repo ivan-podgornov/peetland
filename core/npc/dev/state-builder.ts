@@ -3,6 +3,7 @@ import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
 import type { IPsyche } from '@peetland/psyche';
 import { PsycheBuilder } from '@peetland/psyche/dev';
+import { ManualTime } from '@peetland/timings';
 import type { TimeState } from '@peetland/timings';
 
 import type { NpcState } from '../src';
@@ -77,7 +78,7 @@ export class NpcStateBuilder {
     return this;
   }
 
-  /** Задаёт время суток в мире */
+  /** Задаёт время суток в мире: в состояние ляжет ManualTime с этим временем */
   withTime(time: TimeState): this {
     this.time = time;
     return this;
@@ -95,7 +96,7 @@ export class NpcStateBuilder {
         psyche: this.psyche(new PsycheBuilder()),
       },
       world: {
-        time: { ...this.time },
+        time: new ManualTime(this.time),
       },
     };
   }

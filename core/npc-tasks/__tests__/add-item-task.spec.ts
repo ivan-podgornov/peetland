@@ -38,23 +38,9 @@ describe('AddItemTask', () => {
         count: 1,
       });
 
-      const state = task.applyEffects(
-        new NpcStateBuilder()
-          .withTime({
-            day: 1,
-            hours: 20,
-            minutes: 0,
-          })
-          .build()
-      );
+      const state = NpcStateBuilder.default();
 
-      expect(state.world).toStrictEqual({
-        time: {
-          day: 1,
-          hours: 20,
-          minutes: 0,
-        },
-      });
+      expect(task.applyEffects(state).world).toBe(state.world);
     });
 
     it('Увеличивает количество предмета в состоянии', () => {

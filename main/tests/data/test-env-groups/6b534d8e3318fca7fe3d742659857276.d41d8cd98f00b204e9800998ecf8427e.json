@@ -1,0 +1,1 @@
+{"id":"6b534d8e3318fca7fe3d742659857276.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/time-span/elapsed-minutes.spec.ts#TimeSpan #elapsedMinutes Если from не момент времени, выбрасывает RangeError","name":"Если from не момент времени, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"ffea418aa35b0871daa2628ed2627f0d"}}

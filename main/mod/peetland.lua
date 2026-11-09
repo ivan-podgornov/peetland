@@ -3998,10 +3998,9 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["toolkit.timings.src.manual-time"] = function(...) 
+["toolkit.timings.src.time-state-validator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
 local __TS__NumberIsInteger = ____lualib.__TS__NumberIsInteger
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
@@ -4009,40 +4008,19 @@ local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Первый день в полночь
-local DEFAULT_STATE = {day = 1, hours = 0, minutes = 0}
---- Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
--- воссоздать из слепка другого времени (см. IReadonlyTime.getState)
-____exports.ManualTime = __TS__Class()
-local ManualTime = ____exports.ManualTime
-ManualTime.name = "ManualTime"
-function ManualTime.prototype.____constructor(self, state)
-    if state == nil then
-        state = DEFAULT_STATE
-    end
-    self.state = DEFAULT_STATE
-    self:set(state)
+--- Проверяет, что слепок — момент времени: день, час и минуты в своих пределах
+____exports.TimeStateValidator = __TS__Class()
+local TimeStateValidator = ____exports.TimeStateValidator
+TimeStateValidator.name = "TimeStateValidator"
+function TimeStateValidator.prototype.____constructor(self)
 end
-function ManualTime.prototype.getState(self)
-    local ____self_state_0 = self.state
-    local day = ____self_state_0.day
-    local hours = ____self_state_0.hours
-    local minutes = ____self_state_0.minutes
-    return {day = day, hours = hours, minutes = minutes}
-end
-function ManualTime.prototype.clone(self)
-    return __TS__New(
-        ____exports.ManualTime,
-        self:getState()
-    )
-end
-function ManualTime.prototype.set(self, state)
-    local ____state_1 = state
-    local day = ____state_1.day
-    local hours = ____state_1.hours
-    local minutes = ____state_1.minutes
+function TimeStateValidator.prototype.validate(self, state)
+    local ____state_0 = state
+    local day = ____state_0.day
+    local hours = ____state_0.hours
+    local minutes = ____state_0.minutes
     if not __TS__NumberIsInteger(day) or day < 1 then
         error(
             __TS__New(RangeError, "День должен быть целым числом от 1"),
@@ -4061,6 +4039,51 @@ function ManualTime.prototype.set(self, state)
             0
         )
     end
+end
+return ____exports
+ end,
+["toolkit.timings.src.manual-time"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local ____exports = {}
+local ____time_2Dstate_2Dvalidator = require("toolkit.timings.src.time-state-validator")
+local TimeStateValidator = ____time_2Dstate_2Dvalidator.TimeStateValidator
+--- Первый день в полночь
+local DEFAULT_STATE = {day = 1, hours = 0, minutes = 0}
+--- Время, которое меняется только через set. Нужно в тестах: время такое, какое нужно тесту. Можно
+-- воссоздать из слепка другого времени (см. IReadonlyTime.getState)
+____exports.ManualTime = __TS__Class()
+local ManualTime = ____exports.ManualTime
+ManualTime.name = "ManualTime"
+function ManualTime.prototype.____constructor(self, state)
+    if state == nil then
+        state = DEFAULT_STATE
+    end
+    self.validator = __TS__New(TimeStateValidator)
+    self.state = DEFAULT_STATE
+    self:set(state)
+end
+function ManualTime.prototype.getState(self)
+    local ____self_state_0 = self.state
+    local day = ____self_state_0.day
+    local hours = ____self_state_0.hours
+    local minutes = ____self_state_0.minutes
+    return {day = day, hours = hours, minutes = minutes}
+end
+function ManualTime.prototype.clone(self)
+    return __TS__New(
+        ____exports.ManualTime,
+        self:getState()
+    )
+end
+function ManualTime.prototype.set(self, state)
+    self.validator:validate(state)
+    local ____state_1 = state
+    local day = ____state_1.day
+    local hours = ____state_1.hours
+    local minutes = ____state_1.minutes
     self.state = {day = day, hours = hours, minutes = minutes}
 end
 __TS__SetDescriptor(
@@ -4158,6 +4181,38 @@ function ManualTimer.prototype.findNextInterval(self, ____until)
 end
 return ____exports
  end,
+["toolkit.timings.src.time-span"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____time_2Dstate_2Dvalidator = require("toolkit.timings.src.time-state-validator")
+local TimeStateValidator = ____time_2Dstate_2Dvalidator.TimeStateValidator
+--- Считает, сколько игрового времени прошло между двумя моментами, в том числе через полночь
+____exports.TimeSpan = __TS__Class()
+local TimeSpan = ____exports.TimeSpan
+TimeSpan.name = "TimeSpan"
+function TimeSpan.prototype.____constructor(self)
+    self.validator = __TS__New(TimeStateValidator)
+end
+function TimeSpan.prototype.elapsedMinutes(self, from, to)
+    return self:toMinutes(to) - self:toMinutes(from)
+end
+function TimeSpan.prototype.hasPassed(self, from, to, minutes)
+    return self:elapsedMinutes(from, to) >= minutes
+end
+function TimeSpan.prototype.toMinutes(self, state)
+    self.validator:validate(state)
+    local ____state_0 = state
+    local day = ____state_0.day
+    local hours = ____state_0.hours
+    local minutes = ____state_0.minutes
+    return (day - 1) * ____exports.TimeSpan.MINUTES_PER_DAY + hours * ____exports.TimeSpan.MINUTES_PER_HOUR + minutes
+end
+TimeSpan.MINUTES_PER_HOUR = 60
+TimeSpan.MINUTES_PER_DAY = 24 * ____exports.TimeSpan.MINUTES_PER_HOUR
+return ____exports
+ end,
 ["toolkit.timings.src.timer"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -4195,6 +4250,10 @@ end
 do
     local ____manual_2Dtimer = require("toolkit.timings.src.manual-timer")
     ____exports.ManualTimer = ____manual_2Dtimer.ManualTimer
+end
+do
+    local ____time_2Dspan = require("toolkit.timings.src.time-span")
+    ____exports.TimeSpan = ____time_2Dspan.TimeSpan
 end
 do
     local ____timer = require("toolkit.timings.src.timer")

@@ -1,0 +1,1 @@
+{"id":"91e5e06c6204167af3ba07ff8a232706.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-time/set/range-error.spec.ts#ManualTime #set Если слепок не момент времени, выбрасывает RangeError","name":"Если слепок не момент времени, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"1d48fe30769a6b4dda9df07e53c2e362"}}

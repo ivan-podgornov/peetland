@@ -1,1 +1,0 @@
-{"id":"10ad871de5ba11721ec5328bb21d0971.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/root-task-factory.spec.ts#RootTaskFactory #create Вызывает create у фабрики переданного типа из kindFactories","name":"Вызывает create у фабрики переданного типа из kindFactories","status":"passed","testResultsByEnv":{"default":"481e470c5bfe2ece0287f93bb1f9fbb8"}}

@@ -1,1 +1,0 @@
-{"id":"7bd5e9bed6f24eff3d78df17bc22387c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/multicast-observer/next.spec.ts#MulticastObserver #next При ошибке при вызове observer Передаёт ошибку в reportError","name":"Передаёт ошибку в reportError","status":"passed","testResultsByEnv":{"default":"dbb3b2b23f901bd2858090b30b14947c"}}

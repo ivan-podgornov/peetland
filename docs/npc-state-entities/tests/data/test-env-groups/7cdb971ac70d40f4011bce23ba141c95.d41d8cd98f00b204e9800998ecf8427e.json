@@ -1,1 +1,0 @@
-{"id":"7cdb971ac70d40f4011bce23ba141c95.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/observable/patch-when.spec.ts#EventTarget #when При ошибке в обработчиках наблюдателя, вызывает reportError","name":"При ошибке в обработчиках наблюдателя, вызывает reportError","status":"passed","testResultsByEnv":{"default":"a8abd70e608b78b630d03658c02cfe33"}}

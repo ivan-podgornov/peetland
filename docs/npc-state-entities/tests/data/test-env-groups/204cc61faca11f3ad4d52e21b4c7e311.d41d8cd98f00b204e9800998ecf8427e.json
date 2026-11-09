@@ -1,1 +1,0 @@
-{"id":"204cc61faca11f3ad4d52e21b4c7e311.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/set.spec.ts#Inventory #set Если количество бесконечное, выбрасывает RangeError","name":"Если количество бесконечное, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"1e8c50f7b55746298973d694e025f3e8"}}

@@ -8,11 +8,13 @@ import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createHomelessTaskFactory } from '../dev';
-import { HomelessRootTask, HomelessRootTaskFactory } from '../src';
-import type { HomelessRootTaskFactoryDeps } from '../src';
+import { HomelessActivityTask, HomelessActivityTaskFactory } from '../src';
+import type { HomelessActivityTaskFactoryDeps } from '../src';
 
-/** Создаёт зависимости фабрики корневой задачи бомжа. Свои задачи фабрика собирает по умолчанию */
-function createDeps(deps: Partial<HomelessRootTaskFactoryDeps> = {}): HomelessRootTaskFactoryDeps {
+/** Создаёт зависимости фабрики деятельности бомжа. Свои задачи фабрика собирает по умолчанию */
+function createDeps(
+  deps: Partial<HomelessActivityTaskFactoryDeps> = {}
+): HomelessActivityTaskFactoryDeps {
   return {
     geometry: new Geometry(),
     places: createMockedPlaces(),
@@ -22,19 +24,19 @@ function createDeps(deps: Partial<HomelessRootTaskFactoryDeps> = {}): HomelessRo
   };
 }
 
-describe('HomelessRootTaskFactory', () => {
+describe('HomelessActivityTaskFactory', () => {
   describe('#create', () => {
-    it('Возвращает экземпляр HomelessRootTask', () => {
-      const factory = new HomelessRootTaskFactory(createDeps());
+    it('Возвращает экземпляр HomelessActivityTask', () => {
+      const factory = new HomelessActivityTaskFactory(createDeps());
 
       const task = factory.create();
 
-      expect(task).toBeInstanceOf(HomelessRootTask);
+      expect(task).toBeInstanceOf(HomelessActivityTask);
     });
 
     it('Создаёт задачи бомжа фабрикой homelessTaskFactory из зависимостей', () => {
       const drink = vi.fn(() => createStubTask<NpcState, NpcContext>('drink'));
-      const factory = new HomelessRootTaskFactory(
+      const factory = new HomelessActivityTaskFactory(
         createDeps({ homelessTaskFactory: createHomelessTaskFactory({ drink }) })
       );
 
@@ -47,7 +49,7 @@ describe('HomelessRootTaskFactory', () => {
       const playAnimation = vi.fn(() =>
         createStubPrimitiveTask<NpcState, NpcContext>('play-animation')
       );
-      const factory = new HomelessRootTaskFactory(
+      const factory = new HomelessActivityTaskFactory(
         createDeps({ npcTaskFactory: createNpcTaskFactory({ playAnimation }) })
       );
 

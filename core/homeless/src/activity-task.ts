@@ -4,23 +4,23 @@ import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { IHomelessTaskFactory } from './types';
 
-export type HomelessRootTaskDeps = {
+export type HomelessActivityTaskDeps = {
   homelessTaskFactory: IHomelessTaskFactory;
 };
 
 /**
- * Корневая задача бомжа: жить. Методы перечислены по приоритету: бухать, а если не получается —
+ * Деятельность бомжа: напиться. Методы перечислены по приоритету: бухать, а если не получается —
  * купить пойло, а если и это не получается — сдать бутылки, а если и это не получается — клянчить, а
  * иначе — собирать бутылки. Когда что получается, решают предусловия самих задач: бухать можно,
  * если есть пойло, купить — если хватает денег, сдать — если за бутылки хватит на пойло, клянчить —
  * если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
  */
-export class HomelessRootTask implements CompoundTask<NpcState, NpcContext> {
-  readonly name = 'live';
+export class HomelessActivityTask implements CompoundTask<NpcState, NpcContext> {
+  readonly name = 'get-drunk';
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  constructor(deps: HomelessRootTaskDeps) {
+  constructor(deps: HomelessActivityTaskDeps) {
     const { homelessTaskFactory } = deps;
 
     this.methods = [

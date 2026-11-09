@@ -1,14 +1,15 @@
 import type { IGeometry } from '@peetland/geometry';
-import { HomelessRootTaskFactory } from '@peetland/homeless';
-import type { Task } from '@peetland/htn';
-import { NpcKind } from '@peetland/npc';
-import type { IKindRootTaskFactory, IRootTaskFactory, NpcContext, NpcState } from '@peetland/npc';
+import type { IRootTaskFactory, NpcKind } from '@peetland/npc';
 import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
-/** Фабрика корневой задачи для каждого типа NPC */
-export type KindRootTaskFactories = Readonly<Record<NpcKind, IKindRootTaskFactory>>;
+import { ActivityTaskFactory } from './activity-task-factory';
+import { AddictionsTaskFactory } from './addictions-task-factory';
+import { HobbiesTaskFactory } from './hobbies-task-factory';
+import { NeedsTaskFactory } from './needs-task-factory';
+import { RootTask } from './root-task';
+import type { ILayerTaskFactory } from './types';
 
 export type RootTaskFactoryDeps = {
   geometry: IGeometry;
@@ -16,28 +17,55 @@ export type RootTaskFactoryDeps = {
   places: IPlaces;
   random: IRandom;
   timer: ITimer;
-  /**
-   * Фабрики корневых задач, которые заменяют фабрики по умолчанию. По умолчанию у каждого типа NPC
-   * фабрика из его пакета с задачами
-   */
-  kindFactories?: Partial<KindRootTaskFactories>;
+  /** Фабрика слоя потребностей. По умолчанию — NeedsTaskFactory */
+  needsTaskFactory?: ILayerTaskFactory;
+  /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
+  addictionsTaskFactory?: ILayerTaskFactory;
+  /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
+  activityTaskFactory?: ILayerTaskFactory;
+  /** Фабрика слоя хобби. По умолчанию — HobbiesTaskFactory */
+  hobbiesTaskFactory?: ILayerTaskFactory;
 };
 
-/** Создаёт корневую задачу NPC фабрикой его типа */
+/** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
-  private readonly kindFactories: KindRootTaskFactories;
+  private readonly needsTaskFactory: ILayerTaskFactory;
+  private readonly addictionsTaskFactory: ILayerTaskFactory;
+  private readonly activityTaskFactory: ILayerTaskFactory;
+  private readonly hobbiesTaskFactory: ILayerTaskFactory;
 
   constructor(deps: RootTaskFactoryDeps) {
-    const { kindFactories = {}, ...shared } = deps;
+    const {
+      geometry,
+      places,
+      random,
+      timer,
+      needsTaskFactory = new NeedsTaskFactory(),
+      addictionsTaskFactory = new AddictionsTaskFactory(),
+      activityTaskFactory = new ActivityTaskFactory({
+        geometry,
+        places,
+        random,
+        timer,
+      }),
+      hobbiesTaskFactory = new HobbiesTaskFactory(),
+    } = deps;
 
-    this.kindFactories = {
-      [NpcKind.Homeless]: kindFactories[NpcKind.Homeless] ?? new HomelessRootTaskFactory(shared),
-    };
+    this.needsTaskFactory = needsTaskFactory;
+    this.addictionsTaskFactory = addictionsTaskFactory;
+    this.activityTaskFactory = activityTaskFactory;
+    this.hobbiesTaskFactory = hobbiesTaskFactory;
   }
 
-  create(kind: NpcKind): Task<NpcState, NpcContext> {
-    const { kindFactories } = this;
+  create(kind: NpcKind): RootTask {
+    const { needsTaskFactory, addictionsTaskFactory, activityTaskFactory, hobbiesTaskFactory } =
+      this;
 
-    return kindFactories[kind].create();
+    return new RootTask({
+      needs: needsTaskFactory.create(kind),
+      addictions: addictionsTaskFactory.create(kind),
+      activity: activityTaskFactory.create(kind),
+      hobbies: hobbiesTaskFactory.create(kind),
+    });
   }
 }

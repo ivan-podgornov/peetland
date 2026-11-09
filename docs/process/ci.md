@@ -22,7 +22,9 @@ flowchart LR
   docs --> publish
 ```
 
-- **lint** — проверка типов, eslint, dependency-cruiser и prettier по всему репозиторию.
+- **lint** — проверка типов, eslint, dependency-cruiser и prettier по всему репозиторию, а ещё
+  commitlint по коммитам пулл реквеста (см. [Коммиты и ветки](./commits.md)). Squash-коммит в
+  `main` GitHub собирает при мерже, поэтому commitlint его не проверяет.
   dependency-cruiser проверяет направление зависимостей между слоями и запрещает циклические
   зависимости (см. [Проверка слоёв](../architecture/index.md#проверка-слоёв)).
 - **test** — тесты. Отчёт Allure о тестах публикуется на GitHub Pages, даже если тесты упали: на

@@ -1,0 +1,1 @@
+{"id":"7211aa4b73f1cbc31a12085a1aa872d9.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/constructor.spec.ts#Psyche #constructor Если чувство меньше Psyche.MIN_FEELING, выбрасывает RangeError","name":"Если чувство меньше Psyche.MIN_FEELING, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"54f6ba0a86dae28d310c88402f86c9d8"}}

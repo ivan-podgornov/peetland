@@ -1,0 +1,1 @@
+{"id":"3adf3ddb1cf26d76a53b2187f6354d7b.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/update.spec.ts#Command Обновление Передаёт в onUpdate, сколько прошло с прошлого вызова","name":"Передаёт в onUpdate, сколько прошло с прошлого вызова","status":"passed","testResultsByEnv":{"default":"beb27a7665b3cf9bf81f88ea6c1c3ea8"}}

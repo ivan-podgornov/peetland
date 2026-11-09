@@ -1,0 +1,1 @@
+{"id":"c03517226a0401db69f43056850c888a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-time/set/range-error.spec.ts#ManualTime #set Если минуты не целые, выбрасывает RangeError","name":"Если минуты не целые, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"625fe16546a7a4e1ac6c36cb9c6465e7"}}

@@ -6270,6 +6270,7 @@ local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__New = ____lualib.__TS__New
 local __TS__NumberIsFinite = ____lualib.__TS__NumberIsFinite
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
@@ -6277,7 +6278,6 @@ local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____feeling = require("core.psyche.src.feeling")
 local Feeling = ____feeling.Feeling
@@ -6292,6 +6292,7 @@ Psyche.name = "Psyche"
 function Psyche.prototype.____constructor(self, state, deps)
     local ____deps_0 = deps
     local traitFactories = ____deps_0.traitFactories
+    self.deps = deps
     __TS__ArrayForEach(
         __TS__ObjectValues(Feeling),
         function(____, feeling) return self:assertFeeling(feeling, state.feelings[feeling]) end
@@ -6329,6 +6330,13 @@ function Psyche.prototype.react(self, deed)
             )
         end,
         self.feelings
+    )
+end
+function Psyche.prototype.clone(self)
+    return __TS__New(
+        ____exports.Psyche,
+        self:getState(),
+        self.deps
     )
 end
 function Psyche.prototype.adjustChance(self, chance)
@@ -7081,7 +7089,7 @@ function Npc.prototype.getState(self)
                 angle = self.actor:getAngle()
             },
             inventory = self.inventory,
-            psyche = self.psyche:getState()
+            psyche = self.psyche
         },
         world = self.worldKnowledge:getState()
     }
@@ -7540,27 +7548,20 @@ local ____exports = {}
 ____exports.PsycheReactTask = __TS__Class()
 local PsycheReactTask = ____exports.PsycheReactTask
 PsycheReactTask.name = "PsycheReactTask"
-function PsycheReactTask.prototype.____constructor(self, options, deps)
+function PsycheReactTask.prototype.____constructor(self, options)
     self.name = "psyche-react"
     self.options = options
-    self.deps = deps
 end
 function PsycheReactTask.prototype.canExecute(self)
     return true
 end
 function PsycheReactTask.prototype.applyEffects(self, state)
-    local ____self_deps_0 = self.deps
-    local psycheFactory = ____self_deps_0.psycheFactory
-    local psyche = psycheFactory:create(state.self.psyche)
+    local psyche = state.self.psyche:clone()
     psyche:react(self.options.deed)
     return __TS__ObjectAssign(
         {},
         state,
-        {self = __TS__ObjectAssign(
-            {},
-            state.self,
-            {psyche = psyche:getState()}
-        )}
+        {self = __TS__ObjectAssign({}, state.self, {psyche = psyche})}
     )
 end
 function PsycheReactTask.prototype.start(self, _state, context)
@@ -7719,8 +7720,6 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____htn = require("toolkit.htn.src.index")
 local ParallelTask = ____htn.ParallelTask
-local ____psyche = require("core.psyche.src.index")
-local PsycheFactory = ____psyche.PsycheFactory
 local ____achieve_2Dangle_2Dtask = require("core.npc-tasks.src.achieve-angle-task")
 local AchieveAngleTask = ____achieve_2Dangle_2Dtask.AchieveAngleTask
 local ____add_2Ditem_2Dtask = require("core.npc-tasks.src.add-item-task")
@@ -7739,15 +7738,7 @@ ____exports.NpcTaskFactory = __TS__Class()
 local NpcTaskFactory = ____exports.NpcTaskFactory
 NpcTaskFactory.name = "NpcTaskFactory"
 function NpcTaskFactory.prototype.____constructor(self, deps)
-    local ____deps_0 = deps
-    local geometry = ____deps_0.geometry
-    local psycheFactory = ____deps_0.psycheFactory
-    if psycheFactory == nil then
-        psycheFactory = __TS__New(PsycheFactory)
-    end
-    local random = ____deps_0.random
-    local timer = ____deps_0.timer
-    self.deps = {geometry = geometry, psycheFactory = psycheFactory, random = random, timer = timer}
+    self.deps = deps
 end
 function NpcTaskFactory.prototype.goToCoords(self, options)
     return __TS__New(GoToCoordsTask, options)
@@ -7765,14 +7756,12 @@ function NpcTaskFactory.prototype.removeItem(self, options)
     return __TS__New(RemoveItemTask, options)
 end
 function NpcTaskFactory.prototype.psycheReact(self, options)
-    local ____self_deps_1 = self.deps
-    local psycheFactory = ____self_deps_1.psycheFactory
-    return __TS__New(PsycheReactTask, options, {psycheFactory = psycheFactory})
+    return __TS__New(PsycheReactTask, options)
 end
 function NpcTaskFactory.prototype.tryLuck(self, options)
-    local ____self_deps_2 = self.deps
-    local random = ____self_deps_2.random
-    local timer = ____self_deps_2.timer
+    local ____self_deps_0 = self.deps
+    local random = ____self_deps_0.random
+    local timer = ____self_deps_0.timer
     return __TS__New(TryLuckTask, options, {random = random, timer = timer})
 end
 function NpcTaskFactory.prototype.parallel(self, options)
@@ -8011,10 +8000,8 @@ function BegTask.prototype.countRewardsBeforeShame(self, psyche, limit)
     end
     return rewards
 end
-function BegTask.prototype.predictReward(self, state)
-    local ____self_deps_1 = self.deps
-    local psycheFactory = ____self_deps_1.psycheFactory
-    local psyche = psycheFactory:create(state)
+function BegTask.prototype.predictReward(self, current)
+    local psyche = current:clone()
     local attempts = psyche:expectAttempts(BEGGING_CHANCE)
     do
         local attempt = 0
@@ -8023,10 +8010,10 @@ function BegTask.prototype.predictReward(self, state)
             attempt = attempt + 1
         end
     end
-    return psyche:getState()
+    return psyche
 end
 function BegTask.prototype.isAshamed(self, psyche)
-    return psyche.feelings[Feeling.Shame] >= BEGGING_SHAME_LIMIT
+    return psyche:getState().feelings[Feeling.Shame] >= BEGGING_SHAME_LIMIT
 end
 BegTask.SPOT_COMPLETE_RADIUS = 0.5
 BegTask.SPOT_FACING_TOLERANCE = 15
@@ -8357,8 +8344,7 @@ function HomelessTaskFactory.prototype.beg(self)
     local ____self_deps_5 = self.deps
     local npcTaskFactory = ____self_deps_5.npcTaskFactory
     local places = ____self_deps_5.places
-    local psycheFactory = ____self_deps_5.psycheFactory
-    return __TS__New(BegTask, {npcTaskFactory = npcTaskFactory, places = places, psycheFactory = psycheFactory})
+    return __TS__New(BegTask, {npcTaskFactory = npcTaskFactory, places = places})
 end
 return ____exports
  end,
@@ -8369,8 +8355,6 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____npc_2Dtasks = require("core.npc-tasks.src.index")
 local NpcTaskFactory = ____npc_2Dtasks.NpcTaskFactory
-local ____psyche = require("core.psyche.src.index")
-local PsycheFactory = ____psyche.PsycheFactory
 local ____factory = require("core.homeless.src.factory")
 local HomelessTaskFactory = ____factory.HomelessTaskFactory
 local ____root_2Dtask = require("core.homeless.src.root-task")
@@ -8384,19 +8368,15 @@ function HomelessRootTaskFactory.prototype.____constructor(self, deps)
     local ____deps_0 = deps
     local geometry = ____deps_0.geometry
     local places = ____deps_0.places
-    local psycheFactory = ____deps_0.psycheFactory
-    if psycheFactory == nil then
-        psycheFactory = __TS__New(PsycheFactory)
-    end
     local random = ____deps_0.random
     local timer = ____deps_0.timer
     local npcTaskFactory = ____deps_0.npcTaskFactory
     if npcTaskFactory == nil then
-        npcTaskFactory = __TS__New(NpcTaskFactory, {geometry = geometry, psycheFactory = psycheFactory, random = random, timer = timer})
+        npcTaskFactory = __TS__New(NpcTaskFactory, {geometry = geometry, random = random, timer = timer})
     end
     local homelessTaskFactory = ____deps_0.homelessTaskFactory
     if homelessTaskFactory == nil then
-        homelessTaskFactory = __TS__New(HomelessTaskFactory, {npcTaskFactory = npcTaskFactory, places = places, psycheFactory = psycheFactory, random = random})
+        homelessTaskFactory = __TS__New(HomelessTaskFactory, {npcTaskFactory = npcTaskFactory, places = places, random = random})
     end
     self.homelessTaskFactory = homelessTaskFactory
 end
@@ -8510,13 +8490,7 @@ function World.prototype.bigBang(self)
         local ____self_deps_2 = self.deps
         local rootTaskFactory = ____self_deps_2.rootTaskFactory
         if rootTaskFactory == nil then
-            rootTaskFactory = __TS__New(RootTaskFactory, {
-                geometry = game.geometry,
-                places = worldPlaces,
-                psycheFactory = psycheFactory,
-                random = random,
-                timer = timer
-            })
+            rootTaskFactory = __TS__New(RootTaskFactory, {geometry = game.geometry, places = worldPlaces, random = random, timer = timer})
         end
         local npcFactory = ____self_deps_2.npcFactory
         if npcFactory == nil then

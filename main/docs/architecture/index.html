@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Архитектура | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Архитектура | Peetland"><meta data-rh="true" name="description" content="Чистота архитектуры"><meta data-rh="true" property="og:description" content="Чистота архитектуры"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Архитектура","item":"https://ivan-podgornov.github.io/peetland/main/docs/architecture/"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.0c24fb4c.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.19ef632b.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.6bf33703.js" defer="defer"></script>
 </head>
 <body>
@@ -146,9 +146,9 @@ core и toolkit. Если обход платформы требует меня�
 NPC.</li>
 <li class=""><strong>Рождение NPC.</strong> NPC создаёт актора (тот появляется в игре), инвентарь, психику и HTN-агента с
 корневой задачей своего типа. После этого NPC подписывается на тики игры.</li>
-<li class=""><strong>Тик.</strong> На каждый тик NPC собирает состояние — слепки актора, психики и знания о мире и сам
-инвентарь только на чтение — и передаёт его агенту вместе с контекстом. Если плана нет, агент планирует корневую задачу, а
-затем продвигает текущую задачу плана.</li>
+<li class=""><strong>Тик.</strong> На каждый тик NPC собирает состояние — слепки актора и знания о мире и сами инвентарь
+и психику только на чтение — и передаёт его агенту вместе с контекстом. Если плана нет, агент
+планирует корневую задачу, а затем продвигает текущую задачу плана.</li>
 <li class=""><strong>Перепланирование.</strong> Когда план закончился или задача не удалась, агент забывает план и на
 следующем тике планирует заново с новым состоянием.</li>
 <li class=""><strong>Конец.</strong> Когда игра завершается, её сигнал прерывается: NPC перестаёт слушать тики,

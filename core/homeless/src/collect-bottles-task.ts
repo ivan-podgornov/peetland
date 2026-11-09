@@ -94,6 +94,6 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Сколько у NPC бутылок */
   private countBottles(state: NpcState): number {
-    return state.self.inventory[Item.Bottles] ?? 0;
+    return state.self.inventory.get(Item.Bottles);
   }
 }

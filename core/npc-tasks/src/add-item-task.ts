@@ -1,5 +1,4 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
-import { Inventory } from '@peetland/inventory';
 import type { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
@@ -25,17 +24,17 @@ export class AddItemTask implements PrimitiveTask<NpcState, NpcContext> {
     return true;
   }
 
-  /** Количество предмета в состоянии растёт */
+  /** Количество предмета растёт в копии инвентаря из состояния */
   applyEffects(state: NpcState): NpcState {
     const { item, count } = this.options;
-    const inventory = new Inventory(state.self.inventory);
+    const inventory = state.self.inventory.clone();
     inventory.add(item, count);
 
     return {
       ...state,
       self: {
         ...state.self,
-        inventory: inventory.getAll(),
+        inventory,
       },
     };
   }

@@ -1,4 +1,4 @@
-import { Inventory, Item } from '@peetland/inventory';
+import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import { Feeling, Psyche } from '@peetland/psyche';
 import {
@@ -14,27 +14,14 @@ import { Npc } from '../src';
 
 describe('Npc', () => {
   describe('#getState', () => {
-    it('Возвращает содержимое инвентаря NPC', () => {
-      const inventory = new Inventory({ [Item.Money]: 150 });
+    it('Возвращает инвентарь NPC', () => {
+      const inventory = new Inventory();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
       );
 
-      expect(npc.getState().self.inventory).toStrictEqual({ [Item.Money]: 150 });
-    });
-
-    it('Возвращает слепок инвентаря, который не меняется, когда меняется инвентарь', () => {
-      const inventory = new Inventory({ [Item.Money]: 150 });
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({ inventoryFactory: createMockedInventoryFactory(inventory) })
-      );
-      const state = npc.getState();
-
-      npc.inventory.add(Item.Money, 50);
-
-      expect(state.self.inventory).toStrictEqual({ [Item.Money]: 150 });
+      expect(npc.getState().self.inventory).toBe(inventory);
     });
 
     it('Возвращает позицию актора', () => {

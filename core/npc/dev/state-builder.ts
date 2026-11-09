@@ -1,4 +1,5 @@
 import type { Vector3 } from '@peetland/geometry';
+import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
 import type { Feeling, PsycheFeelings, PsycheTraits, Trait } from '@peetland/psyche';
 import { createPsycheState } from '@peetland/psyche/dev';
@@ -103,7 +104,7 @@ export class NpcStateBuilder {
           position: { ...this.position },
           angle: this.angle,
         },
-        inventory: { ...this.inventory },
+        inventory: new Inventory(this.inventory),
         psyche: {
           traits: { ...this.traits },
           feelings: { ...this.feelings },

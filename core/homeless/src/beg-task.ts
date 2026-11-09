@@ -127,8 +127,8 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
    * хватает, возвращает 0
    */
   private countNeededRewards(state: NpcState): number {
-    const money = state.self.inventory[Item.Money] ?? 0;
-    const bottles = state.self.inventory[Item.Bottles] ?? 0;
+    const money = state.self.inventory.get(Item.Money);
+    const bottles = state.self.inventory.get(Item.Bottles);
     const shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE;
 
     return Math.max(0, Math.ceil(shortfall / BEGGING_REWARD));

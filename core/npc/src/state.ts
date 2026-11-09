@@ -1,5 +1,5 @@
 import type { Vector3 } from '@peetland/geometry';
-import type { InventoryCounts } from '@peetland/inventory';
+import type { ReadonlyInventory } from '@peetland/inventory';
 import type { PsycheState } from '@peetland/psyche';
 import type { TimeState } from '@peetland/timings';
 
@@ -10,10 +10,10 @@ export type NpcActorState = Readonly<{
   angle: number;
 }>;
 
-/** Слепок самого NPC: актора, инвентаря и психики */
+/** Сам NPC: слепки актора и психики и инвентарь только на чтение */
 export type NpcSelfState = Readonly<{
   actor: NpcActorState;
-  inventory: Readonly<InventoryCounts>;
+  inventory: ReadonlyInventory;
   psyche: PsycheState;
 }>;
 

@@ -49,7 +49,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Купить пойло можно, если на него хватает денег и есть магазины */
   private canBuy(state: NpcState): boolean {
-    const money = state.self.inventory[Item.Money] ?? 0;
+    const money = state.self.inventory.get(Item.Money);
 
     return money >= BOOZE_PRICE && this.places.ofType(PlaceType.Shop).length > 0;
   }

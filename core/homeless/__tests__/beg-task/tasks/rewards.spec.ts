@@ -59,7 +59,7 @@ describe('BegTask', () => {
 
         const after = applyPlanEffects(task, state);
 
-        expect(after.self.inventory).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
+        expect(after.self.inventory.getAll()).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
       });
     });
   });

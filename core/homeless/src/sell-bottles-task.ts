@@ -50,7 +50,7 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
    * есть, можно купить пойло. И если есть приёмка, где их сдать
    */
   private canSell(state: NpcState): boolean {
-    const money = state.self.inventory[Item.Money] ?? 0;
+    const money = state.self.inventory.get(Item.Money);
     const bottles = this.countBottles(state);
 
     return (
@@ -97,6 +97,6 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Сколько у NPC бутылок */
   private countBottles(state: NpcState): number {
-    return state.self.inventory[Item.Bottles] ?? 0;
+    return state.self.inventory.get(Item.Bottles);
   }
 }

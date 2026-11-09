@@ -1,5 +1,4 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
-import { Inventory } from '@peetland/inventory';
 import type { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
@@ -27,20 +26,20 @@ export class RemoveItemTask implements PrimitiveTask<NpcState, NpcContext> {
   canExecute(state: NpcState): boolean {
     const { item, count } = this.options;
 
-    return (state.self.inventory[item] ?? 0) >= count;
+    return state.self.inventory.get(item) >= count;
   }
 
-  /** Количество предмета в состоянии уменьшается */
+  /** Количество предмета уменьшается в копии инвентаря из состояния */
   applyEffects(state: NpcState): NpcState {
     const { item, count } = this.options;
-    const inventory = new Inventory(state.self.inventory);
+    const inventory = state.self.inventory.clone();
     inventory.remove(item, count);
 
     return {
       ...state,
       self: {
         ...state.self,
-        inventory: inventory.getAll(),
+        inventory,
       },
     };
   }

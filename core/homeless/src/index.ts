@@ -1,4 +1,4 @@
 export type { IHomelessTaskFactory } from './types';
-export { HomelessRootTask } from './root-task';
-export { HomelessRootTaskFactory } from './root-task-factory';
-export type { HomelessRootTaskFactoryDeps } from './root-task-factory';
+export { HomelessActivityTask } from './activity-task';
+export { HomelessActivityTaskFactory } from './activity-task-factory';
+export type { HomelessActivityTaskFactoryDeps } from './activity-task-factory';

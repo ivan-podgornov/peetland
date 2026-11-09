@@ -4,17 +4,17 @@ import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createHomelessTaskFactory } from '../../dev';
-import { HomelessRootTask } from '../../src';
+import { HomelessActivityTask } from '../../src';
 
 type HomelessTaskName = 'drink' | 'buy-booze' | 'sell-bottles' | 'beg' | 'collect-bottles';
 
-/** Создаёт корневую задачу, в которой можно выполнить любую задачу бомжа, кроме переданных */
-function createRootTask(unavailable: HomelessTaskName[] = []): HomelessRootTask {
+/** Создаёт деятельность бомжа, в которой можно выполнить любую задачу бомжа, кроме переданных */
+function createActivityTask(unavailable: HomelessTaskName[] = []): HomelessActivityTask {
   function stub(name: HomelessTaskName) {
     return () => createStubTask<NpcState, NpcContext>(name, !unavailable.includes(name));
   }
 
-  return new HomelessRootTask({
+  return new HomelessActivityTask({
     homelessTaskFactory: createHomelessTaskFactory({
       drink: stub('drink'),
       buyBooze: stub('buy-booze'),
@@ -25,29 +25,32 @@ function createRootTask(unavailable: HomelessTaskName[] = []): HomelessRootTask 
   });
 }
 
-describe('HomelessRootTask', () => {
+describe('HomelessActivityTask', () => {
   describe('Порядок методов', () => {
     it('Если можно бухать, планирует бухать', () => {
-      const names = planNames(createRootTask(), NpcStateBuilder.default());
+      const names = planNames(createActivityTask(), NpcStateBuilder.default());
 
       expect(names).toStrictEqual(['drink']);
     });
 
     it('Если бухать нельзя, планирует купить пойло', () => {
-      const names = planNames(createRootTask(['drink']), NpcStateBuilder.default());
+      const names = planNames(createActivityTask(['drink']), NpcStateBuilder.default());
 
       expect(names).toStrictEqual(['buy-booze']);
     });
 
     it('Если и купить пойло нельзя, планирует сдать бутылки', () => {
-      const names = planNames(createRootTask(['drink', 'buy-booze']), NpcStateBuilder.default());
+      const names = planNames(
+        createActivityTask(['drink', 'buy-booze']),
+        NpcStateBuilder.default()
+      );
 
       expect(names).toStrictEqual(['sell-bottles']);
     });
 
     it('Если и сдать бутылки нельзя, планирует клянчить', () => {
       const names = planNames(
-        createRootTask(['drink', 'buy-booze', 'sell-bottles']),
+        createActivityTask(['drink', 'buy-booze', 'sell-bottles']),
         NpcStateBuilder.default()
       );
 
@@ -56,7 +59,7 @@ describe('HomelessRootTask', () => {
 
     it('Если и клянчить нельзя, планирует собирать бутылки', () => {
       const names = planNames(
-        createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
+        createActivityTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
         NpcStateBuilder.default()
       );
 
@@ -65,7 +68,7 @@ describe('HomelessRootTask', () => {
 
     it('Если и собирать бутылки нельзя, план не составляется', () => {
       const names = planNames(
-        createRootTask(['drink', 'buy-booze', 'sell-bottles', 'beg', 'collect-bottles']),
+        createActivityTask(['drink', 'buy-booze', 'sell-bottles', 'beg', 'collect-bottles']),
         NpcStateBuilder.default()
       );
 

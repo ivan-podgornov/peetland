@@ -16,8 +16,11 @@ export interface IRootTaskFactory {
   create(kind: NpcKind): Task<NpcState, NpcContext>;
 }
 
-/** Создаёт корневые задачи NPC одного типа. Реализует её пакет с задачами этого типа */
-export interface IKindRootTaskFactory {
+/**
+ * Создаёт слой деятельности корневой задачи для NPC одного типа: то, чем NPC этого типа занят, когда
+ * не заняты слои выше. Реализует её пакет с задачами этого типа
+ */
+export interface IActivityTaskFactory {
   /** Создаёт дерево задач для одного NPC. Дерево не делится между NPC: каждому NPC создаётся своё */
   create(): Task<NpcState, NpcContext>;
 }

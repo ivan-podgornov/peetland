@@ -8422,79 +8422,136 @@ return ____exports
 ["core.world.src.activity-task-factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectRest = ____lualib.__TS__ObjectRest
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____homeless = require("core.homeless.src.index")
 local HomelessActivityTaskFactory = ____homeless.HomelessActivityTaskFactory
 local ____npc = require("core.npc.src.index")
 local NpcKind = ____npc.NpcKind
---- Создаёт слой деятельности корневой задачи NPC фабрикой его типа
+--- Создаёт слой деятельности корневой задачи NPC фабрикой деятельности его типа
 ____exports.ActivityTaskFactory = __TS__Class()
 local ActivityTaskFactory = ____exports.ActivityTaskFactory
 ActivityTaskFactory.name = "ActivityTaskFactory"
 function ActivityTaskFactory.prototype.____constructor(self, deps)
     local ____deps_0 = deps
-    local kindFactories = ____deps_0.kindFactories
-    if kindFactories == nil then
-        kindFactories = {}
+    local geometry = ____deps_0.geometry
+    local places = ____deps_0.places
+    local random = ____deps_0.random
+    local timer = ____deps_0.timer
+    local homelessActivityTaskFactory = ____deps_0.homelessActivityTaskFactory
+    if homelessActivityTaskFactory == nil then
+        homelessActivityTaskFactory = __TS__New(HomelessActivityTaskFactory, {geometry = geometry, places = places, random = random, timer = timer})
     end
-    local shared = __TS__ObjectRest(____deps_0, {kindFactories = true})
-    self.kindFactories = {[NpcKind.Homeless] = kindFactories[NpcKind.Homeless] or __TS__New(HomelessActivityTaskFactory, shared)}
+    self.homelessActivityTaskFactory = homelessActivityTaskFactory
 end
 function ActivityTaskFactory.prototype.create(self, kind)
-    local kindFactories = self.kindFactories
-    return kindFactories[kind]:create()
+    local homelessActivityTaskFactory = self.homelessActivityTaskFactory
+    repeat
+        local ____switch4 = kind
+        local ____cond4 = ____switch4 == NpcKind.Homeless
+        if ____cond4 then
+            return homelessActivityTaskFactory:create()
+        end
+    until true
+end
+return ____exports
+ end,
+["core.world.src.addictions-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Слой зависимостей корневой задачи NPC: то, без чего NPC жить не хочет. Пока зависимостей нет ни у
+-- кого, поэтому методов нет, и планировщик переходит к следующему слою
+____exports.AddictionsTask = __TS__Class()
+local AddictionsTask = ____exports.AddictionsTask
+AddictionsTask.name = "AddictionsTask"
+function AddictionsTask.prototype.____constructor(self)
+    self.name = "addictions"
+    self.methods = {}
 end
 return ____exports
  end,
 ["core.world.src.addictions-task-factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Создаёт слой зависимостей корневой задачи NPC: то, без чего NPC жить не хочет. Пока зависимостей
--- нет ни у кого, поэтому слой — составная задача без методов, и планировщик переходит к следующему
--- слою
+local ____addictions_2Dtask = require("core.world.src.addictions-task")
+local AddictionsTask = ____addictions_2Dtask.AddictionsTask
+--- Создаёт слой зависимостей корневой задачи NPC (см. AddictionsTask)
 ____exports.AddictionsTaskFactory = __TS__Class()
 local AddictionsTaskFactory = ____exports.AddictionsTaskFactory
 AddictionsTaskFactory.name = "AddictionsTaskFactory"
 function AddictionsTaskFactory.prototype.____constructor(self)
 end
 function AddictionsTaskFactory.prototype.create(self)
-    return {name = "addictions", methods = {}}
+    return __TS__New(AddictionsTask)
+end
+return ____exports
+ end,
+["core.world.src.hobbies-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Слой хобби корневой задачи NPC: то, чем NPC занимается для души. Пока хобби нет ни у кого,
+-- поэтому методов нет, и планировщик переходит к следующему слою
+____exports.HobbiesTask = __TS__Class()
+local HobbiesTask = ____exports.HobbiesTask
+HobbiesTask.name = "HobbiesTask"
+function HobbiesTask.prototype.____constructor(self)
+    self.name = "hobbies"
+    self.methods = {}
 end
 return ____exports
  end,
 ["core.world.src.hobbies-task-factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Создаёт слой хобби корневой задачи NPC: то, чем NPC занимается для души. Пока хобби нет ни у
--- кого, поэтому слой — составная задача без методов, и планировщик переходит к следующему слою
+local ____hobbies_2Dtask = require("core.world.src.hobbies-task")
+local HobbiesTask = ____hobbies_2Dtask.HobbiesTask
+--- Создаёт слой хобби корневой задачи NPC (см. HobbiesTask)
 ____exports.HobbiesTaskFactory = __TS__Class()
 local HobbiesTaskFactory = ____exports.HobbiesTaskFactory
 HobbiesTaskFactory.name = "HobbiesTaskFactory"
 function HobbiesTaskFactory.prototype.____constructor(self)
 end
 function HobbiesTaskFactory.prototype.create(self)
-    return {name = "hobbies", methods = {}}
+    return __TS__New(HobbiesTask)
+end
+return ____exports
+ end,
+["core.world.src.needs-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Слой потребностей корневой задачи NPC: то, без чего NPC не может жить. Пока потребностей нет ни у
+-- кого, поэтому методов нет, и планировщик переходит к следующему слою
+____exports.NeedsTask = __TS__Class()
+local NeedsTask = ____exports.NeedsTask
+NeedsTask.name = "NeedsTask"
+function NeedsTask.prototype.____constructor(self)
+    self.name = "needs"
+    self.methods = {}
 end
 return ____exports
  end,
 ["core.world.src.needs-task-factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Создаёт слой потребностей корневой задачи NPC: то, без чего NPC не может жить. Пока потребностей
--- нет ни у кого, поэтому слой — составная задача без методов, и планировщик переходит к следующему
--- слою
+local ____needs_2Dtask = require("core.world.src.needs-task")
+local NeedsTask = ____needs_2Dtask.NeedsTask
+--- Создаёт слой потребностей корневой задачи NPC (см. NeedsTask)
 ____exports.NeedsTaskFactory = __TS__Class()
 local NeedsTaskFactory = ____exports.NeedsTaskFactory
 NeedsTaskFactory.name = "NeedsTaskFactory"
 function NeedsTaskFactory.prototype.____constructor(self)
 end
 function NeedsTaskFactory.prototype.create(self)
-    return {name = "needs", methods = {}}
+    return __TS__New(NeedsTask)
 end
 return ____exports
  end,

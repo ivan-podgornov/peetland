@@ -6345,8 +6345,8 @@ local Need = ____need.Need
 local MINUTES_PER_DAY = 24 * 60
 --- Описание каждой потребности
 ____exports.NEED_DEFINITIONS = {[Need.Satiety] = {category = NeedCategory.Vital, depletionMinutes = MINUTES_PER_DAY}}
---- На сколько растёт сытость, когда NPC поел. Около трёх приёмов пищи в сутки
-____exports.EAT_SATIETY = 40
+--- На сколько растёт сытость, когда NPC поел: досыта, чтобы жизнь NPC не крутилась вокруг еды
+____exports.EAT_SATIETY = 100
 return ____exports
  end,
 ["core.needs.src.validator"] = function(...) 

@@ -1,6 +1,8 @@
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
+import { NeedsFactory } from '@peetland/needs';
+import type { NeedValues } from '@peetland/needs';
 import type { IPsyche } from '@peetland/psyche';
 import { PsycheBuilder } from '@peetland/psyche/dev';
 import { ManualTime } from '@peetland/timings';
@@ -14,7 +16,7 @@ type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC стоит
  * в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder по
- * умолчанию, а в мире полночь первого дня. Каждый вызов build возвращает новое состояние
+ * умолчанию, потребностей нет, а в мире полночь первого дня. Каждый вызов build возвращает новое состояние
  *
  * @example
  * const state = new NpcStateBuilder()
@@ -31,6 +33,7 @@ export class NpcStateBuilder {
   private angle = 0;
   private inventory: InventoryCounts = {};
   private psyche: PsycheBuild = (builder) => builder.build();
+  private needs: NeedValues = {};
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -78,6 +81,15 @@ export class NpcStateBuilder {
     return this;
   }
 
+  /**
+   * Задаёт потребности: какие есть у NPC и их значения на момент времени из состояния. Падают они
+   * по описаниям потребностей по умолчанию
+   */
+  withNeeds(needs: NeedValues): this {
+    this.needs = needs;
+    return this;
+  }
+
   /** Задаёт время суток в мире: в состояние ляжет ManualTime с этим временем */
   withTime(time: TimeState): this {
     this.time = time;
@@ -86,6 +98,8 @@ export class NpcStateBuilder {
 
   /** Возвращает собранное состояние */
   build(): NpcState {
+    const time = new ManualTime(this.time);
+
     return {
       self: {
         actor: {
@@ -94,9 +108,10 @@ export class NpcStateBuilder {
         },
         inventory: new Inventory(this.inventory),
         psyche: this.psyche(new PsycheBuilder()),
+        needs: new NeedsFactory().create(this.needs, time),
       },
       world: {
-        time: new ManualTime(this.time),
+        time,
       },
     };
   }

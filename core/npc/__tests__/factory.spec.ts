@@ -3,6 +3,8 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { Needs } from '@peetland/needs';
+import { createMockedNeedsFactory } from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
@@ -66,6 +68,15 @@ describe('NpcFactory', () => {
       expect(psycheFactory.create).toHaveBeenCalledOnce();
     });
 
+    it('NPC создаёт потребности фабрикой needsFactory из зависимостей', () => {
+      const needsFactory = createMockedNeedsFactory();
+      const factory = new NpcFactory(createRequiredDeps({ needsFactory }));
+
+      factory.create(createNpcData());
+
+      expect(needsFactory.create).toHaveBeenCalledOnce();
+    });
+
     it('Если inventoryFactory не передана, NPC получает экземпляр Inventory', () => {
       const factory = new NpcFactory(createRequiredDeps());
 
@@ -80,6 +91,14 @@ describe('NpcFactory', () => {
       const npc = factory.create(createNpcData());
 
       expect(npc.psyche).toBeInstanceOf(Psyche);
+    });
+
+    it('Если needsFactory не передана, NPC получает экземпляр Needs', () => {
+      const factory = new NpcFactory(createRequiredDeps());
+
+      const npc = factory.create(createNpcData());
+
+      expect(npc.needs).toBeInstanceOf(Needs);
     });
   });
 });

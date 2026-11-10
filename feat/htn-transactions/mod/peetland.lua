@@ -7101,31 +7101,6 @@ __TS__SetDescriptor(
     Executor.prototype,
     "currentTask",
     {get = function(self)
-        return self.currentStep.task
-    end},
-    true
-)
-__TS__SetDescriptor(
-    Executor.prototype,
-    "interruptible",
-    {get = function(self)
-        local ____self_currentStep_0 = self.currentStep
-        local transaction = ____self_currentStep_0.transaction
-        if transaction == nil then
-            return true
-        end
-        if self.taskStarted then
-            return false
-        end
-        local ____opt_1 = self.steps[self.currentTaskIndex]
-        return (____opt_1 and ____opt_1.transaction) ~= transaction
-    end},
-    true
-)
-__TS__SetDescriptor(
-    Executor.prototype,
-    "currentStep",
-    {get = function(self)
         local step = self.steps[self.currentTaskIndex + 1]
         if not step then
             local message = ((("Current task' index (" .. tostring(self.currentTaskIndex)) .. ") must be in range of tasks length (") .. tostring(#self.steps)) .. ")"
@@ -7134,7 +7109,7 @@ __TS__SetDescriptor(
                 0
             )
         end
-        return step
+        return step.task
     end},
     true
 )
@@ -7143,8 +7118,8 @@ __TS__SetDescriptor(
     "nextTask",
     {get = function(self)
         local index = self.currentTaskIndex + 1
-        local ____opt_3 = self.steps[index + 1]
-        return ____opt_3 and ____opt_3.task or nil
+        local ____opt_0 = self.steps[index + 1]
+        return ____opt_0 and ____opt_0.task or nil
     end},
     true
 )
@@ -7163,11 +7138,9 @@ ____exports.Planner = __TS__Class()
 local Planner = ____exports.Planner
 Planner.name = "Planner"
 function Planner.prototype.____constructor(self)
-    self.nextTransaction = 0
 end
 function Planner.prototype.plan(self, root, state)
-    self.nextTransaction = 0
-    return self:decompose({{task = root, transaction = nil}}, state)
+    return self:decompose({{task = root, isPartOf = nil}}, state)
 end
 function Planner.prototype.decompose(self, pending, state)
     local ____pending_0 = pending
@@ -7178,7 +7151,7 @@ function Planner.prototype.decompose(self, pending, state)
     end
     local ____head_3 = head
     local task = ____head_3.task
-    local transaction = ____head_3.transaction
+    local isPartOf = ____head_3.isPartOf
     if isPrimitive(task) then
         if not task:canExecute(state) then
             return nil
@@ -7187,33 +7160,20 @@ function Planner.prototype.decompose(self, pending, state)
             tail,
             task:applyEffects(state)
         )
-        return decomposedTail and __TS__ArrayConcat({{task = task, transaction = transaction}}, decomposedTail)
+        return decomposedTail and __TS__ArrayConcat({{task = task, isPartOf = isPartOf}}, decomposedTail)
     end
-    local ____transaction_8 = transaction
-    if ____transaction_8 == nil then
-        local ____task_transaction_7
-        if task.transaction then
-            local ____self_4, ____nextTransaction_5 = self, "nextTransaction"
-            local ____self_nextTransaction_6 = ____self_4[____nextTransaction_5]
-            ____self_4[____nextTransaction_5] = ____self_nextTransaction_6 + 1
-            ____task_transaction_7 = ____self_nextTransaction_6
-        else
-            ____task_transaction_7 = nil
-        end
-        ____transaction_8 = ____task_transaction_7
-    end
-    local subtasksTransaction = ____transaction_8
     for ____, method in ipairs(task.methods) do
         do
             if not method:preconditions(state) then
                 goto __continue8
             end
+            local node = {task = task, method = method, isPartOf = isPartOf}
             local subtasks = type(method.tasks) == "function" and method.tasks(state) or method.tasks
             local decomposedSubtasks = self:decompose(
                 __TS__ArrayConcat(
                     __TS__ArrayMap(
                         subtasks,
-                        function(____, subtask) return {task = subtask, transaction = subtasksTransaction} end
+                        function(____, subtask) return {task = subtask, isPartOf = node} end
                     ),
                     tail
                 ),
@@ -7255,23 +7215,12 @@ function HTN.prototype.____constructor(self, root, deps)
     self.planner = deps:plannerFactory()
     self.root = root
     self.executor = nil
-    self.replanRequested = false
 end
 function HTN.prototype.update(self, state, context)
-    local ____self_replanRequested_2 = self.replanRequested
-    if ____self_replanRequested_2 then
-        local ____opt_0 = self.executor
-        ____self_replanRequested_2 = ____opt_0 and ____opt_0.interruptible
-    end
-    if ____self_replanRequested_2 then
-        self.executor:stop(context)
-        self.executor = nil
-    end
     if not self.executor then
-        local ____self_deps_3 = self.deps
-        local executorFactory = ____self_deps_3.executorFactory
+        local ____self_deps_0 = self.deps
+        local executorFactory = ____self_deps_0.executorFactory
         local steps = self.planner:plan(self.root, state)
-        self.replanRequested = false
         if not steps then
             return
         end
@@ -7288,9 +7237,6 @@ function HTN.prototype.stop(self, context)
     end
     self.executor:stop(context)
     self.executor = nil
-end
-function HTN.prototype.requestReplan(self)
-    self.replanRequested = true
 end
 return ____exports
  end,
@@ -7319,6 +7265,7 @@ return ____exports
 ["toolkit.htn.src.parallel-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 --- Примитивная задача, которая выполняет две задачи одновременно: основную и фоновую. Завершается
 -- с результатом основной и тогда же останавливает фоновую. Если фоновая завершилась ошибкой,
@@ -7399,6 +7346,22 @@ function ParallelTask.prototype.stopBackground(self, context, execution)
         self.options.background:stop(context)
     end
 end
+__TS__SetDescriptor(
+    ParallelTask.prototype,
+    "main",
+    {get = function(self)
+        return self.options.main
+    end},
+    true
+)
+__TS__SetDescriptor(
+    ParallelTask.prototype,
+    "background",
+    {get = function(self)
+        return self.options.background
+    end},
+    true
+)
 return ____exports
  end,
 ["toolkit.htn.src.index"] = function(...) 

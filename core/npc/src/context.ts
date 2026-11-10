@@ -12,6 +12,6 @@ export type NpcContext = Readonly<{
   inventory: Inventory;
   /** Психика, которой задачи сообщают о поступках NPC */
   psyche: IPsyche;
-  /** Потребности, которые задачи восполняют */
+  /** Потребности, которым задачи сообщают о занятиях NPC */
   needs: INeeds;
 }>;

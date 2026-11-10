@@ -20,16 +20,15 @@ describe('Needs', () => {
         }),
         createNeedsDeps()
       );
+      const time = new ManualTime({
+        day: 1,
+        hours: 12,
+        minutes: 24,
+      });
 
-      const values = needs.getAll(
-        new ManualTime({
-          day: 1,
-          hours: 10,
-          minutes: 30,
-        })
-      );
+      const values = needs.getAll(time);
 
-      expect(values).toStrictEqual({ [Need.Satiety]: 50 });
+      expect(values).toStrictEqual({ [Need.Satiety]: needs.get(Need.Satiety, time) });
     });
   });
 });

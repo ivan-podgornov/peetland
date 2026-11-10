@@ -1,9 +1,15 @@
 import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
+import { Activity } from './activity';
+import type { ActivityDetails } from './activity';
+import { EAT_SATIETY, NEED_DEFINITIONS } from './constants';
 import { Need } from './need';
-import type { NeedDefinitions, NeedsState, NeedValues } from './types';
+import type { NeedsState, NeedValues } from './types';
 import type { INeedsValidator } from './validator';
+
+/** Вклад занятия в потребности: на сколько изменить каждую. Потребностей без изменений в объекте нет */
+type NeedsContribution = Readonly<Partial<Record<Need, number>>>;
 
 /**
  * Потребности только на чтение. Так потребности лежат в состоянии NPC: планирование читает их, а
@@ -30,28 +36,25 @@ export interface IReadonlyNeeds {
 
 export interface INeeds extends IReadonlyNeeds {
   /**
-   * Восполняет потребность: прибавляет amount к значению на момент time, но не выше
-   * Needs.MAX_NEED, и отсчитывает падение от time. Время — момент, когда занятие закончилось.
-   * Выбрасывает ошибку валидатора, если amount не прошёл проверку, и тогда потребность не меняется
-   * @param need - потребность
-   * @param amount - на сколько восполнить
-   * @param time - момент восполнения
+   * Меняет потребности от занятия: прибавляет вклад занятия к значению каждой потребности, которую
+   * оно меняет, на момент time, держит значение в пределах и отсчитывает её падение от time
+   * @param activity - занятие
+   * @param details - детали занятия, например что съели
+   * @param time - момент, когда занятие закончилось
    */
-  satisfy(need: Need, amount: number, time: IReadonlyTime): void;
+  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void;
 }
 
 export type NeedsDeps = {
-  /** Описание каждой потребности: категория и скорость падения */
-  definitions: NeedDefinitions;
-  /** Проверяет значения потребностей, скорости падения и восполнения */
+  /** Проверяет значения потребностей */
   validator: INeedsValidator;
 };
 
 /**
  * Потребности хранят значение каждой потребности NPC и момент, когда его выставили, а текущее
- * значение считают при чтении: значение − скорость падения × прошло игровых минут. Значение не
- * падает ниже Needs.MIN_NEED, а если время назад, не растёт. Никто не убавляет потребности по
- * тикам
+ * значение считают при чтении: значение − скорость падения × прошло игровых минут. Скорость падения
+ * берётся из NEED_DEFINITIONS. Значение не падает ниже Needs.MIN_NEED, а если время назад, не
+ * растёт. Никто не убавляет потребности по тикам
  */
 export class Needs implements INeeds {
   /** Минимальное значение потребности: потребность не удовлетворена совсем */
@@ -65,27 +68,25 @@ export class Needs implements INeeds {
   private state: NeedsState;
 
   /**
-   * Проверяет валидатором значение и скорость падения каждой потребности и выбрасывает его ошибку,
-   * если проверка не прошла
+   * Проверяет валидатором значение каждой потребности и выбрасывает его ошибку, если проверка не
+   * прошла
    * @param state - состояние потребностей, например восстановленное из сохранения
    */
   constructor(state: NeedsState, deps: NeedsDeps) {
-    const { definitions, validator } = deps;
+    const { validator } = deps;
 
-    Object.values(Need).forEach((need) => {
-      validator.validateValue(state[need].value, Needs.MIN_NEED, Needs.MAX_NEED);
-      validator.validateDepletion(definitions[need].depletionMinutes);
-    });
+    Object.values(Need).forEach((need) =>
+      validator.validateValue(state[need].value, Needs.MIN_NEED, Needs.MAX_NEED)
+    );
 
     this.deps = deps;
     this.state = state;
   }
 
   get(need: Need, time: IReadonlyTime): number {
-    const { definitions } = this.deps;
     const { value, since } = this.state[need];
     const elapsed = Math.max(0, this.timeSpan.elapsedMinutes(since, time.getState()));
-    const rate = Needs.MAX_NEED / definitions[need].depletionMinutes;
+    const rate = Needs.MAX_NEED / NEED_DEFINITIONS[need].depletionMinutes;
 
     return Math.max(Needs.MIN_NEED, value - rate * elapsed);
   }
@@ -104,16 +105,42 @@ export class Needs implements INeeds {
     return new Needs(this.state, this.deps);
   }
 
-  satisfy(need: Need, amount: number, time: IReadonlyTime): void {
-    const { validator } = this.deps;
+  /** Детали пока не меняют вклад занятия (см. contribute) */
+  perform<A extends Activity>(
+    activity: A,
+    _details: ActivityDetails[A],
+    time: IReadonlyTime
+  ): void {
+    const contribution = this.contribute(activity);
 
-    validator.validateAmount(amount);
-    this.state = {
-      ...this.state,
-      [need]: {
-        value: Math.min(Needs.MAX_NEED, this.get(need, time) + amount),
-        since: time.getState(),
-      },
-    };
+    this.state = Object.values(Need).reduce<NeedsState>((state, need) => {
+      const change = contribution[need];
+      if (change === undefined) {
+        return state;
+      }
+
+      return {
+        ...state,
+        [need]: {
+          value: this.clamp(this.get(need, time) + change),
+          since: time.getState(),
+        },
+      };
+    }, this.state);
+  }
+
+  /**
+   * Возвращает вклад занятия в потребности. Пока вклад не зависит от деталей: когда в игре появится
+   * еда, от того, что съели, будет зависеть, сколько прибавится сытости
+   */
+  private contribute(activity: Activity): NeedsContribution {
+    switch (activity) {
+      case Activity.Eat:
+        return { [Need.Satiety]: EAT_SATIETY };
+    }
+  }
+
+  private clamp(value: number): number {
+    return Math.min(Needs.MAX_NEED, Math.max(Needs.MIN_NEED, value));
   }
 }

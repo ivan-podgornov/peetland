@@ -4,5 +4,4 @@ export {
   createNeedsDeps,
   createNeedsState,
   createNeedValues,
-  TEST_DEPLETION_MINUTES,
 } from './needs';

@@ -1,0 +1,1 @@
+{"id":"325c34fe07f713f5bfeb08f607a06226.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/constructor.spec.ts#Needs #constructor Если значение потребности NaN, выбрасывает RangeError","name":"Если значение потребности NaN, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"8f0d94605e59a17e01ff68e729732cf4"}}

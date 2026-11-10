@@ -1,0 +1,1 @@
+{"id":"6336a6828e9e727e250d90f651512fd8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/constructor.spec.ts#Needs #constructor Если значение потребности Infinity, выбрасывает RangeError","name":"Если значение потребности Infinity, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"82a61c52c0e4db34e9eec0ff023d0719"}}

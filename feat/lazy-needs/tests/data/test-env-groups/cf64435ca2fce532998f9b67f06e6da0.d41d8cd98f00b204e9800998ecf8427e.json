@@ -1,0 +1,1 @@
+{"id":"cf64435ca2fce532998f9b67f06e6da0.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/constructor.spec.ts#Needs #constructor Если значение потребности -1, выбрасывает RangeError","name":"Если значение потребности -1, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"c73c0acd0f64501be67553875e3e2a65"}}

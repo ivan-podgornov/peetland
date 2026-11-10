@@ -1,0 +1,1 @@
+{"id":"958ace48f091a10f2a73b5751e45677c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satisfy.spec.ts#Needs #satisfy Если amount Infinity, выбрасывает RangeError","name":"Если amount Infinity, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"1eecb828a4c3513ed46b5ea993d00443"}}

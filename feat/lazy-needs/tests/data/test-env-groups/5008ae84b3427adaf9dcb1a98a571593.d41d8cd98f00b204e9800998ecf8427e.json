@@ -1,0 +1,1 @@
+{"id":"5008ae84b3427adaf9dcb1a98a571593.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satisfy.spec.ts#Needs #satisfy Если amount не подошёл, не меняет потребность","name":"Если amount не подошёл, не меняет потребность","status":"passed","testResultsByEnv":{"default":"c8ccf46ff42e07fc18d2c53d88dc408e"}}

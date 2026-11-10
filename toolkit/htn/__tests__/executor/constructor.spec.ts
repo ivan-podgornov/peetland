@@ -1,17 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { primitive } from '../../dev';
+import { primitive, toSteps } from '../../dev';
 import { Executor } from '../../src/executor';
 
 describe('Executor', () => {
   describe('#constructor', () => {
     it('Выбрасывает ошибку, если список задач на выполнение пуст', () => {
-      expect(() => new Executor([])).toThrow("Tasks list can't be empty");
+      expect(() => new Executor(toSteps([]))).toThrow("Tasks list can't be empty");
     });
 
     it('Возвращает экземпляр исполнителя, если указана хотя бы одна задача к выполнению', () => {
       const tasks = [primitive('Primitive Task')];
-      const executor = new Executor(tasks);
+      const executor = new Executor(toSteps(tasks));
 
       expect(executor).toBeInstanceOf(Executor);
     });
@@ -22,7 +22,7 @@ describe('Executor', () => {
       const stopSpy = vi.spyOn(task, 'stop');
       const updateSpy = vi.spyOn(task, 'update');
 
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
 
       expect(executor.currentTask).toStrictEqual(task);
       expect(startSpy).not.toHaveBeenCalled();

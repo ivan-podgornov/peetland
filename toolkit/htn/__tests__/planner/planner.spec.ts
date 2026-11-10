@@ -4,14 +4,14 @@ import {
   blockedMethod,
   blockedPrimitive,
   compound,
-  getNames,
+  getStepNames,
   method,
   primitive,
   testState,
+  toSteps,
 } from '../../dev';
-import type { TestContext, TestState } from '../../dev';
+import type { TestState } from '../../dev';
 import { Planner } from '../../src/planner';
-import type { Task } from '../../src/task';
 
 describe('Planner', () => {
   describe('#plan', () => {
@@ -34,7 +34,7 @@ describe('Planner', () => {
           canExecute: true,
         });
 
-        expect(result).toStrictEqual([task]);
+        expect(result).toStrictEqual(toSteps([task]));
       });
     });
 
@@ -135,7 +135,7 @@ describe('Planner', () => {
           ...testState,
           canExecute: true,
         });
-        const names = getNames(tasks as Task<TestState, TestContext>[]);
+        const names = getStepNames(tasks ?? []);
 
         expect(names).toStrictEqual([
           'Primitive 1',

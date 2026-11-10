@@ -4,7 +4,7 @@ import {
   blockedPrimitive,
   compound,
   dynamicMethod,
-  getNames,
+  getStepNames,
   method,
   primitive,
   spyPrimitive,
@@ -26,7 +26,7 @@ describe('Planner', () => {
 
         const tasks = planner.plan(root, testState) ?? [];
 
-        expect(getNames(tasks)).toStrictEqual(['Primitive 1', 'Primitive 2']);
+        expect(getStepNames(tasks)).toStrictEqual(['Primitive 1', 'Primitive 2']);
       });
 
       it('Передаёт функции состояние с эффектами задач, которые идут перед методом', () => {
@@ -73,7 +73,7 @@ describe('Planner', () => {
 
         const tasks = planner.plan(root, testState) ?? [];
 
-        expect(getNames(tasks)).toStrictEqual(['Fallback primitive']);
+        expect(getStepNames(tasks)).toStrictEqual(['Fallback primitive']);
       });
     });
   });

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { primitive, testContext, testState } from '../../../../dev';
+import { primitive, testContext, testState, toSteps } from '../../../../dev';
 import { Executor } from '../../../../src/executor';
 
 describe('Executor', () => {
@@ -11,7 +11,7 @@ describe('Executor', () => {
         vi.spyOn(task, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         executor.update(testState, testContext); // Начинаем выполнять задачу
         executor.update(testState, testContext); // Продолжаем выполнять задачу
 
@@ -24,7 +24,7 @@ describe('Executor', () => {
         vi.spyOn(task, 'update').mockReturnValue('running');
         const canExecuteSpy = vi.spyOn(task, 'canExecute').mockReturnValue(true);
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         executor.update(testState, testContext); // Начинаем выполнять задачу
         executor.update(testState, testContext); // Продолжаем выполнять задачу
 
@@ -40,7 +40,7 @@ describe('Executor', () => {
         const canExecuteSpy = vi.spyOn(nextTask, 'canExecute').mockReturnValue(true);
 
         // act
-        const executor = new Executor([successTask, nextTask]);
+        const executor = new Executor(toSteps([successTask, nextTask]));
         executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
         executor.update(testState, testContext); // Должна начать выполняться следующая задача
 
@@ -59,7 +59,7 @@ describe('Executor', () => {
         const updateSpy = vi.spyOn(nextTask, 'update').mockReturnValue('failed');
 
         // act
-        const executor = new Executor([successTask, nextTask]);
+        const executor = new Executor(toSteps([successTask, nextTask]));
         executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
         executor.update(testState, testContext); // Должна начать выполняться следующая задача
 
@@ -78,7 +78,7 @@ describe('Executor', () => {
         const updateSpy = vi.spyOn(nextTask, 'update').mockReturnValue('running');
 
         // act
-        const executor = new Executor([successTask, nextTask]);
+        const executor = new Executor(toSteps([successTask, nextTask]));
         executor.update(testState, testContext); // Начинаем выполнять первую задачу, она сразу же выполнилась успешно
         executor.update(testState, testContext); // Должна начать выполняться следующая задача
 

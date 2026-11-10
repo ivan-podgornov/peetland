@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import type { IExecutor } from '../src/executor';
+import type { PlanStep } from '../src/plan';
 import type { IPlanner } from '../src/planner';
 import type { CompoundTask, PrimitiveTask, Method, Task, TaskResult } from '../src/task';
 
@@ -44,6 +45,17 @@ export function compound(
   return {
     name,
     methods,
+  };
+}
+
+/** Составная задача-транзакция (см. CompoundTask.transaction) */
+export function transaction(
+  name: string,
+  ...methods: Method<TestState, TestContext>[]
+): CompoundTask<TestState, TestContext> {
+  return {
+    ...compound(name, ...methods),
+    transaction: true,
   };
 }
 
@@ -107,25 +119,47 @@ export function spyMethod(
   };
 }
 
+/** Возвращает шаги плана из задач, которые все входят в одну транзакцию или все вне транзакций */
+export function toSteps(
+  tasks: PrimitiveTask<TestState, TestContext>[],
+  transaction: number | null = null
+): PlanStep<TestState, TestContext>[] {
+  return tasks.map((task) => ({
+    task,
+    transaction,
+  }));
+}
+
 export function getNames(tasks: Task<TestState, TestContext>[]): string[] {
   return tasks.map((task) => task.name);
 }
 
+/** Возвращает названия задач плана */
+export function getStepNames(steps: PlanStep<TestState, TestContext>[]): string[] {
+  return steps.map((step) => step.task.name);
+}
+
+/** Создаёт планировщика, который возвращает план из переданных задач вне транзакций */
 export function getDummyPlanner(
   plan: PrimitiveTask<TestState, TestContext>[] | null,
   secondPlan?: PrimitiveTask<TestState, TestContext>[] | null
 ): IPlanner<TestState> {
-  return {
-    plan: vi
-      .fn()
-      .mockReturnValueOnce(plan)
-      .mockReturnValue(typeof secondPlan === 'undefined' ? plan : secondPlan),
-  };
+  const first = plan && toSteps(plan);
+  const second = typeof secondPlan === 'undefined' ? first : secondPlan && toSteps(secondPlan);
+
+  return { plan: vi.fn().mockReturnValueOnce(first).mockReturnValue(second) };
 }
 
-export function getDummyExecutor(taskResult: TaskResult): IExecutor<TestState, TestContext> {
+/**
+ * Создаёт исполнителя, который всегда возвращает переданный результат. Прервать его можно, пока
+ * тест не поменяет interruptible
+ */
+export function getDummyExecutor(
+  taskResult: TaskResult
+): IExecutor<TestState, TestContext> & { interruptible: boolean } {
   return {
     currentTask: null,
+    interruptible: true,
     update: vi.fn().mockReturnValue(taskResult),
     stop: vi.fn().mockReturnValue(taskResult),
   };

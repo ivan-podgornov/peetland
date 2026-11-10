@@ -40,17 +40,17 @@ describe('Needs', () => {
         createNeedsDeps()
       );
 
-      // Сытость падает на 100 за сутки, 1440 минут, а прошло 144 минуты: она упала на 10
+      // Сытость падает на 100 за сутки, а прошло 6 часов, четверть суток: она упала на 25
       const value = needs.get(
         Need.Satiety,
         new ManualTime({
           day: 1,
-          hours: 12,
-          minutes: 24,
+          hours: 16,
+          minutes: 0,
         })
       );
 
-      expect(value).toBeCloseTo(70);
+      expect(value).toBeCloseTo(55);
     });
 
     it('Считает прошедшее время через полночь', () => {
@@ -60,7 +60,7 @@ describe('Needs', () => {
             value: 80,
             since: {
               day: 1,
-              hours: 23,
+              hours: 21,
               minutes: 0,
             },
           },
@@ -68,17 +68,17 @@ describe('Needs', () => {
         createNeedsDeps()
       );
 
-      // С 23:00 до 01:24 следующего дня прошло 144 минуты: сытость упала на 10
+      // С 21:00 до 03:00 следующего дня прошло 6 часов: сытость упала на 25
       const value = needs.get(
         Need.Satiety,
         new ManualTime({
           day: 2,
-          hours: 1,
-          minutes: 24,
+          hours: 3,
+          minutes: 0,
         })
       );
 
-      expect(value).toBeCloseTo(70);
+      expect(value).toBeCloseTo(55);
     });
 
     it('Не опускает значение ниже Needs.MIN_NEED', () => {

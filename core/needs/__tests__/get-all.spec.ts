@@ -22,8 +22,8 @@ describe('Needs', () => {
       );
       const time = new ManualTime({
         day: 1,
-        hours: 12,
-        minutes: 24,
+        hours: 16,
+        minutes: 0,
       });
 
       const values = needs.getAll(time);

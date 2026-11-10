@@ -12,7 +12,7 @@ describe('Needs', () => {
         const needs = new Needs(
           createNeedsState({
             [Need.Satiety]: {
-              value: 50,
+              value: 25,
               since: {
                 day: 1,
                 hours: 10,
@@ -24,14 +24,14 @@ describe('Needs', () => {
         );
         const time = new ManualTime({
           day: 1,
-          hours: 12,
-          minutes: 24,
+          hours: 16,
+          minutes: 0,
         });
 
         needs.perform(Activity.Eat, {}, time);
 
-        // Сытость была 50, за 144 минуты упала на 10, а еда прибавила EAT_SATIETY
-        expect(needs.get(Need.Satiety, time)).toBeCloseTo(50 - 10 + EAT_SATIETY);
+        // Сытость была 25, за 6 часов, четверть суток, упала на 25, а еда прибавила EAT_SATIETY
+        expect(needs.get(Need.Satiety, time)).toBeCloseTo(25 - 25 + EAT_SATIETY);
       });
 
       it('Отсчитывает падение сытости от момента, когда NPC поел', () => {
@@ -54,15 +54,15 @@ describe('Needs', () => {
           {},
           new ManualTime({
             day: 1,
-            hours: 12,
-            minutes: 24,
+            hours: 16,
+            minutes: 0,
           })
         );
 
         expect(needs.getState()[Need.Satiety].since).toStrictEqual({
           day: 1,
-          hours: 12,
-          minutes: 24,
+          hours: 16,
+          minutes: 0,
         });
       });
 

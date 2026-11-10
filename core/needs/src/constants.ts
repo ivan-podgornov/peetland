@@ -18,5 +18,5 @@ export const NEED_DEFINITIONS: NeedDefinitions = {
   },
 };
 
-/** На сколько растёт сытость, когда NPC поел. Около трёх приёмов пищи в сутки */
-export const EAT_SATIETY = 40;
+/** На сколько растёт сытость, когда NPC поел: досыта, чтобы жизнь NPC не крутилась вокруг еды */
+export const EAT_SATIETY = 100;

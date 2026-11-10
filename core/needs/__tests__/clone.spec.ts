@@ -1,14 +1,14 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps } from '../dev';
+import { createNeedsDeps, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#clone', () => {
     it('Возвращает потребности с тем же состоянием', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -17,7 +17,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
 
@@ -26,7 +26,7 @@ describe('Needs', () => {
 
     it('Копия падает с той же скоростью', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -35,7 +35,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
       const time = new ManualTime({
@@ -54,12 +54,12 @@ describe('Needs', () => {
         minutes: 0,
       };
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 50,
             since,
           },
-        },
+        }),
         createNeedsDeps()
       );
       const time = new ManualTime(since);
@@ -76,12 +76,12 @@ describe('Needs', () => {
         minutes: 0,
       };
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 50,
             since,
           },
-        },
+        }),
         createNeedsDeps()
       );
       const copy = needs.clone();

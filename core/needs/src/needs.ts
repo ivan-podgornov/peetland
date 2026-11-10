@@ -2,7 +2,8 @@ import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
 import { Need } from './need';
-import type { NeedDefinitions, NeedRecord, NeedsState, NeedValues } from './types';
+import type { NeedDefinitions, NeedsState, NeedValues } from './types';
+import type { INeedsValidator } from './validator';
 
 /**
  * Потребности только на чтение. Так потребности лежат в состоянии NPC: планирование читает их, а
@@ -10,17 +11,14 @@ import type { NeedDefinitions, NeedRecord, NeedsState, NeedValues } from './type
  * потребности падают в том времени, в котором их читают, в том числе во времени из клона состояния
  */
 export interface IReadonlyNeeds {
-  /** Возвращает, есть ли потребность у NPC */
-  has(need: Need): boolean;
   /**
-   * Возвращает значение потребности на момент time.
-   * Выбрасывает RangeError, если потребности у NPC нет
+   * Возвращает значение потребности на момент time
    * @param need - потребность
    * @param time - время, на момент которого нужно значение, обычно время из того же состояния
    */
   get(need: Need, time: IReadonlyTime): number;
   /**
-   * Возвращает значение каждой потребности, которая есть у NPC, на момент time
+   * Возвращает значение каждой потребности на момент time
    * @param time - время, на момент которого нужны значения
    */
   getAll(time: IReadonlyTime): NeedValues;
@@ -34,7 +32,7 @@ export interface INeeds extends IReadonlyNeeds {
   /**
    * Восполняет потребность: прибавляет amount к значению на момент time, но не выше
    * Needs.MAX_NEED, и отсчитывает падение от time. Время — момент, когда занятие закончилось.
-   * Выбрасывает RangeError, если потребности у NPC нет или amount не конечное неотрицательное число
+   * Выбрасывает ошибку валидатора, если amount не прошёл проверку, и тогда потребность не меняется
    * @param need - потребность
    * @param amount - на сколько восполнить
    * @param time - момент восполнения
@@ -45,6 +43,8 @@ export interface INeeds extends IReadonlyNeeds {
 export type NeedsDeps = {
   /** Описание каждой потребности: категория и скорость падения */
   definitions: NeedDefinitions;
+  /** Проверяет значения потребностей, скорости падения и восполнения */
+  validator: INeedsValidator;
 };
 
 /**
@@ -61,39 +61,29 @@ export class Needs implements INeeds {
   static readonly MAX_NEED = 100;
 
   private readonly deps: NeedsDeps;
-  private readonly records = new Map<Need, NeedRecord>();
   private readonly timeSpan = new TimeSpan();
+  private state: NeedsState;
 
   /**
-   * Выбрасывает RangeError, если в состоянии значение потребности вне пределов или не число, или
-   * если потребность в описаниях падает не за конечное положительное число минут
+   * Проверяет валидатором значение и скорость падения каждой потребности и выбрасывает его ошибку,
+   * если проверка не прошла
    * @param state - состояние потребностей, например восстановленное из сохранения
    */
   constructor(state: NeedsState, deps: NeedsDeps) {
-    this.deps = deps;
+    const { definitions, validator } = deps;
 
     Object.values(Need).forEach((need) => {
-      const record = state[need];
-      if (record === undefined) {
-        return;
-      }
-
-      assertValue(record.value);
-      assertDepletion(deps.definitions[need].depletionMinutes);
-      this.records.set(need, {
-        value: record.value,
-        since: { ...record.since },
-      });
+      validator.validateValue(state[need].value, Needs.MIN_NEED, Needs.MAX_NEED);
+      validator.validateDepletion(definitions[need].depletionMinutes);
     });
-  }
 
-  has(need: Need): boolean {
-    return this.records.has(need);
+    this.deps = deps;
+    this.state = state;
   }
 
   get(need: Need, time: IReadonlyTime): number {
     const { definitions } = this.deps;
-    const { value, since } = this.getRecord(need);
+    const { value, since } = this.state[need];
     const elapsed = Math.max(0, this.timeSpan.elapsedMinutes(since, time.getState()));
     const rate = Needs.MAX_NEED / definitions[need].depletionMinutes;
 
@@ -101,68 +91,29 @@ export class Needs implements INeeds {
   }
 
   getAll(time: IReadonlyTime): NeedValues {
-    const values: Partial<Record<Need, number>> = {};
-    this.records.forEach((_, need) => {
-      values[need] = this.get(need, time);
-    });
-    return values;
+    return Object.fromEntries(
+      Object.values(Need).map((need) => [need, this.get(need, time)])
+    ) as NeedValues;
   }
 
   getState(): NeedsState {
-    const state: Partial<Record<Need, NeedRecord>> = {};
-    this.records.forEach((record, need) => {
-      state[need] = {
-        value: record.value,
-        since: { ...record.since },
-      };
-    });
-    return state;
+    return this.state;
   }
 
   clone(): INeeds {
-    return new Needs(this.getState(), this.deps);
+    return new Needs(this.state, this.deps);
   }
 
   satisfy(need: Need, amount: number, time: IReadonlyTime): void {
-    assertAmount(amount);
-    const current = this.get(need, time);
+    const { validator } = this.deps;
 
-    this.records.set(need, {
-      value: Math.min(Needs.MAX_NEED, current + amount),
-      since: time.getState(),
-    });
-  }
-
-  private getRecord(need: Need): NeedRecord {
-    const record = this.records.get(need);
-    if (record === undefined) {
-      throw new RangeError(`У NPC нет потребности ${need}`);
-    }
-
-    return record;
-  }
-}
-
-function assertValue(value: number): void {
-  if (!Number.isFinite(value) || value < Needs.MIN_NEED || value > Needs.MAX_NEED) {
-    throw new RangeError(
-      `Потребность должна быть от ${Needs.MIN_NEED} до ${Needs.MAX_NEED}, получено ${value}`
-    );
-  }
-}
-
-function assertDepletion(minutes: number): void {
-  if (!Number.isFinite(minutes) || minutes <= 0) {
-    throw new RangeError(
-      `Потребность должна падать за конечное положительное число минут, получено ${minutes}`
-    );
-  }
-}
-
-function assertAmount(amount: number): void {
-  if (!Number.isFinite(amount) || amount < 0) {
-    throw new RangeError(
-      `Восполнение должно быть конечным неотрицательным числом, получено ${amount}`
-    );
+    validator.validateAmount(amount);
+    this.state = {
+      ...this.state,
+      [need]: {
+        value: Math.min(Needs.MAX_NEED, this.get(need, time) + amount),
+        since: time.getState(),
+      },
+    };
   }
 }

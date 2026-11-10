@@ -6,3 +6,5 @@ export { Need } from './need';
 export { Needs } from './needs';
 export type { INeeds, IReadonlyNeeds, NeedsDeps } from './needs';
 export type { NeedDefinition, NeedDefinitions, NeedRecord, NeedsState, NeedValues } from './types';
+export { NeedsValidator } from './validator';
+export type { INeedsValidator } from './validator';

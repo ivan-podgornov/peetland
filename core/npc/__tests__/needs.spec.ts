@@ -1,7 +1,12 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Need, Needs } from '@peetland/needs';
-import { createMockedNeedsFactory, createNeedsDeps } from '@peetland/needs/dev';
+import {
+  createMockedNeedsFactory,
+  createNeedsDeps,
+  createNeedsState,
+  createNeedValues,
+} from '@peetland/needs/dev';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
@@ -18,7 +23,7 @@ describe('Npc', () => {
         hours: 8,
         minutes: 0,
       });
-      const data = createNpcData({ needs: { [Need.Satiety]: 70 } });
+      const data = createNpcData({ needs: createNeedValues({ [Need.Satiety]: 70 }) });
 
       new Npc(
         data,
@@ -32,7 +37,7 @@ describe('Npc', () => {
     });
 
     it('Использует потребности, которые вернула needsFactory', () => {
-      const needs = new Needs({}, createNeedsDeps());
+      const needs = new Needs(createNeedsState(), createNeedsDeps());
 
       const npc = new Npc(
         createNpcData(),
@@ -43,7 +48,7 @@ describe('Npc', () => {
     });
 
     it('getState возвращает потребности NPC', () => {
-      const needs = new Needs({}, createNeedsDeps());
+      const needs = new Needs(createNeedsState(), createNeedsDeps());
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({ needsFactory: createMockedNeedsFactory(needs) })

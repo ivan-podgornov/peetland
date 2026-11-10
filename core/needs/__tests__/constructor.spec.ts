@@ -1,87 +1,69 @@
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps } from '../dev';
+import {
+  createMockedNeedsValidator,
+  createNeedsDeps,
+  createNeedsState,
+  TEST_DEPLETION_MINUTES,
+} from '../dev';
 import { Need, Needs } from '../src';
-import type { NeedsDeps } from '../src';
-
-const since = {
-  day: 1,
-  hours: 0,
-  minutes: 0,
-};
-
-/** Создаёт зависимости, в которых сытость падает за переданное число минут */
-function createDepsWithDepletion(depletionMinutes: number): NeedsDeps {
-  const deps = createNeedsDeps();
-
-  return {
-    definitions: {
-      [Need.Satiety]: {
-        ...deps.definitions[Need.Satiety],
-        depletionMinutes,
-      },
-    },
-  };
-}
 
 describe('Needs', () => {
   describe('#constructor', () => {
-    it.each([-1, 101, Number.NaN, Number.POSITIVE_INFINITY])(
-      'Если значение потребности %s, выбрасывает RangeError',
-      (value) => {
-        expect(
-          () =>
-            new Needs(
-              {
-                [Need.Satiety]: {
-                  value,
-                  since,
-                },
-              },
-              createNeedsDeps()
-            )
-        ).toThrow(RangeError);
-      }
-    );
+    it('Проверяет валидатором значение каждой потребности в пределах потребности', () => {
+      const validator = createMockedNeedsValidator();
+      const state = createNeedsState({
+        [Need.Satiety]: {
+          value: 40,
+          since: {
+            day: 1,
+            hours: 0,
+            minutes: 0,
+          },
+        },
+      });
 
-    it.each([Needs.MIN_NEED, Needs.MAX_NEED])(
-      'Если значение потребности %s, не выбрасывает ошибку',
-      (value) => {
-        expect(
-          () =>
-            new Needs(
-              {
-                [Need.Satiety]: {
-                  value,
-                  since,
-                },
-              },
-              createNeedsDeps()
-            )
-        ).not.toThrow();
-      }
-    );
+      new Needs(state, createNeedsDeps({ validator }));
 
-    it.each([0, -10, Number.NaN, Number.POSITIVE_INFINITY])(
-      'Если потребность в описаниях падает за %s минут, выбрасывает RangeError',
-      (depletionMinutes) => {
-        expect(
-          () =>
-            new Needs(
-              {
-                [Need.Satiety]: {
-                  value: 50,
-                  since,
-                },
-              },
-              createDepsWithDepletion(depletionMinutes)
-            )
-        ).toThrow(RangeError);
-      }
-    );
+      expect(validator.validateValue).toHaveBeenCalledExactlyOnceWith(
+        40,
+        Needs.MIN_NEED,
+        Needs.MAX_NEED
+      );
+    });
 
-    it('Не проверяет описания потребностей, которых у NPC нет', () => {
-      expect(() => new Needs({}, createDepsWithDepletion(0))).not.toThrow();
+    it('Проверяет валидатором скорость падения каждой потребности из описаний', () => {
+      const validator = createMockedNeedsValidator();
+
+      new Needs(createNeedsState(), createNeedsDeps({ validator }));
+
+      expect(validator.validateDepletion).toHaveBeenCalledExactlyOnceWith(TEST_DEPLETION_MINUTES);
+    });
+
+    it('Если валидатор выбросил ошибку на значение, выбрасывает ту же ошибку', () => {
+      const error = new RangeError('значение');
+      const validator = createMockedNeedsValidator();
+      validator.validateValue.mockImplementation(() => {
+        throw error;
+      });
+      function create() {
+        return new Needs(createNeedsState(), createNeedsDeps({ validator }));
+      }
+
+      expect(create).toThrow(error);
+    });
+
+    it('Если валидатор выбросил ошибку на скорость падения, выбрасывает ту же ошибку', () => {
+      const error = new RangeError('скорость');
+      const validator = createMockedNeedsValidator();
+      validator.validateDepletion.mockImplementation(() => {
+        throw error;
+      });
+      function create() {
+        return new Needs(createNeedsState(), createNeedsDeps({ validator }));
+      }
+
+      expect(create).toThrow(error);
     });
   });
 });

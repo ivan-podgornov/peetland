@@ -13,11 +13,8 @@ export type NeedDefinition = Readonly<{
 /** Описание каждой потребности */
 export type NeedDefinitions = Readonly<Record<Need, NeedDefinition>>;
 
-/**
- * Значение каждой потребности, которая есть у NPC, от Needs.MIN_NEED до Needs.MAX_NEED.
- * Потребностей, которых у NPC нет, в объекте нет
- */
-export type NeedValues = Readonly<Partial<Record<Need, number>>>;
+/** Значение каждой потребности от Needs.MIN_NEED до Needs.MAX_NEED. Все потребности есть у всех NPC */
+export type NeedValues = Readonly<Record<Need, number>>;
 
 /** Значение потребности и момент игрового времени, когда его выставили */
 export type NeedRecord = Readonly<{
@@ -26,7 +23,7 @@ export type NeedRecord = Readonly<{
 }>;
 
 /**
- * Состояние потребностей: значение каждой потребности, которая есть у NPC, и момент, когда его
- * выставили. Содержит только данные и полностью описывает потребности
+ * Состояние потребностей: значение каждой потребности и момент, когда его выставили. Содержит
+ * только данные и полностью описывает потребности
  */
-export type NeedsState = Readonly<Partial<Record<Need, NeedRecord>>>;
+export type NeedsState = Readonly<Record<Need, NeedRecord>>;

@@ -1,7 +1,7 @@
 import type { IActor } from '@peetland/game';
 import { Inventory } from '@peetland/inventory';
 import { Needs } from '@peetland/needs';
-import { createNeedsDeps } from '@peetland/needs/dev';
+import { createNeedsDeps, createNeedsState } from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createPsycheDeps, createPsycheState } from '@peetland/psyche/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
@@ -10,13 +10,13 @@ import type { NpcContext } from '../src';
 
 /**
  * Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют
- * чувства и модификаторы, потребностей у NPC нет
+ * чувства и модификаторы, потребности удовлетворены полностью
  */
 export function createNpcContext(actor: IActor = createActor()): NpcContext {
   return {
     actor,
     inventory: new Inventory(),
     psyche: new Psyche(createPsycheState(), createPsycheDeps()),
-    needs: new Needs({}, createNeedsDeps()),
+    needs: new Needs(createNeedsState(), createNeedsDeps()),
   };
 }

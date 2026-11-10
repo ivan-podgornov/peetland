@@ -1,14 +1,14 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps } from '../dev';
+import { createMockedNeedsValidator, createNeedsDeps, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#satisfy', () => {
     it('Прибавляет amount к значению на момент восполнения', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -17,7 +17,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
       const time = new ManualTime({
@@ -33,7 +33,7 @@ describe('Needs', () => {
 
     it('Отсчитывает падение от момента восполнения', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -42,7 +42,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
 
@@ -56,7 +56,7 @@ describe('Needs', () => {
         })
       );
 
-      expect(needs.getState()[Need.Satiety]?.since).toStrictEqual({
+      expect(needs.getState()[Need.Satiety].since).toStrictEqual({
         day: 1,
         hours: 10,
         minutes: 30,
@@ -70,12 +70,12 @@ describe('Needs', () => {
         minutes: 0,
       };
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 90,
             since,
           },
-        },
+        }),
         createNeedsDeps()
       );
       const time = new ManualTime(since);
@@ -85,48 +85,42 @@ describe('Needs', () => {
       expect(needs.get(Need.Satiety, time)).toBe(Needs.MAX_NEED);
     });
 
-    it.each([-1, Number.NaN, Number.POSITIVE_INFINITY])(
-      'Если amount %s, выбрасывает RangeError',
-      (amount) => {
-        const needs = new Needs(
-          {
-            [Need.Satiety]: {
-              value: 50,
-              since: {
-                day: 1,
-                hours: 0,
-                minutes: 0,
-              },
-            },
-          },
-          createNeedsDeps()
-        );
+    it('Проверяет amount валидатором', () => {
+      const validator = createMockedNeedsValidator();
+      const needs = new Needs(createNeedsState(), createNeedsDeps({ validator }));
 
-        expect(() => needs.satisfy(Need.Satiety, amount, new ManualTime())).toThrow(RangeError);
-      }
-    );
+      needs.satisfy(Need.Satiety, 20, new ManualTime());
 
-    it('Если amount не подошёл, не меняет потребность', () => {
-      const state = {
-        [Need.Satiety]: {
-          value: 50,
-          since: {
-            day: 1,
-            hours: 0,
-            minutes: 0,
-          },
-        },
-      };
-      const needs = new Needs(state, createNeedsDeps());
-
-      expect(() => needs.satisfy(Need.Satiety, -1, new ManualTime())).toThrow(RangeError);
-      expect(needs.getState()).toStrictEqual(state);
+      expect(validator.validateAmount).toHaveBeenCalledExactlyOnceWith(20);
     });
 
-    it('Если потребности у NPC нет, выбрасывает RangeError', () => {
-      const needs = new Needs({}, createNeedsDeps());
+    it('Если валидатор выбросил ошибку на amount, выбрасывает ту же ошибку', () => {
+      const error = new RangeError('восполнение');
+      const validator = createMockedNeedsValidator();
+      validator.validateAmount.mockImplementation(() => {
+        throw error;
+      });
+      const needs = new Needs(createNeedsState(), createNeedsDeps({ validator }));
+      function satisfy() {
+        needs.satisfy(Need.Satiety, -1, new ManualTime());
+      }
 
-      expect(() => needs.satisfy(Need.Satiety, 10, new ManualTime())).toThrow(RangeError);
+      expect(satisfy).toThrow(error);
+    });
+
+    it('Если валидатор выбросил ошибку на amount, не меняет потребность', () => {
+      const state = createNeedsState();
+      const validator = createMockedNeedsValidator();
+      validator.validateAmount.mockImplementation(() => {
+        throw new RangeError('восполнение');
+      });
+      const needs = new Needs(state, createNeedsDeps({ validator }));
+      function satisfy() {
+        needs.satisfy(Need.Satiety, -1, new ManualTime());
+      }
+
+      expect(satisfy).toThrow(RangeError);
+      expect(needs.getState()).toStrictEqual(state);
     });
   });
 });

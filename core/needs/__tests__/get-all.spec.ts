@@ -1,14 +1,14 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps } from '../dev';
+import { createNeedsDeps, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#getAll', () => {
     it('Возвращает значение каждой потребности на момент переданного времени', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -17,7 +17,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
 
@@ -30,12 +30,6 @@ describe('Needs', () => {
       );
 
       expect(values).toStrictEqual({ [Need.Satiety]: 50 });
-    });
-
-    it('Не возвращает потребности, которых у NPC нет', () => {
-      const needs = new Needs({}, createNeedsDeps());
-
-      expect(needs.getAll(new ManualTime())).toStrictEqual({});
     });
   });
 });

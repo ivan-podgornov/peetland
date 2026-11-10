@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps } from '../dev';
+import { createNeedsDeps, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#getState', () => {
     it('Возвращает выставленное значение и момент, когда его выставили', () => {
-      const state = {
+      const state = createNeedsState({
         [Need.Satiety]: {
           value: 80,
           since: {
@@ -15,7 +15,7 @@ describe('Needs', () => {
             minutes: 0,
           },
         },
-      };
+      });
       const needs = new Needs(state, createNeedsDeps());
 
       expect(needs.getState()).toStrictEqual(state);
@@ -23,7 +23,7 @@ describe('Needs', () => {
 
     it('Из состояния собираются такие же потребности', () => {
       const needs = new Needs(
-        {
+        createNeedsState({
           [Need.Satiety]: {
             value: 80,
             since: {
@@ -32,7 +32,7 @@ describe('Needs', () => {
               minutes: 0,
             },
           },
-        },
+        }),
         createNeedsDeps()
       );
 

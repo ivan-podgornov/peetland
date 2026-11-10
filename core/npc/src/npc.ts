@@ -3,6 +3,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
+import type { INeeds, INeedsFactory } from '@peetland/needs';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
@@ -20,6 +21,8 @@ export type NpcDeps = {
   inventoryFactory: IInventoryFactory;
   /** Фабрика, которой NPC создаёт свою психику */
   psycheFactory: IPsycheFactory;
+  /** Фабрика, которой NPC создаёт свои потребности */
+  needsFactory: INeedsFactory;
   /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом тике мира */
@@ -35,6 +38,7 @@ export class Npc {
   readonly id: string;
   readonly inventory: Inventory;
   readonly psyche: IPsyche;
+  readonly needs: INeeds;
 
   private readonly actor: IActor;
   private readonly context: NpcContext;
@@ -43,8 +47,9 @@ export class Npc {
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
-   * Создаёт актора, инвентарь, психику и HTN-агента по данным NPC и каждый тик передаёт агенту актуальное состояние и
-   * контекст с актором, инвентарём и психикой. Когда игра завершается, деспавнится, а если она уже
+   * Создаёт актора, инвентарь, психику, потребности и HTN-агента по данным NPC и каждый тик передаёт
+   * агенту актуальное состояние и контекст с актором, инвентарём, психикой и потребностями.
+   * Потребности начинают падать со времени, которое NPC знает о мире в момент создания. Когда игра завершается, деспавнится, а если она уже
    * завершилась, деспавнится сразу
    * @param data - данные NPC
    */
@@ -55,6 +60,7 @@ export class Npc {
       htnFactory,
       inventoryFactory,
       psycheFactory,
+      needsFactory,
       rootTaskFactory,
       gameSignal,
       worldKnowledge,
@@ -64,6 +70,7 @@ export class Npc {
     this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
+    this.needs = needsFactory.create(data.needs, worldKnowledge.getState().time);
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({
       modelId: data.modelId,
@@ -74,6 +81,7 @@ export class Npc {
       actor: this.actor,
       inventory: this.inventory,
       psyche: this.psyche,
+      needs: this.needs,
     };
     this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
@@ -102,6 +110,7 @@ export class Npc {
         },
         inventory: this.inventory,
         psyche: this.psyche,
+        needs: this.needs,
       },
       world: this.worldKnowledge.getState(),
     };

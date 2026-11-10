@@ -11,7 +11,7 @@ const sidebars: SidebarsConfig = {
         type: 'doc',
         id: 'npc/README',
       },
-      items: ['homeless/README', 'psyche/README', 'inventory/README'],
+      items: ['homeless/README', 'psyche/README', 'needs/README', 'inventory/README'],
     },
     'places/README',
   ],

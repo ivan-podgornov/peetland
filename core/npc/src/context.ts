@@ -1,5 +1,6 @@
 import type { IActor } from '@peetland/game';
 import type { Inventory } from '@peetland/inventory';
+import type { INeeds } from '@peetland/needs';
 import type { IPsyche } from '@peetland/psyche';
 
 /**
@@ -11,4 +12,6 @@ export type NpcContext = Readonly<{
   inventory: Inventory;
   /** Психика, которой задачи сообщают о поступках NPC */
   psyche: IPsyche;
+  /** Потребности, которым задачи сообщают о занятиях NPC */
+  needs: INeeds;
 }>;

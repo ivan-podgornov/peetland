@@ -14,6 +14,7 @@
     "@peetland/geometry": "0.0.0",
     "@peetland/htn": "0.0.0",
     "@peetland/inventory": "0.0.0",
+    "@peetland/needs": "0.0.0",
     "@peetland/psyche": "0.0.0",
     "@peetland/timings": "0.0.0"
   },

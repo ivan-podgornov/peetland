@@ -1,3 +1,4 @@
+import { Need } from '@peetland/needs';
 import { NpcKind } from '@peetland/npc';
 import type { NpcData } from '@peetland/npc';
 import { Feeling, Trait } from '@peetland/psyche';
@@ -26,5 +27,9 @@ export const npcs: NpcData[] = [
     },
     // Без денег и пойла: так бомж сразу идёт собирать бутылки
     inventory: {},
+    // Сытый: голод придёт к нему только к концу суток
+    needs: {
+      [Need.Satiety]: 100,
+    },
   },
 ];

@@ -1,0 +1,1 @@
+{"id":"2c1e59222e1b8714e9e526d1d7bb6868.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/remove.spec.ts#Inventory #remove Если количество отрицательное, выбрасывает RangeError","name":"Если количество отрицательное, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"e6c3ed622170377584dd12a0fe7117b9"}}

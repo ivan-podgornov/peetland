@@ -1,0 +1,1 @@
+{"id":"b934626dd96ae602b5f21addb41761a3.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/luck/constructor.spec.ts#Luck #constructor Если удачливость не число, выбрасывает RangeError","name":"Если удачливость не число, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"109baaeb9d7f059a23935bc3c26617d5"}}

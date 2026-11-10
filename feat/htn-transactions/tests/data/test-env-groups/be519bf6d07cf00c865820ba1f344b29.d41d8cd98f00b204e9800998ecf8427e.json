@@ -1,0 +1,1 @@
+{"id":"be519bf6d07cf00c865820ba1f344b29.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/luck/constructor.spec.ts#Luck #constructor Если удачливость больше Luck.MAX, выбрасывает RangeError","name":"Если удачливость больше Luck.MAX, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"524f4b6b8f5e059c4589fbd4cd6c8484"}}

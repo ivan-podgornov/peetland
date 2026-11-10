@@ -1,0 +1,1 @@
+{"id":"6092cc986ea0d7ea9f736c3bef2d192c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/validator.spec.ts#NeedsValidator #validateValue Если значение 0 в пределах от 0 до 100, не выбрасывает ошибку","name":"Если значение 0 в пределах от 0 до 100, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"b74621a3d144fa29441a5861bdf52574"}}

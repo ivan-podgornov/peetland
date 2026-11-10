@@ -1,0 +1,1 @@
+{"id":"e5865f5611ed118e997b89eae2e25967.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/ticks.spec.ts#Npc Каждый тик Если задача поменяла инвентарь из контекста, меняется инвентарь NPC","name":"Если задача поменяла инвентарь из контекста, меняется инвентарь NPC","status":"passed","testResultsByEnv":{"default":"f1e6b70a9e00256e71fa8ed99f1318c4"}}

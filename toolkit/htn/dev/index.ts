@@ -8,7 +8,6 @@ export {
   primitive,
   blockedPrimitive,
   compound,
-  transaction,
   method,
   dynamicMethod,
   blockedMethod,

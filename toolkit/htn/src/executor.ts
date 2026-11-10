@@ -13,12 +13,6 @@ export interface IExecutor<TState, TContext> {
 
   /** Возвращает задачу, которая выполняется в данный момент */
   get currentTask(): PrimitiveTask<TState, TContext> | null;
-
-  /**
-   * Возвращает, можно ли сейчас прервать выполнение, не сломав транзакцию: текущая задача вне
-   * транзакции или транзакция ещё не началась
-   */
-  get interruptible(): boolean;
 }
 
 export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
@@ -31,7 +25,7 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
    * Создаёт исполнителя для указанного плана. Предполагается, что на вход будет приходить план,
    * который составил планировщик. Так же, предполагается, что план не может быть пустым, так как
    * пустой план - это повод перепланировать, а не выполнять.
-   * @param steps - шаги плана: задачи и транзакции, в которые они входят
+   * @param steps - шаги плана (см. PlanStep)
    */
   constructor(steps: readonly PlanStep<TState, TContext>[]) {
     if (!steps.length) {
@@ -45,22 +39,14 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   }
 
   get currentTask(): PrimitiveTask<TState, TContext> {
-    return this.currentStep.task;
-  }
+    const step = this.steps[this.currentTaskIndex];
 
-  get interruptible(): boolean {
-    const { transaction } = this.currentStep;
-
-    if (transaction === null) {
-      return true;
+    if (!step) {
+      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.steps.length})`;
+      throw new RangeError(message);
     }
 
-    if (this.taskStarted) {
-      return false;
-    }
-
-    // Задача ещё не началась: прервать можно, если с неё транзакция только начинается
-    return this.steps[this.currentTaskIndex - 1]?.transaction !== transaction;
+    return step.task;
   }
 
   update(state: TState, context: TContext): TaskResult {
@@ -103,17 +89,6 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     if (this.taskStarted) {
       this.currentTask.stop(context);
     }
-  }
-
-  private get currentStep(): PlanStep<TState, TContext> {
-    const step = this.steps[this.currentTaskIndex];
-
-    if (!step) {
-      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.steps.length})`;
-      throw new RangeError(message);
-    }
-
-    return step;
   }
 
   /** Начинает выполнение задачи */

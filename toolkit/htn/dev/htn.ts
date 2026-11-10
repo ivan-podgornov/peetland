@@ -7,7 +7,6 @@ export function createMockedHTN<TState, TContext>(): IHTN<TState, TContext> {
   return {
     update: vi.fn(),
     stop: vi.fn(),
-    requestReplan: vi.fn(),
   };
 }
 

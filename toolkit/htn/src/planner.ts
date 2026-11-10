@@ -1,34 +1,26 @@
-import type { PlanStep } from './plan';
+import type { PlanNode, PlanStep } from './plan';
 import { isPrimitive } from './task';
 import type { Task } from './task';
 
 /** Планировщик работает только с состоянием и о контексте исполнения задач не знает */
 export interface IPlanner<TState> {
-  /**
-   * Возвращает план корневой задачи: шаги с примитивными задачами и транзакциями, в которые они
-   * входят, или null, если план составить нельзя
-   */
+  /** Возвращает план корневой задачи из шагов (см. PlanStep) или null, если план составить нельзя */
   plan<TContext>(root: Task<TState, TContext>, state: TState): PlanStep<TState, TContext>[] | null;
 }
 
-/** Задача, которую ещё предстоит разложить, и транзакция, в которую она входит */
+/** Задача, которую ещё предстоит разложить, и узел разложения, частью которого она запланирована */
 type PendingTask<TState, TContext> = Readonly<{
   task: Task<TState, TContext>;
-  transaction: number | null;
+  isPartOf: PlanNode<TState, TContext> | null;
 }>;
 
 export class Planner<TState> implements IPlanner<TState> {
-  /** Номер следующей транзакции. Сбрасывается на каждый план */
-  private nextTransaction = 0;
-
   plan<TContext>(root: Task<TState, TContext>, state: TState): PlanStep<TState, TContext>[] | null {
-    this.nextTransaction = 0;
-
     return this.decompose(
       [
         {
           task: root,
-          transaction: null,
+          isPartOf: null,
         },
       ],
       state
@@ -45,7 +37,7 @@ export class Planner<TState> implements IPlanner<TState> {
       return [];
     }
 
-    const { task, transaction } = head;
+    const { task, isPartOf } = head;
 
     if (isPrimitive(task)) {
       if (!task.canExecute(state)) {
@@ -59,26 +51,28 @@ export class Planner<TState> implements IPlanner<TState> {
         [
           {
             task,
-            transaction,
+            isPartOf,
           },
         ].concat(decomposedTail)
       );
     }
-
-    // Транзакция внутри транзакции — часть внешней
-    const subtasksTransaction = transaction ?? (task.transaction ? this.nextTransaction++ : null);
 
     for (const method of task.methods) {
       if (!method.preconditions(state)) {
         continue;
       }
 
+      const node: PlanNode<TState, TContext> = {
+        task,
+        method,
+        isPartOf,
+      };
       const subtasks = typeof method.tasks === 'function' ? method.tasks(state) : method.tasks;
       const decomposedSubtasks = this.decompose(
         subtasks
-          .map((subtask) => ({
+          .map<PendingTask<TState, TContext>>((subtask) => ({
             task: subtask,
-            transaction: subtasksTransaction,
+            isPartOf: node,
           }))
           .concat(tail),
         state

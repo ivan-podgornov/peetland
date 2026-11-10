@@ -33,6 +33,16 @@ export class ParallelTask<TState, TContext> implements PrimitiveTask<TState, TCo
     this.options = options;
   }
 
+  /** Основная задача: результат параллельной задачи — её результат */
+  get main(): PrimitiveTask<TState, TContext> {
+    return this.options.main;
+  }
+
+  /** Фоновая задача: выполняется, пока выполняется основная */
+  get background(): PrimitiveTask<TState, TContext> {
+    return this.options.background;
+  }
+
   /** Выполнить можно, если можно выполнить обе задачи */
   canExecute(state: TState): boolean {
     const { main, background } = this.options;

@@ -6304,6 +6304,14 @@ do
 end
 return ____exports
  end,
+["core.needs.src.activity"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- Занятия, от которых меняются потребности
+____exports.Activity = ____exports.Activity or ({})
+____exports.Activity.Eat = "eat"
+return ____exports
+ end,
 ["core.needs.src.category"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -6326,7 +6334,7 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["core.needs.src.definitions"] = function(...) 
+["core.needs.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 local ____category = require("core.needs.src.category")
@@ -6335,8 +6343,10 @@ local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 --- Минут в игровых сутках
 local MINUTES_PER_DAY = 24 * 60
---- Описания потребностей по умолчанию
+--- Описание каждой потребности
 ____exports.NEED_DEFINITIONS = {[Need.Satiety] = {category = NeedCategory.Vital, depletionMinutes = MINUTES_PER_DAY}}
+--- На сколько растёт сытость, когда NPC поел. Около трёх приёмов пищи в сутки
+____exports.EAT_SATIETY = 40
 return ____exports
  end,
 ["core.needs.src.validator"] = function(...) 
@@ -6367,28 +6377,6 @@ function NeedsValidator.prototype.validateValue(self, value, min, max)
         )
     end
 end
-function NeedsValidator.prototype.validateDepletion(self, minutes)
-    if not __TS__NumberIsFinite(minutes) or minutes <= 0 then
-        error(
-            __TS__New(
-                RangeError,
-                "Потребность должна падать за конечное положительное число минут, получено " .. tostring(minutes)
-            ),
-            0
-        )
-    end
-end
-function NeedsValidator.prototype.validateAmount(self, amount)
-    if not __TS__NumberIsFinite(amount) or amount < 0 then
-        error(
-            __TS__New(
-                RangeError,
-                "Восполнение должно быть конечным неотрицательным числом, получено " .. tostring(amount)
-            ),
-            0
-        )
-    end
-end
 return ____exports
  end,
 ["core.needs.src.needs"] = function(...) 
@@ -6400,39 +6388,39 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
 local ____exports = {}
 local ____timings = require("toolkit.timings.src.index")
 local TimeSpan = ____timings.TimeSpan
+local ____activity = require("core.needs.src.activity")
+local Activity = ____activity.Activity
+local ____constants = require("core.needs.src.constants")
+local EAT_SATIETY = ____constants.EAT_SATIETY
+local NEED_DEFINITIONS = ____constants.NEED_DEFINITIONS
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 --- Потребности хранят значение каждой потребности NPC и момент, когда его выставили, а текущее
--- значение считают при чтении: значение − скорость падения × прошло игровых минут. Значение не
--- падает ниже Needs.MIN_NEED, а если время назад, не растёт. Никто не убавляет потребности по
--- тикам
+-- значение считают при чтении: значение − скорость падения × прошло игровых минут. Скорость падения
+-- берётся из NEED_DEFINITIONS. Значение не падает ниже Needs.MIN_NEED, а если время назад, не
+-- растёт. Никто не убавляет потребности по тикам
 ____exports.Needs = __TS__Class()
 local Needs = ____exports.Needs
 Needs.name = "Needs"
 function Needs.prototype.____constructor(self, state, deps)
     self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
-    local definitions = ____deps_0.definitions
     local validator = ____deps_0.validator
     __TS__ArrayForEach(
         __TS__ObjectValues(Need),
-        function(____, need)
-            validator:validateValue(state[need].value, ____exports.Needs.MIN_NEED, ____exports.Needs.MAX_NEED)
-            validator:validateDepletion(definitions[need].depletionMinutes)
-        end
+        function(____, need) return validator:validateValue(state[need].value, ____exports.Needs.MIN_NEED, ____exports.Needs.MAX_NEED) end
     )
     self.deps = deps
     self.state = state
 end
 function Needs.prototype.get(self, need, time)
-    local ____self_deps_1 = self.deps
-    local definitions = ____self_deps_1.definitions
-    local ____self_state_need_2 = self.state[need]
-    local value = ____self_state_need_2.value
-    local since = ____self_state_need_2.since
+    local ____self_state_need_1 = self.state[need]
+    local value = ____self_state_need_1.value
+    local since = ____self_state_need_1.since
     local elapsed = math.max(
         0,
         self.timeSpan:elapsedMinutes(
@@ -6440,7 +6428,7 @@ function Needs.prototype.get(self, need, time)
             time:getState()
         )
     )
-    local rate = ____exports.Needs.MAX_NEED / definitions[need].depletionMinutes
+    local rate = ____exports.Needs.MAX_NEED / NEED_DEFINITIONS[need].depletionMinutes
     return math.max(____exports.Needs.MIN_NEED, value - rate * elapsed)
 end
 function Needs.prototype.getAll(self, time)
@@ -6458,20 +6446,40 @@ end
 function Needs.prototype.clone(self)
     return __TS__New(____exports.Needs, self.state, self.deps)
 end
-function Needs.prototype.satisfy(self, need, amount, time)
-    local ____self_deps_3 = self.deps
-    local validator = ____self_deps_3.validator
-    validator:validateAmount(amount)
-    self.state = __TS__ObjectAssign(
-        {},
-        self.state,
-        {[need] = {
-            value = math.min(
-                ____exports.Needs.MAX_NEED,
-                self:get(need, time) + amount
-            ),
-            since = time:getState()
-        }}
+function Needs.prototype.perform(self, activity, _details, time)
+    local contribution = self:contribute(activity)
+    self.state = __TS__ArrayReduce(
+        __TS__ObjectValues(Need),
+        function(____, state, need)
+            local change = contribution[need]
+            if change == nil then
+                return state
+            end
+            return __TS__ObjectAssign(
+                {},
+                state,
+                {[need] = {
+                    value = self:clamp(self:get(need, time) + change),
+                    since = time:getState()
+                }}
+            )
+        end,
+        self.state
+    )
+end
+function Needs.prototype.contribute(self, activity)
+    repeat
+        local ____switch13 = activity
+        local ____cond13 = ____switch13 == Activity.Eat
+        if ____cond13 then
+            return {[Need.Satiety] = EAT_SATIETY}
+        end
+    until true
+end
+function Needs.prototype.clamp(self, value)
+    return math.min(
+        ____exports.Needs.MAX_NEED,
+        math.max(____exports.Needs.MIN_NEED, value)
     )
 end
 Needs.MIN_NEED = 0
@@ -6486,8 +6494,6 @@ local __TS__ObjectValues = ____lualib.__TS__ObjectValues
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local ____exports = {}
-local ____definitions = require("core.needs.src.definitions")
-local NEED_DEFINITIONS = ____definitions.NEED_DEFINITIONS
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 local ____needs = require("core.needs.src.needs")
@@ -6502,15 +6508,11 @@ function NeedsFactory.prototype.____constructor(self, deps)
         deps = {}
     end
     local ____deps_0 = deps
-    local definitions = ____deps_0.definitions
-    if definitions == nil then
-        definitions = NEED_DEFINITIONS
-    end
     local validator = ____deps_0.validator
     if validator == nil then
         validator = __TS__New(NeedsValidator)
     end
-    self.deps = {definitions = definitions, validator = validator}
+    self.deps = {validator = validator}
 end
 function NeedsFactory.prototype.create(self, values, time)
     local since = time:getState()
@@ -6526,12 +6528,16 @@ return ____exports
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
+    local ____activity = require("core.needs.src.activity")
+    ____exports.Activity = ____activity.Activity
+end
+do
     local ____category = require("core.needs.src.category")
     ____exports.NeedCategory = ____category.NeedCategory
 end
 do
-    local ____definitions = require("core.needs.src.definitions")
-    ____exports.NEED_DEFINITIONS = ____definitions.NEED_DEFINITIONS
+    local ____constants = require("core.needs.src.constants")
+    ____exports.NEED_DEFINITIONS = ____constants.NEED_DEFINITIONS
 end
 do
     local ____factory = require("core.needs.src.factory")

@@ -1,1 +1,0 @@
-{"id":"5a0521c3d8f22d1568d4361119270720.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/validator.spec.ts#NeedsValidator #validateAmount Если восполнение -1, выбрасывает RangeError","name":"Если восполнение -1, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"44bbcd38ecb564959ddcd4b6e8a845d9"}}

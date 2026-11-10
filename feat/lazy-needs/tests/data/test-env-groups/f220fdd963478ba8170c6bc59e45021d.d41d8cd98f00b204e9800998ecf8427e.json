@@ -1,1 +1,0 @@
-{"id":"f220fdd963478ba8170c6bc59e45021d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/factory.spec.ts#NeedsFactory #create Если описания не переданы, потребности падают по NEED_DEFINITIONS","name":"Если описания не переданы, потребности падают по NEED_DEFINITIONS","status":"passed","testResultsByEnv":{"default":"f74dc76486909eef64f880a17b79156e"}}

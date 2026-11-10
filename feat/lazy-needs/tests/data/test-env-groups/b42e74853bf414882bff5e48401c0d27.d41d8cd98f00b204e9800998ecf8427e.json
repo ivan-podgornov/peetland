@@ -1,1 +1,0 @@
-{"id":"b42e74853bf414882bff5e48401c0d27.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satisfy.spec.ts#Needs #satisfy Если amount -1, выбрасывает RangeError","name":"Если amount -1, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"a4d448de8fb0aea2f43e07fdba335d80"}}

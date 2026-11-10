@@ -1,1 +1,0 @@
-{"id":"8c139131203750cd79ab8c13b946f3d9.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satisfy.spec.ts#Needs #satisfy Если потребности у NPC нет, выбрасывает RangeError","name":"Если потребности у NPC нет, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"ed31de39f1fe0428284d5a3fea9309e5"}}

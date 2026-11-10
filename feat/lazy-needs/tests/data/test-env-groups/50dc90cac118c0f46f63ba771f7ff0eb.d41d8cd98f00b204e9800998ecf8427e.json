@@ -1,0 +1,1 @@
+{"id":"50dc90cac118c0f46f63ba771f7ff0eb.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satisfy.spec.ts#Needs #satisfy Если валидатор выбросил ошибку на amount, не меняет потребность","name":"Если валидатор выбросил ошибку на amount, не меняет потребность","status":"passed","testResultsByEnv":{"default":"836ced6960a509766830db76c0a0b883"}}

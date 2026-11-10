@@ -1,0 +1,1 @@
+{"id":"3eb83d8da6128ea2db41d27670f45011.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/validator.spec.ts#NeedsValidator #validateAmount Если восполнение NaN, выбрасывает RangeError","name":"Если восполнение NaN, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"1bed936b39e7cf3f8ddcca898c1421f1"}}

@@ -1,0 +1,1 @@
+{"id":"cf4e5ec77d4818bb5fe10b33a31518f8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/validator.spec.ts#NeedsValidator #validateAmount Если восполнение 20, не выбрасывает ошибку","name":"Если восполнение 20, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"bed6583d2987bc4598f4d7a15b5baf10"}}

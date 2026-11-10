@@ -1,1 +1,0 @@
-{"id":"79c4d415d50d037f586153b7df32224e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/get-all.spec.ts#Needs #getAll Не возвращает потребности, которых у NPC нет","name":"Не возвращает потребности, которых у NPC нет","status":"passed","testResultsByEnv":{"default":"9bda36281e939f72bef8341850eb28b8"}}

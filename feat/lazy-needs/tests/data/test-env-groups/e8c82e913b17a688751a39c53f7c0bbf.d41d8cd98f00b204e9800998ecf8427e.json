@@ -1,1 +1,0 @@
-{"id":"e8c82e913b17a688751a39c53f7c0bbf.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/subscriber/complete.spec.ts#Subscriber #complete При вызове после перехода сигнала в сос… Не вызывает observer.complete","name":"Не вызывает observer.complete","status":"passed","testResultsByEnv":{"default":"1b5638309c681b26e9583cdd2bd1a5e9"}}

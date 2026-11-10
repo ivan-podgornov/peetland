@@ -1,1 +1,0 @@
-{"id":"2c78b0df560ccc3888f777019599bdf8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/remove-item-task.spec.ts#RemoveItemTask #start Если предмета хватило, возвращает 'success'","name":"Если предмета хватило, возвращает 'success'","status":"passed","testResultsByEnv":{"default":"6ec94a393ee7efd58be6f824fdf856cd"}}

@@ -1,1 +1,0 @@
-{"id":"b5ea3f63a6a8b6fef94b871470c66dc2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/on-success.spec.ts#Command Если onUpdate вернул 'success' Больше не вызывает onUpdate","name":"Больше не вызывает onUpdate","status":"passed","testResultsByEnv":{"default":"bd72285e8e869ab490e5bfbf6b11bd1a"}}

@@ -1,1 +1,0 @@
-{"id":"a0befff0a22d80eae3558717bbce0428.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/remove-item-task.spec.ts#RemoveItemTask #applyEffects Если предмета не осталось, убирает его из состояния","name":"Если предмета не осталось, убирает его из состояния","status":"passed","testResultsByEnv":{"default":"7fd89a397d7ca42dc60bc71905be0f4b"}}

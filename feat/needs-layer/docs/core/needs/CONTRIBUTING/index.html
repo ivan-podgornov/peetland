@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/needs-layer/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/needs-layer/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/needs-layer/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/needs-layer/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/feat/needs-layer/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/needs-layer/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/needs-layer/docs/assets/js/runtime~main.0c9f69cc.js" defer="defer"></script>
+<script src="/peetland/feat/needs-layer/docs/assets/js/runtime~main.a3254a54.js" defer="defer"></script>
 <script src="/peetland/feat/needs-layer/docs/assets/js/main.8c24bcc4.js" defer="defer"></script>
 </head>
 <body>
@@ -26,8 +26,7 @@
 дела и удовлетворяет её. Выше верхнего (<code>calmAbove</code>) она перестаёт быть срочной. Пока значение
 между порогами, срочность не меняется, поэтому значение, которое скачет около нижнего порога, не
 поднимает тревогу снова. У сытости пороги 25 и 60: срочно становится за 6 часов до голода.</p>
-<p><code>isUrgent(need, time)</code> возвращает, ниже ли потребность нижнего порога на момент времени. Если
-срочных потребностей несколько, первой удовлетворяется та, что раньше в <code>NEED_PRIORITY</code>.</p>
+<p><code>isUrgent(need, time)</code> возвращает, ниже ли потребность нижнего порога на момент времени.</p>
 <p>Все потребности есть у всех NPC, поэтому начальные значения (<code>NeedValues</code>) и состояние
 (<code>NeedsState</code>) — полные мапы по <code>Need</code>. Зависимости тоже будут у всех: насколько NPC зависим,
 решает не наличие зависимости, а её сила. Зависимость с силой 0 — это отсутствие зависимости.</p>

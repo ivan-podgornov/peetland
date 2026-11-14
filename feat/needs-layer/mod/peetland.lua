@@ -6341,8 +6341,6 @@ local ____category = require("core.needs.src.category")
 local NeedCategory = ____category.NeedCategory
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
---- Потребности по приоритету: если срочных несколько, первой удовлетворяется та, что раньше
-____exports.NEED_PRIORITY = {Need.Satiety}
 --- Минут в игровых сутках
 local MINUTES_PER_DAY = 24 * 60
 --- Описание каждой потребности
@@ -6543,7 +6541,6 @@ end
 do
     local ____constants = require("core.needs.src.constants")
     ____exports.NEED_DEFINITIONS = ____constants.NEED_DEFINITIONS
-    ____exports.NEED_PRIORITY = ____constants.NEED_PRIORITY
 end
 do
     local ____factory = require("core.needs.src.factory")
@@ -9016,29 +9013,56 @@ function SatisfyHungerTask.prototype.____constructor(self)
 end
 return ____exports
  end,
+["core.needs-tasks.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.needs-tasks.src.satisfy-needs-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____needs = require("core.needs.src.index")
+local Need = ____needs.Need
+--- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
+-- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
+-- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
+-- нет, задачу не спланировать
+____exports.SatisfyNeedsTask = __TS__Class()
+local SatisfyNeedsTask = ____exports.SatisfyNeedsTask
+SatisfyNeedsTask.name = "SatisfyNeedsTask"
+function SatisfyNeedsTask.prototype.____constructor(self, deps)
+    self.name = "satisfy-needs"
+    local ____deps_0 = deps
+    local satisfyNeedsTaskFactory = ____deps_0.satisfyNeedsTaskFactory
+    self.methods = {{
+        name = "satisfy-hunger",
+        preconditions = function(____, state) return state.self.needs:isUrgent(Need.Satiety, state.world.time) end,
+        tasks = {satisfyNeedsTaskFactory:satisfyHunger()}
+    }}
+end
+return ____exports
+ end,
 ["core.needs-tasks.src.factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____needs = require("core.needs.src.index")
-local Need = ____needs.Need
 local ____satisfy_2Dhunger_2Dtask = require("core.needs-tasks.src.satisfy-hunger-task")
 local SatisfyHungerTask = ____satisfy_2Dhunger_2Dtask.SatisfyHungerTask
---- Создаёт задачи удовлетворения потребностей: для сытости — SatisfyHungerTask
-____exports.SatisfyNeedTaskFactory = __TS__Class()
-local SatisfyNeedTaskFactory = ____exports.SatisfyNeedTaskFactory
-SatisfyNeedTaskFactory.name = "SatisfyNeedTaskFactory"
-function SatisfyNeedTaskFactory.prototype.____constructor(self)
+local ____satisfy_2Dneeds_2Dtask = require("core.needs-tasks.src.satisfy-needs-task")
+local SatisfyNeedsTask = ____satisfy_2Dneeds_2Dtask.SatisfyNeedsTask
+--- Создаёт задачи удовлетворения потребностей. На каждый вызов задача новая
+____exports.SatisfyNeedsTaskFactory = __TS__Class()
+local SatisfyNeedsTaskFactory = ____exports.SatisfyNeedsTaskFactory
+SatisfyNeedsTaskFactory.name = "SatisfyNeedsTaskFactory"
+function SatisfyNeedsTaskFactory.prototype.____constructor(self)
 end
-function SatisfyNeedTaskFactory.prototype.create(self, need)
-    repeat
-        local ____switch4 = need
-        local ____cond4 = ____switch4 == Need.Satiety
-        if ____cond4 then
-            return __TS__New(SatisfyHungerTask)
-        end
-    until true
+function SatisfyNeedsTaskFactory.prototype.satisfyNeeds(self)
+    return __TS__New(SatisfyNeedsTask, {satisfyNeedsTaskFactory = self})
+end
+function SatisfyNeedsTaskFactory.prototype.satisfyHunger(self)
+    return __TS__New(SatisfyHungerTask)
 end
 return ____exports
  end,
@@ -9047,46 +9071,15 @@ return ____exports
 local ____exports = {}
 do
     local ____factory = require("core.needs-tasks.src.factory")
-    ____exports.SatisfyNeedTaskFactory = ____factory.SatisfyNeedTaskFactory
+    ____exports.SatisfyNeedsTaskFactory = ____factory.SatisfyNeedsTaskFactory
 end
 do
     local ____satisfy_2Dhunger_2Dtask = require("core.needs-tasks.src.satisfy-hunger-task")
     ____exports.SatisfyHungerTask = ____satisfy_2Dhunger_2Dtask.SatisfyHungerTask
 end
-return ____exports
- end,
-["core.world.src.needs-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local ____exports = {}
-local ____needs = require("core.needs.src.index")
-local NEED_DEFINITIONS = ____needs.NEED_DEFINITIONS
-local NEED_PRIORITY = ____needs.NEED_PRIORITY
-local NeedCategory = ____needs.NeedCategory
---- Слой потребностей корневой задачи NPC: то, без чего NPC не может жить. Методы — жизненные
--- потребности в порядке NEED_PRIORITY. Метод подходит, если его потребность срочная, и планирует её
--- удовлетворение. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если
--- срочных нет, — к следующему слою
-____exports.NeedsTask = __TS__Class()
-local NeedsTask = ____exports.NeedsTask
-NeedsTask.name = "NeedsTask"
-function NeedsTask.prototype.____constructor(self, deps)
-    self.name = "needs"
-    local ____deps_0 = deps
-    local satisfyNeedTaskFactory = ____deps_0.satisfyNeedTaskFactory
-    self.methods = __TS__ArrayMap(
-        __TS__ArrayFilter(
-            NEED_PRIORITY,
-            function(____, need) return NEED_DEFINITIONS[need].category == NeedCategory.Vital end
-        ),
-        function(____, need) return {
-            name = need,
-            preconditions = function(____, state) return state.self.needs:isUrgent(need, state.world.time) end,
-            tasks = {satisfyNeedTaskFactory:create(need)}
-        } end
-    )
+do
+    local ____satisfy_2Dneeds_2Dtask = require("core.needs-tasks.src.satisfy-needs-task")
+    ____exports.SatisfyNeedsTask = ____satisfy_2Dneeds_2Dtask.SatisfyNeedsTask
 end
 return ____exports
  end,
@@ -9096,11 +9089,12 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____needs_2Dtasks = require("core.needs-tasks.src.index")
-local SatisfyNeedTaskFactory = ____needs_2Dtasks.SatisfyNeedTaskFactory
-local ____needs_2Dtask = require("core.world.src.needs-task")
-local NeedsTask = ____needs_2Dtask.NeedsTask
---- Создаёт слой потребностей корневой задачи NPC (см. NeedsTask). Задачи удовлетворения одинаковые
--- для всех типов NPC, поэтому тип NPC слою не нужен
+local SatisfyNeedsTaskFactory = ____needs_2Dtasks.SatisfyNeedsTaskFactory
+--- Создаёт слой потребностей корневой задачи NPC: задачу удовлетворить срочные потребности
+-- (SatisfyNeedsTask из
+-- 
+-- @peetland /needs-tasks). Задачи удовлетворения одинаковые для всех типов NPC,
+-- поэтому тип NPC слою не нужен
 ____exports.NeedsTaskFactory = __TS__Class()
 local NeedsTaskFactory = ____exports.NeedsTaskFactory
 NeedsTaskFactory.name = "NeedsTaskFactory"
@@ -9109,15 +9103,14 @@ function NeedsTaskFactory.prototype.____constructor(self, deps)
         deps = {}
     end
     local ____deps_0 = deps
-    local satisfyNeedTaskFactory = ____deps_0.satisfyNeedTaskFactory
-    if satisfyNeedTaskFactory == nil then
-        satisfyNeedTaskFactory = __TS__New(SatisfyNeedTaskFactory)
+    local satisfyNeedsTaskFactory = ____deps_0.satisfyNeedsTaskFactory
+    if satisfyNeedsTaskFactory == nil then
+        satisfyNeedsTaskFactory = __TS__New(SatisfyNeedsTaskFactory)
     end
-    self.satisfyNeedTaskFactory = satisfyNeedTaskFactory
+    self.satisfyNeedsTaskFactory = satisfyNeedsTaskFactory
 end
 function NeedsTaskFactory.prototype.create(self)
-    local satisfyNeedTaskFactory = self.satisfyNeedTaskFactory
-    return __TS__New(NeedsTask, {satisfyNeedTaskFactory = satisfyNeedTaskFactory})
+    return self.satisfyNeedsTaskFactory:satisfyNeeds()
 end
 return ____exports
  end,

@@ -9,29 +9,21 @@ export interface IPlanner<TState> {
 }
 
 /** Задача, которую ещё предстоит разложить, и узел разложения, частью которого она запланирована */
-type PendingTask<TState, TContext> = Readonly<{
+type DecomposingTask<TState, TContext> = Readonly<{
   task: Task<TState, TContext>;
   isPartOf: PlanNode<TState, TContext> | null;
 }>;
 
 export class Planner<TState> implements IPlanner<TState> {
   plan<TContext>(root: Task<TState, TContext>, state: TState): PlanStep<TState, TContext>[] | null {
-    return this.decompose(
-      [
-        {
-          task: root,
-          isPartOf: null,
-        },
-      ],
-      state
-    );
+    return this.decompose([this.partOf(root, null)], state);
   }
 
   private decompose<TContext>(
-    pending: PendingTask<TState, TContext>[],
+    tasks: DecomposingTask<TState, TContext>[],
     state: TState
   ): PlanStep<TState, TContext>[] | null {
-    const [head, ...tail] = pending;
+    const [head, ...tail] = tasks;
 
     if (!head?.task) {
       return [];
@@ -46,15 +38,7 @@ export class Planner<TState> implements IPlanner<TState> {
 
       const decomposedTail = this.decompose(tail, task.applyEffects(state));
 
-      return (
-        decomposedTail &&
-        [
-          {
-            task,
-            isPartOf,
-          },
-        ].concat(decomposedTail)
-      );
+      return decomposedTail && [this.partOf(task, isPartOf)].concat(decomposedTail);
     }
 
     for (const method of task.methods) {
@@ -69,12 +53,7 @@ export class Planner<TState> implements IPlanner<TState> {
       };
       const subtasks = typeof method.tasks === 'function' ? method.tasks(state) : method.tasks;
       const decomposedSubtasks = this.decompose(
-        subtasks
-          .map<PendingTask<TState, TContext>>((subtask) => ({
-            task: subtask,
-            isPartOf: node,
-          }))
-          .concat(tail),
+        subtasks.map((subtask) => this.partOf(subtask, node)).concat(tail),
         state
       );
 
@@ -84,5 +63,22 @@ export class Planner<TState> implements IPlanner<TState> {
     }
 
     return null;
+  }
+
+  /**
+   * Возвращает задачу вместе с узлом разложения, частью которого она запланирована: для примитивной
+   * задачи — шаг плана, для любой — задачу, которую ещё предстоит разложить
+   */
+  private partOf<TTask, TContext>(
+    task: TTask,
+    isPartOf: PlanNode<TState, TContext> | null
+  ): Readonly<{
+    task: TTask;
+    isPartOf: PlanNode<TState, TContext> | null;
+  }> {
+    return {
+      task,
+      isPartOf,
+    };
   }
 }

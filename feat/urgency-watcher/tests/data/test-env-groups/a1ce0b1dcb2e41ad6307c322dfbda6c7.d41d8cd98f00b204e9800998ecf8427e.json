@@ -1,0 +1,1 @@
+{"id":"a1ce0b1dcb2e41ad6307c322dfbda6c7.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/factory.spec.ts#NpcFactory #create Если inventoryFactory не передана, NPC получает экземпляр Inventory","name":"Если inventoryFactory не передана, NPC получает экземпляр Inventory","status":"passed","testResultsByEnv":{"default":"16fcc41770fe7b9682a87fd0bf98ed77"}}

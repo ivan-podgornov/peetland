@@ -1,0 +1,1 @@
+{"id":"ee5659a588dfcba0f322d8ce563c9256.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/animation-manager/__tests__/resolve.spec.ts#AnimationManager #resolve Если время проигрывания бесконечно, выбрасывает RangeError","name":"Если время проигрывания бесконечно, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"2ce6961dcf7ac6abacfdf01bb7da736e"}}

@@ -1,4 +1,7 @@
 import { Geometry } from '@peetland/geometry';
+import type { PrimitiveTask } from '@peetland/htn';
+import { createStubPrimitiveTask } from '@peetland/htn/dev';
+import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 
@@ -32,4 +35,12 @@ export function createNpcTaskFactory(factory: Partial<INpcTaskFactory> = {}): IN
     parallel: (options) => real.parallel(options),
     ...factory,
   };
+}
+
+/**
+ * Создаёт примитивную задачу NPC с названием, которая всегда может выполниться и ничего не меняет.
+ * Её возвращают моки методов фабрики примитивов, когда тесту важны только параметры вызова
+ */
+export function createStubNpcTask(name: string): PrimitiveTask<NpcState, NpcContext> {
+  return createStubPrimitiveTask<NpcState, NpcContext>(name);
 }

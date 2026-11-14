@@ -1,7 +1,7 @@
 import { plan } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
@@ -11,7 +11,7 @@ describe('SellBottlesTask', () => {
   describe('Метод sell-in-nearest-collection', () => {
     describe('Задачи', () => {
       it('Отдаёт бутылки с анимацией item-give', () => {
-        const playAnimation = vi.fn();
+        const playAnimation = vi.fn(() => createStubNpcTask('play-animation'));
         const task = createSellBottlesTask(
           createPlacesWithCollection(),
           createNpcTaskFactory({ playAnimation })
@@ -26,7 +26,7 @@ describe('SellBottlesTask', () => {
       });
 
       it('Отдаёт все бутылки из состояния', () => {
-        const removeItem = vi.fn();
+        const removeItem = vi.fn(() => createStubNpcTask('remove-item'));
         const task = createSellBottlesTask(
           createPlacesWithCollection(),
           createNpcTaskFactory({ removeItem })
@@ -41,7 +41,7 @@ describe('SellBottlesTask', () => {
       });
 
       it('Получает BOTTLE_PRICE за каждую бутылку', () => {
-        const addItem = vi.fn();
+        const addItem = vi.fn(() => createStubNpcTask('add-item'));
         const task = createSellBottlesTask(
           createPlacesWithCollection(),
           createNpcTaskFactory({ addItem })

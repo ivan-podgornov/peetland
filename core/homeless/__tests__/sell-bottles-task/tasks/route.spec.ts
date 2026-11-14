@@ -1,7 +1,7 @@
 import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -56,7 +56,7 @@ describe('SellBottlesTask', () => {
       });
 
       it('Идёт к приёмке, которую вернул places.findNearest', () => {
-        const goToCoords = vi.fn();
+        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const collection = createPlace({
           type: PlaceType.BottleCollection,
           position: {
@@ -83,7 +83,7 @@ describe('SellBottlesTask', () => {
       });
 
       it('Поворачивается лицом к приёмщику приёмки, которую вернул places.findNearest', () => {
-        const achieveAngle = vi.fn();
+        const achieveAngle = vi.fn(() => createStubNpcTask('achieve-angle'));
         const collection = createPlace({
           type: PlaceType.BottleCollection,
           angle: 90,

@@ -1,7 +1,7 @@
 import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { createMockedRandom } from '@peetland/random/dev';
@@ -60,7 +60,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('Идёт к мусорке, которую вернул random.pick', () => {
-        const goToCoords = vi.fn();
+        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const bin = createPlace({
           type: PlaceType.TrashBin,
           position: {
@@ -90,7 +90,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('Поворачивается лицом к мусорке, которую вернул random.pick', () => {
-        const achieveAngle = vi.fn();
+        const achieveAngle = vi.fn(() => createStubNpcTask('achieve-angle'));
         const bin = createPlace({
           type: PlaceType.TrashBin,
           angle: 90,
@@ -112,7 +112,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('Начинает рыться с анимацией trash-search-start, а заканчивает — с trash-search-end', () => {
-        const playAnimation = vi.fn();
+        const playAnimation = vi.fn(() => createStubNpcTask('play-animation'));
         const task = createCollectBottlesTask(
           createPlacesWithTrashBins(),
           createNpcTaskFactory({ playAnimation })

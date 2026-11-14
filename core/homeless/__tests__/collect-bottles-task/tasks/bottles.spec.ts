@@ -2,7 +2,7 @@ import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/d
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { Deed } from '@peetland/psyche';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -69,7 +69,7 @@ describe('CollectBottlesTask', () => {
         const real = createNpcTaskFactory();
         const tryLuck = real.tryLuck({ chance: BOTTLE_FIND_CHANCE });
         const searching = real.playAnimation({ animation: 'trash-search' });
-        const parallel = vi.fn();
+        const parallel = vi.fn(() => createStubNpcTask('parallel'));
 
         planOneBottle({
           tryLuck: () => tryLuck,
@@ -108,7 +108,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('Кладёт найденную бутылку в карман с анимацией trash-search-pocket', () => {
-        const playAnimation = vi.fn();
+        const playAnimation = vi.fn(() => createStubNpcTask('play-animation'));
 
         planOneBottle({ playAnimation });
 
@@ -116,7 +116,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('Добавляет по одной бутылке за находку', () => {
-        const addItem = vi.fn();
+        const addItem = vi.fn(() => createStubNpcTask('add-item'));
 
         planOneBottle({ addItem });
 
@@ -127,7 +127,7 @@ describe('CollectBottlesTask', () => {
       });
 
       it('На каждую найденную бутылку реагирует поступком Deed.BottleFound', () => {
-        const psycheReact = vi.fn();
+        const psycheReact = vi.fn(() => createStubNpcTask('psyche-react'));
 
         planOneBottle({ psycheReact });
 

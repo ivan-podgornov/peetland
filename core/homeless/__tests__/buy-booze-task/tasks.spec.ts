@@ -2,7 +2,7 @@ import { createStubTask, plan, planSteps, PlanStructureBuilder, planTree } from 
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -54,7 +54,7 @@ describe('BuyBoozeTask', () => {
       });
 
       it('Идёт к магазину, который вернул places.findNearest', () => {
-        const goToCoords = vi.fn();
+        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const shop = createPlace({
           position: {
             x: 50,
@@ -79,7 +79,7 @@ describe('BuyBoozeTask', () => {
       });
 
       it('Поворачивается лицом к прилавку магазина, который вернул places.findNearest', () => {
-        const achieveAngle = vi.fn();
+        const achieveAngle = vi.fn(() => createStubNpcTask('achieve-angle'));
         const shop = createPlace({ angle: 90 });
         const task = createBuyBoozeTask(createPlacesWithShop(shop), {
           npcTaskFactory: createNpcTaskFactory({ achieveAngle }),

@@ -25,11 +25,16 @@ export class Planner<TState> implements IPlanner<TState> {
   ): PlanStep<TState, TContext>[] | null {
     const [head, ...tail] = tasks;
 
-    if (!head?.task) {
+    if (!head) {
       return [];
     }
 
     const { task, isPartOf } = head;
+
+    // Типы не ловят undefined вместо задачи, например от мока фабрики задач без реализации
+    if (!task) {
+      throw new TypeError(this.describeMissingTask(task, isPartOf));
+    }
 
     if (isPrimitive(task)) {
       if (!task.canExecute(state)) {
@@ -63,6 +68,18 @@ export class Planner<TState> implements IPlanner<TState> {
     }
 
     return null;
+  }
+
+  /** Описывает, откуда в плане взялось значение вместо задачи */
+  private describeMissingTask<TContext>(
+    task: unknown,
+    isPartOf: PlanNode<TState, TContext> | null
+  ): string {
+    if (!isPartOf) {
+      return `Вместо корневой задачи передано ${String(task)}`;
+    }
+
+    return `Метод ${isPartOf.method.name} задачи ${isPartOf.task.name} вернул ${String(task)} вместо задачи`;
   }
 
   /**

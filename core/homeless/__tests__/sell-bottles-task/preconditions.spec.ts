@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { PlaceType } from '@peetland/places';
@@ -17,7 +17,7 @@ describe('SellBottlesTask', () => {
           .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
           .build();
 
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если бутылок не хватает на пойло, а денег нет, план не составляется', () => {
@@ -26,7 +26,7 @@ describe('SellBottlesTask', () => {
           .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE - 1 })
           .build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если выручки за бутылки вместе с деньгами хватает на пойло, план составляется', () => {
@@ -38,7 +38,7 @@ describe('SellBottlesTask', () => {
           })
           .build();
 
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если выручки за бутылки вместе с деньгами не хватает на пойло, план не составляется', () => {
@@ -50,20 +50,20 @@ describe('SellBottlesTask', () => {
           })
           .build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если ни бутылок, ни денег нет, план не составляется', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
 
-        expect(planNames(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
+        expect(planSteps(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
       });
 
       it('Если бутылок нет, план не составляется, даже если денег хватает на пойло', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
         const state = new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если приёмок нет, план не составляется', () => {
@@ -72,7 +72,7 @@ describe('SellBottlesTask', () => {
           .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
           .build();
 
-        expect(planNames(createSellBottlesTask(places), state)).toBeNull();
+        expect(planSteps(createSellBottlesTask(places), state)).toBeNull();
       });
 
       it('Ищет приёмки среди мест типа PlaceType.BottleCollection', () => {

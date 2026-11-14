@@ -1,4 +1,4 @@
-import { createStubTask, plan, planNames } from '@peetland/htn/dev';
+import { createStubTask, plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
@@ -25,11 +25,13 @@ describe('BuyBoozeTask', () => {
           }),
         });
 
-        expect(planNames(task, createStateWithMoney())).toStrictEqual([
-          'go-to-coords',
-          'achieve-angle',
-          'purchase',
-        ]);
+        expect(planTree(planSteps(task, createStateWithMoney()) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('buy-booze', 'buy-in-nearest-shop', (buy) =>
+              buy.primitive('go-to-coords').primitive('achieve-angle').primitive('purchase')
+            )
+            .build()
+        );
       });
 
       it('Ищет магазин, ближайший к позиции NPC из состояния', () => {

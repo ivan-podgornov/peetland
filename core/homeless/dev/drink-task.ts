@@ -1,3 +1,4 @@
+import type { PlanStructureBuilder } from '@peetland/htn/dev';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
@@ -8,8 +9,15 @@ import { vi } from 'vitest';
 
 import { DrinkTask } from '../src/drink-task';
 
-/** Задачи плана «выпить» */
-export const DRINK_PLAN = ['play-animation', 'remove-item', 'add-item'];
+/**
+ * Добавляет в структуру плана транзакцию «выпить»: выпить стоя, отдать пойло и получить пустую
+ * бутылку
+ */
+export function buildDrinkBooze(structure: PlanStructureBuilder): PlanStructureBuilder {
+  return structure.transaction('drink-booze', 'drink-booze', (drink) =>
+    drink.primitive('play-animation').primitive('remove-item').primitive('add-item')
+  );
+}
 
 /** Создаёт задачу «бухать» с настоящей фабрикой примитивов, если другая не передана */
 export function createDrinkTask(

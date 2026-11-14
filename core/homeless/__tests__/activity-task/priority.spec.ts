@@ -1,4 +1,4 @@
-import { createStubTask, planNames } from '@peetland/htn/dev';
+import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
@@ -28,51 +28,76 @@ function createActivityTask(unavailable: HomelessTaskName[] = []): HomelessActiv
 describe('HomelessActivityTask', () => {
   describe('Порядок методов', () => {
     it('Если можно бухать, планирует бухать', () => {
-      const names = planNames(createActivityTask(), NpcStateBuilder.default());
+      const tree = planTree(planSteps(createActivityTask(), NpcStateBuilder.default()) ?? []);
 
-      expect(names).toStrictEqual(['drink']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('get-drunk', 'drink', (method) => method.primitive('drink'))
+          .build()
+      );
     });
 
     it('Если бухать нельзя, планирует купить пойло', () => {
-      const names = planNames(createActivityTask(['drink']), NpcStateBuilder.default());
+      const tree = planTree(
+        planSteps(createActivityTask(['drink']), NpcStateBuilder.default()) ?? []
+      );
 
-      expect(names).toStrictEqual(['buy-booze']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('get-drunk', 'buy-booze', (method) => method.primitive('buy-booze'))
+          .build()
+      );
     });
 
     it('Если и купить пойло нельзя, планирует сдать бутылки', () => {
-      const names = planNames(
-        createActivityTask(['drink', 'buy-booze']),
-        NpcStateBuilder.default()
+      const tree = planTree(
+        planSteps(createActivityTask(['drink', 'buy-booze']), NpcStateBuilder.default()) ?? []
       );
 
-      expect(names).toStrictEqual(['sell-bottles']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('get-drunk', 'sell-bottles', (method) => method.primitive('sell-bottles'))
+          .build()
+      );
     });
 
     it('Если и сдать бутылки нельзя, планирует клянчить', () => {
-      const names = planNames(
-        createActivityTask(['drink', 'buy-booze', 'sell-bottles']),
-        NpcStateBuilder.default()
+      const tree = planTree(
+        planSteps(
+          createActivityTask(['drink', 'buy-booze', 'sell-bottles']),
+          NpcStateBuilder.default()
+        ) ?? []
       );
 
-      expect(names).toStrictEqual(['beg']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('get-drunk', 'beg', (method) => method.primitive('beg'))
+          .build()
+      );
     });
 
     it('Если и клянчить нельзя, планирует собирать бутылки', () => {
-      const names = planNames(
-        createActivityTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
-        NpcStateBuilder.default()
+      const tree = planTree(
+        planSteps(
+          createActivityTask(['drink', 'buy-booze', 'sell-bottles', 'beg']),
+          NpcStateBuilder.default()
+        ) ?? []
       );
 
-      expect(names).toStrictEqual(['collect-bottles']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('get-drunk', 'collect-bottles', (method) => method.primitive('collect-bottles'))
+          .build()
+      );
     });
 
     it('Если и собирать бутылки нельзя, план не составляется', () => {
-      const names = planNames(
+      const steps = planSteps(
         createActivityTask(['drink', 'buy-booze', 'sell-bottles', 'beg', 'collect-bottles']),
         NpcStateBuilder.default()
       );
 
-      expect(names).toBeNull();
+      expect(steps).toBeNull();
     });
   });
 });

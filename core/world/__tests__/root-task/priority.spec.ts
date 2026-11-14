@@ -1,4 +1,4 @@
-import { createStubTask, planNames } from '@peetland/htn/dev';
+import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
@@ -24,39 +24,57 @@ function createRootTask(unavailable: LayerName[] = []): RootTask {
 describe('RootTask', () => {
   describe('Порядок методов', () => {
     it('Если можно спланировать потребности, планирует потребности', () => {
-      const names = planNames(createRootTask(), NpcStateBuilder.default());
+      const tree = planTree(planSteps(createRootTask(), NpcStateBuilder.default()) ?? []);
 
-      expect(names).toStrictEqual(['needs']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('live', 'needs', (method) => method.primitive('needs'))
+          .build()
+      );
     });
 
     it('Если потребности спланировать нельзя, планирует зависимости', () => {
-      const names = planNames(createRootTask(['needs']), NpcStateBuilder.default());
+      const tree = planTree(planSteps(createRootTask(['needs']), NpcStateBuilder.default()) ?? []);
 
-      expect(names).toStrictEqual(['addictions']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('live', 'addictions', (method) => method.primitive('addictions'))
+          .build()
+      );
     });
 
     it('Если и зависимости спланировать нельзя, планирует деятельность', () => {
-      const names = planNames(createRootTask(['needs', 'addictions']), NpcStateBuilder.default());
+      const tree = planTree(
+        planSteps(createRootTask(['needs', 'addictions']), NpcStateBuilder.default()) ?? []
+      );
 
-      expect(names).toStrictEqual(['activity']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('live', 'activity', (method) => method.primitive('activity'))
+          .build()
+      );
     });
 
     it('Если и деятельность спланировать нельзя, планирует хобби', () => {
-      const names = planNames(
-        createRootTask(['needs', 'addictions', 'activity']),
-        NpcStateBuilder.default()
+      const tree = planTree(
+        planSteps(createRootTask(['needs', 'addictions', 'activity']), NpcStateBuilder.default()) ??
+          []
       );
 
-      expect(names).toStrictEqual(['hobbies']);
+      expect(tree).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('live', 'hobbies', (method) => method.primitive('hobbies'))
+          .build()
+      );
     });
 
     it('Если и хобби спланировать нельзя, план не составляется', () => {
-      const names = planNames(
+      const steps = planSteps(
         createRootTask(['needs', 'addictions', 'activity', 'hobbies']),
         NpcStateBuilder.default()
       );
 
-      expect(names).toBeNull();
+      expect(steps).toBeNull();
     });
   });
 });

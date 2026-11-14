@@ -1,4 +1,4 @@
-import { applyPlanEffects, planNames } from '@peetland/htn/dev';
+import { applyPlanEffects, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
@@ -9,11 +9,17 @@ import { createPurchaseTask } from '../../dev';
 describe('PurchaseTask', () => {
   describe('Метод pay', () => {
     describe('Задачи', () => {
-      it('Планирует заплатить, отнять деньги и добавить предмет', () => {
+      it('Планирует заплатить, отнять деньги и добавить предмет одной транзакцией: если NPC заплатил, он не уйдёт без предмета', () => {
         const task = createPurchaseTask({ price: 100 });
         const state = new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build();
 
-        expect(planNames(task, state)).toStrictEqual(['play-animation', 'remove-item', 'add-item']);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .transaction('purchase', 'pay', (pay) =>
+              pay.primitive('play-animation').primitive('remove-item').primitive('add-item')
+            )
+            .build()
+        );
       });
 
       it('Платит с анимацией оплаты', () => {

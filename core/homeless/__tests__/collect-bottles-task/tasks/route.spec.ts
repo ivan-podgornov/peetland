@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
@@ -7,28 +7,35 @@ import { createPlace } from '@peetland/places/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../../dev';
+import {
+  buildPocketBottle,
+  createCollectBottlesTask,
+  createPlacesWithTrashBins,
+} from '../../../dev';
 import { MAX_BOTTLES } from '../../../src/constants';
 
 describe('CollectBottlesTask', () => {
   describe('Метод search-random-trash-bin', () => {
     describe('Задачи', () => {
-      it('Планирует дойти до мусорки, повернуться к ней, начать рыться, найти бутылки и перестать рыться', () => {
+      it('Планирует дойти до мусорки, повернуться к ней, начать рыться, найти бутылку, забрать её одной транзакцией и перестать рыться', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 })
           .build();
 
-        expect(planNames(task, state)).toStrictEqual([
-          'go-to-coords',
-          'achieve-angle',
-          'play-animation',
-          'parallel',
-          'play-animation',
-          'add-item',
-          'psyche-react',
-          'play-animation',
-        ]);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('collect-bottles', 'search-random-trash-bin', (collect) =>
+              buildPocketBottle(
+                collect
+                  .primitive('go-to-coords')
+                  .primitive('achieve-angle')
+                  .primitive('play-animation')
+                  .primitive('parallel')
+              ).primitive('play-animation')
+            )
+            .build()
+        );
       });
 
       it('Выбирает случайную мусорку из всех мусорок', () => {

@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { PlaceType } from '@peetland/places';
@@ -17,20 +17,20 @@ describe('CollectBottlesTask', () => {
           .withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 })
           .build();
 
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если у NPC MAX_BOTTLES бутылок, план не составляется', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
         const state = new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES }).build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если мусорок нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-        expect(planNames(createCollectBottlesTask(places), NpcStateBuilder.default())).toBeNull();
+        expect(planSteps(createCollectBottlesTask(places), NpcStateBuilder.default())).toBeNull();
       });
 
       it('Ищет мусорки среди мест типа PlaceType.TrashBin', () => {

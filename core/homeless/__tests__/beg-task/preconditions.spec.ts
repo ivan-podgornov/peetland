@@ -1,4 +1,4 @@
-import { planNames } from '@peetland/htn/dev';
+import { planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -30,7 +30,7 @@ describe('BegTask', () => {
           })
           .build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если стыд достиг BEGGING_SHAME_LIMIT, план не составляется', () => {
@@ -39,13 +39,13 @@ describe('BegTask', () => {
           .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build())
           .build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если мест для клянчанья нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
-        expect(planNames(createBegTask(places), NpcStateBuilder.default())).toBeNull();
+        expect(planSteps(createBegTask(places), NpcStateBuilder.default())).toBeNull();
       });
 
       it('Если по ожиданию психики NPC успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, планирует клянчить', () => {
@@ -56,7 +56,7 @@ describe('BegTask', () => {
           .build();
 
         // 30 попыток на удачу по 0.5 стыда: перед четырьмя удачами стыд 0, 15, 30, 45
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если по ожиданию психики NPC не успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, план не составляется', () => {
@@ -67,7 +67,7 @@ describe('BegTask', () => {
           .build();
 
         // 60 попыток на удачу по 0.5 стыда: перед третьей удачей стыд уже 60
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
     });
   });

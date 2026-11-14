@@ -160,3 +160,38 @@ primitive_tasks:
       name: string
     effects: []
 ```
+
+## Для тестов
+
+Точка входа `@peetland/htn/dev` даёт помощники, которыми тесты задач проверяют план. Своих матчеров
+нет: план переводится в простые данные, а сравнивают их обычные `toStrictEqual` и `toContainEqual`.
+
+- `planSteps(root, state)` — составляет план и возвращает его шаги или `null`, если план составить
+  нельзя, а `plan` — его задачи.
+- `planTree(steps)` — структура плана: дерево, в котором составные задачи — с выбранным методом,
+  признаком транзакции и детьми, а примитивные — их имена.
+- `PlanStructureBuilder` — собирает ожидаемую структуру плана для сравнения с `planTree`:
+  `primitive(name)`, `compound(name, method, build)` и `transaction(name, method, build)`. Детей
+  составной задачи собирает функция `build`: она получает новый билдер и возвращает его.
+- `planTransactions(steps)` — имена задач каждой транзакции плана по порядку.
+
+```ts
+import { PlanStructureBuilder, planSteps, planTransactions, planTree } from '@peetland/htn/dev';
+
+const steps = planSteps(task, state) ?? [];
+
+expect(planTree(steps)).toStrictEqual(
+  new PlanStructureBuilder()
+    .compound('sell-bottles', 'sell-in-nearest-collection', (sell) =>
+      sell
+        .primitive('go-to-coords')
+        .transaction('hand-over-bottles', 'hand-over-bottles', (handOver) =>
+          handOver.primitive('remove-item').primitive('add-item')
+        )
+    )
+    .build()
+);
+expect(planTransactions(steps)).toContainEqual(['remove-item', 'add-item']);
+```
+
+Задачи сравниваются по именам, поэтому параметры задач проверяются моками фабрик задач.

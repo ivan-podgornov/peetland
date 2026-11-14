@@ -57,7 +57,7 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
       throw new Error(`Can't update, because execution is already ${this.status}`);
     }
 
-    if (this.softStopRequested && this.isInterruptible()) {
+    if (this.softStopRequested && this.canStop()) {
       this.stop(context);
       return this.status;
     }
@@ -115,10 +115,11 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   }
 
   /**
-   * Проверяет, можно ли прервать выполнение, не сломав транзакцию: текущая задача вне транзакции
-   * или транзакция ещё не началась
+   * Проверяет, можно ли остановить выполнение, не сломав транзакцию. Можно, если текущая задача
+   * вне транзакции или если с неё транзакция только начинается и задача ещё не началась. Нельзя,
+   * если задача транзакции идёт или если она ещё не началась, но продолжает транзакцию предыдущей
    */
-  private isInterruptible(): boolean {
+  private canStop(): boolean {
     const current = this.currentStep;
 
     if (!this.isPartOfTransaction(current)) {
@@ -129,7 +130,7 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
       return false;
     }
 
-    // Задача ещё не началась: прервать можно, если с неё транзакция только начинается
+    // Задача ещё не началась: остановить можно, если с неё транзакция только начинается
     const previous = this.steps[this.currentTaskIndex - 1];
 
     return !previous || !this.isPartOfSameTransaction(previous, current);

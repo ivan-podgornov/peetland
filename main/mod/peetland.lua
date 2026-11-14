@@ -7254,12 +7254,12 @@ function Planner.prototype.decompose(self, tasks, state)
     local ____tasks_0 = tasks
     local head = ____tasks_0[1]
     local tail = __TS__ArraySlice(____tasks_0, 1)
-    if not (head and head.task) then
+    if not head then
         return {}
     end
-    local ____head_3 = head
-    local task = ____head_3.task
-    local isPartOf = ____head_3.isPartOf
+    local ____head_1 = head
+    local task = ____head_1.task
+    local isPartOf = ____head_1.isPartOf
     if isPrimitive(task) then
         if not task:canExecute(state) then
             return nil

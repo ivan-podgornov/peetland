@@ -16,7 +16,10 @@ export function getDefaultDeps<TState, TContext>(): HTNDeps<TState, TContext> {
   };
 }
 
-/** HTN-агент: планирует корневую задачу, исполняет план и перепланирует, когда план закончился */
+/**
+ * HTN-агент: планирует корневую задачу, исполняет план и перепланирует, когда план закончился или
+ * когда его мягко остановили
+ */
 export interface IHTN<TState, TContext> {
   /**
    * Продвигает исполнение плана с актуальным состоянием. Если плана нет, потому что он ещё не
@@ -26,6 +29,13 @@ export interface IHTN<TState, TContext> {
 
   /** Останавливает исполнение текущего плана. Контекст передаётся задаче, которую останавливают */
   stop(context: TContext): void;
+
+  /**
+   * Мягко останавливает текущий план: просит исполнителя остановить его на ближайшей безопасной
+   * границе (см. IExecutor.softStop) и ничего не ждёт. Когда исполнитель остановился, агент в том
+   * же update составляет новый план. Если плана нет, останавливать нечего, и ничего не происходит
+   */
+  softStop(): void;
 }
 
 export class HTN<TState, TContext> implements IHTN<TState, TContext> {
@@ -62,6 +72,11 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
     if (status !== 'running') {
       this.executor = null;
     }
+
+    // Исполнитель мягко остановился и в этом update ничего не делал: новый план составляется сразу
+    if (status === 'stopped') {
+      this.update(state, context);
+    }
   }
 
   stop(context: TContext) {
@@ -71,5 +86,9 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
 
     this.executor.stop(context);
     this.executor = null;
+  }
+
+  softStop() {
+    this.executor?.softStop();
   }
 }

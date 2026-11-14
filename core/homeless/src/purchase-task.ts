@@ -19,10 +19,13 @@ export type PurchaseTaskDeps = {
 
 /**
  * Купить предмет там, где NPC стоит: заплатить и получить предмет. Деньги и предмет меняются, только
- * когда NPC расплатился. Купить можно, только если денег хватает
+ * когда NPC расплатился. Купить можно, только если денег хватает. Покупка — транзакция: если NPC
+ * заплатил, он не уйдёт без предмета
  */
 export class PurchaseTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'purchase';
+
+  readonly transaction = true;
 
   readonly methods: Method<NpcState, NpcContext>[];
 

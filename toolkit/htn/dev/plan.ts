@@ -1,4 +1,4 @@
-import type { PrimitiveTask, Task } from '../src';
+import type { PlanStep, PrimitiveTask, Task } from '../src';
 import { Planner } from '../src/planner';
 
 /** Составляет план корневой задачи и возвращает его задачи без транзакций */
@@ -9,6 +9,14 @@ export function plan<TState, TContext>(
   const steps = new Planner<TState>().plan(root, state);
 
   return steps && steps.map((step) => step.task);
+}
+
+/** Составляет план корневой задачи и возвращает его шаги (см. PlanStep) */
+export function planSteps<TState, TContext>(
+  root: Task<TState, TContext>,
+  state: TState
+): PlanStep<TState, TContext>[] | null {
+  return new Planner<TState>().plan(root, state);
 }
 
 /** Возвращает названия задач плана или null, если план составить нельзя */

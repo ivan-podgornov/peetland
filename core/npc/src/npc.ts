@@ -3,7 +3,12 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTN, IHTNFactory } from '@peetland/htn';
 import type { IInventoryFactory, Inventory } from '@peetland/inventory';
-import type { INeeds, INeedsFactory } from '@peetland/needs';
+import type {
+  INeeds,
+  INeedsFactory,
+  IUrgencyWatcher,
+  IUrgencyWatcherFactory,
+} from '@peetland/needs';
 import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
@@ -24,6 +29,8 @@ export type NpcDeps = {
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой NPC создаёт свои потребности */
   needsFactory: INeedsFactory;
+  /** Фабрика, которой NPC создаёт наблюдателя, который следит, когда потребности становятся срочными */
+  urgencyWatcherFactory: IUrgencyWatcherFactory;
   /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
   rootTaskFactory: IRootTaskFactory;
   /** Сообщает о каждом тике мира */
@@ -46,6 +53,7 @@ export class Npc {
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
   private readonly lifetime: AbortController;
+  private readonly urgencyWatcher: IUrgencyWatcher;
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
@@ -63,6 +71,7 @@ export class Npc {
       inventoryFactory,
       psycheFactory,
       needsFactory,
+      urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
       worldKnowledge,
@@ -74,6 +83,7 @@ export class Npc {
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
     this.needs = needsFactory.create(data.needs, worldKnowledge.getState().time);
+    this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({
       modelId: data.modelId,
@@ -88,9 +98,7 @@ export class Npc {
     };
     this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
-    ticks.subscribe(() => this.htn.update(this.getState(), this.context), {
-      signal: this.lifetime.signal,
-    });
+    ticks.subscribe(() => this.tick(), { signal: this.lifetime.signal });
 
     if (gameSignal.aborted) {
       this.despawn();
@@ -118,6 +126,21 @@ export class Npc {
       },
       world: this.worldKnowledge.getState(),
     };
+  }
+
+  /**
+   * Продвигает HTN-агента на тик. Если потребность только что стала срочной, сначала мягко
+   * останавливает текущий план: так агент доделает транзакции и перепланирует, и слой потребностей
+   * успеет её удовлетворить
+   */
+  private tick(): void {
+    const state = this.getState();
+
+    if (this.urgencyWatcher.check(state.self.needs, state.world.time)) {
+      this.htn.softStop();
+    }
+
+    this.htn.update(state, this.context);
   }
 
   /**

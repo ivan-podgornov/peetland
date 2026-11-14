@@ -1,10 +1,14 @@
 import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedHTNFactory } from '@peetland/htn/dev';
+import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
-import { Needs } from '@peetland/needs';
-import { createMockedNeedsFactory } from '@peetland/needs/dev';
+import { NEED_DEFINITIONS, Need, Needs } from '@peetland/needs';
+import {
+  createMockedNeedsFactory,
+  createMockedUrgencyWatcherFactory,
+  createNeedValues,
+} from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
@@ -91,6 +95,37 @@ describe('NpcFactory', () => {
       const npc = factory.create(createNpcData());
 
       expect(npc.psyche).toBeInstanceOf(Psyche);
+    });
+
+    it('NPC создаёт наблюдателя срочности фабрикой urgencyWatcherFactory из зависимостей', () => {
+      const urgencyWatcherFactory = createMockedUrgencyWatcherFactory();
+      const factory = new NpcFactory(createRequiredDeps({ urgencyWatcherFactory }));
+
+      factory.create(createNpcData());
+
+      expect(urgencyWatcherFactory.create).toHaveBeenCalledOnce();
+    });
+
+    it('Если urgencyWatcherFactory не передана, при срочной потребности NPC мягко останавливает план', () => {
+      const ticks = createControlledObservable();
+      const htn = createMockedHTN<NpcState, NpcContext>();
+      const factory = new NpcFactory(
+        createRequiredDeps({
+          ticks: ticks.observable,
+          htnFactory: createMockedHTNFactory(htn),
+        })
+      );
+      factory.create(
+        createNpcData({
+          needs: createNeedValues({
+            [Need.Satiety]: NEED_DEFINITIONS[Need.Satiety].urgentBelow - 1,
+          }),
+        })
+      );
+
+      ticks.subscriber.next(undefined);
+
+      expect(htn.softStop).toHaveBeenCalledOnce();
     });
 
     it('Если needsFactory не передана, NPC получает экземпляр Needs', () => {

@@ -1,5 +1,4 @@
-import { findTransaction } from './plan';
-import type { PlanStep } from './plan';
+import type { PlanNode, PlanStep } from './plan';
 import type { PrimitiveTask, TaskResult } from './task';
 
 /** Статус выполнения задачи */
@@ -12,14 +11,16 @@ export interface IExecutor<TState, TContext> {
   /** Останавливает выполнение */
   stop(context: TContext): void;
 
+  /**
+   * Просит остановить выполнение на ближайшей безопасной границе плана и ничего не ждёт. На
+   * следующем update, если текущая задача вне транзакции или транзакция ещё не началась (см.
+   * CompoundTask.transaction), исполнитель останавливает выполнение и возвращает 'stopped'. Если
+   * транзакция идёт, исполняет план дальше и останавливается, когда она кончится
+   */
+  softStop(): void;
+
   /** Возвращает задачу, которая выполняется в данный момент */
   get currentTask(): PrimitiveTask<TState, TContext> | null;
-
-  /**
-   * Возвращает, можно ли сейчас прервать выполнение, не сломав транзакцию: текущая задача вне
-   * транзакции или транзакция ещё не началась
-   */
-  get interruptible(): boolean;
 }
 
 export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
@@ -27,6 +28,7 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   private readonly steps: readonly PlanStep<TState, TContext>[];
   private status: ExecuteStatus;
   private taskStarted: boolean;
+  private softStopRequested: boolean;
 
   /**
    * Создаёт исполнителя для указанного плана. Предполагается, что на вход будет приходить план,
@@ -43,32 +45,21 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     this.currentTaskIndex = 0;
     this.status = 'idle';
     this.taskStarted = false;
+    this.softStopRequested = false;
   }
 
   get currentTask(): PrimitiveTask<TState, TContext> {
     return this.currentStep.task;
   }
 
-  get interruptible(): boolean {
-    const transaction = findTransaction(this.currentStep);
-
-    if (!transaction) {
-      return true;
-    }
-
-    if (this.taskStarted) {
-      return false;
-    }
-
-    // Задача ещё не началась: прервать можно, если с неё транзакция только начинается
-    const previous = this.steps[this.currentTaskIndex - 1];
-
-    return !previous || findTransaction(previous) !== transaction;
-  }
-
-  update(state: TState, context: TContext): TaskResult {
+  update(state: TState, context: TContext): ExecuteStatus {
     if (!this.canTouchTask()) {
       throw new Error(`Can't update, because execution is already ${this.status}`);
+    }
+
+    if (this.softStopRequested && this.isInterruptible()) {
+      this.stop(context);
+      return this.status;
     }
 
     this.status = this.taskStarted
@@ -108,6 +99,10 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     }
   }
 
+  softStop() {
+    this.softStopRequested = true;
+  }
+
   private get currentStep(): PlanStep<TState, TContext> {
     const step = this.steps[this.currentTaskIndex];
 
@@ -117,6 +112,62 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     }
 
     return step;
+  }
+
+  /**
+   * Проверяет, можно ли прервать выполнение, не сломав транзакцию: текущая задача вне транзакции
+   * или транзакция ещё не началась
+   */
+  private isInterruptible(): boolean {
+    const current = this.currentStep;
+
+    if (!this.isPartOfTransaction(current)) {
+      return true;
+    }
+
+    if (this.taskStarted) {
+      return false;
+    }
+
+    // Задача ещё не началась: прервать можно, если с неё транзакция только начинается
+    const previous = this.steps[this.currentTaskIndex - 1];
+
+    return !previous || !this.isPartOfSameTransaction(previous, current);
+  }
+
+  /** Проверяет, запланирован ли шаг частью транзакции */
+  private isPartOfTransaction(step: PlanStep<TState, TContext>): boolean {
+    return this.findTransaction(step) !== null;
+  }
+
+  /**
+   * Проверяет, запланированы ли шаги частью одной транзакции. Одна транзакция, запланированная
+   * дважды, — две разные транзакции, поэтому сравниваются узлы транзакций, а не задачи
+   */
+  private isPartOfSameTransaction(
+    first: PlanStep<TState, TContext>,
+    second: PlanStep<TState, TContext>
+  ): boolean {
+    const transaction = this.findTransaction(first);
+
+    return transaction !== null && transaction === this.findTransaction(second);
+  }
+
+  /**
+   * Возвращает узел транзакции, частью которой запланирован шаг: самый внешний узел в цепочке
+   * isPartOf, задача которого — транзакция, или null. Поэтому транзакция внутри транзакции — часть
+   * внешней
+   */
+  private findTransaction(step: PlanStep<TState, TContext>): PlanNode<TState, TContext> | null {
+    let transaction: PlanNode<TState, TContext> | null = null;
+
+    for (let node = step.isPartOf; node; node = node.isPartOf) {
+      if (node.task.transaction) {
+        transaction = node;
+      }
+    }
+
+    return transaction;
   }
 
   /** Начинает выполнение задачи */

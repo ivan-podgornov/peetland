@@ -18,7 +18,7 @@ export function getDefaultDeps<TState, TContext>(): HTNDeps<TState, TContext> {
 
 /**
  * HTN-агент: планирует корневую задачу, исполняет план и перепланирует, когда план закончился или
- * когда его попросили
+ * когда его мягко остановили
  */
 export interface IHTN<TState, TContext> {
   /**
@@ -31,12 +31,11 @@ export interface IHTN<TState, TContext> {
   stop(context: TContext): void;
 
   /**
-   * Просит перепланировать на ближайшей безопасной границе плана и ничего не ждёт. На следующем
-   * update, если текущая задача вне транзакции, агент останавливает план и в том же update
-   * составляет новый. Если внутри транзакции, исполняет план дальше, пока транзакция не кончится
-   * (см. CompoundTask.transaction). Повторные просьбы до перепланирования ничего не меняют
+   * Мягко останавливает текущий план: просит исполнителя остановить его на ближайшей безопасной
+   * границе (см. IExecutor.softStop) и ничего не ждёт. Когда исполнитель остановился, агент в том
+   * же update составляет новый план. Если плана нет, останавливать нечего, и ничего не происходит
    */
-  requestReplan(): void;
+  softStop(): void;
 }
 
 export class HTN<TState, TContext> implements IHTN<TState, TContext> {
@@ -45,7 +44,6 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
   private readonly root: Task<TState, TContext>;
 
   private executor: IExecutor<TState, TContext> | null;
-  private replanRequested: boolean;
 
   constructor(
     root: Task<TState, TContext>,
@@ -55,20 +53,12 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
     this.planner = deps.plannerFactory();
     this.root = root;
     this.executor = null;
-    this.replanRequested = false;
   }
 
   update(state: TState, context: TContext) {
-    if (this.replanRequested && this.executor?.interruptible) {
-      this.executor.stop(context);
-      this.executor = null;
-    }
-
     if (!this.executor) {
       const { executorFactory } = this.deps;
       const steps = this.planner.plan(this.root, state);
-
-      this.replanRequested = false;
 
       if (!steps) {
         return;
@@ -82,6 +72,11 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
     if (status !== 'running') {
       this.executor = null;
     }
+
+    // Исполнитель мягко остановился и в этом update ничего не делал: новый план составляется сразу
+    if (status === 'stopped') {
+      this.update(state, context);
+    }
   }
 
   stop(context: TContext) {
@@ -93,7 +88,7 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
     this.executor = null;
   }
 
-  requestReplan() {
-    this.replanRequested = true;
+  softStop() {
+    this.executor?.softStop();
   }
 }

@@ -1,10 +1,10 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { IExecutor } from '../src/executor';
+import type { ExecuteStatus, IExecutor } from '../src/executor';
 import type { PlanNode, PlanStep } from '../src/plan';
 import type { IPlanner } from '../src/planner';
-import type { CompoundTask, PrimitiveTask, Method, Task, TaskResult } from '../src/task';
+import type { CompoundTask, PrimitiveTask, Method, Task } from '../src/task';
 
 export type TestState = { canExecute: boolean; counter: number };
 
@@ -164,16 +164,13 @@ export function getDummyPlanner(
   return { plan: vi.fn().mockReturnValueOnce(first).mockReturnValue(second) };
 }
 
-/**
- * Создаёт исполнителя, который всегда возвращает переданный результат. Прервать его можно, пока
- * тест не поменяет interruptible
- */
+/** Создаёт исполнителя, который всегда возвращает переданный результат */
 export function getDummyExecutor(
-  taskResult: TaskResult
-): IExecutor<TestState, TestContext> & { interruptible: boolean } {
+  taskResult: ExecuteStatus
+): Mocked<IExecutor<TestState, TestContext>> {
   return {
     currentTask: null,
-    interruptible: true,
+    softStop: vi.fn(),
     update: vi.fn().mockReturnValue(taskResult),
     stop: vi.fn().mockReturnValue(taskResult),
   };

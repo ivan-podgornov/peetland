@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { SatisfyHungerTask, SatisfyNeedsTask, SatisfyNeedsTaskFactory } from '../src';
+import { SatisfyNeedsTask, SatisfyNeedsTaskFactory } from '../src';
+import { SatisfyHungerTask } from '../src/satisfy-hunger-task';
 
 describe('SatisfyNeedsTaskFactory', () => {
   describe('#satisfyNeeds', () => {

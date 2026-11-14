@@ -1,4 +1,6 @@
 import type { IGeometry } from '@peetland/geometry';
+import { SatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
+import type { ISatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
 import type { IRootTaskFactory, NpcKind } from '@peetland/npc';
 import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
@@ -7,7 +9,6 @@ import type { ITimer } from '@peetland/timings';
 import { ActivityTaskFactory } from './activity-task-factory';
 import { AddictionsTaskFactory } from './addictions-task-factory';
 import { HobbiesTaskFactory } from './hobbies-task-factory';
-import { NeedsTaskFactory } from './needs-task-factory';
 import { RootTask } from './root-task';
 import type { ILayerTaskFactory } from './types';
 
@@ -17,8 +18,11 @@ export type RootTaskFactoryDeps = {
   places: IPlaces;
   random: IRandom;
   timer: ITimer;
-  /** Фабрика слоя потребностей. По умолчанию — NeedsTaskFactory */
-  needsTaskFactory?: ILayerTaskFactory;
+  /**
+   * Фабрика задач удовлетворения потребностей, которой создаётся слой потребностей. По умолчанию —
+   * SatisfyNeedsTaskFactory
+   */
+  satisfyNeedsTaskFactory?: ISatisfyNeedsTaskFactory;
   /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
   addictionsTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
@@ -29,7 +33,7 @@ export type RootTaskFactoryDeps = {
 
 /** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
-  private readonly needsTaskFactory: ILayerTaskFactory;
+  private readonly satisfyNeedsTaskFactory: ISatisfyNeedsTaskFactory;
   private readonly addictionsTaskFactory: ILayerTaskFactory;
   private readonly activityTaskFactory: ILayerTaskFactory;
   private readonly hobbiesTaskFactory: ILayerTaskFactory;
@@ -40,7 +44,7 @@ export class RootTaskFactory implements IRootTaskFactory {
       places,
       random,
       timer,
-      needsTaskFactory = new NeedsTaskFactory(),
+      satisfyNeedsTaskFactory = new SatisfyNeedsTaskFactory(),
       addictionsTaskFactory = new AddictionsTaskFactory(),
       activityTaskFactory = new ActivityTaskFactory({
         geometry,
@@ -51,18 +55,23 @@ export class RootTaskFactory implements IRootTaskFactory {
       hobbiesTaskFactory = new HobbiesTaskFactory(),
     } = deps;
 
-    this.needsTaskFactory = needsTaskFactory;
+    this.satisfyNeedsTaskFactory = satisfyNeedsTaskFactory;
     this.addictionsTaskFactory = addictionsTaskFactory;
     this.activityTaskFactory = activityTaskFactory;
     this.hobbiesTaskFactory = hobbiesTaskFactory;
   }
 
   create(kind: NpcKind): RootTask {
-    const { needsTaskFactory, addictionsTaskFactory, activityTaskFactory, hobbiesTaskFactory } =
-      this;
+    const {
+      satisfyNeedsTaskFactory,
+      addictionsTaskFactory,
+      activityTaskFactory,
+      hobbiesTaskFactory,
+    } = this;
 
     return new RootTask({
-      needs: needsTaskFactory.create(kind),
+      // Задачи удовлетворения потребностей одинаковые для всех типов NPC
+      needs: satisfyNeedsTaskFactory.satisfyNeeds(),
       addictions: addictionsTaskFactory.create(kind),
       activity: activityTaskFactory.create(kind),
       hobbies: hobbiesTaskFactory.create(kind),

@@ -1,6 +1,8 @@
 import { Geometry } from '@peetland/geometry';
 import { HomelessActivityTask } from '@peetland/homeless';
 import { createStubTask, methodTasks } from '@peetland/htn/dev';
+import { SatisfyNeedsTask } from '@peetland/needs-tasks';
+import { createMockedSatisfyNeedsTaskFactory } from '@peetland/needs-tasks/dev';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -38,13 +40,13 @@ describe('RootTaskFactory', () => {
       expect(task).toBeInstanceOf(RootTask);
     });
 
-    it('Создаёт слой потребностей фабрикой needsTaskFactory с типом NPC', () => {
-      const needsTaskFactory = createLayerTaskFactory('needs');
-      const factory = new RootTaskFactory(createDeps({ needsTaskFactory }));
+    it('Создаёт слой потребностей фабрикой satisfyNeedsTaskFactory', () => {
+      const satisfyNeedsTaskFactory = createMockedSatisfyNeedsTaskFactory();
+      const factory = new RootTaskFactory(createDeps({ satisfyNeedsTaskFactory }));
 
       factory.create(NpcKind.Homeless);
 
-      expect(needsTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
+      expect(satisfyNeedsTaskFactory.satisfyNeeds).toHaveBeenCalledOnce();
     });
 
     it('Создаёт слой зависимостей фабрикой addictionsTaskFactory с типом NPC', () => {
@@ -80,6 +82,14 @@ describe('RootTaskFactory', () => {
       const task = factory.create(NpcKind.Homeless);
 
       expect(methodTasks(task, 'activity')).toStrictEqual([expect.any(HomelessActivityTask)]);
+    });
+
+    it('Если satisfyNeedsTaskFactory не передана, слой потребностей — экземпляр SatisfyNeedsTask', () => {
+      const factory = new RootTaskFactory(createDeps());
+
+      const task = factory.create(NpcKind.Homeless);
+
+      expect(methodTasks(task, 'needs')).toStrictEqual([expect.any(SatisfyNeedsTask)]);
     });
   });
 });

@@ -20,10 +20,10 @@
 Слой потребностей — задача удовлетворить срочные потребности (`SatisfyNeedsTask` из
 `@peetland/needs-tasks`). Пока утолить голод нечем, поэтому NPC занят своей деятельностью.
 
-Каждый слой создаёт своя фабрика слоя `ILayerTaskFactory` по типу NPC: `NeedsTaskFactory`,
-`AddictionsTaskFactory`, `ActivityTaskFactory` и `HobbiesTaskFactory`. Задачи удовлетворения
-одинаковые для всех типов NPC, поэтому `NeedsTaskFactory` тип NPC не нужен: слой она берёт у фабрики
-`ISatisfyNeedsTaskFactory` из `@peetland/needs-tasks`. Деятельность
+Слой потребностей создаёт фабрика задач удовлетворения `ISatisfyNeedsTaskFactory` из
+`@peetland/needs-tasks`: задачи удовлетворения одинаковые для всех типов NPC, поэтому тип NPC ей не
+нужен. Остальные слои создаёт своя фабрика слоя `ILayerTaskFactory` по типу NPC:
+`AddictionsTaskFactory`, `ActivityTaskFactory` и `HobbiesTaskFactory`. Деятельность
 `ActivityTaskFactory` по типу NPC берёт у фабрики деятельности этого типа (`IActivityTaskFactory`
 из `@peetland/npc`), например у `HomelessActivityTaskFactory` из `@peetland/homeless`. Любую
 фабрику слоя и фабрику деятельности типа можно передать в зависимостях вместо фабрики по

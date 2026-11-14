@@ -7052,6 +7052,7 @@ function Executor.prototype.____constructor(self, steps)
     self.currentTaskIndex = 0
     self.status = "idle"
     self.taskStarted = false
+    self.softStopRequested = false
 end
 function Executor.prototype.update(self, state, context)
     if not self:canTouchTask() then
@@ -7059,6 +7060,10 @@ function Executor.prototype.update(self, state, context)
             __TS__New(Error, "Can't update, because execution is already " .. self.status),
             0
         )
+    end
+    if self.softStopRequested and self:canStop() then
+        self:stop(context)
+        return self.status
     end
     self.status = self.taskStarted and self.currentTask:update(state, context) or self:start(state, context)
     if self.status == "failed" then
@@ -7086,6 +7091,37 @@ function Executor.prototype.stop(self, context)
         self.currentTask:stop(context)
     end
 end
+function Executor.prototype.softStop(self)
+    self.softStopRequested = true
+end
+function Executor.prototype.canStop(self)
+    local current = self.currentStep
+    if not self:isPartOfTransaction(current) then
+        return true
+    end
+    if self.taskStarted then
+        return false
+    end
+    local previous = self.steps[self.currentTaskIndex]
+    return not previous or not self:isPartOfSameTransaction(previous, current)
+end
+function Executor.prototype.isPartOfTransaction(self, step)
+    return self:findTransaction(step.isPartOf) ~= nil
+end
+function Executor.prototype.isPartOfSameTransaction(self, first, second)
+    local transaction = self:findTransaction(first.isPartOf)
+    return transaction ~= nil and transaction == self:findTransaction(second.isPartOf)
+end
+function Executor.prototype.findTransaction(self, node)
+    if not node then
+        return nil
+    end
+    local outer = self:findTransaction(node.isPartOf)
+    if outer then
+        return outer
+    end
+    return node.task.transaction and node or nil
+end
 function Executor.prototype.start(self, state, context)
     if not self.currentTask:canExecute(state) then
         return "failed"
@@ -7101,6 +7137,14 @@ __TS__SetDescriptor(
     Executor.prototype,
     "currentTask",
     {get = function(self)
+        return self.currentStep.task
+    end},
+    true
+)
+__TS__SetDescriptor(
+    Executor.prototype,
+    "currentStep",
+    {get = function(self)
         local step = self.steps[self.currentTaskIndex + 1]
         if not step then
             local message = ((("Current task' index (" .. tostring(self.currentTaskIndex)) .. ") must be in range of tasks length (") .. tostring(#self.steps)) .. ")"
@@ -7109,7 +7153,7 @@ __TS__SetDescriptor(
                 0
             )
         end
-        return step.task
+        return step
     end},
     true
 )
@@ -7239,6 +7283,9 @@ function HTN.prototype.update(self, state, context)
     if status ~= "running" then
         self.executor = nil
     end
+    if status == "stopped" then
+        self:update(state, context)
+    end
 end
 function HTN.prototype.stop(self, context)
     if not self.executor then
@@ -7246,6 +7293,12 @@ function HTN.prototype.stop(self, context)
     end
     self.executor:stop(context)
     self.executor = nil
+end
+function HTN.prototype.softStop(self)
+    local ____opt_1 = self.executor
+    if ____opt_1 ~= nil then
+        ____opt_1:softStop()
+    end
 end
 return ____exports
  end,
@@ -7373,6 +7426,26 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
+["toolkit.htn.src.transaction-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Транзакция из задач, которые нельзя разорвать: составная задача с одним методом, который всегда
+-- подходит и выполняет задачи по очереди (см. CompoundTask.transaction)
+____exports.TransactionTask = __TS__Class()
+local TransactionTask = ____exports.TransactionTask
+TransactionTask.name = "TransactionTask"
+function TransactionTask.prototype.____constructor(self, name, tasks)
+    self.transaction = true
+    self.name = name
+    self.methods = {{
+        name = name,
+        preconditions = function() return true end,
+        tasks = tasks
+    }}
+end
+return ____exports
+ end,
 ["toolkit.htn.src.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -7387,6 +7460,10 @@ end
 do
     local ____parallel_2Dtask = require("toolkit.htn.src.parallel-task")
     ____exports.ParallelTask = ____parallel_2Dtask.ParallelTask
+end
+do
+    local ____transaction_2Dtask = require("toolkit.htn.src.transaction-task")
+    ____exports.TransactionTask = ____transaction_2Dtask.TransactionTask
 end
 return ____exports
  end,
@@ -8168,12 +8245,14 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 --- Купить предмет там, где NPC стоит: заплатить и получить предмет. Деньги и предмет меняются, только
--- когда NPC расплатился. Купить можно, только если денег хватает
+-- когда NPC расплатился. Купить можно, только если денег хватает. Покупка — транзакция: если NPC
+-- заплатил, он не уйдёт без предмета
 ____exports.PurchaseTask = __TS__Class()
 local PurchaseTask = ____exports.PurchaseTask
 PurchaseTask.name = "PurchaseTask"
 function PurchaseTask.prototype.____constructor(self, options, deps)
     self.name = "purchase"
+    self.transaction = true
     local ____options_0 = options
     local item = ____options_0.item
     local count = ____options_0.count
@@ -8462,8 +8541,11 @@ return ____exports
 ["core.homeless.src.collect-bottles-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local __TS__ArrayPush = ____lualib.__TS__ArrayPush
 local ____exports = {}
+local ____htn = require("toolkit.htn.src.index")
+local TransactionTask = ____htn.TransactionTask
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
@@ -8517,9 +8599,15 @@ function CollectBottlesTask.prototype.searchRandomTrashBin(self, state)
                     main = npcTaskFactory:tryLuck({chance = BOTTLE_FIND_CHANCE}),
                     background = npcTaskFactory:playAnimation({animation = "trash-search"})
                 }),
-                npcTaskFactory:playAnimation({animation = "trash-search-pocket"}),
-                npcTaskFactory:addItem({item = Item.Bottles, count = 1}),
-                npcTaskFactory:psycheReact({deed = Deed.BottleFound})
+                __TS__New(
+                    TransactionTask,
+                    "pocket-bottle",
+                    {
+                        npcTaskFactory:playAnimation({animation = "trash-search-pocket"}),
+                        npcTaskFactory:addItem({item = Item.Bottles, count = 1}),
+                        npcTaskFactory:psycheReact({deed = Deed.BottleFound})
+                    }
+                )
             )
             index = index + 1
         end
@@ -8537,15 +8625,17 @@ return ____exports
 ["core.homeless.src.drink-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
 local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local hasBooze
+local ____htn = require("toolkit.htn.src.index")
+local TransactionTask = ____htn.TransactionTask
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
@@ -8562,25 +8652,29 @@ function DrinkTask.prototype.____constructor(self, deps)
     self.name = "drink"
     local ____deps_0 = deps
     local npcTaskFactory = ____deps_0.npcTaskFactory
-    local drink = {
-        npcTaskFactory:playAnimation({animation = "drink-standing-1", duration = ____exports.DrinkTask.DURATION}),
-        npcTaskFactory:removeItem({item = Item.Booze, count = 1}),
-        npcTaskFactory:addItem({item = Item.Bottles, count = 1})
-    }
+    local drink = __TS__New(
+        TransactionTask,
+        "drink-booze",
+        {
+            npcTaskFactory:playAnimation({animation = "drink-standing-1", duration = ____exports.DrinkTask.DURATION}),
+            npcTaskFactory:removeItem({item = Item.Booze, count = 1}),
+            npcTaskFactory:addItem({item = Item.Bottles, count = 1})
+        }
+    )
     self.places = deps.places
     self.deps = deps
     self.methods = {
         {
             name = "drink-in-camp",
             preconditions = function(____, state) return hasBooze(state) and self:isInCamp(state) end,
-            tasks = drink
+            tasks = {drink}
         },
         {
             name = "go-to-camp-and-drink",
             preconditions = function(____, state) return hasBooze(state) and #self.places:ofType(PlaceType.HomelessCamp) > 0 end,
             tasks = function(state) return {
                 self:goToNearestCamp(state),
-                unpack(drink)
+                drink
             } end
         }
     }
@@ -8616,6 +8710,8 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____htn = require("toolkit.htn.src.index")
+local TransactionTask = ____htn.TransactionTask
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
@@ -8658,9 +8754,15 @@ function SellBottlesTask.prototype.sellInNearestCollection(self, state)
     return {
         npcTaskFactory:goToCoords({coords = collection.position, completeRadius = ____exports.SellBottlesTask.COLLECTION_COMPLETE_RADIUS}),
         npcTaskFactory:achieveAngle({angle = collection.angle, tolerance = ____exports.SellBottlesTask.COLLECTION_FACING_TOLERANCE}),
-        npcTaskFactory:playAnimation({animation = "item-give"}),
-        npcTaskFactory:removeItem({item = Item.Bottles, count = bottles}),
-        npcTaskFactory:addItem({item = Item.Money, count = bottles * BOTTLE_PRICE})
+        __TS__New(
+            TransactionTask,
+            "hand-over-bottles",
+            {
+                npcTaskFactory:playAnimation({animation = "item-give"}),
+                npcTaskFactory:removeItem({item = Item.Bottles, count = bottles}),
+                npcTaskFactory:addItem({item = Item.Money, count = bottles * BOTTLE_PRICE})
+            }
+        )
     }
 end
 function SellBottlesTask.prototype.countBottles(self, state)

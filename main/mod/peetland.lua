@@ -6443,6 +6443,9 @@ end
 function Needs.prototype.isUrgent(self, need, time)
     return self:get(need, time) < NEED_DEFINITIONS[need].urgentBelow
 end
+function Needs.prototype.isCalm(self, need, time)
+    return self:get(need, time) > NEED_DEFINITIONS[need].calmAbove
+end
 function Needs.prototype.getState(self)
     return self.state
 end
@@ -6472,9 +6475,9 @@ function Needs.prototype.perform(self, activity, _details, time)
 end
 function Needs.prototype.contribute(self, activity)
     repeat
-        local ____switch14 = activity
-        local ____cond14 = ____switch14 == Activity.Eat
-        if ____cond14 then
+        local ____switch15 = activity
+        local ____cond15 = ____switch15 == Activity.Eat
+        if ____cond15 then
             return {[Need.Satiety] = EAT_SATIETY}
         end
     until true
@@ -6527,6 +6530,56 @@ function NeedsFactory.prototype.create(self, values, time)
 end
 return ____exports
  end,
+["core.needs.src.urgency-watcher"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
+local __TS__ObjectValues = ____lualib.__TS__ObjectValues
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local ____need = require("core.needs.src.need")
+local Need = ____need.Need
+--- Следит, когда потребности становятся срочными. Помнит, какие потребности горят: потребность
+-- загорается, когда стала срочной (см. IReadonlyNeeds.isUrgent), и гаснет, только когда стала
+-- спокойной (см. IReadonlyNeeds.isCalm). Пока потребность горит, она не загорается снова, поэтому
+-- значение, которое скачет около порога срочности, не поднимает тревогу на каждой проверке. Сами
+-- потребности наблюдатель не меняет
+____exports.UrgencyWatcher = __TS__Class()
+local UrgencyWatcher = ____exports.UrgencyWatcher
+UrgencyWatcher.name = "UrgencyWatcher"
+function UrgencyWatcher.prototype.____constructor(self)
+    self.burning = __TS__New(Set)
+end
+function UrgencyWatcher.prototype.check(self, needs, time)
+    local ignited = false
+    __TS__ArrayForEach(
+        __TS__ObjectValues(Need),
+        function(____, need)
+            if self.burning:has(need) then
+                if needs:isCalm(need, time) then
+                    self.burning:delete(need)
+                end
+                return
+            end
+            if needs:isUrgent(need, time) then
+                self.burning:add(need)
+                ignited = true
+            end
+        end
+    )
+    return ignited
+end
+____exports.UrgencyWatcherFactory = __TS__Class()
+local UrgencyWatcherFactory = ____exports.UrgencyWatcherFactory
+UrgencyWatcherFactory.name = "UrgencyWatcherFactory"
+function UrgencyWatcherFactory.prototype.____constructor(self)
+end
+function UrgencyWatcherFactory.prototype.create(self)
+    return __TS__New(____exports.UrgencyWatcher)
+end
+return ____exports
+ end,
 ["core.needs.src.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -6553,6 +6606,11 @@ end
 do
     local ____needs = require("core.needs.src.needs")
     ____exports.Needs = ____needs.Needs
+end
+do
+    local ____urgency_2Dwatcher = require("core.needs.src.urgency-watcher")
+    ____exports.UrgencyWatcher = ____urgency_2Dwatcher.UrgencyWatcher
+    ____exports.UrgencyWatcherFactory = ____urgency_2Dwatcher.UrgencyWatcherFactory
 end
 do
     local ____validator = require("core.needs.src.validator")
@@ -7504,6 +7562,7 @@ function Npc.prototype.____constructor(self, data, deps)
     local inventoryFactory = ____deps_0.inventoryFactory
     local psycheFactory = ____deps_0.psycheFactory
     local needsFactory = ____deps_0.needsFactory
+    local urgencyWatcherFactory = ____deps_0.urgencyWatcherFactory
     local rootTaskFactory = ____deps_0.rootTaskFactory
     local gameSignal = ____deps_0.gameSignal
     local worldKnowledge = ____deps_0.worldKnowledge
@@ -7516,15 +7575,13 @@ function Npc.prototype.____constructor(self, data, deps)
         data.needs,
         worldKnowledge:getState().time
     )
+    self.urgencyWatcher = urgencyWatcherFactory:create()
     self.lifetime = __TS__New(AbortController)
     self.actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
     self.context = {actor = self.actor, inventory = self.inventory, psyche = self.psyche, needs = self.needs}
     self.htn = htnFactory:create(rootTaskFactory:create(data.kind))
     ticks:subscribe(
-        function() return self.htn:update(
-            self:getState(),
-            self.context
-        ) end,
+        function() return self:tick() end,
         {signal = self.lifetime.signal}
     )
     if gameSignal.aborted then
@@ -7552,6 +7609,13 @@ function Npc.prototype.getState(self)
         world = self.worldKnowledge:getState()
     }
 end
+function Npc.prototype.tick(self)
+    local state = self:getState()
+    if self.urgencyWatcher:check(state.self.needs, state.world.time) then
+        self.htn:softStop()
+    end
+    self.htn:update(state, self.context)
+end
 function Npc.prototype.despawn(self)
     self.lifetime:abort()
     self.htn:stop(self.context)
@@ -7570,6 +7634,7 @@ local ____inventory = require("core.inventory.src.index")
 local InventoryFactory = ____inventory.InventoryFactory
 local ____needs = require("core.needs.src.index")
 local NeedsFactory = ____needs.NeedsFactory
+local UrgencyWatcherFactory = ____needs.UrgencyWatcherFactory
 local ____psyche = require("core.psyche.src.index")
 local PsycheFactory = ____psyche.PsycheFactory
 local ____npc = require("core.npc.src.npc")
@@ -7600,6 +7665,10 @@ function NpcFactory.prototype.____constructor(self, deps)
     if needsFactory == nil then
         needsFactory = __TS__New(NeedsFactory)
     end
+    local urgencyWatcherFactory = ____deps_0.urgencyWatcherFactory
+    if urgencyWatcherFactory == nil then
+        urgencyWatcherFactory = __TS__New(UrgencyWatcherFactory)
+    end
     self.deps = {
         actorFactory = actorFactory,
         ticks = ticks,
@@ -7607,6 +7676,7 @@ function NpcFactory.prototype.____constructor(self, deps)
         inventoryFactory = inventoryFactory,
         psycheFactory = psycheFactory,
         needsFactory = needsFactory,
+        urgencyWatcherFactory = urgencyWatcherFactory,
         rootTaskFactory = rootTaskFactory,
         gameSignal = gameSignal,
         worldKnowledge = worldKnowledge

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/npc | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/npc | Peetland"><meta data-rh="true" name="description" content="NPC: склеивает свои данные, актора, инвентарь, психику, потребности и HTN-агента, который каждый"><meta data-rh="true" property="og:description" content="NPC: склеивает свои данные, актора, инвентарь, психику, потребности и HTN-агента, который каждый"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/npc","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.f232a538.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.7cd49cd3.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.54f7c512.js" defer="defer"></script>
 </head>
 <body>
@@ -30,6 +30,12 @@
 <code>INeedsFactory</code> со временем, которое знает о мире в момент создания: с него потребности и начинают
 падать. Значения потребностей читаются на момент времени из того же состояния:
 <code>state.self.needs.get(need, state.world.time)</code> (см. <a class="" href="/peetland/main/docs/core/needs/CONTRIBUTING/">потребности</a>).</p>
+<p>Если NPC ушёл в долгое дело, срочная потребность не должна ждать конца плана. Поэтому NPC создаёт
+фабрикой <code>IUrgencyWatcherFactory</code> наблюдателя срочности и каждый тик перед тем, как продвинуть
+HTN-агента, проверяет им потребности из состояния. Если потребность только что стала срочной, NPC
+мягко останавливает текущий план (<code>softStop</code>): агент доделывает транзакции и в том же тике
+перепланирует, а слой потребностей корневой задачи планирует её удовлетворение. Пока потребность
+срочная, повторной остановки нет.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="корневая-задача">Корневая задача<a href="#корневая-задача" class="hash-link" aria-label="Прямая ссылка на Корневая задача" title="Прямая ссылка на Корневая задача" translate="no">​</a></h2>
 <p>NPC не зависит от задач. Корневую задачу HTN-агента он получает от фабрики <code>IRootTaskFactory</code>,
 которую объявляет сам и получает в зависимостях. Какую реализацию передать, решает тот, кто

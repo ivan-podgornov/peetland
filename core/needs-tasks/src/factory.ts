@@ -1,14 +1,14 @@
 import type { Task } from '@peetland/htn';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
+import { NeedsTask } from './needs-task';
 import { SatisfyHungerTask } from './satisfy-hunger-task';
-import { SatisfyNeedsTask } from './satisfy-needs-task';
-import type { ISatisfyNeedsTaskFactory } from './types';
+import type { INeedsTaskFactory } from './types';
 
 /** Создаёт задачи удовлетворения потребностей. На каждый вызов задача новая */
-export class SatisfyNeedsTaskFactory implements ISatisfyNeedsTaskFactory {
+export class NeedsTaskFactory implements INeedsTaskFactory {
   satisfyNeeds(): Task<NpcState, NpcContext> {
-    return new SatisfyNeedsTask({ satisfyNeedsTaskFactory: this });
+    return new NeedsTask({ needsTaskFactory: this });
   }
 
   satisfyHunger(): Task<NpcState, NpcContext> {

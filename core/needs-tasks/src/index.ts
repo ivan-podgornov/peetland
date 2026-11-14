@@ -1,3 +1,3 @@
-export { SatisfyNeedsTaskFactory } from './factory';
-export { SatisfyNeedsTask } from './satisfy-needs-task';
-export type { ISatisfyNeedsTaskFactory } from './types';
+export { NeedsTaskFactory } from './factory';
+export { NeedsTask } from './needs-task';
+export type { INeedsTaskFactory } from './types';

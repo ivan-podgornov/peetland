@@ -2,11 +2,11 @@ import type { CompoundTask, Method } from '@peetland/htn';
 import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
-import type { ISatisfyNeedsTaskFactory } from './types';
+import type { INeedsTaskFactory } from './types';
 
-export type SatisfyNeedsTaskDeps = {
+export type NeedsTaskDeps = {
   /** Фабрика, которой задача создаёт задачи удовлетворения каждой потребности */
-  satisfyNeedsTaskFactory: ISatisfyNeedsTaskFactory;
+  needsTaskFactory: INeedsTaskFactory;
 };
 
 /**
@@ -15,19 +15,19 @@ export type SatisfyNeedsTaskDeps = {
  * срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
  * нет, задачу не спланировать
  */
-export class SatisfyNeedsTask implements CompoundTask<NpcState, NpcContext> {
-  readonly name = 'satisfy-needs';
+export class NeedsTask implements CompoundTask<NpcState, NpcContext> {
+  readonly name = 'needs';
 
   readonly methods: Method<NpcState, NpcContext>[];
 
-  constructor(deps: SatisfyNeedsTaskDeps) {
-    const { satisfyNeedsTaskFactory } = deps;
+  constructor(deps: NeedsTaskDeps) {
+    const { needsTaskFactory } = deps;
 
     this.methods = [
       {
         name: 'satisfy-hunger',
         preconditions: (state) => state.self.needs.isUrgent(Need.Satiety, state.world.time),
-        tasks: [satisfyNeedsTaskFactory.satisfyHunger()],
+        tasks: [needsTaskFactory.satisfyHunger()],
       },
     ];
   }

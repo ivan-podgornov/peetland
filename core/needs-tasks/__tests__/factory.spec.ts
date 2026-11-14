@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { SatisfyNeedsTask, SatisfyNeedsTaskFactory } from '../src';
+import { NeedsTask, NeedsTaskFactory } from '../src';
 import { SatisfyHungerTask } from '../src/satisfy-hunger-task';
 
-describe('SatisfyNeedsTaskFactory', () => {
+describe('NeedsTaskFactory', () => {
   describe('#satisfyNeeds', () => {
-    it('Возвращает экземпляр SatisfyNeedsTask', () => {
-      const factory = new SatisfyNeedsTaskFactory();
+    it('Возвращает экземпляр NeedsTask', () => {
+      const factory = new NeedsTaskFactory();
 
-      expect(factory.satisfyNeeds()).toBeInstanceOf(SatisfyNeedsTask);
+      expect(factory.satisfyNeeds()).toBeInstanceOf(NeedsTask);
     });
 
     it('На каждый вызов возвращает новую задачу', () => {
-      const factory = new SatisfyNeedsTaskFactory();
+      const factory = new NeedsTaskFactory();
 
       expect(factory.satisfyNeeds()).not.toBe(factory.satisfyNeeds());
     });
@@ -20,13 +20,13 @@ describe('SatisfyNeedsTaskFactory', () => {
 
   describe('#satisfyHunger', () => {
     it('Возвращает экземпляр SatisfyHungerTask', () => {
-      const factory = new SatisfyNeedsTaskFactory();
+      const factory = new NeedsTaskFactory();
 
       expect(factory.satisfyHunger()).toBeInstanceOf(SatisfyHungerTask);
     });
 
     it('На каждый вызов возвращает новую задачу', () => {
-      const factory = new SatisfyNeedsTaskFactory();
+      const factory = new NeedsTaskFactory();
 
       expect(factory.satisfyHunger()).not.toBe(factory.satisfyHunger());
     });

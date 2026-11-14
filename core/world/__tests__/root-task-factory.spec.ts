@@ -1,8 +1,8 @@
 import { Geometry } from '@peetland/geometry';
 import { HomelessActivityTask } from '@peetland/homeless';
 import { createStubTask, methodTasks } from '@peetland/htn/dev';
-import { SatisfyNeedsTask } from '@peetland/needs-tasks';
-import { createMockedSatisfyNeedsTaskFactory } from '@peetland/needs-tasks/dev';
+import { NeedsTask } from '@peetland/needs-tasks';
+import { createMockedNeedsTaskFactory } from '@peetland/needs-tasks/dev';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -41,7 +41,7 @@ describe('RootTaskFactory', () => {
     });
 
     it('Создаёт слой потребностей фабрикой needsTaskFactory', () => {
-      const needsTaskFactory = createMockedSatisfyNeedsTaskFactory();
+      const needsTaskFactory = createMockedNeedsTaskFactory();
       const factory = new RootTaskFactory(createDeps({ needsTaskFactory }));
 
       factory.create(NpcKind.Homeless);
@@ -84,12 +84,12 @@ describe('RootTaskFactory', () => {
       expect(methodTasks(task, 'activity')).toStrictEqual([expect.any(HomelessActivityTask)]);
     });
 
-    it('Если needsTaskFactory не передана, слой потребностей — экземпляр SatisfyNeedsTask', () => {
+    it('Если needsTaskFactory не передана, слой потребностей — экземпляр NeedsTask', () => {
       const factory = new RootTaskFactory(createDeps());
 
       const task = factory.create(NpcKind.Homeless);
 
-      expect(methodTasks(task, 'needs')).toStrictEqual([expect.any(SatisfyNeedsTask)]);
+      expect(methodTasks(task, 'needs')).toStrictEqual([expect.any(NeedsTask)]);
     });
   });
 });

@@ -1,1 +1,1 @@
-export { createMockedSatisfyNeedsTaskFactory } from './factory';
+export { createMockedNeedsTaskFactory } from './factory';

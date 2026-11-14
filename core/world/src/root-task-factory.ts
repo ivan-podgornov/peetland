@@ -1,6 +1,6 @@
 import type { IGeometry } from '@peetland/geometry';
-import { SatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
-import type { ISatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
+import { NeedsTaskFactory } from '@peetland/needs-tasks';
+import type { INeedsTaskFactory } from '@peetland/needs-tasks';
 import type { IRootTaskFactory, NpcKind } from '@peetland/npc';
 import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
@@ -20,9 +20,9 @@ export type RootTaskFactoryDeps = {
   timer: ITimer;
   /**
    * Фабрика задач удовлетворения потребностей, которой создаётся слой потребностей. По умолчанию —
-   * SatisfyNeedsTaskFactory
+   * NeedsTaskFactory
    */
-  needsTaskFactory?: ISatisfyNeedsTaskFactory;
+  needsTaskFactory?: INeedsTaskFactory;
   /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
   addictionsTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
@@ -33,7 +33,7 @@ export type RootTaskFactoryDeps = {
 
 /** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
-  private readonly needsTaskFactory: ISatisfyNeedsTaskFactory;
+  private readonly needsTaskFactory: INeedsTaskFactory;
   private readonly addictionsTaskFactory: ILayerTaskFactory;
   private readonly activityTaskFactory: ILayerTaskFactory;
   private readonly hobbiesTaskFactory: ILayerTaskFactory;
@@ -44,7 +44,7 @@ export class RootTaskFactory implements IRootTaskFactory {
       places,
       random,
       timer,
-      needsTaskFactory = new SatisfyNeedsTaskFactory(),
+      needsTaskFactory = new NeedsTaskFactory(),
       addictionsTaskFactory = new AddictionsTaskFactory(),
       activityTaskFactory = new ActivityTaskFactory({
         geometry,

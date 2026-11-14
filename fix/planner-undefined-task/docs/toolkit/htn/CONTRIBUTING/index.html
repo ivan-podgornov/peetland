@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/htn | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/fix/planner-undefined-task/docs/toolkit/htn/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" property="og:title" content="@peetland/htn | Peetland"><meta data-rh="true" name="description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><meta data-rh="true" property="og:description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/fix/planner-undefined-task/docs/toolkit/htn/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/fix/planner-undefined-task/docs/toolkit/htn/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/fix/planner-undefined-task/docs/toolkit/htn/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/htn","item":"https://ivan-podgornov.github.io/peetland/fix/planner-undefined-task/docs/toolkit/htn/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/fix/planner-undefined-task/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/fix/planner-undefined-task/docs/assets/js/runtime~main.3a3d7df4.js" defer="defer"></script>
+<script src="/peetland/fix/planner-undefined-task/docs/assets/js/runtime~main.09d10e75.js" defer="defer"></script>
 <script src="/peetland/fix/planner-undefined-task/docs/assets/js/main.12710235.js" defer="defer"></script>
 </head>
 <body>
@@ -57,9 +57,6 @@
 <p>Если вся цепочка подзадач метода может быть выполнена, то этот метод и будет превращён в план.
 План - это набор задач, декомпозированных до примитивных. План является результатом работы
 планировщика.</p>
-<p>Если вместо задачи в методе оказалось <code>undefined</code>, например его вернул мок фабрики задач без
-реализации, планировщик выбрасывает <code>TypeError</code> с именами метода и составной задачи, а не молча
-обрезает план.</p>
 <h4 class="anchor anchorTargetStickyNavbar_tleR" id="шаги-плана">Шаги плана<a href="#шаги-плана" class="hash-link" aria-label="Прямая ссылка на Шаги плана" title="Прямая ссылка на Шаги плана" translate="no">​</a></h4>
 <p>План состоит из шагов (<code>PlanStep</code>). В шаге лежит примитивная задача (<code>task</code>) и узел разложения,
 частью которого она запланирована (<code>isPartOf</code>). Узел (<code>PlanNode</code>) — это составная задача, метод,

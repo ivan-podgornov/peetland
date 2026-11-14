@@ -7234,13 +7234,6 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
 local __TS__ArrayConcat = ____lualib.__TS__ArrayConcat
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
@@ -7267,15 +7260,6 @@ function Planner.prototype.decompose(self, tasks, state)
     local ____head_1 = head
     local task = ____head_1.task
     local isPartOf = ____head_1.isPartOf
-    if not task then
-        error(
-            __TS__New(
-                TypeError,
-                self:describeMissingTask(task, isPartOf)
-            ),
-            0
-        )
-    end
     if isPrimitive(task) then
         if not task:canExecute(state) then
             return nil
@@ -7292,7 +7276,7 @@ function Planner.prototype.decompose(self, tasks, state)
     for ____, method in ipairs(task.methods) do
         do
             if not method:preconditions(state) then
-                goto __continue9
+                goto __continue8
             end
             local node = {task = task, method = method, isPartOf = isPartOf}
             local subtasks = type(method.tasks) == "function" and method.tasks(state) or method.tasks
@@ -7310,15 +7294,9 @@ function Planner.prototype.decompose(self, tasks, state)
                 return decomposedSubtasks
             end
         end
-        ::__continue9::
+        ::__continue8::
     end
     return nil
-end
-function Planner.prototype.describeMissingTask(self, task, isPartOf)
-    if not isPartOf then
-        return "Вместо корневой задачи передано " .. tostring(task)
-    end
-    return ((((("Метод " .. isPartOf.method.name) .. " задачи ") .. isPartOf.task.name) .. " вернул ") .. tostring(task)) .. " вместо задачи"
 end
 function Planner.prototype.partOf(self, task, isPartOf)
     return {task = task, isPartOf = isPartOf}

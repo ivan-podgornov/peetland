@@ -1,20 +1,33 @@
-import { Need } from '@peetland/needs';
 import { describe, expect, it } from 'vitest';
 
-import { SatisfyHungerTask, SatisfyNeedTaskFactory } from '../src';
+import { SatisfyHungerTask, SatisfyNeedsTask, SatisfyNeedsTaskFactory } from '../src';
 
-describe('SatisfyNeedTaskFactory', () => {
-  describe('#create', () => {
-    it('Для сытости возвращает экземпляр SatisfyHungerTask', () => {
-      const factory = new SatisfyNeedTaskFactory();
+describe('SatisfyNeedsTaskFactory', () => {
+  describe('#satisfyNeeds', () => {
+    it('Возвращает экземпляр SatisfyNeedsTask', () => {
+      const factory = new SatisfyNeedsTaskFactory();
 
-      expect(factory.create(Need.Satiety)).toBeInstanceOf(SatisfyHungerTask);
+      expect(factory.satisfyNeeds()).toBeInstanceOf(SatisfyNeedsTask);
     });
 
     it('На каждый вызов возвращает новую задачу', () => {
-      const factory = new SatisfyNeedTaskFactory();
+      const factory = new SatisfyNeedsTaskFactory();
 
-      expect(factory.create(Need.Satiety)).not.toBe(factory.create(Need.Satiety));
+      expect(factory.satisfyNeeds()).not.toBe(factory.satisfyNeeds());
+    });
+  });
+
+  describe('#satisfyHunger', () => {
+    it('Возвращает экземпляр SatisfyHungerTask', () => {
+      const factory = new SatisfyNeedsTaskFactory();
+
+      expect(factory.satisfyHunger()).toBeInstanceOf(SatisfyHungerTask);
+    });
+
+    it('На каждый вызов возвращает новую задачу', () => {
+      const factory = new SatisfyNeedsTaskFactory();
+
+      expect(factory.satisfyHunger()).not.toBe(factory.satisfyHunger());
     });
   });
 });

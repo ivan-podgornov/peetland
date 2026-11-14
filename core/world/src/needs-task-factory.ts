@@ -1,30 +1,30 @@
-import { SatisfyNeedTaskFactory } from '@peetland/needs-tasks';
-import type { ISatisfyNeedTaskFactory } from '@peetland/needs-tasks';
+import type { Task } from '@peetland/htn';
+import { SatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
+import type { ISatisfyNeedsTaskFactory } from '@peetland/needs-tasks';
+import type { NpcContext, NpcState } from '@peetland/npc';
 
-import { NeedsTask } from './needs-task';
 import type { ILayerTaskFactory } from './types';
 
 export type NeedsTaskFactoryDeps = {
-  /** Фабрика задач, которые удовлетворяют потребности. По умолчанию — SatisfyNeedTaskFactory */
-  satisfyNeedTaskFactory?: ISatisfyNeedTaskFactory;
+  /** Фабрика задач удовлетворения потребностей. По умолчанию — SatisfyNeedsTaskFactory */
+  satisfyNeedsTaskFactory?: ISatisfyNeedsTaskFactory;
 };
 
 /**
- * Создаёт слой потребностей корневой задачи NPC (см. NeedsTask). Задачи удовлетворения одинаковые
- * для всех типов NPC, поэтому тип NPC слою не нужен
+ * Создаёт слой потребностей корневой задачи NPC: задачу удовлетворить срочные потребности
+ * (SatisfyNeedsTask из @peetland/needs-tasks). Задачи удовлетворения одинаковые для всех типов NPC,
+ * поэтому тип NPC слою не нужен
  */
 export class NeedsTaskFactory implements ILayerTaskFactory {
-  private readonly satisfyNeedTaskFactory: ISatisfyNeedTaskFactory;
+  private readonly satisfyNeedsTaskFactory: ISatisfyNeedsTaskFactory;
 
   constructor(deps: NeedsTaskFactoryDeps = {}) {
-    const { satisfyNeedTaskFactory = new SatisfyNeedTaskFactory() } = deps;
+    const { satisfyNeedsTaskFactory = new SatisfyNeedsTaskFactory() } = deps;
 
-    this.satisfyNeedTaskFactory = satisfyNeedTaskFactory;
+    this.satisfyNeedsTaskFactory = satisfyNeedsTaskFactory;
   }
 
-  create(): NeedsTask {
-    const { satisfyNeedTaskFactory } = this;
-
-    return new NeedsTask({ satisfyNeedTaskFactory });
+  create(): Task<NpcState, NpcContext> {
+    return this.satisfyNeedsTaskFactory.satisfyNeeds();
   }
 }

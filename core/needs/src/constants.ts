@@ -6,9 +6,6 @@ import { NeedCategory } from './category';
 import { Need } from './need';
 import type { NeedDefinitions } from './types';
 
-/** Потребности по приоритету: если срочных несколько, первой удовлетворяется та, что раньше */
-export const NEED_PRIORITY: readonly Need[] = [Need.Satiety];
-
 /** Минут в игровых сутках */
 const MINUTES_PER_DAY = 24 * 60;
 

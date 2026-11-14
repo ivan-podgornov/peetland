@@ -3,11 +3,18 @@ import type { TimeState } from '@peetland/timings';
 import type { NeedCategory } from './category';
 import type { Need } from './need';
 
-/** Описание потребности: её категория и то, как быстро она падает */
+/** Описание потребности: её категория, как быстро она падает и когда она срочная */
 export type NeedDefinition = Readonly<{
   category: NeedCategory;
   /** За сколько игровых минут потребность падает от Needs.MAX_NEED до Needs.MIN_NEED */
   depletionMinutes: number;
+  /** Ниже этого значения потребность срочная: NPC бросает дела и удовлетворяет её */
+  urgentBelow: number;
+  /**
+   * Выше этого значения потребность перестаёт быть срочной. Пока она между порогами, срочность не
+   * меняется, поэтому значение, которое скачет около нижнего порога, не поднимает тревогу снова
+   */
+  calmAbove: number;
 }>;
 
 /** Описание каждой потребности */

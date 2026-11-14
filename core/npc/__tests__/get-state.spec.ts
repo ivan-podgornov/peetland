@@ -6,10 +6,16 @@ import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/d
 import { describe, expect, it } from 'vitest';
 
 import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
-import { Npc } from '../src';
+import { Npc, NpcKind } from '../src';
 
 describe('Npc', () => {
   describe('#getState', () => {
+    it('Возвращает тип NPC из данных', () => {
+      const npc = new Npc(createNpcData({ kind: NpcKind.Homeless }), createNpcDeps());
+
+      expect(npc.getState().self.kind).toBe(NpcKind.Homeless);
+    });
+
     it('Возвращает инвентарь NPC', () => {
       const inventory = new Inventory();
       const npc = new Npc(

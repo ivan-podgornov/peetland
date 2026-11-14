@@ -15,6 +15,9 @@ export const NEED_DEFINITIONS: NeedDefinitions = {
   [Need.Satiety]: {
     category: NeedCategory.Vital,
     depletionMinutes: MINUTES_PER_DAY,
+    // Срочно за 6 часов до голода
+    urgentBelow: 25,
+    calmAbove: 60,
   },
 };
 

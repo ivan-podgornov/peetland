@@ -1,4 +1,6 @@
 import type { IGeometry } from '@peetland/geometry';
+import { NeedsTaskFactory } from '@peetland/needs-tasks';
+import type { INeedsTaskFactory } from '@peetland/needs-tasks';
 import type { IRootTaskFactory, NpcKind } from '@peetland/npc';
 import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
@@ -7,7 +9,6 @@ import type { ITimer } from '@peetland/timings';
 import { ActivityTaskFactory } from './activity-task-factory';
 import { AddictionsTaskFactory } from './addictions-task-factory';
 import { HobbiesTaskFactory } from './hobbies-task-factory';
-import { NeedsTaskFactory } from './needs-task-factory';
 import { RootTask } from './root-task';
 import type { ILayerTaskFactory } from './types';
 
@@ -17,8 +18,11 @@ export type RootTaskFactoryDeps = {
   places: IPlaces;
   random: IRandom;
   timer: ITimer;
-  /** Фабрика слоя потребностей. По умолчанию — NeedsTaskFactory */
-  needsTaskFactory?: ILayerTaskFactory;
+  /**
+   * Фабрика задач удовлетворения потребностей, которой создаётся слой потребностей. По умолчанию —
+   * NeedsTaskFactory
+   */
+  needsTaskFactory?: INeedsTaskFactory;
   /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
   addictionsTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
@@ -29,7 +33,7 @@ export type RootTaskFactoryDeps = {
 
 /** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
-  private readonly needsTaskFactory: ILayerTaskFactory;
+  private readonly needsTaskFactory: INeedsTaskFactory;
   private readonly addictionsTaskFactory: ILayerTaskFactory;
   private readonly activityTaskFactory: ILayerTaskFactory;
   private readonly hobbiesTaskFactory: ILayerTaskFactory;
@@ -62,7 +66,8 @@ export class RootTaskFactory implements IRootTaskFactory {
       this;
 
     return new RootTask({
-      needs: needsTaskFactory.create(kind),
+      // Задачи удовлетворения потребностей одинаковые для всех типов NPC
+      needs: needsTaskFactory.satisfyNeeds(),
       addictions: addictionsTaskFactory.create(kind),
       activity: activityTaskFactory.create(kind),
       hobbies: hobbiesTaskFactory.create(kind),

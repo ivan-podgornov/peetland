@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { primitive, testContext, testState } from '../../dev';
+import { primitive, testContext, testState, toSteps } from '../../dev';
 import { Executor } from '../../src/executor';
 
 describe('Executor', () => {
@@ -8,7 +8,7 @@ describe('Executor', () => {
     it('Выбрасывает ошибку, если выполнение задач уже завершилось успешно', () => {
       const task = primitive('Primitive Task');
       vi.spyOn(task, 'start').mockReturnValue('success');
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
 
       executor.update(testState, testContext);
 
@@ -20,7 +20,7 @@ describe('Executor', () => {
     it('Выбрасывает ошибку, если выполнение задач ранее завершилось с ошибкой', () => {
       const task = primitive('Primitive Task');
       vi.spyOn(task, 'start').mockReturnValue('failed');
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
 
       executor.update(testState, testContext);
 
@@ -31,7 +31,7 @@ describe('Executor', () => {
 
     it('Выбрасывает ошибку, если выполнее задач было остановлено ранее', () => {
       const task = primitive('Primitive Task');
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
 
       executor.stop(testContext);
 
@@ -44,7 +44,7 @@ describe('Executor', () => {
       const task = primitive('Primitive Task');
       const stopSpy = vi.spyOn(task, 'stop');
 
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
       executor.stop(testContext);
 
       expect(stopSpy).not.toHaveBeenCalled();
@@ -54,7 +54,7 @@ describe('Executor', () => {
       const task = primitive('Primitive Task');
       const stopSpy = vi.spyOn(task, 'stop');
 
-      const executor = new Executor([task]);
+      const executor = new Executor(toSteps([task]));
       executor.update(testState, testContext);
       executor.stop(testContext);
 
@@ -71,7 +71,7 @@ describe('Executor', () => {
       const unreachableTaskStopSpy = vi.spyOn(unreachableTask, 'stop');
 
       // act
-      const executor = new Executor([firstTask, unreachableTask]);
+      const executor = new Executor(toSteps([firstTask, unreachableTask]));
       executor.update(testState, testContext);
       executor.stop(testContext);
 

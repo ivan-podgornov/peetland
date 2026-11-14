@@ -1,18 +1,17 @@
 import { Executor, type IExecutor } from './executor';
+import type { PlanStep } from './plan';
 import { Planner, type IPlanner } from './planner';
-import type { PrimitiveTask, Task } from './task';
+import type { Task } from './task';
 
 export type HTNDeps<TState, TContext> = {
-  executorFactory: (
-    tasks: readonly PrimitiveTask<TState, TContext>[]
-  ) => IExecutor<TState, TContext>;
+  executorFactory: (steps: readonly PlanStep<TState, TContext>[]) => IExecutor<TState, TContext>;
   plannerFactory: () => IPlanner<TState>;
 };
 
 export function getDefaultDeps<TState, TContext>(): HTNDeps<TState, TContext> {
   return {
-    executorFactory: (tasks: readonly PrimitiveTask<TState, TContext>[]) =>
-      new Executor<TState, TContext>(tasks),
+    executorFactory: (steps: readonly PlanStep<TState, TContext>[]) =>
+      new Executor<TState, TContext>(steps),
     plannerFactory: () => new Planner<TState>(),
   };
 }
@@ -49,13 +48,13 @@ export class HTN<TState, TContext> implements IHTN<TState, TContext> {
   update(state: TState, context: TContext) {
     if (!this.executor) {
       const { executorFactory } = this.deps;
-      const tasks = this.planner.plan(this.root, state);
+      const steps = this.planner.plan(this.root, state);
 
-      if (!tasks) {
+      if (!steps) {
         return;
       }
 
-      this.executor = executorFactory(tasks);
+      this.executor = executorFactory(steps);
     }
 
     const status = this.executor.update(state, context);

@@ -1,12 +1,14 @@
 import type { PrimitiveTask, Task } from '../src';
 import { Planner } from '../src/planner';
 
-/** Составляет план корневой задачи */
+/** Составляет план корневой задачи и возвращает его задачи без транзакций */
 export function plan<TState, TContext>(
   root: Task<TState, TContext>,
   state: TState
 ): PrimitiveTask<TState, TContext>[] | null {
-  return new Planner<TState>().plan(root, state);
+  const steps = new Planner<TState>().plan(root, state);
+
+  return steps && steps.map((step) => step.task);
 }
 
 /** Возвращает названия задач плана или null, если план составить нельзя */

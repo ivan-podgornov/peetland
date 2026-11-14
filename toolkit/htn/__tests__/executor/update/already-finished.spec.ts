@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { primitive, testContext, testState } from '../../../dev';
+import { primitive, testContext, testState, toSteps } from '../../../dev';
 import { Executor } from '../../../src/executor';
 
 describe('Executor', () => {
@@ -9,7 +9,7 @@ describe('Executor', () => {
       it('Выбрасывает ошибку, если выполнение задач уже завершилось успешно', () => {
         const task = primitive('Primitive Task');
         vi.spyOn(task, 'start').mockReturnValue('success');
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
 
         executor.update(testState, testContext);
 
@@ -21,7 +21,7 @@ describe('Executor', () => {
       it('Выбрасывает ошибку, если выполнение задач уже завершилось с ошибкой', () => {
         const task = primitive('Primitive Task');
         vi.spyOn(task, 'start').mockReturnValue('failed');
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
 
         executor.update(testState, testContext);
 
@@ -31,7 +31,7 @@ describe('Executor', () => {
       });
 
       it('Выбрасывает ошибку, если выполнение задач было остановлено ранее', () => {
-        const executor = new Executor([primitive('Primitive Task')]);
+        const executor = new Executor(toSteps([primitive('Primitive Task')]));
 
         executor.stop(testContext);
 

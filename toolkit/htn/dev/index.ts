@@ -14,6 +14,8 @@ export {
   spyPrimitive,
   spyMethod,
   getNames,
+  getStepNames,
+  toSteps,
   getDummyPlanner,
   getDummyExecutor,
 } from './test-tasks';

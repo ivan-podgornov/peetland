@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { primitive, testContext, testState } from '../../../dev';
+import { primitive, testContext, testState, toSteps } from '../../../dev';
 import { Executor } from '../../../src/executor';
 
 describe('Executor', () => {
@@ -10,7 +10,7 @@ describe('Executor', () => {
         const task = primitive('Primitive Task');
         const canExecuteSpy = vi.spyOn(task, 'canExecute').mockReturnValue(false);
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         executor.update(testState, testContext);
 
         expect(canExecuteSpy).toHaveBeenCalledExactlyOnceWith(testState);
@@ -22,7 +22,7 @@ describe('Executor', () => {
         const startSpy = vi.spyOn(task, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         executor.update(testState, testContext);
 
         expect(startSpy).not.toHaveBeenCalled();
@@ -34,7 +34,7 @@ describe('Executor', () => {
         const startSpy = vi.spyOn(task, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(task, 'update').mockReturnValue('running');
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         executor.update(testState, testContext);
 
         expect(startSpy).toHaveBeenCalledExactlyOnceWith(testState, testContext);
@@ -48,7 +48,7 @@ describe('Executor', () => {
         const startSpy = vi.spyOn(anotherTask, 'start').mockReturnValue('running');
         const updateSpy = vi.spyOn(anotherTask, 'update').mockReturnValue('running');
 
-        const executor = new Executor([successTask, anotherTask]);
+        const executor = new Executor(toSteps([successTask, anotherTask]));
         executor.update(testState, testContext);
 
         expect(startSpy).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('Executor', () => {
         const task = primitive('Primitive Task');
         vi.spyOn(task, 'start').mockReturnValue('success');
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('success');
@@ -69,7 +69,7 @@ describe('Executor', () => {
         const task = primitive('Primitive Task');
         vi.spyOn(task, 'start').mockReturnValue('running');
 
-        const executor = new Executor([task]);
+        const executor = new Executor(toSteps([task]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
@@ -79,7 +79,7 @@ describe('Executor', () => {
         const successTask = primitive('Success Task');
         vi.spyOn(successTask, 'start').mockReturnValue('success');
 
-        const executor = new Executor([successTask, primitive('Another Task')]);
+        const executor = new Executor(toSteps([successTask, primitive('Another Task')]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('running');
@@ -89,7 +89,7 @@ describe('Executor', () => {
         const failedTask = primitive('Failed Task');
         vi.spyOn(failedTask, 'start').mockReturnValue('failed');
 
-        const executor = new Executor([failedTask]);
+        const executor = new Executor(toSteps([failedTask]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
@@ -99,7 +99,7 @@ describe('Executor', () => {
         const failedTask = primitive('Failed Task');
         vi.spyOn(failedTask, 'canExecute').mockReturnValue(false);
 
-        const executor = new Executor([failedTask]);
+        const executor = new Executor(toSteps([failedTask]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');
@@ -109,7 +109,7 @@ describe('Executor', () => {
         const failedTask = primitive('Failed Task');
         vi.spyOn(failedTask, 'start').mockReturnValue('failed');
 
-        const executor = new Executor([failedTask, primitive('Another Task')]);
+        const executor = new Executor(toSteps([failedTask, primitive('Another Task')]));
         const result = executor.update(testState, testContext);
 
         expect(result).toBe('failed');

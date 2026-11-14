@@ -1,3 +1,4 @@
+import type { PlanStep } from './plan';
 import type { PrimitiveTask, TaskResult } from './task';
 
 /** Статус выполнения задачи */
@@ -16,36 +17,36 @@ export interface IExecutor<TState, TContext> {
 
 export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   private currentTaskIndex: number;
-  private readonly tasks: readonly PrimitiveTask<TState, TContext>[];
+  private readonly steps: readonly PlanStep<TState, TContext>[];
   private status: ExecuteStatus;
   private taskStarted: boolean;
 
   /**
-   * Создаёт исполнителя для указанного списка задач. Предполагается, что на вход будет приходить
-   * уже декомпозированный планировщиком список задач. Так же, предполагается, что список задач не
-   * может быть пустым, так как пустой список задач - это повод их перепланировать, а не выполнять.
-   * @param tasks - декомпозированный список задач
+   * Создаёт исполнителя для указанного плана. Предполагается, что на вход будет приходить план,
+   * который составил планировщик. Так же, предполагается, что план не может быть пустым, так как
+   * пустой план - это повод перепланировать, а не выполнять.
+   * @param steps - шаги плана (см. PlanStep)
    */
-  constructor(tasks: readonly PrimitiveTask<TState, TContext>[]) {
-    if (!tasks.length) {
+  constructor(steps: readonly PlanStep<TState, TContext>[]) {
+    if (!steps.length) {
       throw new Error("Tasks list can't be empty");
     }
 
-    this.tasks = tasks;
+    this.steps = steps;
     this.currentTaskIndex = 0;
     this.status = 'idle';
     this.taskStarted = false;
   }
 
   get currentTask(): PrimitiveTask<TState, TContext> {
-    const task = this.tasks[this.currentTaskIndex];
+    const step = this.steps[this.currentTaskIndex];
 
-    if (!task) {
-      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.tasks.length})`;
+    if (!step) {
+      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.steps.length})`;
       throw new RangeError(message);
     }
 
-    return task;
+    return step.task;
   }
 
   update(state: TState, context: TContext): TaskResult {
@@ -114,6 +115,6 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   private get nextTask(): PrimitiveTask<TState, TContext> | null {
     const index = this.currentTaskIndex + 1;
 
-    return this.tasks[index] ?? null;
+    return this.steps[index]?.task ?? null;
   }
 }

@@ -1,1 +1,0 @@
-{"id":"01448896044fa6e2ed75d2f3f49bfa47.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/game-signal.spec.ts#Npc Когда игра завершается Если NPC уже деспавнен, не останавливает HTN-агента повторно","name":"Если NPC уже деспавнен, не останавливает HTN-агента повторно","status":"passed","testResultsByEnv":{"default":"b0dfe603ad71b1bfa6c5bcaa5831c1cd"}}

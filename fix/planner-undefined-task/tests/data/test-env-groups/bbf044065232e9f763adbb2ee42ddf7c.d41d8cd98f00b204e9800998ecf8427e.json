@@ -1,1 +1,0 @@
-{"id":"bbf044065232e9f763adbb2ee42ddf7c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/observable/from/array.spec.ts#Observable .from При передаче массива Не вызывает observer.error","name":"Не вызывает observer.error","status":"passed","testResultsByEnv":{"default":"aaf51cfa46c1a7e7de61696c0aa02a53"}}

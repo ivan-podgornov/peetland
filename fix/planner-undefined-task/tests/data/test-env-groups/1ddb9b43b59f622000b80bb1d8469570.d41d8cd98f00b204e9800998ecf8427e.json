@@ -1,1 +1,0 @@
-{"id":"1ddb9b43b59f622000b80bb1d8469570.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/root-task/priority.spec.ts#RootTask Порядок методов Если потребности спланировать нельзя, планирует зависимости","name":"Если потребности спланировать нельзя, планирует зависимости","status":"passed","testResultsByEnv":{"default":"ab70ed4bd71cf3fbf6e28ff47384cffc"}}

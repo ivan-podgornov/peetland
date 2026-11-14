@@ -1,1 +1,0 @@
-{"id":"97206b98711adcbf074da42db5f3a946.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-within-radius-2d.spec.ts#Geometry #isWithinRadius2d Если точки совпадают и радиус равен 0, возвращает true","name":"Если точки совпадают и радиус равен 0, возвращает true","status":"passed","testResultsByEnv":{"default":"a6283a89fb43090bf004dad9076e0ec9"}}

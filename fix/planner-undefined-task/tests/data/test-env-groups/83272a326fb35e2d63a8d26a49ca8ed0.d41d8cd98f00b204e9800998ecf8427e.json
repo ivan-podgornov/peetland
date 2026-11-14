@@ -1,1 +1,0 @@
-{"id":"83272a326fb35e2d63a8d26a49ca8ed0.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/animation-manager/__tests__/resolve.spec.ts#AnimationManager #resolve Если анимации нет в таблице, выбрасывает ошибку","name":"Если анимации нет в таблице, выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"b12764ad34b7c931a07f04f4f6f72caa"}}

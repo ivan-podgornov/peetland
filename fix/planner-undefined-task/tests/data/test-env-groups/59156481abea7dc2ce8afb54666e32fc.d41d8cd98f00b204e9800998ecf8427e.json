@@ -1,1 +1,0 @@
-{"id":"59156481abea7dc2ce8afb54666e32fc.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/try-luck-task/start/on-attempt.spec.ts#TryLuckTask #start При каждой попытке вызывает onAttempt с контекстом","name":"При каждой попытке вызывает onAttempt с контекстом","status":"passed","testResultsByEnv":{"default":"aa10aa60c1f366ca12386b8e11a47972"}}

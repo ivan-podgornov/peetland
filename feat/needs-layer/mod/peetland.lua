@@ -7796,6 +7796,36 @@ function NpcWorldKnowledge.prototype.getState(self)
 end
 return ____exports
  end,
+["core.needs-tasks.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.needs-tasks.src.needs-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____needs = require("core.needs.src.index")
+local Need = ____needs.Need
+--- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
+-- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
+-- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
+-- нет, задачу не спланировать
+____exports.NeedsTask = __TS__Class()
+local NeedsTask = ____exports.NeedsTask
+NeedsTask.name = "NeedsTask"
+function NeedsTask.prototype.____constructor(self, deps)
+    self.name = "needs"
+    local ____deps_0 = deps
+    local needsTaskFactory = ____deps_0.needsTaskFactory
+    self.methods = {{
+        name = "satisfy-hunger",
+        preconditions = function(____, state) return state.self.needs:isUrgent(Need.Satiety, state.world.time) end,
+        tasks = {needsTaskFactory:satisfyHunger()}
+    }}
+end
+return ____exports
+ end,
 ["core.needs-tasks.src.satisfy-hunger-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -7812,55 +7842,25 @@ function SatisfyHungerTask.prototype.____constructor(self)
 end
 return ____exports
  end,
-["core.needs-tasks.src.types"] = function(...) 
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-local ____exports = {}
-return ____exports
- end,
-["core.needs-tasks.src.satisfy-needs-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
-local ____needs = require("core.needs.src.index")
-local Need = ____needs.Need
---- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
--- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
--- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
--- нет, задачу не спланировать
-____exports.SatisfyNeedsTask = __TS__Class()
-local SatisfyNeedsTask = ____exports.SatisfyNeedsTask
-SatisfyNeedsTask.name = "SatisfyNeedsTask"
-function SatisfyNeedsTask.prototype.____constructor(self, deps)
-    self.name = "satisfy-needs"
-    local ____deps_0 = deps
-    local satisfyNeedsTaskFactory = ____deps_0.satisfyNeedsTaskFactory
-    self.methods = {{
-        name = "satisfy-hunger",
-        preconditions = function(____, state) return state.self.needs:isUrgent(Need.Satiety, state.world.time) end,
-        tasks = {satisfyNeedsTaskFactory:satisfyHunger()}
-    }}
-end
-return ____exports
- end,
 ["core.needs-tasks.src.factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____needs_2Dtask = require("core.needs-tasks.src.needs-task")
+local NeedsTask = ____needs_2Dtask.NeedsTask
 local ____satisfy_2Dhunger_2Dtask = require("core.needs-tasks.src.satisfy-hunger-task")
 local SatisfyHungerTask = ____satisfy_2Dhunger_2Dtask.SatisfyHungerTask
-local ____satisfy_2Dneeds_2Dtask = require("core.needs-tasks.src.satisfy-needs-task")
-local SatisfyNeedsTask = ____satisfy_2Dneeds_2Dtask.SatisfyNeedsTask
 --- Создаёт задачи удовлетворения потребностей. На каждый вызов задача новая
-____exports.SatisfyNeedsTaskFactory = __TS__Class()
-local SatisfyNeedsTaskFactory = ____exports.SatisfyNeedsTaskFactory
-SatisfyNeedsTaskFactory.name = "SatisfyNeedsTaskFactory"
-function SatisfyNeedsTaskFactory.prototype.____constructor(self)
+____exports.NeedsTaskFactory = __TS__Class()
+local NeedsTaskFactory = ____exports.NeedsTaskFactory
+NeedsTaskFactory.name = "NeedsTaskFactory"
+function NeedsTaskFactory.prototype.____constructor(self)
 end
-function SatisfyNeedsTaskFactory.prototype.satisfyNeeds(self)
-    return __TS__New(SatisfyNeedsTask, {satisfyNeedsTaskFactory = self})
+function NeedsTaskFactory.prototype.satisfyNeeds(self)
+    return __TS__New(NeedsTask, {needsTaskFactory = self})
 end
-function SatisfyNeedsTaskFactory.prototype.satisfyHunger(self)
+function NeedsTaskFactory.prototype.satisfyHunger(self)
     return __TS__New(SatisfyHungerTask)
 end
 return ____exports
@@ -7870,11 +7870,11 @@ return ____exports
 local ____exports = {}
 do
     local ____factory = require("core.needs-tasks.src.factory")
-    ____exports.SatisfyNeedsTaskFactory = ____factory.SatisfyNeedsTaskFactory
+    ____exports.NeedsTaskFactory = ____factory.NeedsTaskFactory
 end
 do
-    local ____satisfy_2Dneeds_2Dtask = require("core.needs-tasks.src.satisfy-needs-task")
-    ____exports.SatisfyNeedsTask = ____satisfy_2Dneeds_2Dtask.SatisfyNeedsTask
+    local ____needs_2Dtask = require("core.needs-tasks.src.needs-task")
+    ____exports.NeedsTask = ____needs_2Dtask.NeedsTask
 end
 return ____exports
  end,
@@ -9128,7 +9128,7 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____needs_2Dtasks = require("core.needs-tasks.src.index")
-local SatisfyNeedsTaskFactory = ____needs_2Dtasks.SatisfyNeedsTaskFactory
+local NeedsTaskFactory = ____needs_2Dtasks.NeedsTaskFactory
 local ____activity_2Dtask_2Dfactory = require("core.world.src.activity-task-factory")
 local ActivityTaskFactory = ____activity_2Dtask_2Dfactory.ActivityTaskFactory
 local ____addictions_2Dtask_2Dfactory = require("core.world.src.addictions-task-factory")
@@ -9147,9 +9147,9 @@ function RootTaskFactory.prototype.____constructor(self, deps)
     local places = ____deps_0.places
     local random = ____deps_0.random
     local timer = ____deps_0.timer
-    local satisfyNeedsTaskFactory = ____deps_0.satisfyNeedsTaskFactory
-    if satisfyNeedsTaskFactory == nil then
-        satisfyNeedsTaskFactory = __TS__New(SatisfyNeedsTaskFactory)
+    local needsTaskFactory = ____deps_0.needsTaskFactory
+    if needsTaskFactory == nil then
+        needsTaskFactory = __TS__New(NeedsTaskFactory)
     end
     local addictionsTaskFactory = ____deps_0.addictionsTaskFactory
     if addictionsTaskFactory == nil then
@@ -9163,20 +9163,20 @@ function RootTaskFactory.prototype.____constructor(self, deps)
     if hobbiesTaskFactory == nil then
         hobbiesTaskFactory = __TS__New(HobbiesTaskFactory)
     end
-    self.satisfyNeedsTaskFactory = satisfyNeedsTaskFactory
+    self.needsTaskFactory = needsTaskFactory
     self.addictionsTaskFactory = addictionsTaskFactory
     self.activityTaskFactory = activityTaskFactory
     self.hobbiesTaskFactory = hobbiesTaskFactory
 end
 function RootTaskFactory.prototype.create(self, kind)
-    local satisfyNeedsTaskFactory = self.satisfyNeedsTaskFactory
+    local needsTaskFactory = self.needsTaskFactory
     local addictionsTaskFactory = self.addictionsTaskFactory
     local activityTaskFactory = self.activityTaskFactory
     local hobbiesTaskFactory = self.hobbiesTaskFactory
     return __TS__New(
         RootTask,
         {
-            needs = satisfyNeedsTaskFactory:satisfyNeeds(),
+            needs = needsTaskFactory:satisfyNeeds(),
             addictions = addictionsTaskFactory:create(kind),
             activity = activityTaskFactory:create(kind),
             hobbies = hobbiesTaskFactory:create(kind)

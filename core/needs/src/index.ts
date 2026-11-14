@@ -1,7 +1,7 @@
 export { Activity } from './activity';
 export type { ActivityDetails, EatDetails } from './activity';
 export { NeedCategory } from './category';
-export { NEED_DEFINITIONS } from './constants';
+export { NEED_DEFINITIONS, NEED_PRIORITY } from './constants';
 export { NeedsFactory } from './factory';
 export type { INeedsFactory, NeedsFactoryDeps } from './factory';
 export { Need } from './need';

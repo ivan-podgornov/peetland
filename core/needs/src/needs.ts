@@ -28,6 +28,13 @@ export interface IReadonlyNeeds {
    * @param time - время, на момент которого нужны значения
    */
   getAll(time: IReadonlyTime): NeedValues;
+  /**
+   * Возвращает, срочная ли потребность на момент time: её значение ниже порога срочности
+   * urgentBelow из описания (см. NEED_DEFINITIONS)
+   * @param need - потребность
+   * @param time - время, на момент которого нужна срочность, обычно время из того же состояния
+   */
+  isUrgent(need: Need, time: IReadonlyTime): boolean;
   /** Возвращает состояние потребностей. Из него конструктор собирает такие же потребности */
   getState(): NeedsState;
   /** Возвращает копию потребностей, в которую можно писать. Исходные потребности копия не меняет */
@@ -95,6 +102,10 @@ export class Needs implements INeeds {
     return Object.fromEntries(
       Object.values(Need).map((need) => [need, this.get(need, time)])
     ) as NeedValues;
+  }
+
+  isUrgent(need: Need, time: IReadonlyTime): boolean {
+    return this.get(need, time) < NEED_DEFINITIONS[need].urgentBelow;
   }
 
   getState(): NeedsState {

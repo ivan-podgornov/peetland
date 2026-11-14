@@ -4,6 +4,8 @@ import type { IReadonlyNeeds } from '@peetland/needs';
 import type { IReadonlyPsyche } from '@peetland/psyche';
 import type { IReadonlyTime } from '@peetland/timings';
 
+import type { NpcKind } from './kind';
+
 /** Слепок состояния актора NPC на момент сбора состояния */
 export type NpcActorState = Readonly<{
   position: Vector3;
@@ -11,8 +13,10 @@ export type NpcActorState = Readonly<{
   angle: number;
 }>;
 
-/** Сам NPC: слепок актора, инвентарь, психика и потребности только на чтение */
+/** Сам NPC: тип, слепок актора, инвентарь, психика и потребности только на чтение */
 export type NpcSelfState = Readonly<{
+  /** Тип NPC. Задачи, которые доступны не всем типам, проверяют его в предусловиях */
+  kind: NpcKind;
   actor: NpcActorState;
   inventory: IReadonlyInventory;
   psyche: IReadonlyPsyche;

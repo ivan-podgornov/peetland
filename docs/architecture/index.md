@@ -87,6 +87,8 @@ flowchart TD
   subgraph core
     world --> homeless
     world --> places
+    world --> needstasks[needs-tasks]
+    needstasks --> npc
     homeless --> npctasks[npc-tasks]
     homeless --> places
     npctasks --> npc

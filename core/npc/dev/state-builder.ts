@@ -9,15 +9,17 @@ import { PsycheBuilder } from '@peetland/psyche/dev';
 import { ManualTime } from '@peetland/timings';
 import type { TimeState } from '@peetland/timings';
 
+import { NpcKind } from '../src';
 import type { NpcState } from '../src';
 
 /** Собирает психику из переданного билдера психики */
 type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
 
 /**
- * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC стоит
- * в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder по
- * умолчанию, потребности удовлетворены полностью, а в мире полночь первого дня. Каждый вызов build возвращает новое состояние
+ * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC —
+ * бомж, стоит в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder
+ * по умолчанию, потребности удовлетворены полностью, а в мире полночь первого дня. Каждый вызов
+ * build возвращает новое состояние
  *
  * @example
  * const state = new NpcStateBuilder()
@@ -26,6 +28,7 @@ type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
  *   .build();
  */
 export class NpcStateBuilder {
+  private kind = NpcKind.Homeless;
   private position: Vector3 = {
     x: 0,
     y: 0,
@@ -44,6 +47,12 @@ export class NpcStateBuilder {
   /** Возвращает состояние, в котором тесту ничего не важно: всё заполнено значениями по умолчанию */
   static default(): NpcState {
     return new NpcStateBuilder().build();
+  }
+
+  /** Задаёт тип NPC */
+  withKind(kind: NpcKind): this {
+    this.kind = kind;
+    return this;
   }
 
   /** Задаёт позицию актора */
@@ -103,6 +112,7 @@ export class NpcStateBuilder {
 
     return {
       self: {
+        kind: this.kind,
         actor: {
           position: { ...this.position },
           angle: this.angle,

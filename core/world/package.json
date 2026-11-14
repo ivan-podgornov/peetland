@@ -12,6 +12,8 @@
     "@peetland/game": "0.0.0",
     "@peetland/geometry": "0.0.0",
     "@peetland/homeless": "0.0.0",
+    "@peetland/needs": "0.0.0",
+    "@peetland/needs-tasks": "0.0.0",
     "@peetland/npc": "0.0.0",
     "@peetland/places": "0.0.0",
     "@peetland/psyche": "0.0.0",

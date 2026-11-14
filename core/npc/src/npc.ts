@@ -8,6 +8,7 @@ import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
+import type { NpcKind } from './kind';
 import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 import type { INpcWorldKnowledge } from './world-knowledge';
@@ -36,6 +37,7 @@ export type NpcDeps = {
 /** NPC склеивает свои данные, актора и HTN-агента */
 export class Npc {
   readonly id: string;
+  readonly kind: NpcKind;
   readonly inventory: Inventory;
   readonly psyche: IPsyche;
   readonly needs: INeeds;
@@ -67,6 +69,7 @@ export class Npc {
     } = deps;
 
     this.id = data.id;
+    this.kind = data.kind;
     this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
@@ -104,6 +107,7 @@ export class Npc {
   getState(): NpcState {
     return {
       self: {
+        kind: this.kind,
         actor: {
           position: this.actor.getPosition(),
           angle: this.actor.getAngle(),

@@ -1,1 +1,0 @@
-{"id":"fe4f8cc3aa56a8e199c031cc0b92762d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/update.spec.ts#Command Обновление Не вызывает onUpdate, пока не прошёл период обновления","name":"Не вызывает onUpdate, пока не прошёл период обновления","status":"passed","testResultsByEnv":{"default":"9cdc5489914b6b3d7c1d05edcce7e0a7"}}

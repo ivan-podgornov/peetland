@@ -1,1 +1,0 @@
-{"id":"e2f54247c837fee032f83bf67f5d98f5.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-actor/__tests__/play-animation/play-animation.spec.ts#VirtualActor #playAnimation Если анимации нет в таблице, выбрасывает ошибку","name":"Если анимации нет в таблице, выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"67126eb9bfddb196e3d261e6511c31a2"}}

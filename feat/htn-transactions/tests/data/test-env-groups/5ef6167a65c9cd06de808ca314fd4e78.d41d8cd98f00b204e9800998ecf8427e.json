@@ -1,1 +1,0 @@
-{"id":"5ef6167a65c9cd06de808ca314fd4e78.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/get-angle-to.spec.ts#Geometry #getAngleTo Если цель на севере (+Y), возвращает 0","name":"Если цель на севере (+Y), возвращает 0","status":"passed","testResultsByEnv":{"default":"1cb83051137a252ac8ed4d8b009081b9"}}

@@ -7106,24 +7106,21 @@ function Executor.prototype.canStop(self)
     return not previous or not self:isPartOfSameTransaction(previous, current)
 end
 function Executor.prototype.isPartOfTransaction(self, step)
-    return self:findTransaction(step) ~= nil
+    return self:findTransaction(step.isPartOf) ~= nil
 end
 function Executor.prototype.isPartOfSameTransaction(self, first, second)
-    local transaction = self:findTransaction(first)
-    return transaction ~= nil and transaction == self:findTransaction(second)
+    local transaction = self:findTransaction(first.isPartOf)
+    return transaction ~= nil and transaction == self:findTransaction(second.isPartOf)
 end
-function Executor.prototype.findTransaction(self, step)
-    local transaction = nil
-    do
-        local node = step.isPartOf
-        while node do
-            if node.task.transaction then
-                transaction = node
-            end
-            node = node.isPartOf
-        end
+function Executor.prototype.findTransaction(self, node)
+    if not node then
+        return nil
     end
-    return transaction
+    local outer = self:findTransaction(node.isPartOf)
+    if outer then
+        return outer
+    end
+    return node.task.transaction and node or nil
 end
 function Executor.prototype.start(self, state, context)
     if not self.currentTask:canExecute(state) then

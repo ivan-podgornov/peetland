@@ -1,1 +1,0 @@
-{"id":"fb1880b67c6e6e07bb269144239b5168.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили после завершения команды Не завершает Observable ошибкой","name":"Не завершает Observable ошибкой","status":"passed","testResultsByEnv":{"default":"e6f6d985fd6bb7d90186a4b1e0b78908"}}

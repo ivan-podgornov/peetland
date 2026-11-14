@@ -1,1 +1,0 @@
-{"id":"214d9f26db2916a5421e489b5f4f8618.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили во время выполнения Вызывает onFinish с 'cancelled'","name":"Вызывает onFinish с 'cancelled'","status":"passed","testResultsByEnv":{"default":"b055a99d66dfeb33f58c8d26028b7448"}}

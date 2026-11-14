@@ -1,1 +1,0 @@
-{"id":"3bbe97058ef7e022e704620a96b4b8d3.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/cancel.spec.ts#Command #cancel Если команда уже прервана, не вызывает onFinish повторно","name":"Если команда уже прервана, не вызывает onFinish повторно","status":"passed","testResultsByEnv":{"default":"0de927ca43dd185b9f294f95d4c589ea"}}

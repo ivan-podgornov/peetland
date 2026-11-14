@@ -1,1 +1,0 @@
-{"id":"104525134b3dc469af70a6505ba0fc19.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/multicast-observer/complete.spec.ts#MulticastObserver #complete При ошибке при вызове observer.complete Передаёт ошибку в reportError","name":"Передаёт ошибку в reportError","status":"passed","testResultsByEnv":{"default":"94de1c7b4c652d88ca127c827501655e"}}

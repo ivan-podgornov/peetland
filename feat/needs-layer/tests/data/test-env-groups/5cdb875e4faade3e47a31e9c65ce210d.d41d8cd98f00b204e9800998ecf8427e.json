@@ -1,1 +1,0 @@
-{"id":"5cdb875e4faade3e47a31e9c65ce210d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-actor/__tests__/go-to-coords/on-arrive.spec.ts#VirtualActor #goToCoords При входе актора в радиус Не учитывает высоту при проверке радиуса","name":"Не учитывает высоту при проверке радиуса","status":"passed","testResultsByEnv":{"default":"75dc1759656ca4a0545695d708f597d9"}}

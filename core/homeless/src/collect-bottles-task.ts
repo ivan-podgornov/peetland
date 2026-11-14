@@ -1,3 +1,4 @@
+import { TransactionTask } from '@peetland/htn';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
@@ -78,12 +79,15 @@ export class CollectBottlesTask implements CompoundTask<NpcState, NpcContext> {
           main: npcTaskFactory.tryLuck({ chance: BOTTLE_FIND_CHANCE }),
           background: npcTaskFactory.playAnimation({ animation: 'trash-search' }),
         }),
-        npcTaskFactory.playAnimation({ animation: 'trash-search-pocket' }),
-        npcTaskFactory.addItem({
-          item: Item.Bottles,
-          count: 1,
-        }),
-        npcTaskFactory.psycheReact({ deed: Deed.BottleFound })
+        // Забрать бутылку — транзакция: если NPC положил её в карман, она у него, и он ей рад
+        new TransactionTask('pocket-bottle', [
+          npcTaskFactory.playAnimation({ animation: 'trash-search-pocket' }),
+          npcTaskFactory.addItem({
+            item: Item.Bottles,
+            count: 1,
+          }),
+          npcTaskFactory.psycheReact({ deed: Deed.BottleFound }),
+        ])
       );
     }
 

@@ -1,4 +1,5 @@
-import type { CompoundTask, Method, PrimitiveTask, Task } from '@peetland/htn';
+import { TransactionTask } from '@peetland/htn';
+import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
 import type { NpcContext, NpcState } from '@peetland/npc';
@@ -35,7 +36,8 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   constructor(deps: DrinkTaskDeps) {
     const { npcTaskFactory } = deps;
-    const drink: PrimitiveTask<NpcState, NpcContext>[] = [
+    // Выпить — транзакция: если NPC выпил, пойло кончилось, а пустая бутылка осталась
+    const drink = new TransactionTask<NpcState, NpcContext>('drink-booze', [
       npcTaskFactory.playAnimation({
         animation: 'drink-standing-1',
         duration: DrinkTask.DURATION,
@@ -48,7 +50,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
         item: Item.Bottles,
         count: 1,
       }),
-    ];
+    ]);
 
     this.places = deps.places;
     this.deps = deps;
@@ -56,13 +58,13 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
       {
         name: 'drink-in-camp',
         preconditions: (state) => hasBooze(state) && this.isInCamp(state),
-        tasks: drink,
+        tasks: [drink],
       },
       {
         name: 'go-to-camp-and-drink',
         preconditions: (state) =>
           hasBooze(state) && this.places.ofType(PlaceType.HomelessCamp).length > 0,
-        tasks: (state) => [this.goToNearestCamp(state), ...drink],
+        tasks: (state) => [this.goToNearestCamp(state), drink],
       },
     ];
   }

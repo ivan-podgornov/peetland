@@ -25,7 +25,7 @@ function createInstant() {
 describe('Executor', () => {
   describe('#softStop', () => {
     describe('Если текущая задача в транзакции', () => {
-      it('Продолжает задачу, которая идёт', () => {
+      it('Если текущая задача является частью транзакции, продолжает её выполнять', () => {
         const pay = createMockedPrimitive();
         const executor = new Executor(toSteps([pay], createPurchase()));
         executor.update(testState, testContext); // Pay началась
@@ -36,7 +36,7 @@ describe('Executor', () => {
         expect(pay.update).toHaveBeenCalledExactlyOnceWith(testState, testContext);
       });
 
-      it('Если транзакция выше по цепочке isPartOf, продолжает задачу, которая идёт', () => {
+      it('Если текущая задача является частью составной задачи внутри транзакции, продолжает её выполнять', () => {
         const giveMoney = createMockedPrimitive();
         const pay = node(compound('Pay', method('Give')), createPurchase());
         const executor = new Executor(toSteps([giveMoney], pay));
@@ -48,7 +48,7 @@ describe('Executor', () => {
         expect(giveMoney.update).toHaveBeenCalledOnce();
       });
 
-      it('Если следующая задача из той же транзакции, начинает её', () => {
+      it('Если следующая задача является частью той же транзакции, что и текущая задача, начинает её выполнять', () => {
         const take = createMockedPrimitive();
         const executor = new Executor(toSteps([createInstant(), take], createPurchase()));
         executor.update(testState, testContext); // Pay завершилась, Take ещё не началась

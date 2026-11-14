@@ -1,3 +1,4 @@
+import { TransactionTask } from '@peetland/htn';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
@@ -83,15 +84,18 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
         angle: collection.angle,
         tolerance: SellBottlesTask.COLLECTION_FACING_TOLERANCE,
       }),
-      npcTaskFactory.playAnimation({ animation: 'item-give' }),
-      npcTaskFactory.removeItem({
-        item: Item.Bottles,
-        count: bottles,
-      }),
-      npcTaskFactory.addItem({
-        item: Item.Money,
-        count: bottles * BOTTLE_PRICE,
-      }),
+      // Сдача — транзакция: если NPC отдал бутылки, он не уйдёт без денег
+      new TransactionTask('hand-over-bottles', [
+        npcTaskFactory.playAnimation({ animation: 'item-give' }),
+        npcTaskFactory.removeItem({
+          item: Item.Bottles,
+          count: bottles,
+        }),
+        npcTaskFactory.addItem({
+          item: Item.Money,
+          count: bottles * BOTTLE_PRICE,
+        }),
+      ]),
     ];
   }
 

@@ -7020,6 +7020,11 @@ function ____exports.isPrimitive(task)
 end
 return ____exports
  end,
+["toolkit.htn.src.plan"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
 ["toolkit.htn.src.executor"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -7036,14 +7041,14 @@ local ____exports = {}
 ____exports.Executor = __TS__Class()
 local Executor = ____exports.Executor
 Executor.name = "Executor"
-function Executor.prototype.____constructor(self, tasks)
-    if not #tasks then
+function Executor.prototype.____constructor(self, steps)
+    if not #steps then
         error(
             __TS__New(Error, "Tasks list can't be empty"),
             0
         )
     end
-    self.tasks = tasks
+    self.steps = steps
     self.currentTaskIndex = 0
     self.status = "idle"
     self.taskStarted = false
@@ -7096,15 +7101,15 @@ __TS__SetDescriptor(
     Executor.prototype,
     "currentTask",
     {get = function(self)
-        local task = self.tasks[self.currentTaskIndex + 1]
-        if not task then
-            local message = ((("Current task' index (" .. tostring(self.currentTaskIndex)) .. ") must be in range of tasks length (") .. tostring(#self.tasks)) .. ")"
+        local step = self.steps[self.currentTaskIndex + 1]
+        if not step then
+            local message = ((("Current task' index (" .. tostring(self.currentTaskIndex)) .. ") must be in range of tasks length (") .. tostring(#self.steps)) .. ")"
             error(
                 __TS__New(RangeError, message),
                 0
             )
         end
-        return task
+        return step.task
     end},
     true
 )
@@ -7113,7 +7118,8 @@ __TS__SetDescriptor(
     "nextTask",
     {get = function(self)
         local index = self.currentTaskIndex + 1
-        return self.tasks[index + 1] or nil
+        local ____opt_0 = self.steps[index + 1]
+        return ____opt_0 and ____opt_0.task or nil
     end},
     true
 )
@@ -7124,6 +7130,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArraySlice = ____lualib.__TS__ArraySlice
 local __TS__ArrayConcat = ____lualib.__TS__ArrayConcat
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
 local ____task = require("toolkit.htn.src.task")
 local isPrimitive = ____task.isPrimitive
@@ -7133,33 +7140,49 @@ Planner.name = "Planner"
 function Planner.prototype.____constructor(self)
 end
 function Planner.prototype.plan(self, root, state)
-    return self:decompose({root}, state)
+    return self:decompose(
+        {self:partOf(root, nil)},
+        state
+    )
 end
 function Planner.prototype.decompose(self, tasks, state)
     local ____tasks_0 = tasks
     local head = ____tasks_0[1]
     local tail = __TS__ArraySlice(____tasks_0, 1)
-    if not head then
+    if not (head and head.task) then
         return {}
     end
-    if isPrimitive(head) then
-        if not head:canExecute(state) then
+    local ____head_3 = head
+    local task = ____head_3.task
+    local isPartOf = ____head_3.isPartOf
+    if isPrimitive(task) then
+        if not task:canExecute(state) then
             return nil
         end
         local decomposedTail = self:decompose(
             tail,
-            head:applyEffects(state)
+            task:applyEffects(state)
         )
-        return decomposedTail and __TS__ArrayConcat({head}, decomposedTail)
+        return decomposedTail and __TS__ArrayConcat(
+            {self:partOf(task, isPartOf)},
+            decomposedTail
+        )
     end
-    for ____, method in ipairs(head.methods) do
+    for ____, method in ipairs(task.methods) do
         do
             if not method:preconditions(state) then
                 goto __continue8
             end
+            local node = {task = task, method = method, isPartOf = isPartOf}
             local subtasks = type(method.tasks) == "function" and method.tasks(state) or method.tasks
             local decomposedSubtasks = self:decompose(
-                __TS__ArrayConcat(subtasks, tail),
+                __TS__ArrayConcat(
+                    __TS__ArrayMap(
+                        subtasks,
+                        function(____, subtask) return self:partOf(subtask, node) end
+                    ),
+                    tail
+                ),
                 state
             )
             if decomposedSubtasks then
@@ -7169,6 +7192,9 @@ function Planner.prototype.decompose(self, tasks, state)
         ::__continue8::
     end
     return nil
+end
+function Planner.prototype.partOf(self, task, isPartOf)
+    return {task = task, isPartOf = isPartOf}
 end
 return ____exports
  end,
@@ -7183,7 +7209,7 @@ local ____planner = require("toolkit.htn.src.planner")
 local Planner = ____planner.Planner
 function ____exports.getDefaultDeps()
     return {
-        executorFactory = function(____, tasks) return __TS__New(Executor, tasks) end,
+        executorFactory = function(____, steps) return __TS__New(Executor, steps) end,
         plannerFactory = function() return __TS__New(Planner) end
     }
 end
@@ -7203,11 +7229,11 @@ function HTN.prototype.update(self, state, context)
     if not self.executor then
         local ____self_deps_0 = self.deps
         local executorFactory = ____self_deps_0.executorFactory
-        local tasks = self.planner:plan(self.root, state)
-        if not tasks then
+        local steps = self.planner:plan(self.root, state)
+        if not steps then
             return
         end
-        self.executor = executorFactory(nil, tasks)
+        self.executor = executorFactory(nil, steps)
     end
     local status = self.executor:update(state, context)
     if status ~= "running" then
@@ -7248,6 +7274,7 @@ return ____exports
 ["toolkit.htn.src.parallel-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 --- Примитивная задача, которая выполняет две задачи одновременно: основную и фоновую. Завершается
 -- с результатом основной и тогда же останавливает фоновую. Если фоновая завершилась ошибкой,
@@ -7328,6 +7355,22 @@ function ParallelTask.prototype.stopBackground(self, context, execution)
         self.options.background:stop(context)
     end
 end
+__TS__SetDescriptor(
+    ParallelTask.prototype,
+    "main",
+    {get = function(self)
+        return self.options.main
+    end},
+    true
+)
+__TS__SetDescriptor(
+    ParallelTask.prototype,
+    "background",
+    {get = function(self)
+        return self.options.background
+    end},
+    true
+)
 return ____exports
  end,
 ["toolkit.htn.src.index"] = function(...) 

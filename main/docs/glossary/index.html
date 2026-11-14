@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/main/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.eb0d396c.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.14b90d69.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.33544e89.js" defer="defer"></script>
 </head>
 <body>
@@ -92,6 +92,9 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <li class=""><strong>Эффект</strong> — как задача меняет состояние, например, после «идти к координатам» NPC оказывается в
 точке. Планировщик применяет эффекты, чтобы проверить предусловия следующих задач.</li>
 <li class=""><strong>План</strong> — последовательность примитивных задач, в которую планировщик разложил корневую задачу.</li>
+<li class=""><strong>Шаг плана</strong> (<code>PlanStep</code>) — примитивная задача плана и узел разложения, частью которого она
+запланирована. Цепочка узлов приводит к корневой задаче и показывает, какой метод выбран на
+каждом уровне.</li>
 <li class=""><strong>Планировщик</strong> (<code>Planner</code>) — выбирает метод и раскладывает корневую задачу в план по текущему
 состоянию.</li>
 <li class=""><strong>Исполнитель</strong> (<code>Executor</code>) — выполняет задачи плана по очереди. Если задача не удалась, отдаёт

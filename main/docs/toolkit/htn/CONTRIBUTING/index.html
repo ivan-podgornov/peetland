@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/htn | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-toolkit-current"><meta data-rh="true" property="og:title" content="@peetland/htn | Peetland"><meta data-rh="true" name="description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><meta data-rh="true" property="og:description" content="HTN (Hierarchical Task Network) - это подход к планированию поведения NPC, где задача описывается"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/htn","item":"https://ivan-podgornov.github.io/peetland/main/docs/toolkit/htn/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.eb0d396c.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.14b90d69.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.33544e89.js" defer="defer"></script>
 </head>
 <body>
@@ -57,6 +57,15 @@
 <p>Если вся цепочка подзадач метода может быть выполнена, то этот метод и будет превращён в план.
 План - это набор задач, декомпозированных до примитивных. План является результатом работы
 планировщика.</p>
+<h4 class="anchor anchorTargetStickyNavbar_tleR" id="шаги-плана">Шаги плана<a href="#шаги-плана" class="hash-link" aria-label="Прямая ссылка на Шаги плана" title="Прямая ссылка на Шаги плана" translate="no">​</a></h4>
+<p>План состоит из шагов (<code>PlanStep</code>). В шаге лежит примитивная задача (<code>task</code>) и узел разложения,
+частью которого она запланирована (<code>isPartOf</code>). Узел (<code>PlanNode</code>) — это составная задача, метод,
+которым планировщик её разложил, и родительский узел. У узла корневой задачи родителя нет, поэтому
+цепочка <code>isPartOf</code> от любого шага приводит к корню, и по ней видно, почему план именно такой. Если
+корневая задача — сама примитивная, у её шага <code>isPartOf</code> равен <code>null</code>.</p>
+<p>Узлы создаёт планировщик, а не задачи: составная задача — переиспользуемый объект и не знает своего
+родителя. На каждое разложение планировщик создаёт новый узел, поэтому одна составная задача,
+запланированная дважды, даёт два разных узла, а задачи одного разложения — части одного узла.</p>
 <h3 class="anchor anchorTargetStickyNavbar_tleR" id="исполнитель">Исполнитель<a href="#исполнитель" class="hash-link" aria-label="Прямая ссылка на Исполнитель" title="Прямая ссылка на Исполнитель" translate="no">​</a></h3>
 <p>Исполнитель - это сущность которая принимает на вход план и выполняет его задачи, последовательно их
 запуская. В случае если задача не может быть выполнена, исполнитель прерывает своё выполнение и
@@ -75,6 +84,8 @@
 <code>failed</code>.</li>
 <li class="">Эффекты фоновой задачи не учитываются, поэтому она не должна менять состояние.</li>
 </ul>
+<p>Для планировщика параллельная задача — обычная примитивная, и в плане у неё один шаг. Её состав
+видно в полях <code>main</code> и <code>background</code>.</p>
 <p>Задачи не должны мешать друг другу. Ждать и проигрывать анимацию можно одновременно, а идти в две
 стороны — нельзя.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="пример-htn">Пример HTN<a href="#пример-htn" class="hash-link" aria-label="Прямая ссылка на Пример HTN" title="Прямая ссылка на Пример HTN" translate="no">​</a></h2>

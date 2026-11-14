@@ -6344,7 +6344,7 @@ local Need = ____need.Need
 --- Минут в игровых сутках
 local MINUTES_PER_DAY = 24 * 60
 --- Описание каждой потребности
-____exports.NEED_DEFINITIONS = {[Need.Satiety] = {category = NeedCategory.Vital, depletionMinutes = MINUTES_PER_DAY}}
+____exports.NEED_DEFINITIONS = {[Need.Satiety] = {category = NeedCategory.Vital, depletionMinutes = MINUTES_PER_DAY, urgentBelow = 25, calmAbove = 60}}
 --- На сколько растёт сытость, когда NPC поел: досыта, чтобы жизнь NPC не крутилась вокруг еды
 ____exports.EAT_SATIETY = 100
 return ____exports
@@ -6440,6 +6440,9 @@ function Needs.prototype.getAll(self, time)
         } end
     ))
 end
+function Needs.prototype.isUrgent(self, need, time)
+    return self:get(need, time) < NEED_DEFINITIONS[need].urgentBelow
+end
 function Needs.prototype.getState(self)
     return self.state
 end
@@ -6469,9 +6472,9 @@ function Needs.prototype.perform(self, activity, _details, time)
 end
 function Needs.prototype.contribute(self, activity)
     repeat
-        local ____switch13 = activity
-        local ____cond13 = ____switch13 == Activity.Eat
-        if ____cond13 then
+        local ____switch14 = activity
+        local ____cond14 = ____switch14 == Activity.Eat
+        if ____cond14 then
             return {[Need.Satiety] = EAT_SATIETY}
         end
     until true
@@ -7505,6 +7508,7 @@ function Npc.prototype.____constructor(self, data, deps)
     local gameSignal = ____deps_0.gameSignal
     local worldKnowledge = ____deps_0.worldKnowledge
     self.id = data.id
+    self.kind = data.kind
     self.worldKnowledge = worldKnowledge
     self.inventory = inventoryFactory:create(data.inventory)
     self.psyche = psycheFactory:create(data.psyche)
@@ -7536,6 +7540,7 @@ end
 function Npc.prototype.getState(self)
     return {
         self = {
+            kind = self.kind,
             actor = {
                 position = self.actor:getPosition(),
                 angle = self.actor:getAngle()
@@ -7788,6 +7793,88 @@ function NpcWorldKnowledge.prototype.getState(self)
     local ____self_deps_0 = self.deps
     local time = ____self_deps_0.time
     return {time = time}
+end
+return ____exports
+ end,
+["core.needs-tasks.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.needs-tasks.src.needs-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____needs = require("core.needs.src.index")
+local Need = ____needs.Need
+--- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
+-- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
+-- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
+-- нет, задачу не спланировать
+____exports.NeedsTask = __TS__Class()
+local NeedsTask = ____exports.NeedsTask
+NeedsTask.name = "NeedsTask"
+function NeedsTask.prototype.____constructor(self, deps)
+    self.name = "needs"
+    local ____deps_0 = deps
+    local needsTaskFactory = ____deps_0.needsTaskFactory
+    self.methods = {{
+        name = "satisfy-hunger",
+        preconditions = function(____, state) return state.self.needs:isUrgent(Need.Satiety, state.world.time) end,
+        tasks = {needsTaskFactory:satisfyHunger()}
+    }}
+end
+return ____exports
+ end,
+["core.needs-tasks.src.satisfy-hunger-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Утолить голод: восполнить сытость. Методы — способы поесть, одинаковые для всех типов NPC. Если
+-- способ доступен не всем, это решают его предусловия, например по типу NPC. Пока способов нет,
+-- поэтому методов нет, и утолить голод нечем
+____exports.SatisfyHungerTask = __TS__Class()
+local SatisfyHungerTask = ____exports.SatisfyHungerTask
+SatisfyHungerTask.name = "SatisfyHungerTask"
+function SatisfyHungerTask.prototype.____constructor(self)
+    self.name = "satisfy-hunger"
+    self.methods = {}
+end
+return ____exports
+ end,
+["core.needs-tasks.src.factory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____needs_2Dtask = require("core.needs-tasks.src.needs-task")
+local NeedsTask = ____needs_2Dtask.NeedsTask
+local ____satisfy_2Dhunger_2Dtask = require("core.needs-tasks.src.satisfy-hunger-task")
+local SatisfyHungerTask = ____satisfy_2Dhunger_2Dtask.SatisfyHungerTask
+--- Создаёт задачи удовлетворения потребностей. На каждый вызов задача новая
+____exports.NeedsTaskFactory = __TS__Class()
+local NeedsTaskFactory = ____exports.NeedsTaskFactory
+NeedsTaskFactory.name = "NeedsTaskFactory"
+function NeedsTaskFactory.prototype.____constructor(self)
+end
+function NeedsTaskFactory.prototype.satisfyNeeds(self)
+    return __TS__New(NeedsTask, {needsTaskFactory = self})
+end
+function NeedsTaskFactory.prototype.satisfyHunger(self)
+    return __TS__New(SatisfyHungerTask)
+end
+return ____exports
+ end,
+["core.needs-tasks.src.index"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____factory = require("core.needs-tasks.src.factory")
+    ____exports.NeedsTaskFactory = ____factory.NeedsTaskFactory
+end
+do
+    local ____needs_2Dtask = require("core.needs-tasks.src.needs-task")
+    ____exports.NeedsTask = ____needs_2Dtask.NeedsTask
 end
 return ____exports
  end,
@@ -8992,39 +9079,6 @@ function HobbiesTaskFactory.prototype.create(self)
 end
 return ____exports
  end,
-["core.world.src.needs-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
---- Слой потребностей корневой задачи NPC: то, без чего NPC не может жить. Пока потребностей нет ни у
--- кого, поэтому методов нет, и планировщик переходит к следующему слою
-____exports.NeedsTask = __TS__Class()
-local NeedsTask = ____exports.NeedsTask
-NeedsTask.name = "NeedsTask"
-function NeedsTask.prototype.____constructor(self)
-    self.name = "needs"
-    self.methods = {}
-end
-return ____exports
- end,
-["core.world.src.needs-task-factory"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local ____needs_2Dtask = require("core.world.src.needs-task")
-local NeedsTask = ____needs_2Dtask.NeedsTask
---- Создаёт слой потребностей корневой задачи NPC (см. NeedsTask)
-____exports.NeedsTaskFactory = __TS__Class()
-local NeedsTaskFactory = ____exports.NeedsTaskFactory
-NeedsTaskFactory.name = "NeedsTaskFactory"
-function NeedsTaskFactory.prototype.____constructor(self)
-end
-function NeedsTaskFactory.prototype.create(self)
-    return __TS__New(NeedsTask)
-end
-return ____exports
- end,
 ["core.world.src.root-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -9073,14 +9127,14 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____needs_2Dtasks = require("core.needs-tasks.src.index")
+local NeedsTaskFactory = ____needs_2Dtasks.NeedsTaskFactory
 local ____activity_2Dtask_2Dfactory = require("core.world.src.activity-task-factory")
 local ActivityTaskFactory = ____activity_2Dtask_2Dfactory.ActivityTaskFactory
 local ____addictions_2Dtask_2Dfactory = require("core.world.src.addictions-task-factory")
 local AddictionsTaskFactory = ____addictions_2Dtask_2Dfactory.AddictionsTaskFactory
 local ____hobbies_2Dtask_2Dfactory = require("core.world.src.hobbies-task-factory")
 local HobbiesTaskFactory = ____hobbies_2Dtask_2Dfactory.HobbiesTaskFactory
-local ____needs_2Dtask_2Dfactory = require("core.world.src.needs-task-factory")
-local NeedsTaskFactory = ____needs_2Dtask_2Dfactory.NeedsTaskFactory
 local ____root_2Dtask = require("core.world.src.root-task")
 local RootTask = ____root_2Dtask.RootTask
 --- Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв
@@ -9122,7 +9176,7 @@ function RootTaskFactory.prototype.create(self, kind)
     return __TS__New(
         RootTask,
         {
-            needs = needsTaskFactory:create(kind),
+            needs = needsTaskFactory:satisfyNeeds(),
             addictions = addictionsTaskFactory:create(kind),
             activity = activityTaskFactory:create(kind),
             hobbies = hobbiesTaskFactory:create(kind)

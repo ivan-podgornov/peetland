@@ -1,1 +1,0 @@
-{"id":"1e9249c1383fbc510c0b3118b342eb6a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/get-all.spec.ts#Inventory #getAll Изменение возвращённого объекта не меняет инвентарь","name":"Изменение возвращённого объекта не меняет инвентарь","status":"passed","testResultsByEnv":{"default":"5372c6060d1018d7d8ebb74b2e940071"}}

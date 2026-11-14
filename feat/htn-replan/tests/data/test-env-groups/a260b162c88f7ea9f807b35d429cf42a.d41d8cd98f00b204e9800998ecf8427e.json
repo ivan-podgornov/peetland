@@ -1,1 +1,0 @@
-{"id":"a260b162c88f7ea9f807b35d429cf42a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/luck/adjust-chance.spec.ts#Luck #adjustChance Если шанс 0, возвращает 0","name":"Если шанс 0, возвращает 0","status":"passed","testResultsByEnv":{"default":"f398bffa116d34db7fb4613408f45e4d"}}

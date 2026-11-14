@@ -7140,12 +7140,15 @@ Planner.name = "Planner"
 function Planner.prototype.____constructor(self)
 end
 function Planner.prototype.plan(self, root, state)
-    return self:decompose({{task = root, isPartOf = nil}}, state)
+    return self:decompose(
+        {self:partOf(root, nil)},
+        state
+    )
 end
-function Planner.prototype.decompose(self, pending, state)
-    local ____pending_0 = pending
-    local head = ____pending_0[1]
-    local tail = __TS__ArraySlice(____pending_0, 1)
+function Planner.prototype.decompose(self, tasks, state)
+    local ____tasks_0 = tasks
+    local head = ____tasks_0[1]
+    local tail = __TS__ArraySlice(____tasks_0, 1)
     if not (head and head.task) then
         return {}
     end
@@ -7160,7 +7163,10 @@ function Planner.prototype.decompose(self, pending, state)
             tail,
             task:applyEffects(state)
         )
-        return decomposedTail and __TS__ArrayConcat({{task = task, isPartOf = isPartOf}}, decomposedTail)
+        return decomposedTail and __TS__ArrayConcat(
+            {self:partOf(task, isPartOf)},
+            decomposedTail
+        )
     end
     for ____, method in ipairs(task.methods) do
         do
@@ -7173,7 +7179,7 @@ function Planner.prototype.decompose(self, pending, state)
                 __TS__ArrayConcat(
                     __TS__ArrayMap(
                         subtasks,
-                        function(____, subtask) return {task = subtask, isPartOf = node} end
+                        function(____, subtask) return self:partOf(subtask, node) end
                     ),
                     tail
                 ),
@@ -7186,6 +7192,9 @@ function Planner.prototype.decompose(self, pending, state)
         ::__continue8::
     end
     return nil
+end
+function Planner.prototype.partOf(self, task, isPartOf)
+    return {task = task, isPartOf = isPartOf}
 end
 return ____exports
  end,

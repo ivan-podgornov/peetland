@@ -1,1 +1,0 @@
-{"id":"1b292fd32258526927ea630f3b9c3cb6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/time-state-validator.spec.ts#TimeStateValidator #validate Если день не целый, выбрасывает RangeError","name":"Если день не целый, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"a99e70ed71e663141163caf0ba5a2dce"}}

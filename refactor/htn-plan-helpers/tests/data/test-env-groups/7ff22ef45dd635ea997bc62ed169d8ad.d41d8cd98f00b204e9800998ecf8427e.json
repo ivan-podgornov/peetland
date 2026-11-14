@@ -1,1 +1,0 @@
-{"id":"7ff22ef45dd635ea997bc62ed169d8ad.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/remove.spec.ts#Inventory #remove Если предмета нет, возвращает false","name":"Если предмета нет, возвращает false","status":"passed","testResultsByEnv":{"default":"7bd2e609758a4564d810356ecf1570ea"}}

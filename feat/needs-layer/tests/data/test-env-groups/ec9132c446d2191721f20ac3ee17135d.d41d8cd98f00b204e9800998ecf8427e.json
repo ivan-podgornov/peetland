@@ -1,0 +1,1 @@
+{"id":"ec9132c446d2191721f20ac3ee17135d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/abort-signal/aborted-state.spec.ts#AbortSignal При состоянии aborted #throwIfAborted Выбрасывает reason","name":"Выбрасывает reason","status":"passed","testResultsByEnv":{"default":"9a2df2dfa3feb019b412b3879fe0b4ba"}}

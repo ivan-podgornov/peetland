@@ -1,6 +1,6 @@
 import { HTNFactory } from '@peetland/htn';
 import { InventoryFactory } from '@peetland/inventory';
-import { NeedsFactory } from '@peetland/needs';
+import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
 import { PsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
@@ -22,7 +22,12 @@ export type NpcFactoryDeps = Pick<
   NpcDeps,
   'actorFactory' | 'ticks' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
 > &
-  Partial<Pick<NpcDeps, 'htnFactory' | 'inventoryFactory' | 'psycheFactory' | 'needsFactory'>>;
+  Partial<
+    Pick<
+      NpcDeps,
+      'htnFactory' | 'inventoryFactory' | 'psycheFactory' | 'needsFactory' | 'urgencyWatcherFactory'
+    >
+  >;
 
 export class NpcFactory implements INpcFactory {
   private readonly deps: NpcDeps;
@@ -38,6 +43,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory = new InventoryFactory(),
       psycheFactory = new PsycheFactory(),
       needsFactory = new NeedsFactory(),
+      urgencyWatcherFactory = new UrgencyWatcherFactory(),
     } = deps;
 
     this.deps = {
@@ -47,6 +53,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory,
       psycheFactory,
       needsFactory,
+      urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
       worldKnowledge,

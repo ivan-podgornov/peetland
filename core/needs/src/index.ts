@@ -8,5 +8,7 @@ export { Need } from './need';
 export { Needs } from './needs';
 export type { INeeds, IReadonlyNeeds, NeedsDeps } from './needs';
 export type { NeedDefinition, NeedDefinitions, NeedRecord, NeedsState, NeedValues } from './types';
+export { UrgencyWatcher, UrgencyWatcherFactory } from './urgency-watcher';
+export type { IUrgencyWatcher, IUrgencyWatcherFactory } from './urgency-watcher';
 export { NeedsValidator } from './validator';
 export type { INeedsValidator } from './validator';

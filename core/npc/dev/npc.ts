@@ -2,7 +2,11 @@ import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
-import { createMockedNeedsFactory, createNeedValues } from '@peetland/needs/dev';
+import {
+  createMockedNeedsFactory,
+  createMockedUrgencyWatcherFactory,
+  createNeedValues,
+} from '@peetland/needs/dev';
 import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
@@ -41,6 +45,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
     needsFactory: createMockedNeedsFactory(),
+    urgencyWatcherFactory: createMockedUrgencyWatcherFactory(),
     rootTaskFactory: {
       create: vi.fn(() => ({
         name: 'root',

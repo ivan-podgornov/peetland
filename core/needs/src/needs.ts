@@ -35,6 +35,14 @@ export interface IReadonlyNeeds {
    * @param time - время, на момент которого нужна срочность, обычно время из того же состояния
    */
   isUrgent(need: Need, time: IReadonlyTime): boolean;
+  /**
+   * Возвращает, спокойна ли потребность на момент time: её значение выше порога calmAbove из
+   * описания (см. NEED_DEFINITIONS). Срочная потребность перестаёт быть срочной, только когда стала
+   * спокойной
+   * @param need - потребность
+   * @param time - время, на момент которого нужно спокойствие
+   */
+  isCalm(need: Need, time: IReadonlyTime): boolean;
   /** Возвращает состояние потребностей. Из него конструктор собирает такие же потребности */
   getState(): NeedsState;
   /** Возвращает копию потребностей, в которую можно писать. Исходные потребности копия не меняет */
@@ -106,6 +114,10 @@ export class Needs implements INeeds {
 
   isUrgent(need: Need, time: IReadonlyTime): boolean {
     return this.get(need, time) < NEED_DEFINITIONS[need].urgentBelow;
+  }
+
+  isCalm(need: Need, time: IReadonlyTime): boolean {
+    return this.get(need, time) > NEED_DEFINITIONS[need].calmAbove;
   }
 
   getState(): NeedsState {

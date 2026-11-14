@@ -1,3 +1,4 @@
+import { findTransaction } from './plan';
 import type { PlanStep } from './plan';
 import type { PrimitiveTask, TaskResult } from './task';
 
@@ -13,6 +14,12 @@ export interface IExecutor<TState, TContext> {
 
   /** Возвращает задачу, которая выполняется в данный момент */
   get currentTask(): PrimitiveTask<TState, TContext> | null;
+
+  /**
+   * Возвращает, можно ли сейчас прервать выполнение, не сломав транзакцию: текущая задача вне
+   * транзакции или транзакция ещё не началась
+   */
+  get interruptible(): boolean;
 }
 
 export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
@@ -39,14 +46,24 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
   }
 
   get currentTask(): PrimitiveTask<TState, TContext> {
-    const step = this.steps[this.currentTaskIndex];
+    return this.currentStep.task;
+  }
 
-    if (!step) {
-      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.steps.length})`;
-      throw new RangeError(message);
+  get interruptible(): boolean {
+    const transaction = findTransaction(this.currentStep);
+
+    if (!transaction) {
+      return true;
     }
 
-    return step.task;
+    if (this.taskStarted) {
+      return false;
+    }
+
+    // Задача ещё не началась: прервать можно, если с неё транзакция только начинается
+    const previous = this.steps[this.currentTaskIndex - 1];
+
+    return !previous || findTransaction(previous) !== transaction;
   }
 
   update(state: TState, context: TContext): TaskResult {
@@ -89,6 +106,17 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     if (this.taskStarted) {
       this.currentTask.stop(context);
     }
+  }
+
+  private get currentStep(): PlanStep<TState, TContext> {
+    const step = this.steps[this.currentTaskIndex];
+
+    if (!step) {
+      const message = `Current task' index (${this.currentTaskIndex}) must be in range of tasks length (${this.steps.length})`;
+      throw new RangeError(message);
+    }
+
+    return step;
   }
 
   /** Начинает выполнение задачи */

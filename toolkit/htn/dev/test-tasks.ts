@@ -48,6 +48,31 @@ export function compound(
   };
 }
 
+/** Составная задача-транзакция (см. CompoundTask.transaction) */
+export function transaction(
+  name: string,
+  ...methods: Method<TestState, TestContext>[]
+): CompoundTask<TestState, TestContext> {
+  return {
+    ...compound(name, ...methods),
+    transaction: true,
+  };
+}
+
+/** Возвращает узел разложения составной задачи первым методом */
+export function node(
+  task: CompoundTask<TestState, TestContext>,
+  isPartOf: PlanNode<TestState, TestContext> | null = null
+): PlanNode<TestState, TestContext> {
+  const [first = method('method')] = task.methods;
+
+  return {
+    task,
+    method: first,
+    isPartOf,
+  };
+}
+
 export function method(
   name: string,
   ...tasks: Task<TestState, TestContext>[]
@@ -139,9 +164,16 @@ export function getDummyPlanner(
   return { plan: vi.fn().mockReturnValueOnce(first).mockReturnValue(second) };
 }
 
-export function getDummyExecutor(taskResult: TaskResult): IExecutor<TestState, TestContext> {
+/**
+ * Создаёт исполнителя, который всегда возвращает переданный результат. Прервать его можно, пока
+ * тест не поменяет interruptible
+ */
+export function getDummyExecutor(
+  taskResult: TaskResult
+): IExecutor<TestState, TestContext> & { interruptible: boolean } {
   return {
     currentTask: null,
+    interruptible: true,
     update: vi.fn().mockReturnValue(taskResult),
     stop: vi.fn().mockReturnValue(taskResult),
   };

@@ -8,6 +8,8 @@ export {
   primitive,
   blockedPrimitive,
   compound,
+  transaction,
+  node,
   method,
   dynamicMethod,
   blockedMethod,

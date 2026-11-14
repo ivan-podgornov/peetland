@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
@@ -6,7 +6,7 @@ import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DRINK_PLAN, createDrinkTask, createPlacesWithCamp } from '../../../dev';
+import { buildDrinkBooze, createDrinkTask, createPlacesWithCamp } from '../../../dev';
 
 describe('DrinkTask', () => {
   describe('Метод go-to-camp-and-drink', () => {
@@ -15,7 +15,13 @@ describe('DrinkTask', () => {
         const task = createDrinkTask(createPlacesWithCamp(false));
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
-        expect(planNames(task, state)).toStrictEqual(['go-to-coords', ...DRINK_PLAN]);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('drink', 'go-to-camp-and-drink', (drink) =>
+              buildDrinkBooze(drink.primitive('go-to-coords'))
+            )
+            .build()
+        );
       });
 
       it('Ищет бомжарню, ближайшую к позиции NPC из состояния', () => {

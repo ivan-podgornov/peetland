@@ -1,10 +1,10 @@
-import { applyPlanEffects, planNames } from '@peetland/htn/dev';
+import { applyPlanEffects, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { DRINK_PLAN, createDrinkTask, createPlacesWithCamp } from '../../../dev';
+import { buildDrinkBooze, createDrinkTask, createPlacesWithCamp } from '../../../dev';
 import { DrinkTask } from '../../../src/drink-task';
 
 describe('DrinkTask', () => {
@@ -14,7 +14,9 @@ describe('DrinkTask', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
-        expect(planNames(task, state)).toStrictEqual(DRINK_PLAN);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder().compound('drink', 'drink-in-camp', buildDrinkBooze).build()
+        );
       });
 
       it('Пьёт стоя в течение DrinkTask.DURATION', () => {

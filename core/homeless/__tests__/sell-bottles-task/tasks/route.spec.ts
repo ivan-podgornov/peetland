@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
@@ -16,16 +16,24 @@ function createStateWithBottles() {
 describe('SellBottlesTask', () => {
   describe('Метод sell-in-nearest-collection', () => {
     describe('Задачи', () => {
-      it('Планирует дойти до приёмки, повернуться к приёмщику, отдать бутылки и получить деньги', () => {
+      it('Планирует дойти до приёмки, повернуться к приёмщику, а отдать бутылки и получить деньги — одной транзакцией', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
 
-        expect(planNames(task, createStateWithBottles())).toStrictEqual([
-          'go-to-coords',
-          'achieve-angle',
-          'play-animation',
-          'remove-item',
-          'add-item',
-        ]);
+        expect(planTree(planSteps(task, createStateWithBottles()) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('sell-bottles', 'sell-in-nearest-collection', (sell) =>
+              sell
+                .primitive('go-to-coords')
+                .primitive('achieve-angle')
+                .transaction('hand-over-bottles', 'hand-over-bottles', (handOver) =>
+                  handOver
+                    .primitive('play-animation')
+                    .primitive('remove-item')
+                    .primitive('add-item')
+                )
+            )
+            .build()
+        );
       });
 
       it('Ищет приёмку, ближайшую к позиции NPC из состояния', () => {

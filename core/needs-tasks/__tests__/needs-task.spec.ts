@@ -1,4 +1,4 @@
-import { createStubTask, planNames } from '@peetland/htn/dev';
+import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { NEED_DEFINITIONS, Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
@@ -27,7 +27,11 @@ describe('NeedsTask', () => {
       });
       const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow - 1);
 
-      expect(planNames(task, state)).toStrictEqual(['satisfy-hunger']);
+      expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('needs', 'satisfy-hunger', (needs) => needs.primitive('satisfy-hunger'))
+          .build()
+      );
     });
 
     it('Если сытость на пороге срочности, план не составляется', () => {
@@ -36,7 +40,7 @@ describe('NeedsTask', () => {
       });
       const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow);
 
-      expect(planNames(task, state)).toBeNull();
+      expect(planSteps(task, state)).toBeNull();
     });
 
     it('Если утолить голод нечем, план не составляется', () => {
@@ -47,7 +51,7 @@ describe('NeedsTask', () => {
       });
       const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow - 1);
 
-      expect(planNames(task, state)).toBeNull();
+      expect(planSteps(task, state)).toBeNull();
     });
   });
 });

@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { PlaceType } from '@peetland/places';
@@ -14,13 +14,13 @@ describe('DrinkTask', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
-        expect(planNames(task, state)).not.toContain('go-to-coords');
+        expect(planTree(planSteps(task, state) ?? [])).toMatchObject([{ method: 'drink-in-camp' }]);
       });
 
       it('Если пойла нет, план не составляется, даже если NPC в бомжарне', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
 
-        expect(planNames(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
+        expect(planSteps(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
       });
 
       it('Проверяет, что NPC в бомжарне, по его позиции и DrinkTask.CAMP_RADIUS', () => {

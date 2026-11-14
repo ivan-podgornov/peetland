@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { TryLuckTaskOptions } from '@peetland/npc-tasks';
@@ -6,7 +6,11 @@ import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { Deed } from '@peetland/psyche';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCollectBottlesTask, createPlacesWithTrashBins } from '../../../dev';
+import {
+  buildPocketBottle,
+  createCollectBottlesTask,
+  createPlacesWithTrashBins,
+} from '../../../dev';
 import { BOTTLE_FIND_CHANCE, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from '../../../src/constants';
 
 /** Планирует заход за одной бутылкой фабрикой примитивов, в которой подменены переданные методы */
@@ -86,16 +90,21 @@ describe('CollectBottlesTask', () => {
           .withInventory({ [Item.Bottles]: MAX_BOTTLES - 2 })
           .build();
 
-        expect(planNames(task, state)?.slice(3, -1)).toStrictEqual([
-          'parallel',
-          'play-animation',
-          'add-item',
-          'psyche-react',
-          'parallel',
-          'play-animation',
-          'add-item',
-          'psyche-react',
-        ]);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('collect-bottles', 'search-random-trash-bin', (collect) =>
+              buildPocketBottle(
+                buildPocketBottle(
+                  collect
+                    .primitive('go-to-coords')
+                    .primitive('achieve-angle')
+                    .primitive('play-animation')
+                    .primitive('parallel')
+                ).primitive('parallel')
+              ).primitive('play-animation')
+            )
+            .build()
+        );
       });
 
       it('Кладёт найденную бутылку в карман с анимацией trash-search-pocket', () => {

@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { PlayAnimationTaskOptions } from '@peetland/npc-tasks';
@@ -19,12 +19,17 @@ describe('BegTask', () => {
           .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD })
           .build();
 
-        expect(planNames(task, state)).toStrictEqual([
-          'go-to-coords',
-          'achieve-angle',
-          'parallel',
-          'add-item',
-        ]);
+        expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+          new PlanStructureBuilder()
+            .compound('beg', 'beg-at-nearest-spot', (beg) =>
+              beg
+                .primitive('go-to-coords')
+                .primitive('achieve-angle')
+                .primitive('parallel')
+                .primitive('add-item')
+            )
+            .build()
+        );
       });
 
       it('Ищет место для клянчанья, ближайшее к NPC', () => {

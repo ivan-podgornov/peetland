@@ -1,4 +1,4 @@
-import { plan, planNames } from '@peetland/htn/dev';
+import { plan, planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { PlaceType } from '@peetland/places';
@@ -15,7 +15,7 @@ describe('BuyBoozeTask', () => {
         const task = createBuyBoozeTask(createPlacesWithShop());
         const state = new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
 
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если денег не хватает на пойло, план не составляется', () => {
@@ -24,14 +24,14 @@ describe('BuyBoozeTask', () => {
           .withInventory({ [Item.Money]: BOOZE_PRICE - 1 })
           .build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
 
       it('Если магазинов нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
         const state = new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
 
-        expect(planNames(createBuyBoozeTask(places), state)).toBeNull();
+        expect(planSteps(createBuyBoozeTask(places), state)).toBeNull();
       });
 
       it('Ищет магазины среди мест типа PlaceType.Shop', () => {

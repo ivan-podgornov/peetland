@@ -1,4 +1,4 @@
-import { planNames } from '@peetland/htn/dev';
+import { planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
@@ -13,20 +13,20 @@ describe('DrinkTask', () => {
         const task = createDrinkTask(createPlacesWithCamp(false));
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
-        expect(planNames(task, state)).not.toBeNull();
+        expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если пойла нет, план не составляется', () => {
         const task = createDrinkTask(createPlacesWithCamp(false));
 
-        expect(planNames(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
+        expect(planSteps(task, new NpcStateBuilder().withEmptyInventory().build())).toBeNull();
       });
 
       it('Если бомжарен нет, план не составляется', () => {
         const task = createDrinkTask(createMockedPlaces());
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
-        expect(planNames(task, state)).toBeNull();
+        expect(planSteps(task, state)).toBeNull();
       });
     });
   });

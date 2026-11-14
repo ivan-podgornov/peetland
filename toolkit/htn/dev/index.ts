@@ -1,6 +1,6 @@
 export { createMockedHTN, createMockedHTNFactory } from './htn';
 export { createMockedPrimitive, createContext } from './parallel-task';
-export { applyPlanEffects, plan, planNames, planSteps } from './plan';
+export { applyPlanEffects, plan, planSteps } from './plan';
 export { PlanStructureBuilder, planTransactions, planTree } from './plan-structure';
 export type { PlannedCompound, PlanStructure, PlanStructureNode } from './plan-structure';
 export { createStubPrimitiveTask, createStubTask, methodTasks } from './task';

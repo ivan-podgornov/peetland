@@ -1,7 +1,7 @@
 import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -44,7 +44,7 @@ describe('DrinkTask', () => {
       });
 
       it('Идёт к бомжарне, которую вернул places.findNearest', () => {
-        const goToCoords = vi.fn();
+        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const camp = createPlace({
           type: PlaceType.HomelessCamp,
           position: {

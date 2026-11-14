@@ -2,7 +2,7 @@ import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/d
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { PlayAnimationTaskOptions } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -49,7 +49,7 @@ describe('BegTask', () => {
       });
 
       it('Идёт к месту, которое вернул places.findNearest', () => {
-        const goToCoords = vi.fn();
+        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const spot = createPlace({
           type: PlaceType.BeggingSpot,
           position: {
@@ -76,7 +76,7 @@ describe('BegTask', () => {
       });
 
       it('Поворачивается на угол места, которое вернул places.findNearest', () => {
-        const achieveAngle = vi.fn();
+        const achieveAngle = vi.fn(() => createStubNpcTask('achieve-angle'));
         const spot = createPlace({
           type: PlaceType.BeggingSpot,
           angle: 90,

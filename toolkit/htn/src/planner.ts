@@ -25,7 +25,7 @@ export class Planner<TState> implements IPlanner<TState> {
   ): PlanStep<TState, TContext>[] | null {
     const [head, ...tail] = tasks;
 
-    if (!head?.task) {
+    if (!head) {
       return [];
     }
 

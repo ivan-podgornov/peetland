@@ -1,0 +1,1 @@
+{"id":"27c5dd20d1056c30b604dd9120dd08ab.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/factory.spec.ts#NpcFactory #create Если psycheFactory не передана, NPC получает экземпляр Psyche","name":"Если psycheFactory не передана, NPC получает экземпляр Psyche","status":"passed","testResultsByEnv":{"default":"40e08857dfd56378e65d6b2749c4a928"}}

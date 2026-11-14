@@ -1,0 +1,1 @@
+{"id":"433f328d28d69089df404d375b384285.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-actor/__tests__/get-angle.spec.ts#VirtualActor #getAngle Если актор переместился, угол не меняется","name":"Если актор переместился, угол не меняется","status":"passed","testResultsByEnv":{"default":"f21e13c19691a47bd5da640c614b0557"}}

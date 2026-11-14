@@ -40,13 +40,13 @@ describe('RootTaskFactory', () => {
       expect(task).toBeInstanceOf(RootTask);
     });
 
-    it('Создаёт слой потребностей фабрикой satisfyNeedsTaskFactory', () => {
-      const satisfyNeedsTaskFactory = createMockedSatisfyNeedsTaskFactory();
-      const factory = new RootTaskFactory(createDeps({ satisfyNeedsTaskFactory }));
+    it('Создаёт слой потребностей фабрикой needsTaskFactory', () => {
+      const needsTaskFactory = createMockedSatisfyNeedsTaskFactory();
+      const factory = new RootTaskFactory(createDeps({ needsTaskFactory }));
 
       factory.create(NpcKind.Homeless);
 
-      expect(satisfyNeedsTaskFactory.satisfyNeeds).toHaveBeenCalledOnce();
+      expect(needsTaskFactory.satisfyNeeds).toHaveBeenCalledOnce();
     });
 
     it('Создаёт слой зависимостей фабрикой addictionsTaskFactory с типом NPC', () => {
@@ -84,7 +84,7 @@ describe('RootTaskFactory', () => {
       expect(methodTasks(task, 'activity')).toStrictEqual([expect.any(HomelessActivityTask)]);
     });
 
-    it('Если satisfyNeedsTaskFactory не передана, слой потребностей — экземпляр SatisfyNeedsTask', () => {
+    it('Если needsTaskFactory не передана, слой потребностей — экземпляр SatisfyNeedsTask', () => {
       const factory = new RootTaskFactory(createDeps());
 
       const task = factory.create(NpcKind.Homeless);

@@ -1,1 +1,0 @@
-{"id":"5f7e037e332cbeaaf0c39a671390d4a4.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/normalize-angle.spec.ts#Geometry #normalizeAngle Если угол равен −360, возвращает 0","name":"Если угол равен −360, возвращает 0","status":"passed","testResultsByEnv":{"default":"c59034191ad6b3381b298e49c4b9c117"}}

@@ -1,1 +1,0 @@
-{"id":"3246b95f40d7757aea9adfd3e6d01deb.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/ticks.spec.ts#Npc Каждый тик Вызывает htn.update с контекстом, в котором актор NPC","name":"Вызывает htn.update с контекстом, в котором актор NPC","status":"passed","testResultsByEnv":{"default":"08e2ff2e42f50991e16f28a415b08815"}}

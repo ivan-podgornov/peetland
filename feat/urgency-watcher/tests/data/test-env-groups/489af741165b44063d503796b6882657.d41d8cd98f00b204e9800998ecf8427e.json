@@ -1,1 +1,0 @@
-{"id":"489af741165b44063d503796b6882657.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/timings/__tests__/manual-timer/advance.spec.ts#ManualTimer #advance Если ms отрицательное, выбрасывает RangeError","name":"Если ms отрицательное, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"09172f2f922c0d719c5b5e8c440b0731"}}

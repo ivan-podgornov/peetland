@@ -1,1 +1,0 @@
-{"id":"0a366cf98a3000d3034310057aa479dc.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/add.spec.ts#Inventory #add Если количество не число, выбрасывает RangeError","name":"Если количество не число, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"34d5b8baf7df1f3c63f9edca3b1a04bb"}}

@@ -1,1 +1,0 @@
-{"id":"4ec3a43e289149701241a8a27765ea1c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/urgency.spec.ts#Npc Срочные потребности Если ни одна потребность не стала срочной, не останавливает план","name":"Если ни одна потребность не стала срочной, не останавливает план","status":"passed","testResultsByEnv":{"default":"b93edac7a75d69c7859381a9e0be1ab9"}}

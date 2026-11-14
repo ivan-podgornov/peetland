@@ -1,1 +1,0 @@
-{"id":"813f8f1aa4ab0131ee0bb68ba932b8ca.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/actor-command/__tests__/despawn.spec.ts#Command Если актора деспавнили во время выполнения Больше не вызывает onUpdate","name":"Больше не вызывает onUpdate","status":"passed","testResultsByEnv":{"default":"a2b27180bed9b4362eee7131d7a56d21"}}

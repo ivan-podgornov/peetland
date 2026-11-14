@@ -1,1 +1,0 @@
-{"id":"af44a1e67f8b40fd05386f2d2b3d2c8d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/events/__tests__/subscriber/complete.spec.ts#Subscriber #complete При вызове после subscriber.error(), общее поведение Не выбрасывает ошибку","name":"Не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"917917f022ecec89d0a0e40b9da01f2f"}}

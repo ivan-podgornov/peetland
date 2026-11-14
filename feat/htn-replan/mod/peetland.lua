@@ -7061,7 +7061,7 @@ function Executor.prototype.update(self, state, context)
             0
         )
     end
-    if self.softStopRequested and self:isInterruptible() then
+    if self.softStopRequested and self:canStop() then
         self:stop(context)
         return self.status
     end
@@ -7094,7 +7094,7 @@ end
 function Executor.prototype.softStop(self)
     self.softStopRequested = true
 end
-function Executor.prototype.isInterruptible(self)
+function Executor.prototype.canStop(self)
     local current = self.currentStep
     if not self:isPartOfTransaction(current) then
         return true

@@ -1,0 +1,1 @@
+{"id":"4b3f6c78dd994f98968aeab632a75062.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/psyche/__tests__/traits/luck/constructor.spec.ts#Luck #constructor Если удачливость 0 в пределах, не выбрасывает ошибку","name":"Если удачливость 0 в пределах, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"829890c0408c6b4d7e5d6639dfadc37b"}}

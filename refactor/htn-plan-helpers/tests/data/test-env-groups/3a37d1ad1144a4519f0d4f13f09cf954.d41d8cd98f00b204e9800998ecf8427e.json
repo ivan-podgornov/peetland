@@ -1,0 +1,1 @@
+{"id":"3a37d1ad1144a4519f0d4f13f09cf954.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/places/__tests__/find-nearest.spec.ts#Places #findNearest Не возвращает место другого типа, даже если оно ближе","name":"Не возвращает место другого типа, даже если оно ближе","status":"passed","testResultsByEnv":{"default":"7940864fcbdc4f367336b41fbeef30a2"}}

@@ -1,0 +1,1 @@
+{"id":"3034e8b3d8a4787eae61bcbac27129bb.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/constructor.spec.ts#Inventory #constructor Если количество отрицательное, выбрасывает RangeError","name":"Если количество отрицательное, выбрасывает RangeError","status":"passed","testResultsByEnv":{"default":"a58161d6d10b82d23f60b3b68585ec93"}}

@@ -1,0 +1,1 @@
+{"id":"b834da49e4aec624c880f4e61bbcad2e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/places/__tests__/is-near.spec.ts#Places #isNear Если место переданного типа дальше радиуса, возвращает false","name":"Если место переданного типа дальше радиуса, возвращает false","status":"passed","testResultsByEnv":{"default":"41845d6ec8696e88166b90f3f0e5101a"}}

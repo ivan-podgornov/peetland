@@ -1,0 +1,1 @@
+{"id":"f1f684ccbd950cee8897932c084fb79d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/get-angle-to.spec.ts#Geometry #getAngleTo Если цель на западе (−X), возвращает 90","name":"Если цель на западе (−X), возвращает 90","status":"passed","testResultsByEnv":{"default":"31c696b3cbdc951e1b183456e58cfd74"}}

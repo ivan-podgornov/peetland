@@ -138,7 +138,7 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
 
   /** Проверяет, запланирован ли шаг частью транзакции */
   private isPartOfTransaction(step: PlanStep<TState, TContext>): boolean {
-    return this.findTransaction(step) !== null;
+    return this.findTransaction(step.isPartOf) !== null;
   }
 
   /**
@@ -149,26 +149,31 @@ export class Executor<TState, TContext> implements IExecutor<TState, TContext> {
     first: PlanStep<TState, TContext>,
     second: PlanStep<TState, TContext>
   ): boolean {
-    const transaction = this.findTransaction(first);
+    const transaction = this.findTransaction(first.isPartOf);
 
-    return transaction !== null && transaction === this.findTransaction(second);
+    return transaction !== null && transaction === this.findTransaction(second.isPartOf);
   }
 
   /**
-   * Возвращает узел транзакции, частью которой запланирован шаг: самый внешний узел в цепочке
-   * isPartOf, задача которого — транзакция, или null. Поэтому транзакция внутри транзакции — часть
-   * внешней
+   * Возвращает узел транзакции, частью которой запланирован узел: самый внешний узел-транзакцию
+   * среди самого узла и его родителей по цепочке isPartOf, или null. Поэтому транзакция внутри
+   * транзакции — часть внешней
    */
-  private findTransaction(step: PlanStep<TState, TContext>): PlanNode<TState, TContext> | null {
-    let transaction: PlanNode<TState, TContext> | null = null;
-
-    for (let node = step.isPartOf; node; node = node.isPartOf) {
-      if (node.task.transaction) {
-        transaction = node;
-      }
+  private findTransaction(
+    node: PlanNode<TState, TContext> | null
+  ): PlanNode<TState, TContext> | null {
+    if (!node) {
+      return null;
     }
 
-    return transaction;
+    // Транзакция выше по цепочке важнее: внутренняя транзакция — её часть
+    const outer = this.findTransaction(node.isPartOf);
+
+    if (outer) {
+      return outer;
+    }
+
+    return node.task.transaction ? node : null;
   }
 
   /** Начинает выполнение задачи */

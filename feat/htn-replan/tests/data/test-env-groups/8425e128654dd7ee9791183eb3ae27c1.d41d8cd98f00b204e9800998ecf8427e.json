@@ -1,0 +1,1 @@
+{"id":"8425e128654dd7ee9791183eb3ae27c1.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/plan/find-transaction.spec.ts#findTransaction Если ни одна задача в цепочке не транзакция, возвращает null","name":"Если ни одна задача в цепочке не транзакция, возвращает null","status":"passed","testResultsByEnv":{"default":"a54b471a25efda369cb6b91bc62a7499"}}

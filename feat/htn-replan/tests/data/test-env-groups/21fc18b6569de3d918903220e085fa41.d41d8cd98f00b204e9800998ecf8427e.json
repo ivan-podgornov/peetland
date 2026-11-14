@@ -1,0 +1,1 @@
+{"id":"21fc18b6569de3d918903220e085fa41.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/htn/__tests__/plan/find-transaction.spec.ts#findTransaction Если шаг не часть составной задачи, возвращает null","name":"Если шаг не часть составной задачи, возвращает null","status":"passed","testResultsByEnv":{"default":"ad9524c74b212d0a377d1339a69791ad"}}

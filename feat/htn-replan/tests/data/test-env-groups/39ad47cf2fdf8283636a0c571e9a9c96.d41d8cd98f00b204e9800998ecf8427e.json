@@ -1,0 +1,1 @@
+{"id":"39ad47cf2fdf8283636a0c571e9a9c96.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/command-task/stop.spec.ts#CommandTask #stop Если задачу не начинали, не выбрасывает ошибку","name":"Если задачу не начинали, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"f8e19be352b0411bfceebf24d7b0e84b"}}

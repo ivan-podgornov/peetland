@@ -1,0 +1,1 @@
+{"id":"8e2f3977042976ab28f78f99d69104d5.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-within-angle.spec.ts#Geometry #isWithinAngle Если допуск не передан и углы отличаются, возвращает false","name":"Если допуск не передан и углы отличаются, возвращает false","status":"passed","testResultsByEnv":{"default":"8902f5a5460b4bc649a8775b00f2f1cc"}}

@@ -7023,22 +7023,6 @@ return ____exports
 ["toolkit.htn.src.plan"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Возвращает узел транзакции, в которую входит шаг: самый внешний узел в цепочке isPartOf, задача
--- которого — транзакция (см. CompoundTask.transaction), или null, если шаг вне транзакции. Шаги
--- одной транзакции возвращают один и тот же узел
-function ____exports.findTransaction(step)
-    local transaction = nil
-    do
-        local node = step.isPartOf
-        while node do
-            if node.task.transaction then
-                transaction = node
-            end
-            node = node.isPartOf
-        end
-    end
-    return transaction
-end
 return ____exports
  end,
 ["toolkit.htn.src.executor"] = function(...) 
@@ -7054,8 +7038,6 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
 local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____plan = require("toolkit.htn.src.plan")
-local findTransaction = ____plan.findTransaction
 ____exports.Executor = __TS__Class()
 local Executor = ____exports.Executor
 Executor.name = "Executor"
@@ -7070,6 +7052,7 @@ function Executor.prototype.____constructor(self, steps)
     self.currentTaskIndex = 0
     self.status = "idle"
     self.taskStarted = false
+    self.softStopRequested = false
 end
 function Executor.prototype.update(self, state, context)
     if not self:canTouchTask() then
@@ -7077,6 +7060,10 @@ function Executor.prototype.update(self, state, context)
             __TS__New(Error, "Can't update, because execution is already " .. self.status),
             0
         )
+    end
+    if self.softStopRequested and self:isInterruptible() then
+        self:stop(context)
+        return self.status
     end
     self.status = self.taskStarted and self.currentTask:update(state, context) or self:start(state, context)
     if self.status == "failed" then
@@ -7104,6 +7091,40 @@ function Executor.prototype.stop(self, context)
         self.currentTask:stop(context)
     end
 end
+function Executor.prototype.softStop(self)
+    self.softStopRequested = true
+end
+function Executor.prototype.isInterruptible(self)
+    local current = self.currentStep
+    if not self:isPartOfTransaction(current) then
+        return true
+    end
+    if self.taskStarted then
+        return false
+    end
+    local previous = self.steps[self.currentTaskIndex]
+    return not previous or not self:isPartOfSameTransaction(previous, current)
+end
+function Executor.prototype.isPartOfTransaction(self, step)
+    return self:findTransaction(step) ~= nil
+end
+function Executor.prototype.isPartOfSameTransaction(self, first, second)
+    local transaction = self:findTransaction(first)
+    return transaction ~= nil and transaction == self:findTransaction(second)
+end
+function Executor.prototype.findTransaction(self, step)
+    local transaction = nil
+    do
+        local node = step.isPartOf
+        while node do
+            if node.task.transaction then
+                transaction = node
+            end
+            node = node.isPartOf
+        end
+    end
+    return transaction
+end
 function Executor.prototype.start(self, state, context)
     if not self.currentTask:canExecute(state) then
         return "failed"
@@ -7120,22 +7141,6 @@ __TS__SetDescriptor(
     "currentTask",
     {get = function(self)
         return self.currentStep.task
-    end},
-    true
-)
-__TS__SetDescriptor(
-    Executor.prototype,
-    "interruptible",
-    {get = function(self)
-        local transaction = findTransaction(self.currentStep)
-        if not transaction then
-            return true
-        end
-        if self.taskStarted then
-            return false
-        end
-        local previous = self.steps[self.currentTaskIndex]
-        return not previous or findTransaction(previous) ~= transaction
     end},
     true
 )
@@ -7266,23 +7271,12 @@ function HTN.prototype.____constructor(self, root, deps)
     self.planner = deps:plannerFactory()
     self.root = root
     self.executor = nil
-    self.replanRequested = false
 end
 function HTN.prototype.update(self, state, context)
-    local ____self_replanRequested_2 = self.replanRequested
-    if ____self_replanRequested_2 then
-        local ____opt_0 = self.executor
-        ____self_replanRequested_2 = ____opt_0 and ____opt_0.interruptible
-    end
-    if ____self_replanRequested_2 then
-        self.executor:stop(context)
-        self.executor = nil
-    end
     if not self.executor then
-        local ____self_deps_3 = self.deps
-        local executorFactory = ____self_deps_3.executorFactory
+        local ____self_deps_0 = self.deps
+        local executorFactory = ____self_deps_0.executorFactory
         local steps = self.planner:plan(self.root, state)
-        self.replanRequested = false
         if not steps then
             return
         end
@@ -7292,6 +7286,9 @@ function HTN.prototype.update(self, state, context)
     if status ~= "running" then
         self.executor = nil
     end
+    if status == "stopped" then
+        self:update(state, context)
+    end
 end
 function HTN.prototype.stop(self, context)
     if not self.executor then
@@ -7300,8 +7297,11 @@ function HTN.prototype.stop(self, context)
     self.executor:stop(context)
     self.executor = nil
 end
-function HTN.prototype.requestReplan(self)
-    self.replanRequested = true
+function HTN.prototype.softStop(self)
+    local ____opt_1 = self.executor
+    if ____opt_1 ~= nil then
+        ____opt_1:softStop()
+    end
 end
 return ____exports
  end,
@@ -7443,10 +7443,6 @@ end
 do
     local ____parallel_2Dtask = require("toolkit.htn.src.parallel-task")
     ____exports.ParallelTask = ____parallel_2Dtask.ParallelTask
-end
-do
-    local ____plan = require("toolkit.htn.src.plan")
-    ____exports.findTransaction = ____plan.findTransaction
 end
 return ____exports
  end,

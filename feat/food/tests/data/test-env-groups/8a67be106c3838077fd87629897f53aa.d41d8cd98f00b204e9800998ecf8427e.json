@@ -1,0 +1,1 @@
+{"id":"8a67be106c3838077fd87629897f53aa.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/need-model/perform.spec.ts#NeedModel #perform Если занятие не меняет потребность, возвращает ту же запись","name":"Если занятие не меняет потребность, возвращает ту же запись","status":"passed","testResultsByEnv":{"default":"43fb9e20df75cac99fa92ac28eb31a0a"}}

@@ -1,1 +1,0 @@
-{"id":"1536eed4c02675b7b482cbe810dde56e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/is-food.spec.ts#isFood Если предмет не еда (bottles), возвращает false","name":"Если предмет не еда (bottles), возвращает false","status":"passed","testResultsByEnv":{"default":"0d30fd9bf7bd97443f685813101d45da"}}

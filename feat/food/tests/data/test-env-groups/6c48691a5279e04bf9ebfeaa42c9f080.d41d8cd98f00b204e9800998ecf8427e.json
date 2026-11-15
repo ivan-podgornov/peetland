@@ -1,0 +1,1 @@
+{"id":"6c48691a5279e04bf9ebfeaa42c9f080.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/need-model/get.spec.ts#NeedModel #get Не опускает значение ниже NeedModel.MIN_NEED","name":"Не опускает значение ниже NeedModel.MIN_NEED","status":"passed","testResultsByEnv":{"default":"da94f0077c154d7e057d16f0e48ba043"}}

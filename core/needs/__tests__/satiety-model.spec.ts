@@ -1,4 +1,5 @@
 import { Item } from '@peetland/inventory';
+import type { Food } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
@@ -30,7 +31,7 @@ describe('SatietyModel', () => {
     expect(value).toBe(0);
   });
 
-  it.each([
+  it.each<{ food: Food; satiety: number }>([
     {
       food: Item.RomashkaLoaf,
       satiety: 60,
@@ -39,7 +40,7 @@ describe('SatietyModel', () => {
       food: Item.SmilePizza,
       satiety: 100,
     },
-  ])('Если съели $food.name, восполняет $satiety сытости', ({ food, satiety }) => {
+  ])('Если съели $food, восполняет $satiety сытости', ({ food, satiety }) => {
     const record = new SatietyModel().perform(
       {
         value: 0,

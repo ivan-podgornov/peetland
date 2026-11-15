@@ -14,7 +14,7 @@ describe('SellBottlesTask', () => {
       it('Если бутылок ровно на пойло, а денег нет, план составляется', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE })
+          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
           .build();
 
         expect(planSteps(task, state)).not.toBeNull();
@@ -23,7 +23,7 @@ describe('SellBottlesTask', () => {
       it('Если бутылок не хватает на пойло, а денег нет, план не составляется', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE - 1 })
+          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE - 1 })
           .build();
 
         expect(planSteps(task, state)).toBeNull();
@@ -33,8 +33,8 @@ describe('SellBottlesTask', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
         const state = new NpcStateBuilder()
           .withInventory({
-            [Item.Bottles.name]: 1,
-            [Item.Money.name]: BOOZE_PRICE - BOTTLE_PRICE,
+            [Item.Bottles]: 1,
+            [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
           })
           .build();
 
@@ -45,8 +45,8 @@ describe('SellBottlesTask', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
         const state = new NpcStateBuilder()
           .withInventory({
-            [Item.Bottles.name]: 1,
-            [Item.Money.name]: BOOZE_PRICE - BOTTLE_PRICE - 1,
+            [Item.Bottles]: 1,
+            [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE - 1,
           })
           .build();
 
@@ -61,9 +61,7 @@ describe('SellBottlesTask', () => {
 
       it('Если бутылок нет, план не составляется, даже если денег хватает на пойло', () => {
         const task = createSellBottlesTask(createPlacesWithCollection());
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money.name]: BOOZE_PRICE })
-          .build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
 
         expect(planSteps(task, state)).toBeNull();
       });
@@ -71,7 +69,7 @@ describe('SellBottlesTask', () => {
       it('Если приёмок нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE })
+          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
           .build();
 
         expect(planSteps(createSellBottlesTask(places), state)).toBeNull();
@@ -80,7 +78,7 @@ describe('SellBottlesTask', () => {
       it('Ищет приёмки среди мест типа PlaceType.BottleCollection', () => {
         const places = createMockedPlaces();
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE })
+          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
           .build();
 
         plan(createSellBottlesTask(places), state);

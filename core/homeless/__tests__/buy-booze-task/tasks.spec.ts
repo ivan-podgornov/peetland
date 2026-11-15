@@ -12,7 +12,7 @@ import { BOOZE_PRICE } from '../../src/constants';
 
 /** Создаёт состояние NPC, у которого хватает денег на пойло: без них план не составляется */
 function createStateWithMoney() {
-  return new NpcStateBuilder().withInventory({ [Item.Money.name]: BOOZE_PRICE }).build();
+  return new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE }).build();
 }
 
 describe('BuyBoozeTask', () => {
@@ -38,7 +38,7 @@ describe('BuyBoozeTask', () => {
         const places = createPlacesWithShop();
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
-          .withInventory({ [Item.Money.name]: BOOZE_PRICE })
+          .withInventory({ [Item.Money]: BOOZE_PRICE })
           .build();
 
         plan(createBuyBoozeTask(places), state);

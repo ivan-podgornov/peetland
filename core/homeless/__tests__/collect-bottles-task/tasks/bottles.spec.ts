@@ -17,7 +17,7 @@ import { BOTTLE_FIND_CHANCE, MAX_BOTTLES, MAX_BOTTLES_PER_VISIT } from '../../..
 function planOneBottle(overrides: Parameters<typeof createNpcTaskFactory>[0]) {
   plan(
     createCollectBottlesTask(createPlacesWithTrashBins(), createNpcTaskFactory(overrides)),
-    new NpcStateBuilder().withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 1 }).build()
+    new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build()
   );
 }
 
@@ -49,7 +49,7 @@ describe('CollectBottlesTask', () => {
 
         plan(
           task,
-          new NpcStateBuilder().withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 3 }).build()
+          new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 3 }).build()
         );
 
         expect(tryLuck).toHaveBeenCalledTimes(3);
@@ -87,7 +87,7 @@ describe('CollectBottlesTask', () => {
       it('Каждую найденную бутылку кладёт в карман, добавляет в инвентарь и реагирует на находку', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 2 })
+          .withInventory({ [Item.Bottles]: MAX_BOTTLES - 2 })
           .build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(

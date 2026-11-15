@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createMockedNeedModel, createNeedsDeps, createNeedsState } from '../dev';
 import { Activity, Need, Needs } from '../src';
+import type { EatDetails } from '../src';
 
 const record = {
   value: 80,
@@ -22,7 +23,7 @@ describe('Needs', () => {
         createNeedsState({ [Need.Satiety]: record }),
         createNeedsDeps({ models: { [Need.Satiety]: model } })
       );
-      const details = { food: Item.SmilePizza };
+      const details: EatDetails = { food: Item.SmilePizza };
       const time = new ManualTime();
 
       needs.perform(Activity.Eat, details, time);

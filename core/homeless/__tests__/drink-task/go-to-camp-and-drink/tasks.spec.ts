@@ -13,7 +13,7 @@ describe('DrinkTask', () => {
     describe('Задачи', () => {
       it('Планирует сначала дойти до бомжарни, а потом выпить', () => {
         const task = createDrinkTask(createPlacesWithCamp(false));
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
           new PlanStructureBuilder()
@@ -28,7 +28,7 @@ describe('DrinkTask', () => {
         const places = createPlacesWithCamp(false);
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
-          .withInventory({ [Item.Booze.name]: 1 })
+          .withInventory({ [Item.Booze]: 1 })
           .build();
 
         plan(createDrinkTask(places), state);
@@ -58,7 +58,7 @@ describe('DrinkTask', () => {
           createNpcTaskFactory({ goToCoords })
         );
 
-        plan(task, new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build());
+        plan(task, new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build());
 
         expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
           coords: {

@@ -19,7 +19,7 @@ describe('SellBottlesTask', () => {
 
         plan(
           task,
-          new NpcStateBuilder().withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE }).build()
+          new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE }).build()
         );
 
         expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-give' });
@@ -32,7 +32,7 @@ describe('SellBottlesTask', () => {
           createNpcTaskFactory({ removeItem })
         );
 
-        plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles.name]: 12 }).build());
+        plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: 12 }).build());
 
         expect(removeItem).toHaveBeenCalledExactlyOnceWith({
           item: Item.Bottles,
@@ -47,7 +47,7 @@ describe('SellBottlesTask', () => {
           createNpcTaskFactory({ addItem })
         );
 
-        plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles.name]: 12 }).build());
+        plan(task, new NpcStateBuilder().withInventory({ [Item.Bottles]: 12 }).build());
 
         expect(addItem).toHaveBeenCalledExactlyOnceWith({
           item: Item.Money,

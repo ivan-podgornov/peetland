@@ -40,7 +40,7 @@ describe('Npc', () => {
 
     it('Вызывает inventoryFactory.create с начальным содержимым инвентаря из данных', () => {
       const inventoryFactory = createMockedInventoryFactory();
-      const data = createNpcData({ inventory: { [Item.Money.name]: 150 } });
+      const data = createNpcData({ inventory: { [Item.Money]: 150 } });
 
       new Npc(data, createNpcDeps({ inventoryFactory }));
 

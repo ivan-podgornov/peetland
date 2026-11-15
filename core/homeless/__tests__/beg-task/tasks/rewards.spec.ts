@@ -28,8 +28,8 @@ describe('BegTask', () => {
         const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
         const state = new NpcStateBuilder()
           .withInventory({
-            [Item.Money.name]: 3 * BEGGING_REWARD,
-            [Item.Bottles.name]: 2,
+            [Item.Money]: 3 * BEGGING_REWARD,
+            [Item.Bottles]: 2,
           })
           .build();
 
@@ -43,7 +43,7 @@ describe('BegTask', () => {
       it('Если не хватает не кратно BEGGING_REWARD, пытает удачу с запасом до целой удачи', () => {
         const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money.name]: BOOZE_PRICE - BEGGING_REWARD - 1 })
+          .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 })
           .build();
 
         plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), state);
@@ -54,12 +54,12 @@ describe('BegTask', () => {
       it('За каждую удачу получает BEGGING_REWARD', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money.name]: BOOZE_PRICE - 2 * BEGGING_REWARD })
+          .withInventory({ [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD })
           .build();
 
         const after = applyPlanEffects(task, state);
 
-        expect(after.self.inventory.getAll()).toStrictEqual({ [Item.Money.name]: BOOZE_PRICE });
+        expect(after.self.inventory.getAll()).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
       });
     });
   });

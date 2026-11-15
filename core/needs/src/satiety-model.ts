@@ -18,6 +18,6 @@ export class SatietyModel extends NeedModel {
   protected readonly depletionMinutes = SATIETY_DEPLETION_MINUTES;
 
   protected readonly contributors: NeedContributors = {
-    [Activity.Eat]: (details) => FOOD_SATIETY[details.food.name],
+    [Activity.Eat]: (details) => FOOD_SATIETY[details.food],
   };
 }

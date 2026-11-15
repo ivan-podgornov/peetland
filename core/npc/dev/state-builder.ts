@@ -23,7 +23,7 @@ type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
  *
  * @example
  * const state = new NpcStateBuilder()
- *   .withInventory({ [Item.Money.name]: 50 })
+ *   .withInventory({ [Item.Money]: 50 })
  *   .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, 30).build())
  *   .build();
  */

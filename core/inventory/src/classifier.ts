@@ -1,20 +1,20 @@
-import { ItemTag } from './item';
-import type { Food, Item } from './item';
+import { Item } from './item';
+import type { Food } from './item';
 
-/** Определяет по тегам, к какому виду относится предмет */
+/** Определяет, к какому виду относится предмет */
 export interface IItemClassifier {
-  /** Возвращает, еда ли предмет: есть ли у него тег ItemTag.Food */
+  /** Возвращает, еда ли предмет */
   isFood(item: Item): item is Food;
 }
 
 export class ItemClassifier implements IItemClassifier {
+  /** Предметы, которые можно съесть */
+  private static readonly FOOD: readonly Item[] = [
+    Item.RomashkaLoaf,
+    Item.SmilePizza,
+  ] satisfies Food[];
+
   isFood(item: Item): item is Food {
-    return this.hasTag(item, ItemTag.Food);
-  }
-
-  private hasTag(item: Item, tag: ItemTag): boolean {
-    const tags: readonly ItemTag[] = item.tags;
-
-    return tags.includes(tag);
+    return ItemClassifier.FOOD.includes(item);
   }
 }

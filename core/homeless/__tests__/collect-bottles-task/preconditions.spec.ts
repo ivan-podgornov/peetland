@@ -14,7 +14,7 @@ describe('CollectBottlesTask', () => {
       it('Если NPC унесёт ещё бутылку и мусорки есть, план составляется', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 1 })
+          .withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 })
           .build();
 
         expect(planSteps(task, state)).not.toBeNull();
@@ -22,9 +22,7 @@ describe('CollectBottlesTask', () => {
 
       it('Если у NPC MAX_BOTTLES бутылок, план не составляется', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles.name]: MAX_BOTTLES })
-          .build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES }).build();
 
         expect(planSteps(task, state)).toBeNull();
       });

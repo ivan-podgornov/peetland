@@ -18,7 +18,7 @@ export const SATIETY_URGENT_BELOW = 25;
 export const SATIETY_CALM_ABOVE = 60;
 
 /** На сколько растёт сытость от каждой еды */
-export const FOOD_SATIETY: Readonly<Record<Food['name'], number>> = {
-  [Item.RomashkaLoaf.name]: 60,
-  [Item.SmilePizza.name]: 100,
+export const FOOD_SATIETY: Readonly<Record<Food, number>> = {
+  [Item.RomashkaLoaf]: 60,
+  [Item.SmilePizza]: 100,
 };

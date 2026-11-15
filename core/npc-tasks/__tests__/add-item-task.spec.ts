@@ -50,10 +50,10 @@ describe('AddItemTask', () => {
       });
 
       const state = task.applyEffects(
-        new NpcStateBuilder().withInventory({ [Item.Booze.name]: 2 }).build()
+        new NpcStateBuilder().withInventory({ [Item.Booze]: 2 }).build()
       );
 
-      expect(state.self.inventory.getAll()).toStrictEqual({ [Item.Booze.name]: 3 });
+      expect(state.self.inventory.getAll()).toStrictEqual({ [Item.Booze]: 3 });
     });
 
     it('Если предмета в состоянии не было, добавляет его', () => {
@@ -63,12 +63,12 @@ describe('AddItemTask', () => {
       });
 
       const state = task.applyEffects(
-        new NpcStateBuilder().withInventory({ [Item.Money.name]: 5 }).build()
+        new NpcStateBuilder().withInventory({ [Item.Money]: 5 }).build()
       );
 
       expect(state.self.inventory.getAll()).toStrictEqual({
-        [Item.Money.name]: 5,
-        [Item.Booze.name]: 1,
+        [Item.Money]: 5,
+        [Item.Booze]: 1,
       });
     });
   });

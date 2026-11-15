@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { TestNeedModel } from '../../dev';
 import { Activity, NeedModel } from '../../src';
+import type { EatDetails } from '../../src';
 
 const since = {
   day: 1,
@@ -15,7 +16,7 @@ describe('NeedModel', () => {
   describe('#perform', () => {
     it('Передаёт вкладу занятия его детали', () => {
       const eat = vi.fn(() => 0);
-      const details = { food: Item.RomashkaLoaf };
+      const details: EatDetails = { food: Item.RomashkaLoaf };
 
       new TestNeedModel({ [Activity.Eat]: eat }).perform(
         {

@@ -6,13 +6,13 @@ describe('Inventory', () => {
   describe('#clone', () => {
     it('Возвращает инвентарь с тем же количеством предметов', () => {
       const inventory = new Inventory({
-        [Item.Money.name]: 5,
-        [Item.Bottles.name]: 2,
+        [Item.Money]: 5,
+        [Item.Bottles]: 2,
       });
 
       expect(inventory.clone().getAll()).toStrictEqual({
-        [Item.Money.name]: 5,
-        [Item.Bottles.name]: 2,
+        [Item.Money]: 5,
+        [Item.Bottles]: 2,
       });
     });
 
@@ -23,7 +23,7 @@ describe('Inventory', () => {
     });
 
     it('Изменение копии не меняет исходный инвентарь', () => {
-      const inventory = new Inventory({ [Item.Money.name]: 5 });
+      const inventory = new Inventory({ [Item.Money]: 5 });
       const copy = inventory.clone();
 
       copy.add(Item.Money, 10);
@@ -32,7 +32,7 @@ describe('Inventory', () => {
     });
 
     it('Изменение исходного инвентаря не меняет копию', () => {
-      const inventory = new Inventory({ [Item.Money.name]: 5 });
+      const inventory = new Inventory({ [Item.Money]: 5 });
       const copy = inventory.clone();
 
       inventory.add(Item.Money, 10);

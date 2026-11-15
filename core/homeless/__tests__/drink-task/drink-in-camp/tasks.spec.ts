@@ -12,7 +12,7 @@ describe('DrinkTask', () => {
     describe('Задачи', () => {
       it('Планирует проиграть анимацию питья, отнять пойло и добавить пустую бутылку', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
           new PlanStructureBuilder().compound('drink', 'drink-in-camp', buildDrinkBooze).build()
@@ -32,13 +32,13 @@ describe('DrinkTask', () => {
 
       it('По плану отнимает бутылку пойла и добавляет пустую бутылку', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 3 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 3 }).build();
 
         const after = applyPlanEffects(task, state);
 
         expect(after.self.inventory.getAll()).toStrictEqual({
-          [Item.Booze.name]: 2,
-          [Item.Bottles.name]: 1,
+          [Item.Booze]: 2,
+          [Item.Bottles]: 1,
         });
       });
     });

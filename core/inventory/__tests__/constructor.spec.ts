@@ -12,31 +12,31 @@ describe('Inventory', () => {
 
     it('Устанавливает переданное количество предметов', () => {
       const inventory = new Inventory({
-        [Item.Money.name]: 5,
-        [Item.Booze.name]: 0.5,
+        [Item.Money]: 5,
+        [Item.Booze]: 0.5,
       });
 
       expect(inventory.getAll()).toStrictEqual({
-        [Item.Money.name]: 5,
-        [Item.Booze.name]: 0.5,
+        [Item.Money]: 5,
+        [Item.Booze]: 0.5,
       });
     });
 
     it('Не добавляет предметы с нулевым количеством', () => {
-      const inventory = new Inventory({ [Item.Money.name]: 0 });
+      const inventory = new Inventory({ [Item.Money]: 0 });
 
       expect(inventory.getAll()).toStrictEqual({});
     });
 
     it('Если количество отрицательное, выбрасывает RangeError', () => {
-      expect(() => new Inventory({ [Item.Money.name]: -1 })).toThrow(RangeError);
+      expect(() => new Inventory({ [Item.Money]: -1 })).toThrow(RangeError);
     });
 
     it('Изменение переданного объекта не меняет инвентарь', () => {
-      const counts = { [Item.Money.name]: 5 };
+      const counts = { [Item.Money]: 5 };
       const inventory = new Inventory(counts);
 
-      counts[Item.Money.name] = 1;
+      counts[Item.Money] = 1;
 
       expect(inventory.get(Item.Money)).toBe(5);
     });

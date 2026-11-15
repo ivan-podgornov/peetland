@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/food/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/food/docs/assets/js/runtime~main.af863bc7.js" defer="defer"></script>
-<script src="/peetland/feat/food/docs/assets/js/main.510122c7.js" defer="defer"></script>
+<script src="/peetland/feat/food/docs/assets/js/runtime~main.0d15a43c.js" defer="defer"></script>
+<script src="/peetland/feat/food/docs/assets/js/main.12c09e6e.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -55,8 +55,7 @@
 захардкожен в <code>Needs</code>, а его размер лежит в константах баланса, например <code>FOOD_SATIETY</code>.</p>
 <p>У каждого занятия есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
 деталей зависит вклад. В деталях еды (<code>EatDetails</code>) лежит, что съели (<code>Food</code> из
-<code>@peetland/inventory</code>), а сколько от этого восполнится сытости, лежит в <code>FOOD_SATIETY</code>: батон
-«Ромашка» восполняет 60, пицца «Смайл» — 100.</p>
+<code>@peetland/inventory</code>), а сколько от этого восполнится сытости, лежит в <code>FOOD_SATIETY</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="время-при-чтении-и-записи">Время при чтении и записи<a href="#время-при-чтении-и-записи" class="hash-link" aria-label="Прямая ссылка на Время при чтении и записи" title="Прямая ссылка на Время при чтении и записи" translate="no">​</a></h2>
 <p>Потребности не хранят время: <code>get</code>, <code>getAll</code> и <code>perform</code> получают его параметром. Так потребность
 падает в том времени, в котором её читают. Если эффект задачи сдвигает время в клоне состояния,

@@ -42,7 +42,7 @@ describe('Needs', () => {
       );
       const time = new ManualTime(since);
 
-      needs.clone().perform(Activity.Eat, { food: Item.Smile }, time);
+      needs.clone().perform(Activity.Eat, { food: Item.SmilePizza }, time);
 
       expect(needs.get(Need.Satiety, time)).toBe(50);
     });
@@ -65,7 +65,7 @@ describe('Needs', () => {
       const copy = needs.clone();
       const time = new ManualTime(since);
 
-      needs.perform(Activity.Eat, { food: Item.Smile }, time);
+      needs.perform(Activity.Eat, { food: Item.SmilePizza }, time);
 
       expect(copy.get(Need.Satiety, time)).toBe(50);
     });

@@ -5,27 +5,20 @@
 import { Item } from '@peetland/inventory';
 import type { Food } from '@peetland/inventory';
 
-import { NeedCategory } from './category';
-import { Need } from './need';
-import type { NeedDefinitions } from './types';
-
 /** Минут в игровых сутках */
 const MINUTES_PER_DAY = 24 * 60;
 
-/** Описание каждой потребности */
-export const NEED_DEFINITIONS: NeedDefinitions = {
-  // Сутки, а не 8 часов: иначе вся жизнь NPC крутится вокруг еды
-  [Need.Satiety]: {
-    category: NeedCategory.Vital,
-    depletionMinutes: MINUTES_PER_DAY,
-    // Срочно за 6 часов до голода
-    urgentBelow: 25,
-    calmAbove: 60,
-  },
-};
+/** За сколько игровых минут сытость падает до нуля. Сутки, а не 8 часов: иначе вся жизнь NPC крутится вокруг еды */
+export const SATIETY_DEPLETION_MINUTES = MINUTES_PER_DAY;
+
+/** Ниже этой сытости голод срочный: за 6 часов до голода */
+export const SATIETY_URGENT_BELOW = 25;
+
+/** Выше этой сытости голод перестаёт быть срочным */
+export const SATIETY_CALM_ABOVE = 60;
 
 /** На сколько растёт сытость от каждой еды */
-export const FOOD_SATIETY: Readonly<Record<Food, number>> = {
-  [Item.Romashka]: 60,
-  [Item.Smile]: 100,
+export const FOOD_SATIETY: Readonly<Record<Food['name'], number>> = {
+  [Item.RomashkaLoaf.name]: 60,
+  [Item.SmilePizza.name]: 100,
 };

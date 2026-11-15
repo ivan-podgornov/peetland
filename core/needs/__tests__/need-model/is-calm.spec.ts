@@ -1,8 +1,7 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps, createNeedsState } from '../dev';
-import { NEED_DEFINITIONS, Need, Needs } from '../src';
+import { TestNeedModel } from '../../dev';
 
 const since = {
   day: 1,
@@ -10,46 +9,52 @@ const since = {
   minutes: 0,
 };
 
-/** Создаёт потребности, у которых сытость с момента since равна переданному значению */
-function createNeedsWithSatiety(value: number) {
-  return new Needs(
-    createNeedsState({
-      [Need.Satiety]: {
-        value,
-        since,
-      },
-    }),
-    createNeedsDeps()
-  );
-}
-
-describe('Needs', () => {
+describe('NeedModel', () => {
   describe('#isCalm', () => {
     it('Если значение выше порога спокойствия, возвращает true', () => {
-      const needs = createNeedsWithSatiety(NEED_DEFINITIONS[Need.Satiety].calmAbove + 1);
+      const model = new TestNeedModel();
 
-      expect(needs.isCalm(Need.Satiety, new ManualTime(since))).toBe(true);
+      const calm = model.isCalm(
+        {
+          value: model.calmAbove + 1,
+          since,
+        },
+        new ManualTime(since)
+      );
+
+      expect(calm).toBe(true);
     });
 
     it('Если значение на пороге спокойствия, возвращает false', () => {
-      const needs = createNeedsWithSatiety(NEED_DEFINITIONS[Need.Satiety].calmAbove);
+      const model = new TestNeedModel();
 
-      expect(needs.isCalm(Need.Satiety, new ManualTime(since))).toBe(false);
+      const calm = model.isCalm(
+        {
+          value: model.calmAbove,
+          since,
+        },
+        new ManualTime(since)
+      );
+
+      expect(calm).toBe(false);
     });
 
     it('Считает спокойствие по значению на момент переданного времени', () => {
-      const needs = createNeedsWithSatiety(NEED_DEFINITIONS[Need.Satiety].calmAbove + 1);
+      const model = new TestNeedModel();
 
-      // Через час сытость упала до порога спокойствия и ниже
-      const value = needs.isCalm(
-        Need.Satiety,
+      // Через час потребность упала до порога спокойствия и ниже
+      const calm = model.isCalm(
+        {
+          value: model.calmAbove + 1,
+          since,
+        },
         new ManualTime({
           ...since,
           hours: 11,
         })
       );
 
-      expect(value).toBe(false);
+      expect(calm).toBe(false);
     });
   });
 });

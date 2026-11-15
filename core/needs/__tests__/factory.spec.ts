@@ -2,7 +2,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createNeedsDeps, createNeedValues } from '../dev';
-import { Need, Needs, NeedsFactory } from '../src';
+import { Need, Needs, NeedsFactory, SatietyModel } from '../src';
 
 describe('NeedsFactory', () => {
   describe('#create', () => {
@@ -43,6 +43,33 @@ describe('NeedsFactory', () => {
       }
 
       expect(create).toThrow(RangeError);
+    });
+
+    it('Если модели не переданы, сытость считает SatietyModel', () => {
+      const since = {
+        day: 1,
+        hours: 10,
+        minutes: 0,
+      };
+      const time = new ManualTime({
+        ...since,
+        hours: 16,
+      });
+
+      const needs = new NeedsFactory().create(
+        createNeedValues({ [Need.Satiety]: 80 }),
+        new ManualTime(since)
+      );
+
+      expect(needs.get(Need.Satiety, time)).toBe(
+        new SatietyModel().get(
+          {
+            value: 80,
+            since,
+          },
+          time
+        )
+      );
     });
   });
 });

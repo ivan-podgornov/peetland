@@ -1,95 +1,124 @@
-import { FOOD, Item } from '@peetland/inventory';
+import { Item } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { createNeedsDeps, createNeedsState } from '../dev';
-import { Activity, FOOD_SATIETY, Need, Needs } from '../src';
+import { TestNeedModel } from '../../dev';
+import { Activity, NeedModel } from '../../src';
 
-describe('Needs', () => {
+const since = {
+  day: 1,
+  hours: 10,
+  minutes: 0,
+};
+
+describe('NeedModel', () => {
   describe('#perform', () => {
-    describe('Если NPC поел', () => {
-      it.each(FOOD)(
-        'Прибавляет к сытости на момент, когда NPC поел, сколько восполняет еда (%s)',
-        (food) => {
-          const needs = new Needs(
-            createNeedsState({
-              [Need.Satiety]: {
-                value: 25,
-                since: {
-                  day: 1,
-                  hours: 10,
-                  minutes: 0,
-                },
-              },
-            }),
-            createNeedsDeps()
-          );
-          const time = new ManualTime({
-            day: 1,
-            hours: 16,
-            minutes: 0,
-          });
+    it('Передаёт вкладу занятия его детали', () => {
+      const eat = vi.fn(() => 0);
+      const details = { food: Item.RomashkaLoaf };
 
-          needs.perform(Activity.Eat, { food }, time);
-
-          // Сытость была 25, за 6 часов, четверть суток, упала на 25, а еда прибавила своё
-          expect(needs.get(Need.Satiety, time)).toBeCloseTo(25 - 25 + FOOD_SATIETY[food]);
-        }
+      new TestNeedModel({ [Activity.Eat]: eat }).perform(
+        {
+          value: 50,
+          since,
+        },
+        Activity.Eat,
+        details,
+        new ManualTime(since)
       );
 
-      it('Отсчитывает падение сытости от момента, когда NPC поел', () => {
-        const needs = new Needs(
-          createNeedsState({
-            [Need.Satiety]: {
-              value: 50,
-              since: {
-                day: 1,
-                hours: 10,
-                minutes: 0,
-              },
-            },
-          }),
-          createNeedsDeps()
-        );
+      expect(eat).toHaveBeenCalledExactlyOnceWith(details);
+    });
 
-        needs.perform(
-          Activity.Eat,
-          { food: Item.Romashka },
-          new ManualTime({
-            day: 1,
-            hours: 16,
-            minutes: 0,
-          })
-        );
+    it('Прибавляет вклад занятия к значению на момент, когда занятие закончилось', () => {
+      const model = new TestNeedModel({ [Activity.Eat]: () => 30 });
 
-        expect(needs.getState()[Need.Satiety].since).toStrictEqual({
-          day: 1,
+      // За 6 часов, четверть суток, потребность упала с 50 на 25
+      const record = model.perform(
+        {
+          value: 50,
+          since,
+        },
+        Activity.Eat,
+        { food: Item.RomashkaLoaf },
+        new ManualTime({
+          ...since,
           hours: 16,
-          minutes: 0,
-        });
-      });
+        })
+      );
 
-      it('Не поднимает сытость выше Needs.MAX_NEED', () => {
-        const since = {
-          day: 1,
-          hours: 10,
-          minutes: 0,
-        };
-        const needs = new Needs(
-          createNeedsState({
-            [Need.Satiety]: {
-              value: Needs.MAX_NEED - 1,
-              since,
-            },
-          }),
-          createNeedsDeps()
-        );
-        const time = new ManualTime(since);
+      expect(record.value).toBeCloseTo(50 - 25 + 30);
+    });
 
-        needs.perform(Activity.Eat, { food: Item.Romashka }, time);
+    it('Отсчитывает падение от момента, когда занятие закончилось', () => {
+      const model = new TestNeedModel({ [Activity.Eat]: () => 30 });
+      const end = {
+        ...since,
+        hours: 16,
+      };
 
-        expect(needs.get(Need.Satiety, time)).toBe(Needs.MAX_NEED);
-      });
+      const record = model.perform(
+        {
+          value: 50,
+          since,
+        },
+        Activity.Eat,
+        { food: Item.RomashkaLoaf },
+        new ManualTime(end)
+      );
+
+      expect(record.since).toStrictEqual(end);
+    });
+
+    it('Не поднимает значение выше NeedModel.MAX_NEED', () => {
+      const model = new TestNeedModel({ [Activity.Eat]: () => 30 });
+
+      const record = model.perform(
+        {
+          value: NeedModel.MAX_NEED - 1,
+          since,
+        },
+        Activity.Eat,
+        { food: Item.RomashkaLoaf },
+        new ManualTime(since)
+      );
+
+      expect(record.value).toBe(NeedModel.MAX_NEED);
+    });
+
+    it('Не опускает значение ниже NeedModel.MIN_NEED', () => {
+      const model = new TestNeedModel({ [Activity.Eat]: () => -30 });
+
+      const record = model.perform(
+        {
+          value: 10,
+          since,
+        },
+        Activity.Eat,
+        { food: Item.RomashkaLoaf },
+        new ManualTime(since)
+      );
+
+      expect(record.value).toBe(NeedModel.MIN_NEED);
+    });
+
+    it('Если занятие не меняет потребность, возвращает ту же запись', () => {
+      const record = {
+        value: 50,
+        since,
+      };
+
+      const result = new TestNeedModel().perform(
+        record,
+        Activity.Eat,
+        { food: Item.RomashkaLoaf },
+        new ManualTime({
+          ...since,
+          hours: 16,
+        })
+      );
+
+      expect(result).toBe(record);
     });
   });
 });

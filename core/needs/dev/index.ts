@@ -1,4 +1,5 @@
 export { createMockedNeedsFactory } from './factory';
+export { createMockedNeedModel, TestNeedModel } from './need-model';
 export {
   createMockedNeedsValidator,
   createNeedsDeps,

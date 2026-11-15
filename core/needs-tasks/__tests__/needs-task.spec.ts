@@ -1,5 +1,5 @@
 import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
-import { NEED_DEFINITIONS, Need } from '@peetland/needs';
+import { SatietyModel, Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -25,7 +25,7 @@ describe('NeedsTask', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
-      const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow - 1);
+      const state = createStateWithSatiety(new SatietyModel().urgentBelow - 1);
 
       expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
         new PlanStructureBuilder()
@@ -38,7 +38,7 @@ describe('NeedsTask', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
-      const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow);
+      const state = createStateWithSatiety(new SatietyModel().urgentBelow);
 
       expect(planSteps(task, state)).toBeNull();
     });
@@ -49,7 +49,7 @@ describe('NeedsTask', () => {
           satisfyHunger: () => createStubTask('satisfy-hunger', false),
         }),
       });
-      const state = createStateWithSatiety(NEED_DEFINITIONS[Need.Satiety].urgentBelow - 1);
+      const state = createStateWithSatiety(new SatietyModel().urgentBelow - 1);
 
       expect(planSteps(task, state)).toBeNull();
     });

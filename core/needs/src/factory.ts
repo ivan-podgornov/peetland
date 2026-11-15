@@ -1,11 +1,12 @@
 import type { IReadonlyTime } from '@peetland/timings';
 
 import { Need } from './need';
+import { NeedFactory } from './need-factory';
 import { Needs } from './needs';
 import type { INeeds, NeedsDeps } from './needs';
-import { SatietyModel } from './satiety-model';
 import type { NeedsState, NeedValues } from './types';
 import { NeedsValidator } from './validator';
+import type { INeedsValidator } from './validator';
 
 export interface INeedsFactory {
   /**
@@ -16,27 +17,25 @@ export interface INeedsFactory {
   create(values: NeedValues, time: IReadonlyTime): INeeds;
 }
 
-export type NeedsFactoryDeps = Partial<NeedsDeps>;
+export type NeedsFactoryDeps = Partial<
+  NeedsDeps & {
+    /** Проверяет значения потребностей */
+    validator: INeedsValidator;
+  }
+>;
 
 export class NeedsFactory implements INeedsFactory {
   private readonly deps: NeedsDeps;
 
   /**
-   * @param deps - валидатор и модели потребностей. По умолчанию — NeedsValidator и модель каждой
-   * потребности, например SatietyModel
+   * @param deps - валидатор и фабрика потребностей. По умолчанию — NeedsValidator и NeedFactory с
+   * этим валидатором
    */
   constructor(deps: NeedsFactoryDeps = {}) {
-    const {
-      validator = new NeedsValidator(),
-      models = {
-        [Need.Satiety]: new SatietyModel(),
-      },
-    } = deps;
+    const { validator = new NeedsValidator() } = deps;
+    const { needFactory = new NeedFactory({ validator }) } = deps;
 
-    this.deps = {
-      validator,
-      models,
-    };
+    this.deps = { needFactory };
   }
 
   create(values: NeedValues, time: IReadonlyTime): INeeds {

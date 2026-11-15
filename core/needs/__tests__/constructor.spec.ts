@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNeedsValidator, createNeedsDeps, createNeedsState } from '../dev';
+import { createMockedNeedFactory, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#constructor', () => {
-    it('Валидирует значение каждой потребности в пределах потребности', () => {
-      const validator = createMockedNeedsValidator();
+    it('Собирает фабрикой каждую потребность из её записи', () => {
+      const needFactory = createMockedNeedFactory();
       const state = createNeedsState({
         [Need.Satiety]: {
           value: 40,
@@ -18,21 +18,17 @@ describe('Needs', () => {
         },
       });
 
-      new Needs(state, createNeedsDeps({ validator }));
+      new Needs(state, { needFactory });
 
-      expect(validator.validateValue).toHaveBeenCalledExactlyOnceWith(
-        40,
-        Needs.MIN_NEED,
-        Needs.MAX_NEED
-      );
+      expect(needFactory.create).toHaveBeenCalledExactlyOnceWith(Need.Satiety, state[Need.Satiety]);
     });
 
-    it('Если валидатор выбросил ошибку, выбрасывает ту же ошибку', () => {
+    it('Если фабрика выбросила ошибку, выбрасывает ту же ошибку', () => {
       const error = new RangeError();
-      const validator = createMockedNeedsValidator();
-      validator.validateValue.mockThrow(error);
+      const needFactory = createMockedNeedFactory();
+      needFactory.create.mockThrow(error);
       function create() {
-        return new Needs(createNeedsState(), createNeedsDeps({ validator }));
+        return new Needs(createNeedsState(), { needFactory });
       }
 
       expect(create).toThrow(error);

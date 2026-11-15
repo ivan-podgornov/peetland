@@ -1,7 +1,7 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TestNeedModel } from '../../dev';
+import { TestNeed } from '../../dev';
 
 const since = {
   day: 1,
@@ -9,52 +9,41 @@ const since = {
   minutes: 0,
 };
 
-describe('NeedModel', () => {
+describe('BaseNeed', () => {
   describe('#isCalm', () => {
     it('Если значение выше порога спокойствия, возвращает true', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.CALM_ABOVE + 1,
+        since,
+      });
 
-      const calm = model.isCalm(
-        {
-          value: model.calmAbove + 1,
-          since,
-        },
-        new ManualTime(since)
-      );
-
-      expect(calm).toBe(true);
+      expect(need.isCalm(new ManualTime(since))).toBe(true);
     });
 
     it('Если значение на пороге спокойствия, возвращает false', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.CALM_ABOVE,
+        since,
+      });
 
-      const calm = model.isCalm(
-        {
-          value: model.calmAbove,
-          since,
-        },
-        new ManualTime(since)
-      );
-
-      expect(calm).toBe(false);
+      expect(need.isCalm(new ManualTime(since))).toBe(false);
     });
 
     it('Считает спокойствие по значению на момент переданного времени', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.CALM_ABOVE + 1,
+        since,
+      });
 
       // Через час потребность упала до порога спокойствия и ниже
-      const calm = model.isCalm(
-        {
-          value: model.calmAbove + 1,
-          since,
-        },
+      const result = need.isCalm(
         new ManualTime({
           ...since,
           hours: 11,
         })
       );
 
-      expect(calm).toBe(false);
+      expect(result).toBe(false);
     });
   });
 });

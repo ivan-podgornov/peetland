@@ -1,7 +1,7 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TestNeedModel } from '../../dev';
+import { TestNeed } from '../../dev';
 
 const since = {
   day: 1,
@@ -9,52 +9,41 @@ const since = {
   minutes: 0,
 };
 
-describe('NeedModel', () => {
+describe('BaseNeed', () => {
   describe('#isUrgent', () => {
     it('Если значение ниже порога срочности, возвращает true', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.URGENT_BELOW - 1,
+        since,
+      });
 
-      const urgent = model.isUrgent(
-        {
-          value: model.urgentBelow - 1,
-          since,
-        },
-        new ManualTime(since)
-      );
-
-      expect(urgent).toBe(true);
+      expect(need.isUrgent(new ManualTime(since))).toBe(true);
     });
 
     it('Если значение на пороге срочности, возвращает false', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.URGENT_BELOW,
+        since,
+      });
 
-      const urgent = model.isUrgent(
-        {
-          value: model.urgentBelow,
-          since,
-        },
-        new ManualTime(since)
-      );
-
-      expect(urgent).toBe(false);
+      expect(need.isUrgent(new ManualTime(since))).toBe(false);
     });
 
     it('Считает срочность по значению на момент переданного времени', () => {
-      const model = new TestNeedModel();
+      const need = new TestNeed({
+        value: TestNeed.URGENT_BELOW,
+        since,
+      });
 
       // Через час потребность упала ниже порога
-      const urgent = model.isUrgent(
-        {
-          value: model.urgentBelow,
-          since,
-        },
+      const result = need.isUrgent(
         new ManualTime({
           ...since,
           hours: 11,
         })
       );
 
-      expect(urgent).toBe(true);
+      expect(result).toBe(true);
     });
   });
 });

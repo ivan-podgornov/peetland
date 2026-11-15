@@ -1,33 +1,23 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNeedModel, createNeedsDeps, createNeedsState } from '../dev';
+import { createMockedNeed, createMockedNeedFactory, createNeedsState } from '../dev';
 import { Need, Needs } from '../src';
-
-const record = {
-  value: 80,
-  since: {
-    day: 1,
-    hours: 10,
-    minutes: 0,
-  },
-};
 
 describe('Needs', () => {
   describe('#get', () => {
-    it('Возвращает значение, которое модель потребности посчитала по её записи и времени', () => {
-      const model = createMockedNeedModel();
-      model.get.mockReturnValue(42);
-      const needs = new Needs(
-        createNeedsState({ [Need.Satiety]: record }),
-        createNeedsDeps({ models: { [Need.Satiety]: model } })
-      );
+    it('Возвращает значение, которое потребность посчитала на момент переданного времени', () => {
+      const need = createMockedNeed();
+      need.get.mockReturnValue(42);
+      const needs = new Needs(createNeedsState(), {
+        needFactory: createMockedNeedFactory(need),
+      });
       const time = new ManualTime();
 
-      const value = needs.get(Need.Satiety, time);
+      const result = needs.get(Need.Satiety, time);
 
-      expect(model.get).toHaveBeenCalledExactlyOnceWith(record, time);
-      expect(value).toBe(42);
+      expect(need.get).toHaveBeenCalledExactlyOnceWith(time);
+      expect(result).toBe(42);
     });
   });
 });

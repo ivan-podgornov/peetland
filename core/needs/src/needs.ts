@@ -1,14 +1,11 @@
 import type { IReadonlyTime } from '@peetland/timings';
 
 import type { Activity, ActivityDetails } from './activity';
+import { BaseNeed } from './base-need';
+import type { INeed } from './base-need';
 import { Need } from './need';
-import { NeedModel } from './need-model';
-import type { INeedModel } from './need-model';
+import type { INeedFactory } from './need-factory';
 import type { NeedsState, NeedValues } from './types';
-import type { INeedsValidator } from './validator';
-
-/** Модель каждой потребности */
-export type NeedModels = Readonly<Record<Need, INeedModel>>;
 
 /**
  * Потребности только на чтение. Так потребности лежат в состоянии NPC: планирование читает их, а
@@ -29,14 +26,14 @@ export interface IReadonlyNeeds {
   getAll(time: IReadonlyTime): NeedValues;
   /**
    * Возвращает, срочная ли потребность на момент time: её значение ниже порога срочности
-   * urgentBelow её модели (см. INeedModel)
+   * (см. INeed)
    * @param need - потребность
    * @param time - время, на момент которого нужна срочность, обычно время из того же состояния
    */
   isUrgent(need: Need, time: IReadonlyTime): boolean;
   /**
    * Возвращает, спокойна ли потребность на момент time: её значение выше порога calmAbove из
-   * её модели (см. INeedModel). Срочная потребность перестаёт быть срочной, только когда стала
+   * (см. INeed). Срочная потребность перестаёт быть срочной, только когда стала
    * спокойной
    * @param need - потребность
    * @param time - время, на момент которого нужно спокойствие
@@ -60,47 +57,40 @@ export interface INeeds extends IReadonlyNeeds {
 }
 
 export type NeedsDeps = {
-  /** Проверяет значения потребностей */
-  validator: INeedsValidator;
-  /** Модели потребностей: как каждая падает, когда срочная и как её меняют занятия */
-  models: NeedModels;
+  /** Фабрика, которой потребности собираются из состояния */
+  needFactory: INeedFactory;
 };
 
 /**
- * Потребности хранят значение каждой потребности NPC и момент, когда его выставили, а текущее
- * значение, срочность и вклад занятий считают модели потребностей (см. INeedModel). Никто не
- * убавляет потребности по тикам
+ * Потребности NPC: коллекция потребностей, каждая из которых сама хранит значение, падает и
+ * меняется от занятий (см. INeed). Потребности раздают им вызовы и собирают их состояние
  */
 export class Needs implements INeeds {
   /** Минимальное значение потребности: потребность не удовлетворена совсем */
-  static readonly MIN_NEED = NeedModel.MIN_NEED;
+  static readonly MIN_NEED = BaseNeed.MIN_NEED;
 
   /** Максимальное значение потребности: потребность удовлетворена полностью */
-  static readonly MAX_NEED = NeedModel.MAX_NEED;
+  static readonly MAX_NEED = BaseNeed.MAX_NEED;
 
   private readonly deps: NeedsDeps;
-  private state: NeedsState;
+  private readonly needs: Readonly<Record<Need, INeed>>;
 
   /**
-   * Проверяет валидатором значение каждой потребности и выбрасывает его ошибку, если проверка не
-   * прошла
+   * Собирает фабрикой каждую потребность из её записи. Если фабрика выбросила ошибку, например
+   * значение вне пределов, выбрасывает ту же ошибку
    * @param state - состояние потребностей, например восстановленное из сохранения
    */
   constructor(state: NeedsState, deps: NeedsDeps) {
-    const { validator } = deps;
-
-    Object.values(Need).forEach((need) =>
-      validator.validateValue(state[need].value, Needs.MIN_NEED, Needs.MAX_NEED)
-    );
+    const { needFactory } = deps;
 
     this.deps = deps;
-    this.state = state;
+    this.needs = Object.fromEntries(
+      Object.values(Need).map((need) => [need, needFactory.create(need, state[need])])
+    ) as Record<Need, INeed>;
   }
 
   get(need: Need, time: IReadonlyTime): number {
-    const { models } = this.deps;
-
-    return models[need].get(this.state[need], time);
+    return this.needs[need].get(time);
   }
 
   getAll(time: IReadonlyTime): NeedValues {
@@ -110,33 +100,24 @@ export class Needs implements INeeds {
   }
 
   isUrgent(need: Need, time: IReadonlyTime): boolean {
-    const { models } = this.deps;
-
-    return models[need].isUrgent(this.state[need], time);
+    return this.needs[need].isUrgent(time);
   }
 
   isCalm(need: Need, time: IReadonlyTime): boolean {
-    const { models } = this.deps;
-
-    return models[need].isCalm(this.state[need], time);
+    return this.needs[need].isCalm(time);
   }
 
   getState(): NeedsState {
-    return this.state;
+    return Object.fromEntries(
+      Object.values(Need).map((need) => [need, this.needs[need].getState()])
+    ) as NeedsState;
   }
 
   clone(): INeeds {
-    return new Needs(this.state, this.deps);
+    return new Needs(this.getState(), this.deps);
   }
 
   perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
-    const { models } = this.deps;
-
-    this.state = Object.fromEntries(
-      Object.values(Need).map((need) => [
-        need,
-        models[need].perform(this.state[need], activity, details, time),
-      ])
-    ) as NeedsState;
+    Object.values(Need).forEach((need) => this.needs[need].perform(activity, details, time));
   }
 }

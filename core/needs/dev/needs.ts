@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { Need, Needs, SatietyModel } from '../src';
+import { Need, NeedFactory, Needs } from '../src';
 import type { INeedsValidator, NeedsDeps, NeedsState, NeedValues } from '../src';
 
 /** Создаёт валидатор, который пропускает любые значения */
@@ -10,15 +10,12 @@ export function createMockedNeedsValidator(): Mocked<INeedsValidator> {
 }
 
 /**
- * Создаёт зависимости потребностей. Если валидатор не передан, он пропускает любые значения, а если
- * не переданы модели, они настоящие
+ * Создаёт зависимости потребностей. Если фабрика не передана, она настоящая, а её валидатор пропускает
+ * любые значения
  */
 export function createNeedsDeps(deps: Partial<NeedsDeps> = {}): NeedsDeps {
   return {
-    validator: createMockedNeedsValidator(),
-    models: {
-      [Need.Satiety]: new SatietyModel(),
-    },
+    needFactory: new NeedFactory({ validator: createMockedNeedsValidator() }),
     ...deps,
   };
 }

@@ -1,8 +1,13 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps, createNeedValues } from '../dev';
-import { Need, Needs, NeedsFactory, SatietyModel } from '../src';
+import {
+  createMockedNeedFactory,
+  createMockedNeedsValidator,
+  createNeedsDeps,
+  createNeedValues,
+} from '../dev';
+import { Need, Needs, NeedsFactory } from '../src';
 
 describe('NeedsFactory', () => {
   describe('#create', () => {
@@ -45,31 +50,20 @@ describe('NeedsFactory', () => {
       expect(create).toThrow(RangeError);
     });
 
-    it('Если модели не переданы, сытость считает SatietyModel', () => {
-      const since = {
-        day: 1,
-        hours: 10,
-        minutes: 0,
-      };
-      const time = new ManualTime({
-        ...since,
-        hours: 16,
-      });
+    it('Собирает потребности переданной фабрикой потребностей', () => {
+      const needFactory = createMockedNeedFactory();
 
-      const needs = new NeedsFactory().create(
-        createNeedValues({ [Need.Satiety]: 80 }),
-        new ManualTime(since)
-      );
+      new NeedsFactory({ needFactory }).create(createNeedValues(), new ManualTime());
 
-      expect(needs.get(Need.Satiety, time)).toBe(
-        new SatietyModel().get(
-          {
-            value: 80,
-            since,
-          },
-          time
-        )
-      );
+      expect(needFactory.create).toHaveBeenCalledOnce();
+    });
+
+    it('Проверяет значения переданным валидатором', () => {
+      const validator = createMockedNeedsValidator();
+
+      new NeedsFactory({ validator }).create(createNeedValues(), new ManualTime());
+
+      expect(validator.validateValue).toHaveBeenCalled();
     });
   });
 });

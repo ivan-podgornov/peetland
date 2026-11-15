@@ -2,6 +2,9 @@
  * Баланс потребностей: значения, которые подбираются, чтобы потребности падали и восполнялись как
  * задумано. Свойства модели, которые не настраиваются, лежат статическими полями своих классов
  */
+import { Item } from '@peetland/inventory';
+import type { Food } from '@peetland/inventory';
+
 import { NeedCategory } from './category';
 import { Need } from './need';
 import type { NeedDefinitions } from './types';
@@ -21,5 +24,9 @@ export const NEED_DEFINITIONS: NeedDefinitions = {
   },
 };
 
-/** На сколько растёт сытость, когда NPC поел: досыта, чтобы жизнь NPC не крутилась вокруг еды */
-export const EAT_SATIETY = 100;
+/** На сколько растёт сытость от каждой еды */
+export const FOOD_SATIETY: Readonly<Record<Food, number>> = {
+  [Item.Romashka]: 60,
+  // Досыта, чтобы жизнь NPC не крутилась вокруг еды
+  [Item.Smile]: 100,
+};

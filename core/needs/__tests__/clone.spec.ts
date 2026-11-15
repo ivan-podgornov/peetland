@@ -1,3 +1,4 @@
+import { Item } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
@@ -41,7 +42,7 @@ describe('Needs', () => {
       );
       const time = new ManualTime(since);
 
-      needs.clone().perform(Activity.Eat, {}, time);
+      needs.clone().perform(Activity.Eat, { food: Item.Smile }, time);
 
       expect(needs.get(Need.Satiety, time)).toBe(50);
     });
@@ -64,7 +65,7 @@ describe('Needs', () => {
       const copy = needs.clone();
       const time = new ManualTime(since);
 
-      needs.perform(Activity.Eat, {}, time);
+      needs.perform(Activity.Eat, { food: Item.Smile }, time);
 
       expect(copy.get(Need.Satiety, time)).toBe(50);
     });

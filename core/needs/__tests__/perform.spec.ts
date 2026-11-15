@@ -1,38 +1,41 @@
+import { FOOD, Item } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createNeedsDeps, createNeedsState } from '../dev';
-import { Activity, Need, Needs } from '../src';
-import { EAT_SATIETY } from '../src/constants';
+import { Activity, FOOD_SATIETY, Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#perform', () => {
     describe('Если NPC поел', () => {
-      it('Прибавляет EAT_SATIETY к сытости на момент, когда NPC поел', () => {
-        const needs = new Needs(
-          createNeedsState({
-            [Need.Satiety]: {
-              value: 25,
-              since: {
-                day: 1,
-                hours: 10,
-                minutes: 0,
+      it.each(FOOD)(
+        'Прибавляет к сытости на момент, когда NPC поел, сколько восполняет еда (%s)',
+        (food) => {
+          const needs = new Needs(
+            createNeedsState({
+              [Need.Satiety]: {
+                value: 25,
+                since: {
+                  day: 1,
+                  hours: 10,
+                  minutes: 0,
+                },
               },
-            },
-          }),
-          createNeedsDeps()
-        );
-        const time = new ManualTime({
-          day: 1,
-          hours: 16,
-          minutes: 0,
-        });
+            }),
+            createNeedsDeps()
+          );
+          const time = new ManualTime({
+            day: 1,
+            hours: 16,
+            minutes: 0,
+          });
 
-        needs.perform(Activity.Eat, {}, time);
+          needs.perform(Activity.Eat, { food }, time);
 
-        // Сытость была 25, за 6 часов, четверть суток, упала на 25, а еда прибавила EAT_SATIETY
-        expect(needs.get(Need.Satiety, time)).toBeCloseTo(25 - 25 + EAT_SATIETY);
-      });
+          // Сытость была 25, за 6 часов, четверть суток, упала на 25, а еда прибавила своё
+          expect(needs.get(Need.Satiety, time)).toBeCloseTo(25 - 25 + FOOD_SATIETY[food]);
+        }
+      );
 
       it('Отсчитывает падение сытости от момента, когда NPC поел', () => {
         const needs = new Needs(
@@ -51,7 +54,7 @@ describe('Needs', () => {
 
         needs.perform(
           Activity.Eat,
-          {},
+          { food: Item.Romashka },
           new ManualTime({
             day: 1,
             hours: 16,
@@ -83,7 +86,7 @@ describe('Needs', () => {
         );
         const time = new ManualTime(since);
 
-        needs.perform(Activity.Eat, {}, time);
+        needs.perform(Activity.Eat, { food: Item.Romashka }, time);
 
         expect(needs.get(Need.Satiety, time)).toBe(Needs.MAX_NEED);
       });

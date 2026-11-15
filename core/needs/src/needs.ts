@@ -3,13 +3,18 @@ import type { IReadonlyTime } from '@peetland/timings';
 
 import { Activity } from './activity';
 import type { ActivityDetails } from './activity';
-import { EAT_SATIETY, NEED_DEFINITIONS } from './constants';
+import { FOOD_SATIETY, NEED_DEFINITIONS } from './constants';
 import { Need } from './need';
 import type { NeedsState, NeedValues } from './types';
 import type { INeedsValidator } from './validator';
 
 /** Вклад занятия в потребности: на сколько изменить каждую. Потребностей без изменений в объекте нет */
 type NeedsContribution = Readonly<Partial<Record<Need, number>>>;
+
+/** Считает вклад каждого занятия по его деталям */
+type Contributors = Readonly<{
+  [A in Activity]: (details: ActivityDetails[A]) => NeedsContribution;
+}>;
 
 /**
  * Потребности только на чтение. Так потребности лежат в состоянии NPC: планирование читает их, а
@@ -78,6 +83,11 @@ export class Needs implements INeeds {
   /** Максимальное значение потребности: потребность удовлетворена полностью */
   static readonly MAX_NEED = 100;
 
+  /** Вклад каждого занятия: еда восполняет сытость в зависимости от того, что съели */
+  private static readonly CONTRIBUTORS: Contributors = {
+    [Activity.Eat]: (details) => ({ [Need.Satiety]: FOOD_SATIETY[details.food] }),
+  };
+
   private readonly deps: NeedsDeps;
   private readonly timeSpan = new TimeSpan();
   private state: NeedsState;
@@ -128,13 +138,9 @@ export class Needs implements INeeds {
     return new Needs(this.state, this.deps);
   }
 
-  /** Детали пока не меняют вклад занятия (см. contribute) */
-  perform<A extends Activity>(
-    activity: A,
-    _details: ActivityDetails[A],
-    time: IReadonlyTime
-  ): void {
-    const contribution = this.contribute(activity);
+  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
+    const contributor: Contributors[A] = Needs.CONTRIBUTORS[activity];
+    const contribution = contributor(details);
 
     this.state = Object.values(Need).reduce<NeedsState>((state, need) => {
       const change = contribution[need];
@@ -150,17 +156,6 @@ export class Needs implements INeeds {
         },
       };
     }, this.state);
-  }
-
-  /**
-   * Возвращает вклад занятия в потребности. Пока вклад не зависит от деталей: когда в игре появится
-   * еда, от того, что съели, будет зависеть, сколько прибавится сытости
-   */
-  private contribute(activity: Activity): NeedsContribution {
-    switch (activity) {
-      case Activity.Eat:
-        return { [Need.Satiety]: EAT_SATIETY };
-    }
   }
 
   private clamp(value: number): number {

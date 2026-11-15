@@ -1,14 +1,15 @@
+import type { Food } from '@peetland/inventory';
+
 /** Занятия, от которых меняются потребности */
 export enum Activity {
   /** Поел */
   Eat = 'eat',
 }
 
-/**
- * Детали еды: что съели. Пока еды в игре нет, деталей нет, а когда появится, от того, что съели,
- * будет зависеть, как меняются потребности
- */
-export type EatDetails = Readonly<Record<string, never>>;
+/** Детали еды: что съели. От этого зависит, сколько восполнится сытости (см. FOOD_SATIETY) */
+export type EatDetails = Readonly<{
+  food: Food;
+}>;
 
 /** Детали каждого занятия */
 export type ActivityDetails = {

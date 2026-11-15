@@ -6164,18 +6164,12 @@ return ____exports
 ["core.inventory.src.item"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Тег предмета: к какому виду предметов он относится. У предмета может быть несколько тегов
-____exports.ItemTag = ____exports.ItemTag or ({})
-____exports.ItemTag.Food = "food"
---- Предметы. В коде предметы всегда указываются через Item, а не именами
--- Предмет: одно из описаний в Item
-____exports.Item = {
-    Money = {name = "money", tags = {}},
-    Bottles = {name = "bottles", tags = {}},
-    Booze = {name = "booze", tags = {}},
-    RomashkaLoaf = {name = "romashka-loaf", tags = {____exports.ItemTag.Food}},
-    SmilePizza = {name = "smile-pizza", tags = {____exports.ItemTag.Food}}
-}
+____exports.Item = ____exports.Item or ({})
+____exports.Item.Money = "money"
+____exports.Item.Bottles = "bottles"
+____exports.Item.Booze = "booze"
+____exports.Item.RomashkaLoaf = "romashka-loaf"
+____exports.Item.SmilePizza = "smile-pizza"
 return ____exports
  end,
 ["core.inventory.src.classifier"] = function(...) 
@@ -6184,19 +6178,16 @@ local __TS__Class = ____lualib.__TS__Class
 local __TS__ArrayIncludes = ____lualib.__TS__ArrayIncludes
 local ____exports = {}
 local ____item = require("core.inventory.src.item")
-local ItemTag = ____item.ItemTag
+local Item = ____item.Item
 ____exports.ItemClassifier = __TS__Class()
 local ItemClassifier = ____exports.ItemClassifier
 ItemClassifier.name = "ItemClassifier"
 function ItemClassifier.prototype.____constructor(self)
 end
 function ItemClassifier.prototype.isFood(self, item)
-    return self:hasTag(item, ItemTag.Food)
+    return __TS__ArrayIncludes(____exports.ItemClassifier.FOOD, item)
 end
-function ItemClassifier.prototype.hasTag(self, item, tag)
-    local tags = item.tags
-    return __TS__ArrayIncludes(tags, tag)
-end
+ItemClassifier.FOOD = {Item.RomashkaLoaf, Item.SmilePizza}
 return ____exports
  end,
 ["core.inventory.src.inventory"] = function(...) 
@@ -6241,7 +6232,7 @@ function Inventory.prototype.____constructor(self, counts)
     __TS__ArrayForEach(
         __TS__ObjectValues(Item),
         function(____, item)
-            local count = counts[item.name]
+            local count = counts[item]
             if count ~= nil then
                 self:set(item, count)
             end
@@ -6249,12 +6240,12 @@ function Inventory.prototype.____constructor(self, counts)
     )
 end
 function Inventory.prototype.get(self, item)
-    return self.counts:get(item.name) or 0
+    return self.counts:get(item) or 0
 end
 function Inventory.prototype.getAll(self)
     local counts = {}
-    self.counts:forEach(function(____, count, name)
-        counts[name] = count
+    self.counts:forEach(function(____, count, item)
+        counts[item] = count
     end)
     return counts
 end
@@ -6289,9 +6280,9 @@ function Inventory.prototype.remove(self, item, count)
 end
 function Inventory.prototype.write(self, item, count)
     if count == 0 then
-        self.counts:delete(item.name)
+        self.counts:delete(item)
     else
-        self.counts:set(item.name, count)
+        self.counts:set(item, count)
     end
 end
 return ____exports
@@ -6334,7 +6325,6 @@ end
 do
     local ____item = require("core.inventory.src.item")
     ____exports.Item = ____item.Item
-    ____exports.ItemTag = ____item.ItemTag
 end
 return ____exports
  end,
@@ -6543,7 +6533,7 @@ ____exports.SATIETY_URGENT_BELOW = 25
 --- Выше этой сытости голод перестаёт быть срочным
 ____exports.SATIETY_CALM_ABOVE = 60
 --- На сколько растёт сытость от каждой еды
-____exports.FOOD_SATIETY = {[Item.RomashkaLoaf.name] = 60, [Item.SmilePizza.name] = 100}
+____exports.FOOD_SATIETY = {[Item.RomashkaLoaf] = 60, [Item.SmilePizza] = 100}
 return ____exports
  end,
 ["core.needs.src.satiety-model"] = function(...) 
@@ -6573,7 +6563,7 @@ function SatietyModel.prototype.____constructor(self, ...)
     self.urgentBelow = SATIETY_URGENT_BELOW
     self.calmAbove = SATIETY_CALM_ABOVE
     self.depletionMinutes = SATIETY_DEPLETION_MINUTES
-    self.contributors = {[Activity.Eat] = function(details) return FOOD_SATIETY[details.food.name] end}
+    self.contributors = {[Activity.Eat] = function(details) return FOOD_SATIETY[details.food] end}
 end
 return ____exports
  end,

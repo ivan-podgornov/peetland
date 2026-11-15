@@ -10,14 +10,14 @@ describe('PurchaseTask', () => {
     describe('Предусловия', () => {
       it('Если денег ровно на цену, план составляется', () => {
         const task = createPurchaseTask({ price: 100 });
-        const state = new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money.name]: 100 }).build();
 
         expect(planSteps(task, state)).not.toBeNull();
       });
 
       it('Если денег не хватает на цену, план не составляется', () => {
         const task = createPurchaseTask({ price: 100 });
-        const state = new NpcStateBuilder().withInventory({ [Item.Money]: 99 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money.name]: 99 }).build();
 
         expect(planSteps(task, state)).toBeNull();
       });

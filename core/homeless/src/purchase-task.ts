@@ -6,7 +6,7 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 
 export type PurchaseTaskOptions = {
   /** Какой предмет купить */
-  item: Exclude<Item, Item.Money>;
+  item: Exclude<Item, typeof Item.Money>;
   /** Сколько предмета купить */
   count: number;
   /** Сколько заплатить, в долларах */

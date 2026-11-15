@@ -10,7 +10,7 @@ import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } 
 
 /** Создаёт состояние NPC, у которого бутылок хватает на пойло: без них план не составляется */
 function createStateWithBottles() {
-  return new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE }).build();
+  return new NpcStateBuilder().withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE }).build();
 }
 
 describe('SellBottlesTask', () => {
@@ -40,7 +40,7 @@ describe('SellBottlesTask', () => {
         const places = createPlacesWithCollection();
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
-          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
+          .withInventory({ [Item.Bottles.name]: BOTTLES_FOR_BOOZE })
           .build();
 
         plan(createSellBottlesTask(places), state);

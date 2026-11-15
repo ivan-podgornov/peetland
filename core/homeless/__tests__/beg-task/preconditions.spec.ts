@@ -25,8 +25,8 @@ describe('BegTask', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
           .withInventory({
-            [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
-            [Item.Bottles]: 1,
+            [Item.Money.name]: BOOZE_PRICE - BOTTLE_PRICE,
+            [Item.Bottles.name]: 1,
           })
           .build();
 
@@ -52,7 +52,7 @@ describe('BegTask', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
           .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(30)).build())
-          .withInventory({ [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD })
+          .withInventory({ [Item.Money.name]: BOOZE_PRICE - 4 * BEGGING_REWARD })
           .build();
 
         // 30 попыток на удачу по 0.5 стыда: перед четырьмя удачами стыд 0, 15, 30, 45
@@ -63,7 +63,7 @@ describe('BegTask', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
           .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(60)).build())
-          .withInventory({ [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD })
+          .withInventory({ [Item.Money.name]: BOOZE_PRICE - 3 * BEGGING_REWARD })
           .build();
 
         // 60 попыток на удачу по 0.5 стыда: перед третьей удачей стыд уже 60

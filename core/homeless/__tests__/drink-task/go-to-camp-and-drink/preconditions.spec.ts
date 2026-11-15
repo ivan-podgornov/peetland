@@ -11,7 +11,7 @@ describe('DrinkTask', () => {
     describe('Предусловия', () => {
       it('Если пойло есть, NPC не в бомжарне и бомжарни есть, план составляется', () => {
         const task = createDrinkTask(createPlacesWithCamp(false));
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build();
 
         expect(planSteps(task, state)).not.toBeNull();
       });
@@ -24,7 +24,7 @@ describe('DrinkTask', () => {
 
       it('Если бомжарен нет, план не составляется', () => {
         const task = createDrinkTask(createMockedPlaces());
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build();
 
         expect(planSteps(task, state)).toBeNull();
       });

@@ -12,7 +12,7 @@ describe('DrinkTask', () => {
     describe('Предусловия', () => {
       it('Если пойло есть и NPC в бомжарне, пьёт на месте и никуда не идёт', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
-        const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Booze.name]: 1 }).build();
 
         expect(planTree(planSteps(task, state) ?? [])).toMatchObject([{ method: 'drink-in-camp' }]);
       });
@@ -27,7 +27,7 @@ describe('DrinkTask', () => {
         const places = createPlacesWithCamp(true);
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
-          .withInventory({ [Item.Booze]: 1 })
+          .withInventory({ [Item.Booze.name]: 1 })
           .build();
 
         plan(createDrinkTask(places), state);

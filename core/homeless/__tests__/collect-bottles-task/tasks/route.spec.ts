@@ -20,7 +20,7 @@ describe('CollectBottlesTask', () => {
       it('Планирует дойти до мусорки, повернуться к ней, начать рыться, найти бутылку, забрать её одной транзакцией и перестать рыться', () => {
         const task = createCollectBottlesTask(createPlacesWithTrashBins());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 })
+          .withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 1 })
           .build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
@@ -120,7 +120,7 @@ describe('CollectBottlesTask', () => {
 
         plan(
           task,
-          new NpcStateBuilder().withInventory({ [Item.Bottles]: MAX_BOTTLES - 1 }).build()
+          new NpcStateBuilder().withInventory({ [Item.Bottles.name]: MAX_BOTTLES - 1 }).build()
         );
 
         expect([playAnimation.mock.calls.at(0), playAnimation.mock.calls.at(-1)]).toStrictEqual([

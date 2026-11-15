@@ -24,7 +24,7 @@ function planTryLuck() {
   const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
   plan(
     createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory),
-    new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD }).build()
+    new NpcStateBuilder().withInventory({ [Item.Money.name]: BOOZE_PRICE - BEGGING_REWARD }).build()
   );
 
   return tryLuck.mock.calls[0]?.[0];

@@ -11,7 +11,7 @@ describe('PurchaseTask', () => {
     describe('Задачи', () => {
       it('Планирует заплатить, отнять деньги и добавить предмет одной транзакцией: если NPC заплатил, он не уйдёт без предмета', () => {
         const task = createPurchaseTask({ price: 100 });
-        const state = new NpcStateBuilder().withInventory({ [Item.Money]: 100 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money.name]: 100 }).build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
           new PlanStructureBuilder()
@@ -36,13 +36,13 @@ describe('PurchaseTask', () => {
           count: 2,
           price: 100,
         });
-        const state = new NpcStateBuilder().withInventory({ [Item.Money]: 150 }).build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money.name]: 150 }).build();
 
         const after = applyPlanEffects(task, state);
 
         expect(after.self.inventory.getAll()).toStrictEqual({
-          [Item.Money]: 50,
-          [Item.Booze]: 2,
+          [Item.Money.name]: 50,
+          [Item.Booze.name]: 2,
         });
       });
     });

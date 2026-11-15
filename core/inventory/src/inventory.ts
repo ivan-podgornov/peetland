@@ -1,7 +1,10 @@
 import { Item } from './item';
+import type { ItemName } from './item';
 
-/** Количество каждого предмета. Предметов, которых нет в инвентаре, в объекте нет */
-export type InventoryCounts = Partial<Record<Item, number>>;
+/**
+ * Количество каждого предмета по его имени. Предметов, которых нет в инвентаре, в объекте нет
+ */
+export type InventoryCounts = Partial<Record<ItemName, number>>;
 
 /**
  * Инвентарь только на чтение. Так инвентарь лежит в состоянии NPC: планирование читает его, а
@@ -23,12 +26,12 @@ export interface IReadonlyInventory {
  * дробное. Предметы с нулевым количеством не хранятся
  */
 export class Inventory implements IReadonlyInventory {
-  private readonly counts = new Map<Item, number>();
+  private readonly counts = new Map<ItemName, number>();
 
   /** @param counts - начальное количество предметов, например восстановленное из сохранения */
   constructor(counts: InventoryCounts = {}) {
     Object.values(Item).forEach((item) => {
-      const count = counts[item];
+      const count = counts[item.name];
       if (count !== undefined) {
         this.set(item, count);
       }
@@ -37,14 +40,14 @@ export class Inventory implements IReadonlyInventory {
 
   /** Возвращает количество предмета или 0, если его нет */
   get(item: Item): number {
-    return this.counts.get(item) ?? 0;
+    return this.counts.get(item.name) ?? 0;
   }
 
   /** Возвращает количество всех предметов, которые есть в инвентаре */
   getAll(): InventoryCounts {
     const counts: InventoryCounts = {};
-    this.counts.forEach((count, item) => {
-      counts[item] = count;
+    this.counts.forEach((count, name) => {
+      counts[name] = count;
     });
     return counts;
   }
@@ -87,9 +90,9 @@ export class Inventory implements IReadonlyInventory {
 
   private write(item: Item, count: number): void {
     if (count === 0) {
-      this.counts.delete(item);
+      this.counts.delete(item.name);
     } else {
-      this.counts.set(item, count);
+      this.counts.set(item.name, count);
     }
   }
 }

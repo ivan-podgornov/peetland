@@ -16,7 +16,7 @@ describe('BegTask', () => {
       it('Планирует дойти до места, повернуться и клянчить', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD })
+          .withInventory({ [Item.Money.name]: BOOZE_PRICE - BEGGING_REWARD })
           .build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(

@@ -10,8 +10,8 @@ describe('Inventory', () => {
       inventory.set(Item.Bottles, 2);
 
       expect(inventory.getAll()).toStrictEqual({
-        [Item.Money]: 5,
-        [Item.Bottles]: 2,
+        [Item.Money.name]: 5,
+        [Item.Bottles.name]: 2,
       });
     });
 
@@ -29,7 +29,7 @@ describe('Inventory', () => {
       inventory.set(Item.Money, 5);
 
       const counts = inventory.getAll();
-      counts[Item.Money] = 1;
+      counts[Item.Money.name] = 1;
 
       expect(inventory.get(Item.Money)).toBe(5);
     });

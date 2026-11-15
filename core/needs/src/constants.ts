@@ -27,6 +27,5 @@ export const NEED_DEFINITIONS: NeedDefinitions = {
 /** На сколько растёт сытость от каждой еды */
 export const FOOD_SATIETY: Readonly<Record<Food, number>> = {
   [Item.Romashka]: 60,
-  // Досыта, чтобы жизнь NPC не крутилась вокруг еды
   [Item.Smile]: 100,
 };

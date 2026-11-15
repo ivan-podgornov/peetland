@@ -1,0 +1,1 @@
+{"id":"5783f6320e85edd2daa8ba09a06a749d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/base-need/is-urgent.spec.ts#BaseNeed #isUrgent Если значение ниже порога срочности, возвращает true","name":"Если значение ниже порога срочности, возвращает true","status":"passed","testResultsByEnv":{"default":"ac1851ef09735cde0283846c7ad8211b"}}

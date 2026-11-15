@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/food/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/food/docs/assets/js/runtime~main.a010bc85.js" defer="defer"></script>
+<script src="/peetland/feat/food/docs/assets/js/runtime~main.8065e79f.js" defer="defer"></script>
 <script src="/peetland/feat/food/docs/assets/js/main.510122c7.js" defer="defer"></script>
 </head>
 <body>
@@ -16,21 +16,22 @@
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="потребности-и-категории">Потребности и категории<a href="#потребности-и-категории" class="hash-link" aria-label="Прямая ссылка на Потребности и категории" title="Прямая ссылка на Потребности и категории" translate="no">​</a></h2>
 <p>Потребности перечислены в enum <code>Need</code>, пока одна — сытость (<code>Satiety</code>). Значение потребности — от
 <code>Needs.MIN_NEED</code> (0, не удовлетворена совсем) до <code>Needs.MAX_NEED</code> (100, удовлетворена полностью),
-они же <code>NeedModel.MIN_NEED</code> и <code>NeedModel.MAX_NEED</code>.</p>
-<p>У каждой потребности есть модель (<code>INeedModel</code>): её категория (<code>NeedCategory</code>), как быстро она
-падает, когда она срочная и как её меняют занятия. Категория решает, какой слой корневой задачи NPC
-удовлетворяет потребность: жизненные (<code>Vital</code>) — слой потребностей, зависимости (<code>Addiction</code>) — слой
-зависимостей.</p>
-<h2 class="anchor anchorTargetStickyNavbar_tleR" id="модели-потребностей">Модели потребностей<a href="#модели-потребностей" class="hash-link" aria-label="Прямая ссылка на Модели потребностей" title="Прямая ссылка на Модели потребностей" translate="no">​</a></h2>
-<p>Модель не хранит значение: она считает по записи потребности (<code>NeedRecord</code>) — значению и моменту,
-когда его выставили. Записи хранит <code>Needs</code>, а модели получает в зависимостях (<code>NeedModels</code>) и
-делегирует им чтение, срочность и занятия. По умолчанию модели собирает <code>NeedsFactory</code>.</p>
-<p>Общая логика лежит в абстрактном классе <code>NeedModel</code>: падение, пределы, срочность и то, как вклад
-занятия меняет запись. Подкласс описывает только то, чем потребность отличается: категорию, за
-сколько минут она падает до нуля, пороги и вклад занятий. Например, сытость (<code>SatietyModel</code>)
-жизненная и падает до нуля за игровые сутки. Значения лежат в константах баланса.</p>
+они же <code>BaseNeed.MIN_NEED</code> и <code>BaseNeed.MAX_NEED</code>.</p>
+<p>Каждая потребность — отдельный объект (<code>INeed</code>): она сама хранит значение и момент, когда его
+выставили, сама падает со временем и сама меняется от занятий. У потребности есть категория
+(<code>NeedCategory</code>). Она решает, какой слой корневой задачи NPC удовлетворяет потребность: жизненные
+(<code>Vital</code>) — слой потребностей, зависимости (<code>Addiction</code>) — слой зависимостей.</p>
+<h2 class="anchor anchorTargetStickyNavbar_tleR" id="классы-потребностей">Классы потребностей<a href="#классы-потребностей" class="hash-link" aria-label="Прямая ссылка на Классы потребностей" title="Прямая ссылка на Классы потребностей" translate="no">​</a></h2>
+<p>Общая логика лежит в абстрактном классе <code>BaseNeed</code>: падение, пределы, срочность, проверка значения
+и то, как вклад занятия меняет значение. Подкласс описывает только то, чем потребность отличается:
+категорию, за сколько минут она падает до нуля, пороги и вклад занятий. Например, сытость
+(<code>Satiety</code>) жизненная и падает до нуля за игровые сутки. Значения лежат в константах баланса, а
+пороги сытости видны снаружи как <code>Satiety.URGENT_BELOW</code> и <code>Satiety.CALM_ABOVE</code>.</p>
+<p><code>Needs</code> — коллекция потребностей: раздаёт им вызовы и собирает их состояние. Потребности из
+состояния собирает фабрика потребностей (<code>INeedFactory</code>, <code>NeedFactory</code>), которую <code>Needs</code> получает в
+зависимостях. Новая потребность — новый подкласс <code>BaseNeed</code> и новая ветка в <code>NeedFactory</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="срочность">Срочность<a href="#срочность" class="hash-link" aria-label="Прямая ссылка на Срочность" title="Прямая ссылка на Срочность" translate="no">​</a></h2>
-<p>В модели потребности два порога. Ниже нижнего (<code>urgentBelow</code>) потребность срочная: NPC бросает
+<p>У потребности два порога. Ниже нижнего (<code>urgentBelow</code>) потребность срочная: NPC бросает
 дела и удовлетворяет её. Выше верхнего (<code>calmAbove</code>) она перестаёт быть срочной. Пока значение
 между порогами, срочность не меняется, поэтому значение, которое скачет около нижнего порога, не
 поднимает тревогу снова. У сытости пороги 25 и 60: срочно становится за 6 часов до голода.</p>
@@ -60,11 +61,11 @@
 одно — поесть (<code>Eat</code>).</p>
 <p><code>perform(activity, details, time)</code> прибавляет вклад занятия к значению каждой потребности, которую
 оно меняет, на момент <code>time</code>, держит значение в пределах и отсчитывает падение от <code>time</code>. Вклад
-занятий описывает модель каждой потребности (<code>NeedContributors</code>): если занятия в нём нет,
+занятий описывает каждая потребность (<code>NeedContributors</code>): если занятия в нём нет,
 потребность от него не меняется.</p>
 <p>У каждого занятия есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
 деталей зависит вклад. В деталях еды (<code>EatDetails</code>) лежит, что съели (<code>Food</code> из
-<code>@peetland/inventory</code>), а сколько от этого восполнится сытости, решает <code>SatietyModel</code>.</p>
+<code>@peetland/inventory</code>), а сколько от этого восполнится сытости, решает <code>Satiety</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="время-при-чтении-и-записи">Время при чтении и записи<a href="#время-при-чтении-и-записи" class="hash-link" aria-label="Прямая ссылка на Время при чтении и записи" title="Прямая ссылка на Время при чтении и записи" translate="no">​</a></h2>
 <p>Потребности не хранят время: <code>get</code>, <code>getAll</code> и <code>perform</code> получают его параметром. Так потребность
 падает в том времени, в котором её читают. Если эффект задачи сдвигает время в клоне состояния,
@@ -83,22 +84,24 @@
 <p><code>getState()</code> возвращает значение каждой потребности и момент, когда его выставили, а конструктор
 <code>Needs</code> собирает из такого же объекта такие же потребности.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="проверка-значений">Проверка значений<a href="#проверка-значений" class="hash-link" aria-label="Прямая ссылка на Проверка значений" title="Прямая ссылка на Проверка значений" translate="no">​</a></h2>
-<p>Значения проверяет валидатор (<code>INeedsValidator</code>), который <code>Needs</code> получает в зависимостях, а
-фабрика по умолчанию берёт <code>NeedsValidator</code>. Конструктор проверяет значение каждой потребности и,
-если проверка не прошла, выбрасывает ошибку валидатора. <code>NeedsValidator</code> выбрасывает <code>RangeError</code>,
+<p>Значение проверяет валидатор (<code>INeedsValidator</code>), который каждая потребность получает в
+зависимостях от <code>NeedFactory</code>, а <code>NeedsFactory</code> по умолчанию берёт <code>NeedsValidator</code>. Конструктор
+потребности проверяет значение и, если проверка не прошла, выбрасывает ошибку валидатора, а
+конструктор <code>Needs</code> — ту же ошибку. <code>NeedsValidator</code> выбрасывает <code>RangeError</code>,
 если значение не конечное число в пределах.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="для-тестов">Для тестов<a href="#для-тестов" class="hash-link" aria-label="Прямая ссылка на Для тестов" title="Прямая ссылка на Для тестов" translate="no">​</a></h2>
 <p>Точка входа <code>@peetland/needs/dev</code> даёт:</p>
 <ul>
 <li class="">зависимости потребностей (<code>createNeedsDeps</code>) с валидатором, который пропускает любые значения
-(<code>createMockedNeedsValidator</code>), и настоящими моделями потребностей;</li>
-<li class="">мок модели потребности (<code>createMockedNeedModel</code>) и модель для тестов общей логики <code>NeedModel</code>
-(<code>TestNeedModel</code>), которой вклад занятий передаётся в конструктор;</li>
+(<code>createMockedNeedsValidator</code>), и настоящей фабрикой потребностей;</li>
+<li class="">мок потребности (<code>createMockedNeed</code>), мок фабрики потребностей (<code>createMockedNeedFactory</code>) и
+потребность для тестов общей логики <code>BaseNeed</code> (<code>TestNeed</code>), которой вклад занятий передаётся в
+конструктор;</li>
 <li class="">значения и состояние потребностей (<code>createNeedValues</code>, <code>createNeedsState</code>), в которых всё, что не
 передано, удовлетворено полностью;</li>
 <li class="">мок фабрики (<code>createMockedNeedsFactory</code>), который всегда возвращает переданные потребности;</li>
 <li class="">мок наблюдателя срочности (<code>createMockedUrgencyWatcher</code>), который на каждой проверке возвращает
 переданный результат, и мок его фабрики (<code>createMockedUrgencyWatcherFactory</code>).</li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_QeZL"><a href="https://github.com/ivan-podgornov/peetland/edit/feat/food/core/needs/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_bHB7" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Отредактировать эту страницу</a></div><div class="col lastUpdated_ydrU"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Страница документа"><a class="pagination-nav__link pagination-nav__link--prev" href="/peetland/feat/food/docs/core/inventory/CONTRIBUTING/"><div class="pagination-nav__sublabel">Предыдущая страница</div><div class="pagination-nav__label">@peetland/inventory</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/peetland/feat/food/docs/core/needs-tasks/CONTRIBUTING/"><div class="pagination-nav__sublabel">Следующая страница</div><div class="pagination-nav__label">@peetland/needs-tasks</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_XG6w thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#потребности-и-категории" class="table-of-contents__link toc-highlight">Потребности и категории</a></li><li><a href="#модели-потребностей" class="table-of-contents__link toc-highlight">Модели потребностей</a></li><li><a href="#срочность" class="table-of-contents__link toc-highlight">Срочность</a></li><li><a href="#наблюдатель-срочности" class="table-of-contents__link toc-highlight">Наблюдатель срочности</a></li><li><a href="#ленивое-падение" class="table-of-contents__link toc-highlight">Ленивое падение</a></li><li><a href="#занятия" class="table-of-contents__link toc-highlight">Занятия</a></li><li><a href="#время-при-чтении-и-записи" class="table-of-contents__link toc-highlight">Время при чтении и записи</a></li><li><a href="#только-на-чтение" class="table-of-contents__link toc-highlight">Только на чтение</a></li><li><a href="#создание-и-сохранение" class="table-of-contents__link toc-highlight">Создание и сохранение</a></li><li><a href="#проверка-значений" class="table-of-contents__link toc-highlight">Проверка значений</a></li><li><a href="#для-тестов" class="table-of-contents__link toc-highlight">Для тестов</a></li></ul></div></div></div></div></main></div></div></div></div>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_QeZL"><a href="https://github.com/ivan-podgornov/peetland/edit/feat/food/core/needs/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_bHB7" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Отредактировать эту страницу</a></div><div class="col lastUpdated_ydrU"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Страница документа"><a class="pagination-nav__link pagination-nav__link--prev" href="/peetland/feat/food/docs/core/inventory/CONTRIBUTING/"><div class="pagination-nav__sublabel">Предыдущая страница</div><div class="pagination-nav__label">@peetland/inventory</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/peetland/feat/food/docs/core/needs-tasks/CONTRIBUTING/"><div class="pagination-nav__sublabel">Следующая страница</div><div class="pagination-nav__label">@peetland/needs-tasks</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_XG6w thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#потребности-и-категории" class="table-of-contents__link toc-highlight">Потребности и категории</a></li><li><a href="#классы-потребностей" class="table-of-contents__link toc-highlight">Классы потребностей</a></li><li><a href="#срочность" class="table-of-contents__link toc-highlight">Срочность</a></li><li><a href="#наблюдатель-срочности" class="table-of-contents__link toc-highlight">Наблюдатель срочности</a></li><li><a href="#ленивое-падение" class="table-of-contents__link toc-highlight">Ленивое падение</a></li><li><a href="#занятия" class="table-of-contents__link toc-highlight">Занятия</a></li><li><a href="#время-при-чтении-и-записи" class="table-of-contents__link toc-highlight">Время при чтении и записи</a></li><li><a href="#только-на-чтение" class="table-of-contents__link toc-highlight">Только на чтение</a></li><li><a href="#создание-и-сохранение" class="table-of-contents__link toc-highlight">Создание и сохранение</a></li><li><a href="#проверка-значений" class="table-of-contents__link toc-highlight">Проверка значений</a></li><li><a href="#для-тестов" class="table-of-contents__link toc-highlight">Для тестов</a></li></ul></div></div></div></div></main></div></div></div></div>
 </body>
 </html>

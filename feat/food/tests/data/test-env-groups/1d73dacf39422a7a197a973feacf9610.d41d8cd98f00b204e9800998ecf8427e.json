@@ -1,0 +1,1 @@
+{"id":"1d73dacf39422a7a197a973feacf9610.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/base-need/constructor.spec.ts#BaseNeed #constructor Если валидатор выбросил ошибку, выбрасывает ту же ошибку","name":"Если валидатор выбросил ошибку, выбрасывает ту же ошибку","status":"passed","testResultsByEnv":{"default":"af418cfe522b003bdafc5fef5d979ced"}}

@@ -6358,63 +6358,6 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["core.needs.src.need-model"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local ____timings = require("toolkit.timings.src.index")
-local TimeSpan = ____timings.TimeSpan
---- Общая логика моделей потребностей. Значение падает со скоростью MAX_NEED за depletionMinutes
--- игровых минут, не падает ниже MIN_NEED, а если время назад, не растёт. Что отличает одну
--- потребность от другой, описывает подкласс: категорию, скорость падения, пороги и вклад занятий
-____exports.NeedModel = __TS__Class()
-local NeedModel = ____exports.NeedModel
-NeedModel.name = "NeedModel"
-function NeedModel.prototype.____constructor(self)
-    self.timeSpan = __TS__New(TimeSpan)
-end
-function NeedModel.prototype.get(self, record, time)
-    local ____record_0 = record
-    local value = ____record_0.value
-    local since = ____record_0.since
-    local elapsed = math.max(
-        0,
-        self.timeSpan:elapsedMinutes(
-            since,
-            time:getState()
-        )
-    )
-    local rate = ____exports.NeedModel.MAX_NEED / self.depletionMinutes
-    return math.max(____exports.NeedModel.MIN_NEED, value - rate * elapsed)
-end
-function NeedModel.prototype.isUrgent(self, record, time)
-    return self:get(record, time) < self.urgentBelow
-end
-function NeedModel.prototype.isCalm(self, record, time)
-    return self:get(record, time) > self.calmAbove
-end
-function NeedModel.prototype.perform(self, record, activity, details, time)
-    local contributors = self.contributors
-    local contributor = contributors[activity]
-    if contributor == nil then
-        return record
-    end
-    return {
-        value = self:clamp(self:get(record, time) + contributor(details)),
-        since = time:getState()
-    }
-end
-function NeedModel.prototype.clamp(self, value)
-    return math.min(
-        ____exports.NeedModel.MAX_NEED,
-        math.max(____exports.NeedModel.MIN_NEED, value)
-    )
-end
-NeedModel.MIN_NEED = 0
-NeedModel.MAX_NEED = 100
-return ____exports
- end,
 ["core.needs.src.validator"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -6445,78 +6388,69 @@ function NeedsValidator.prototype.validateValue(self, value, min, max)
 end
 return ____exports
  end,
-["core.needs.src.needs"] = function(...) 
+["core.needs.src.base-need"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectValues = ____lualib.__TS__ObjectValues
-local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____need = require("core.needs.src.need")
-local Need = ____need.Need
-local ____need_2Dmodel = require("core.needs.src.need-model")
-local NeedModel = ____need_2Dmodel.NeedModel
---- Потребности хранят значение каждой потребности NPC и момент, когда его выставили, а текущее
--- значение, срочность и вклад занятий считают модели потребностей (см. INeedModel). Никто не
--- убавляет потребности по тикам
-____exports.Needs = __TS__Class()
-local Needs = ____exports.Needs
-Needs.name = "Needs"
-function Needs.prototype.____constructor(self, state, deps)
+local ____timings = require("toolkit.timings.src.index")
+local TimeSpan = ____timings.TimeSpan
+--- Общая логика потребностей. Значение падает со скоростью MAX_NEED за depletionMinutes игровых
+-- минут, не падает ниже MIN_NEED, а если время назад, не растёт. Никто не убавляет потребность по
+-- тикам: текущее значение считается при чтении. Чем одна потребность отличается от другой, описывает
+-- подкласс: категорию, скорость падения, пороги и вклад занятий
+____exports.BaseNeed = __TS__Class()
+local BaseNeed = ____exports.BaseNeed
+BaseNeed.name = "BaseNeed"
+function BaseNeed.prototype.____constructor(self, record, deps)
+    self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
     local validator = ____deps_0.validator
-    __TS__ArrayForEach(
-        __TS__ObjectValues(Need),
-        function(____, need) return validator:validateValue(state[need].value, ____exports.Needs.MIN_NEED, ____exports.Needs.MAX_NEED) end
+    validator:validateValue(record.value, ____exports.BaseNeed.MIN_NEED, ____exports.BaseNeed.MAX_NEED)
+    self.record = record
+end
+function BaseNeed.prototype.get(self, time)
+    local ____self_record_1 = self.record
+    local value = ____self_record_1.value
+    local since = ____self_record_1.since
+    local elapsed = math.max(
+        0,
+        self.timeSpan:elapsedMinutes(
+            since,
+            time:getState()
+        )
     )
-    self.deps = deps
-    self.state = state
+    local rate = ____exports.BaseNeed.MAX_NEED / self.depletionMinutes
+    return math.max(____exports.BaseNeed.MIN_NEED, value - rate * elapsed)
 end
-function Needs.prototype.get(self, need, time)
-    local ____self_deps_1 = self.deps
-    local models = ____self_deps_1.models
-    return models[need]:get(self.state[need], time)
+function BaseNeed.prototype.isUrgent(self, time)
+    return self:get(time) < self.urgentBelow
 end
-function Needs.prototype.getAll(self, time)
-    return __TS__ObjectFromEntries(__TS__ArrayMap(
-        __TS__ObjectValues(Need),
-        function(____, need) return {
-            need,
-            self:get(need, time)
-        } end
-    ))
+function BaseNeed.prototype.isCalm(self, time)
+    return self:get(time) > self.calmAbove
 end
-function Needs.prototype.isUrgent(self, need, time)
-    local ____self_deps_2 = self.deps
-    local models = ____self_deps_2.models
-    return models[need]:isUrgent(self.state[need], time)
+function BaseNeed.prototype.getState(self)
+    return self.record
 end
-function Needs.prototype.isCalm(self, need, time)
-    local ____self_deps_3 = self.deps
-    local models = ____self_deps_3.models
-    return models[need]:isCalm(self.state[need], time)
+function BaseNeed.prototype.perform(self, activity, details, time)
+    local contributors = self.contributors
+    local contributor = contributors[activity]
+    if contributor == nil then
+        return
+    end
+    self.record = {
+        value = self:clamp(self:get(time) + contributor(details)),
+        since = time:getState()
+    }
 end
-function Needs.prototype.getState(self)
-    return self.state
+function BaseNeed.prototype.clamp(self, value)
+    return math.min(
+        ____exports.BaseNeed.MAX_NEED,
+        math.max(____exports.BaseNeed.MIN_NEED, value)
+    )
 end
-function Needs.prototype.clone(self)
-    return __TS__New(____exports.Needs, self.state, self.deps)
-end
-function Needs.prototype.perform(self, activity, details, time)
-    local ____self_deps_4 = self.deps
-    local models = ____self_deps_4.models
-    self.state = __TS__ObjectFromEntries(__TS__ArrayMap(
-        __TS__ObjectValues(Need),
-        function(____, need) return {
-            need,
-            models[need]:perform(self.state[need], activity, details, time)
-        } end
-    ))
-end
-Needs.MIN_NEED = NeedModel.MIN_NEED
-Needs.MAX_NEED = NeedModel.MAX_NEED
+BaseNeed.MIN_NEED = 0
+BaseNeed.MAX_NEED = 100
 return ____exports
  end,
 ["core.needs.src.constants"] = function(...) 
@@ -6536,13 +6470,15 @@ ____exports.SATIETY_CALM_ABOVE = 60
 ____exports.FOOD_SATIETY = {[Item.RomashkaLoaf] = 60, [Item.SmilePizza] = 100}
 return ____exports
  end,
-["core.needs.src.satiety-model"] = function(...) 
+["core.needs.src.satiety"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local ____exports = {}
 local ____activity = require("core.needs.src.activity")
 local Activity = ____activity.Activity
+local ____base_2Dneed = require("core.needs.src.base-need")
+local BaseNeed = ____base_2Dneed.BaseNeed
 local ____category = require("core.needs.src.category")
 local NeedCategory = ____category.NeedCategory
 local ____constants = require("core.needs.src.constants")
@@ -6550,21 +6486,121 @@ local FOOD_SATIETY = ____constants.FOOD_SATIETY
 local SATIETY_CALM_ABOVE = ____constants.SATIETY_CALM_ABOVE
 local SATIETY_DEPLETION_MINUTES = ____constants.SATIETY_DEPLETION_MINUTES
 local SATIETY_URGENT_BELOW = ____constants.SATIETY_URGENT_BELOW
-local ____need_2Dmodel = require("core.needs.src.need-model")
-local NeedModel = ____need_2Dmodel.NeedModel
 --- Сытость: жизненная потребность. Падает, пока NPC не ест, а еда восполняет её по тому, что съели
-____exports.SatietyModel = __TS__Class()
-local SatietyModel = ____exports.SatietyModel
-SatietyModel.name = "SatietyModel"
-__TS__ClassExtends(SatietyModel, NeedModel)
-function SatietyModel.prototype.____constructor(self, ...)
-    NeedModel.prototype.____constructor(self, ...)
+____exports.Satiety = __TS__Class()
+local Satiety = ____exports.Satiety
+Satiety.name = "Satiety"
+__TS__ClassExtends(Satiety, BaseNeed)
+function Satiety.prototype.____constructor(self, ...)
+    BaseNeed.prototype.____constructor(self, ...)
     self.category = NeedCategory.Vital
-    self.urgentBelow = SATIETY_URGENT_BELOW
-    self.calmAbove = SATIETY_CALM_ABOVE
     self.depletionMinutes = SATIETY_DEPLETION_MINUTES
+    self.urgentBelow = ____exports.Satiety.URGENT_BELOW
+    self.calmAbove = ____exports.Satiety.CALM_ABOVE
     self.contributors = {[Activity.Eat] = function(details) return FOOD_SATIETY[details.food] end}
 end
+Satiety.URGENT_BELOW = SATIETY_URGENT_BELOW
+Satiety.CALM_ABOVE = SATIETY_CALM_ABOVE
+return ____exports
+ end,
+["core.needs.src.need-factory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____need = require("core.needs.src.need")
+local Need = ____need.Need
+local ____satiety = require("core.needs.src.satiety")
+local Satiety = ____satiety.Satiety
+____exports.NeedFactory = __TS__Class()
+local NeedFactory = ____exports.NeedFactory
+NeedFactory.name = "NeedFactory"
+function NeedFactory.prototype.____constructor(self, deps)
+    self.deps = deps
+end
+function NeedFactory.prototype.create(self, need, record)
+    repeat
+        local ____switch4 = need
+        local ____cond4 = ____switch4 == Need.Satiety
+        if ____cond4 then
+            return __TS__New(Satiety, record, self.deps)
+        end
+    until true
+end
+return ____exports
+ end,
+["core.needs.src.needs"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectValues = ____lualib.__TS__ObjectValues
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
+local __TS__New = ____lualib.__TS__New
+local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
+local ____exports = {}
+local ____base_2Dneed = require("core.needs.src.base-need")
+local BaseNeed = ____base_2Dneed.BaseNeed
+local ____need = require("core.needs.src.need")
+local Need = ____need.Need
+--- Потребности NPC: коллекция потребностей, каждая из которых сама хранит значение, падает и
+-- меняется от занятий (см. INeed). Потребности раздают им вызовы и собирают их состояние
+____exports.Needs = __TS__Class()
+local Needs = ____exports.Needs
+Needs.name = "Needs"
+function Needs.prototype.____constructor(self, state, deps)
+    local ____deps_0 = deps
+    local needFactory = ____deps_0.needFactory
+    self.deps = deps
+    self.needs = __TS__ObjectFromEntries(__TS__ArrayMap(
+        __TS__ObjectValues(Need),
+        function(____, need) return {
+            need,
+            needFactory:create(need, state[need])
+        } end
+    ))
+end
+function Needs.prototype.get(self, need, time)
+    return self.needs[need]:get(time)
+end
+function Needs.prototype.getAll(self, time)
+    return __TS__ObjectFromEntries(__TS__ArrayMap(
+        __TS__ObjectValues(Need),
+        function(____, need) return {
+            need,
+            self:get(need, time)
+        } end
+    ))
+end
+function Needs.prototype.isUrgent(self, need, time)
+    return self.needs[need]:isUrgent(time)
+end
+function Needs.prototype.isCalm(self, need, time)
+    return self.needs[need]:isCalm(time)
+end
+function Needs.prototype.getState(self)
+    return __TS__ObjectFromEntries(__TS__ArrayMap(
+        __TS__ObjectValues(Need),
+        function(____, need) return {
+            need,
+            self.needs[need]:getState()
+        } end
+    ))
+end
+function Needs.prototype.clone(self)
+    return __TS__New(
+        ____exports.Needs,
+        self:getState(),
+        self.deps
+    )
+end
+function Needs.prototype.perform(self, activity, details, time)
+    __TS__ArrayForEach(
+        __TS__ObjectValues(Need),
+        function(____, need) return self.needs[need]:perform(activity, details, time) end
+    )
+end
+Needs.MIN_NEED = BaseNeed.MIN_NEED
+Needs.MAX_NEED = BaseNeed.MAX_NEED
 return ____exports
  end,
 ["core.needs.src.factory"] = function(...) 
@@ -6577,10 +6613,10 @@ local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local ____exports = {}
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
+local ____need_2Dfactory = require("core.needs.src.need-factory")
+local NeedFactory = ____need_2Dfactory.NeedFactory
 local ____needs = require("core.needs.src.needs")
 local Needs = ____needs.Needs
-local ____satiety_2Dmodel = require("core.needs.src.satiety-model")
-local SatietyModel = ____satiety_2Dmodel.SatietyModel
 local ____validator = require("core.needs.src.validator")
 local NeedsValidator = ____validator.NeedsValidator
 ____exports.NeedsFactory = __TS__Class()
@@ -6595,11 +6631,12 @@ function NeedsFactory.prototype.____constructor(self, deps)
     if validator == nil then
         validator = __TS__New(NeedsValidator)
     end
-    local models = ____deps_0.models
-    if models == nil then
-        models = {[Need.Satiety] = __TS__New(SatietyModel)}
+    local ____deps_1 = deps
+    local needFactory = ____deps_1.needFactory
+    if needFactory == nil then
+        needFactory = __TS__New(NeedFactory, {validator = validator})
     end
-    self.deps = {validator = validator, models = models}
+    self.deps = {needFactory = needFactory}
 end
 function NeedsFactory.prototype.create(self, values, time)
     local since = time:getState()
@@ -6685,12 +6722,16 @@ do
     ____exports.Needs = ____needs.Needs
 end
 do
-    local ____need_2Dmodel = require("core.needs.src.need-model")
-    ____exports.NeedModel = ____need_2Dmodel.NeedModel
+    local ____base_2Dneed = require("core.needs.src.base-need")
+    ____exports.BaseNeed = ____base_2Dneed.BaseNeed
 end
 do
-    local ____satiety_2Dmodel = require("core.needs.src.satiety-model")
-    ____exports.SatietyModel = ____satiety_2Dmodel.SatietyModel
+    local ____need_2Dfactory = require("core.needs.src.need-factory")
+    ____exports.NeedFactory = ____need_2Dfactory.NeedFactory
+end
+do
+    local ____satiety = require("core.needs.src.satiety")
+    ____exports.Satiety = ____satiety.Satiety
 end
 do
     local ____urgency_2Dwatcher = require("core.needs.src.urgency-watcher")

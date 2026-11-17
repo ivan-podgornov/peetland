@@ -1,1 +1,0 @@
-{"id":"d5fc07e2571285828fcf1c86c96071ed.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/base-need/record.spec.ts#BaseNeed Сеттер record Не опускает значение ниже BaseNeed.MIN_NEED","name":"Не опускает значение ниже BaseNeed.MIN_NEED","status":"passed","testResultsByEnv":{"default":"ad8cfa4ddbd1bea0fb86cdd90744b5cc"}}

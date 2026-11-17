@@ -1,1 +1,0 @@
-{"id":"80f016ed6747e30061ab850a99d2a1a8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/purchase-task/preconditions.spec.ts#PurchaseTask Метод pay Предусловия Если денег нет, план не составляется","name":"Если денег нет, план не составляется","status":"passed","testResultsByEnv":{"default":"ce07a58ec2ae6778b0e76a7fa9439efb"}}

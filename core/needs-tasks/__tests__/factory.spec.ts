@@ -1,6 +1,5 @@
 import { createStubTask, planSteps } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
-import { createSpiedItemClassifier } from '@peetland/inventory/dev';
+import { Item, ItemClassifier } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
@@ -58,7 +57,8 @@ describe('NeedsTaskFactory', () => {
     });
 
     it('Задача получает классификатор предметов из зависимостей', () => {
-      const itemClassifier = createSpiedItemClassifier();
+      const itemClassifier = new ItemClassifier();
+      vi.spyOn(itemClassifier, 'isFood');
       const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ itemClassifier }));
       const state = new NpcStateBuilder()
         .withInventory({ [Item.SmilePizza]: 1 })

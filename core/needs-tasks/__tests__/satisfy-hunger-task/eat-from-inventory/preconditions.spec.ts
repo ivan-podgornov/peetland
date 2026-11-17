@@ -1,10 +1,9 @@
 import { planSteps } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
-import { createSpiedItemClassifier } from '@peetland/inventory/dev';
+import { Item, ItemClassifier } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createSatisfyHungerTask } from '../../../dev';
 
@@ -33,7 +32,8 @@ describe('SatisfyHungerTask', () => {
       });
 
       it('Что из инвентаря еда, решает классификатор предметов', () => {
-        const itemClassifier = createSpiedItemClassifier();
+        const itemClassifier = new ItemClassifier();
+        vi.spyOn(itemClassifier, 'isFood');
         const task = createSatisfyHungerTask({
           itemClassifier,
           places: createMockedPlaces(),

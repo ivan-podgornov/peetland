@@ -32,7 +32,6 @@ export function createHomelessTaskFactory(
   const real = new HomelessTaskFactory(createHomelessTaskFactoryDeps());
 
   return {
-    purchase: (options) => real.purchase(options),
     buyBooze: () => real.buyBooze(),
     drink: () => real.drink(),
     sellBottles: () => real.sellBottles(),

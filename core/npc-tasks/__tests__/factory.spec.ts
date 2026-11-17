@@ -11,6 +11,7 @@ import { AddItemTask } from '../src/add-item-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
 import { PlayAnimationTask } from '../src/play-animation-task';
 import { PsycheReactTask } from '../src/psyche-react-task';
+import { PurchaseTask } from '../src/purchase-task';
 import { RemoveItemTask } from '../src/remove-item-task';
 import { TryLuckTask } from '../src/try-luck-task';
 
@@ -124,6 +125,20 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(ParallelTask);
+    });
+  });
+
+  describe('#purchase', () => {
+    it('Возвращает PurchaseTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.purchase({
+        item: Item.Booze,
+        count: 1,
+        price: 100,
+      });
+
+      expect(task).toBeInstanceOf(PurchaseTask);
     });
   });
 });

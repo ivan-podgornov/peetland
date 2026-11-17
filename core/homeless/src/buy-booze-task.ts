@@ -7,14 +7,11 @@ import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
 import { BOOZE_PRICE } from './constants';
-import type { IHomelessTaskFactory } from './types';
 
 export type BuyBoozeTaskDeps = {
   /** Места мира. Пойло покупается в местах типа PlaceType.Shop */
   places: IPlaces;
   npcTaskFactory: INpcTaskFactory;
-  /** Фабрика, которой создаётся покупка в магазине */
-  homelessTaskFactory: IHomelessTaskFactory;
 };
 
 /**
@@ -56,7 +53,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Собирает задачи покупки в магазине, ближайшем к NPC */
   private buyInNearestShop(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { homelessTaskFactory, npcTaskFactory } = this.deps;
+    const { npcTaskFactory } = this.deps;
     const shop = this.places.findNearest(state.self.actor.position, PlaceType.Shop);
 
     if (!shop) {
@@ -72,7 +69,7 @@ export class BuyBoozeTask implements CompoundTask<NpcState, NpcContext> {
         angle: shop.angle,
         tolerance: BuyBoozeTask.SHOP_FACING_TOLERANCE,
       }),
-      homelessTaskFactory.purchase({
+      npcTaskFactory.purchase({
         item: Item.Booze,
         count: 1,
         price: BOOZE_PRICE,

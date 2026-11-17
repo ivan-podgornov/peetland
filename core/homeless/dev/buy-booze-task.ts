@@ -7,16 +7,13 @@ import { vi } from 'vitest';
 import { BuyBoozeTask } from '../src/buy-booze-task';
 import type { BuyBoozeTaskDeps } from '../src/buy-booze-task';
 
-import { createHomelessTaskFactory } from './factory';
-
-/** Создаёт задачу покупки пойла с настоящими фабриками задач, если другие не переданы */
+/** Создаёт задачу покупки пойла с настоящей фабрикой примитивов, если другая не передана */
 export function createBuyBoozeTask(
   places: IPlaces,
   deps: Partial<BuyBoozeTaskDeps> = {}
 ): BuyBoozeTask {
   return new BuyBoozeTask({
     npcTaskFactory: createNpcTaskFactory(),
-    homelessTaskFactory: createHomelessTaskFactory(),
     places,
     ...deps,
   });

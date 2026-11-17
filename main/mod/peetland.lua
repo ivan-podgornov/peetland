@@ -8302,6 +8302,48 @@ function GoToCoordsTask.prototype.createCommand(self, actor)
 end
 return ____exports
  end,
+["core.npc-tasks.src.needs-perform-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+--- Сообщить потребностям о занятии, например что NPC поел. Задача мгновенная
+____exports.NeedsPerformTask = __TS__Class()
+local NeedsPerformTask = ____exports.NeedsPerformTask
+NeedsPerformTask.name = "NeedsPerformTask"
+function NeedsPerformTask.prototype.____constructor(self, options)
+    self.name = "needs-perform"
+    self.options = options
+end
+function NeedsPerformTask.prototype.canExecute(self)
+    return true
+end
+function NeedsPerformTask.prototype.applyEffects(self, state)
+    local ____self_options_0 = self.options
+    local activity = ____self_options_0.activity
+    local details = ____self_options_0.details
+    local needs = state.self.needs:clone()
+    needs:perform(activity, details, state.world.time)
+    return __TS__ObjectAssign(
+        {},
+        state,
+        {self = __TS__ObjectAssign({}, state.self, {needs = needs})}
+    )
+end
+function NeedsPerformTask.prototype.start(self, state, context)
+    local ____self_options_1 = self.options
+    local activity = ____self_options_1.activity
+    local details = ____self_options_1.details
+    context.needs:perform(activity, details, state.world.time)
+    return "success"
+end
+function NeedsPerformTask.prototype.update(self)
+    return "failed"
+end
+function NeedsPerformTask.prototype.stop(self)
+end
+return ____exports
+ end,
 ["core.npc-tasks.src.play-animation-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8557,6 +8599,8 @@ local ____add_2Ditem_2Dtask = require("core.npc-tasks.src.add-item-task")
 local AddItemTask = ____add_2Ditem_2Dtask.AddItemTask
 local ____go_2Dto_2Dcoords_2Dtask = require("core.npc-tasks.src.go-to-coords-task")
 local GoToCoordsTask = ____go_2Dto_2Dcoords_2Dtask.GoToCoordsTask
+local ____needs_2Dperform_2Dtask = require("core.npc-tasks.src.needs-perform-task")
+local NeedsPerformTask = ____needs_2Dperform_2Dtask.NeedsPerformTask
 local ____play_2Danimation_2Dtask = require("core.npc-tasks.src.play-animation-task")
 local PlayAnimationTask = ____play_2Danimation_2Dtask.PlayAnimationTask
 local ____psyche_2Dreact_2Dtask = require("core.npc-tasks.src.psyche-react-task")
@@ -8590,6 +8634,9 @@ function NpcTaskFactory.prototype.removeItem(self, options)
 end
 function NpcTaskFactory.prototype.psycheReact(self, options)
     return __TS__New(PsycheReactTask, options)
+end
+function NpcTaskFactory.prototype.needsPerform(self, options)
+    return __TS__New(NeedsPerformTask, options)
 end
 function NpcTaskFactory.prototype.tryLuck(self, options)
     local ____self_deps_0 = self.deps

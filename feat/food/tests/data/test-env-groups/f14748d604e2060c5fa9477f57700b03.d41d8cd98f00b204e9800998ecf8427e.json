@@ -1,0 +1,1 @@
+{"id":"f14748d604e2060c5fa9477f57700b03.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/base-need/record.spec.ts#BaseNeed Сеттер record Не поднимает значение выше BaseNeed.MAX_NEED","name":"Не поднимает значение выше BaseNeed.MAX_NEED","status":"passed","testResultsByEnv":{"default":"46b4de4a145a9e15635169482469a2f8"}}

@@ -1,1 +1,0 @@
-{"id":"47feea3551e334ca6a70e303a724b605.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satiety.spec.ts#Satiety Если сытость ниже Satiety.URGENT_BELOW, голод срочный","name":"Если сытость ниже Satiety.URGENT_BELOW, голод срочный","status":"passed","testResultsByEnv":{"default":"5cc52bf38991385dd3d42629eaf32016"}}

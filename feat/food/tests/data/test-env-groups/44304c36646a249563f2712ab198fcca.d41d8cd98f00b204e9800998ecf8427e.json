@@ -1,0 +1,1 @@
+{"id":"44304c36646a249563f2712ab198fcca.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/is-urgent.spec.ts#Needs #isUrgent Если статус потребности NeedStatus.Moderate, возвращает false","name":"Если статус потребности NeedStatus.Moderate, возвращает false","status":"passed","testResultsByEnv":{"default":"a2e5336f1255db0fac3a8de50f177249"}}

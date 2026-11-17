@@ -1,0 +1,1 @@
+{"id":"42b14aea9489fb1c7f53e014b8dae5f4.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/is-calm.spec.ts#Needs #isCalm Если статус потребности NeedStatus.Calm, возвращает true","name":"Если статус потребности NeedStatus.Calm, возвращает true","status":"passed","testResultsByEnv":{"default":"ed0d5f52e84b10806adfffd40a5a5a8f"}}

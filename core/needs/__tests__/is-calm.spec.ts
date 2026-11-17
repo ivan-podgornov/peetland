@@ -2,22 +2,40 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedNeed, createMockedNeedFactory, createNeedsState } from '../dev';
-import { Need, Needs } from '../src';
+import { Need, Needs, NeedStatus } from '../src';
 
 describe('Needs', () => {
   describe('#isCalm', () => {
-    it('Возвращает спокойствие, которое потребность посчитала на момент переданного времени', () => {
+    it('Спрашивает статус потребности на момент переданного времени', () => {
       const need = createMockedNeed();
-      need.isCalm.mockReturnValue(true);
       const needs = new Needs(createNeedsState(), {
         needFactory: createMockedNeedFactory(need),
       });
       const time = new ManualTime();
 
-      const result = needs.isCalm(Need.Satiety, time);
+      needs.isCalm(Need.Satiety, time);
 
-      expect(need.isCalm).toHaveBeenCalledExactlyOnceWith(time);
-      expect(result).toBe(true);
+      expect(need.getStatus).toHaveBeenCalledExactlyOnceWith(time);
+    });
+
+    it('Если статус потребности NeedStatus.Calm, возвращает true', () => {
+      const need = createMockedNeed();
+      need.getStatus.mockReturnValue(NeedStatus.Calm);
+      const needs = new Needs(createNeedsState(), {
+        needFactory: createMockedNeedFactory(need),
+      });
+
+      expect(needs.isCalm(Need.Satiety, new ManualTime())).toBe(true);
+    });
+
+    it('Если статус потребности NeedStatus.Moderate, возвращает false', () => {
+      const need = createMockedNeed();
+      need.getStatus.mockReturnValue(NeedStatus.Moderate);
+      const needs = new Needs(createNeedsState(), {
+        needFactory: createMockedNeedFactory(need),
+      });
+
+      expect(needs.isCalm(Need.Satiety, new ManualTime())).toBe(false);
     });
   });
 });

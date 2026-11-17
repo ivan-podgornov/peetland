@@ -1,5 +1,12 @@
 export { createMockedNeedsFactory } from './factory';
-export { createMockedNeed, createMockedNeedFactory, TestNeed } from './need';
+export {
+  createMockedNeed,
+  createMockedNeedFactory,
+  DEFAULT_RECORD,
+  DEFAULT_SATIETY_DEPS,
+  TestNeed,
+} from './need';
+export { Satiety } from '../src/satiety';
 export {
   createMockedNeedsValidator,
   createNeedsDeps,

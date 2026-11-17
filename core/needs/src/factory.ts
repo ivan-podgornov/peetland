@@ -19,7 +19,6 @@ export interface INeedsFactory {
 
 export type NeedsFactoryDeps = Partial<
   NeedsDeps & {
-    /** Проверяет значения потребностей */
     validator: INeedsValidator;
   }
 >;
@@ -27,10 +26,6 @@ export type NeedsFactoryDeps = Partial<
 export class NeedsFactory implements INeedsFactory {
   private readonly deps: NeedsDeps;
 
-  /**
-   * @param deps - валидатор и фабрика потребностей. По умолчанию — NeedsValidator и NeedFactory с
-   * этим валидатором
-   */
   constructor(deps: NeedsFactoryDeps = {}) {
     const { validator = new NeedsValidator() } = deps;
     const { needFactory = new NeedFactory({ validator }) } = deps;

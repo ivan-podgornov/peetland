@@ -1,42 +1,38 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { TestNeed } from '../../dev';
-import { BaseNeed } from '../../src';
+import { DEFAULT_RECORD, TestNeed } from '../../dev';
+import { BaseNeed } from '../../src/base-need';
 
 describe('BaseNeed', () => {
   describe('#get', () => {
     it('Если время не прошло, возвращает выставленное значение', () => {
-      const since = {
-        day: 1,
-        hours: 10,
-        minutes: 0,
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 80,
       };
 
-      const value = new TestNeed({
-        value: 80,
-        since,
-      }).get(new ManualTime(since));
+      const value = new TestNeed(record).get(new ManualTime(record.since));
 
       expect(value).toBe(80);
     });
 
     it('Возвращает выставленное значение минус скорость падения, умноженную на минуты от момента, когда его выставили, до переданного времени', () => {
+      const since = {
+        day: 1,
+        hours: 10,
+        minutes: 0,
+      };
       const need = new TestNeed({
         value: 80,
-        since: {
-          day: 1,
-          hours: 10,
-          minutes: 0,
-        },
+        since,
       });
 
-      // Потребность падает на 100 за сутки, а прошло 6 часов, четверть суток: она упала на 25
+      // Потребность падает на 100 за сутки, а прошла четверть суток: она упала на 25
       const value = need.get(
         new ManualTime({
-          day: 1,
-          hours: 16,
-          minutes: 0,
+          ...since,
+          hours: since.hours + 6,
         })
       );
 
@@ -44,19 +40,20 @@ describe('BaseNeed', () => {
     });
 
     it('Считает прошедшее время через полночь', () => {
+      const since = {
+        day: 1,
+        hours: 21,
+        minutes: 0,
+      };
       const need = new TestNeed({
         value: 80,
-        since: {
-          day: 1,
-          hours: 21,
-          minutes: 0,
-        },
+        since,
       });
 
-      // С 21:00 до 03:00 следующего дня прошло 6 часов: потребность упала на 25
+      // Прошло 6 часов, четверть суток: потребность упала на 25
       const value = need.get(
         new ManualTime({
-          day: 2,
+          day: since.day + 1,
           hours: 3,
           minutes: 0,
         })
@@ -66,21 +63,20 @@ describe('BaseNeed', () => {
     });
 
     it('Не опускает значение ниже BaseNeed.MIN_NEED', () => {
+      const since = {
+        day: 1,
+        hours: 10,
+        minutes: 0,
+      };
       const need = new TestNeed({
         value: 10,
-        since: {
-          day: 1,
-          hours: 10,
-          minutes: 0,
-        },
+        since,
       });
 
-      // Прошли сутки: потребность упала бы на 100
       const value = need.get(
         new ManualTime({
-          day: 2,
-          hours: 10,
-          minutes: 0,
+          ...since,
+          day: since.day + 1,
         })
       );
 
@@ -88,20 +84,20 @@ describe('BaseNeed', () => {
     });
 
     it('Если время раньше момента, когда выставили значение, возвращает выставленное значение', () => {
+      const since = {
+        day: 2,
+        hours: 10,
+        minutes: 0,
+      };
       const need = new TestNeed({
         value: 80,
-        since: {
-          day: 2,
-          hours: 10,
-          minutes: 0,
-        },
+        since,
       });
 
       const value = need.get(
         new ManualTime({
-          day: 1,
-          hours: 10,
-          minutes: 0,
+          ...since,
+          day: since.day - 1,
         })
       );
 

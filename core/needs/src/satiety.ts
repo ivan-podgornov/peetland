@@ -1,29 +1,42 @@
+import { Item } from '@peetland/inventory';
+import type { Food } from '@peetland/inventory';
+import type { IReadonlyTime } from '@peetland/timings';
+
 import { Activity } from './activity';
+import type { ActivityDetails } from './activity';
 import { BaseNeed } from './base-need';
-import type { NeedContributors } from './base-need';
+import type { NeedDeps, NeedOptions } from './base-need';
 import { NeedCategory } from './category';
-import {
-  FOOD_SATIETY,
-  SATIETY_CALM_ABOVE,
-  SATIETY_DEPLETION_MINUTES,
-  SATIETY_URGENT_BELOW,
-} from './constants';
+import type { NeedRecord } from './types';
 
-/** Сытость: жизненная потребность. Падает, пока NPC не ест, а еда восполняет её по тому, что съели */
+/** Сытость */
 export class Satiety extends BaseNeed {
-  /** Ниже этой сытости голод срочный */
-  static readonly URGENT_BELOW = SATIETY_URGENT_BELOW;
-
-  /** Выше этой сытости голод перестаёт быть срочным */
-  static readonly CALM_ABOVE = SATIETY_CALM_ABOVE;
-
-  readonly category = NeedCategory.Vital;
-
-  protected readonly depletionMinutes = SATIETY_DEPLETION_MINUTES;
-  protected readonly urgentBelow = Satiety.URGENT_BELOW;
-  protected readonly calmAbove = Satiety.CALM_ABOVE;
-
-  protected readonly contributors: NeedContributors = {
-    [Activity.Eat]: (details) => FOOD_SATIETY[details.food],
+  static readonly OPTIONS: NeedOptions = {
+    category: NeedCategory.Vital,
+    // Сутки, а не 8 часов: иначе вся жизнь NPC крутится вокруг еды
+    depletionMinutes: 24 * 60,
+    // Срочно за 6 часов до голода
+    urgentBelow: 25,
+    calmAbove: 60,
   };
+
+  /** Сколько сытости восполняет еда */
+  static readonly FOOD_SATIETY: Readonly<Record<Food, number>> = {
+    [Item.RomashkaLoaf]: 60,
+    [Item.SmilePizza]: 100,
+  };
+
+  constructor(record: NeedRecord, deps: NeedDeps) {
+    super(record, Satiety.OPTIONS, deps);
+  }
+
+  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
+    switch (activity) {
+      case Activity.Eat:
+        this.record = {
+          value: this.get(time) + Satiety.FOOD_SATIETY[details.food],
+          since: time.getState(),
+        };
+    }
+  }
 }

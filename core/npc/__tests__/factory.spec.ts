@@ -3,11 +3,12 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Inventory } from '@peetland/inventory';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
-import { Satiety, Need, Needs } from '@peetland/needs';
+import { Need, Needs } from '@peetland/needs';
 import {
   createMockedNeedsFactory,
   createMockedUrgencyWatcherFactory,
   createNeedValues,
+  Satiety,
 } from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
@@ -118,7 +119,7 @@ describe('NpcFactory', () => {
       factory.create(
         createNpcData({
           needs: createNeedValues({
-            [Need.Satiety]: Satiety.URGENT_BELOW - 1,
+            [Need.Satiety]: Satiety.OPTIONS.urgentBelow - 1,
           }),
         })
       );

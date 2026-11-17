@@ -1,18 +1,16 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { Need, NeedFactory, Needs } from '../src';
+import { Need, Needs } from '../src';
 import type { INeedsValidator, NeedsDeps, NeedsState, NeedValues } from '../src';
+import { NeedFactory } from '../src/need-factory';
 
 /** Создаёт валидатор, который пропускает любые значения */
 export function createMockedNeedsValidator(): Mocked<INeedsValidator> {
   return { validateValue: vi.fn() };
 }
 
-/**
- * Создаёт зависимости потребностей. Если фабрика не передана, она настоящая, а её валидатор пропускает
- * любые значения
- */
+/** Создаёт зависимости потребностей с настоящей фабрикой, валидатор которой пропускает любые значения */
 export function createNeedsDeps(deps: Partial<NeedsDeps> = {}): NeedsDeps {
   return {
     needFactory: new NeedFactory({ validator: createMockedNeedsValidator() }),

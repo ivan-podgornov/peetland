@@ -14,10 +14,10 @@ describe('Needs', () => {
       });
       const time = new ManualTime();
 
-      const result = needs.get(Need.Satiety, time);
+      const value = needs.get(Need.Satiety, time);
 
       expect(need.get).toHaveBeenCalledExactlyOnceWith(time);
-      expect(result).toBe(42);
+      expect(value).toBe(42);
     });
   });
 });

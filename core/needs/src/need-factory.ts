@@ -3,13 +3,8 @@ import { Need } from './need';
 import { Satiety } from './satiety';
 import type { NeedRecord } from './types';
 
-/** Создаёт потребности по их виду */
 export interface INeedFactory {
-  /**
-   * Создаёт потребность из её записи
-   * @param need - какую потребность создать
-   * @param record - значение и момент, когда его выставили
-   */
+  /** Создаёт потребность из её записи */
   create(need: Need, record: NeedRecord): INeed;
 }
 

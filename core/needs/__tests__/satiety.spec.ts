@@ -3,68 +3,104 @@ import type { Food } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNeedsValidator } from '../dev';
-import { Activity, NeedCategory, Satiety } from '../src';
-
-const since = {
-  day: 1,
-  hours: 10,
-  minutes: 0,
-};
-
-function createSatiety(value: number) {
-  return new Satiety(
-    {
-      value,
-      since,
-    },
-    { validator: createMockedNeedsValidator() }
-  );
-}
+import { DEFAULT_RECORD, DEFAULT_SATIETY_DEPS, Satiety } from '../dev';
+import { Activity, NeedCategory } from '../src';
 
 describe('Satiety', () => {
   it('Сытость — жизненная потребность', () => {
-    expect(createSatiety(100).category).toBe(NeedCategory.Vital);
+    const satiety = new Satiety(DEFAULT_RECORD, DEFAULT_SATIETY_DEPS);
+
+    expect(satiety.category).toBe(NeedCategory.Vital);
   });
 
   it('Падает от максимума до нуля за игровые сутки', () => {
-    const value = createSatiety(100).get(
+    const record = {
+      ...DEFAULT_RECORD,
+      value: 100,
+    };
+    const satiety = new Satiety(record, DEFAULT_SATIETY_DEPS);
+
+    const value = satiety.get(
       new ManualTime({
-        ...since,
-        day: 2,
+        ...record.since,
+        day: record.since.day + 1,
       })
     );
 
     expect(value).toBe(0);
   });
 
-  it('Если сытость ниже Satiety.URGENT_BELOW, голод срочный', () => {
-    const satiety = createSatiety(Satiety.URGENT_BELOW - 1);
+  describe('#perform', () => {
+    it.each<{ food: Food; satiety: number }>([
+      {
+        food: Item.RomashkaLoaf,
+        satiety: 60,
+      },
+      {
+        food: Item.SmilePizza,
+        satiety: 100,
+      },
+    ])('Если съели $food, восполняет $satiety сытости', ({ food, satiety }) => {
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 0,
+      };
+      const need = new Satiety(record, DEFAULT_SATIETY_DEPS);
+      const time = new ManualTime(record.since);
 
-    expect(satiety.isUrgent(new ManualTime(since))).toBe(true);
-  });
+      need.perform(Activity.Eat, { food }, time);
 
-  it('Если сытость выше Satiety.CALM_ABOVE, голод спокойный', () => {
-    const satiety = createSatiety(Satiety.CALM_ABOVE + 1);
+      expect(need.get(time)).toBe(satiety);
+    });
 
-    expect(satiety.isCalm(new ManualTime(since))).toBe(true);
-  });
+    it('Прибавляет еду к сытости на момент, когда NPC поел', () => {
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 50,
+      };
+      const need = new Satiety(record, DEFAULT_SATIETY_DEPS);
+      const time = new ManualTime({
+        ...record.since,
+        hours: record.since.hours + 6,
+      });
 
-  it.each<{ food: Food; satiety: number }>([
-    {
-      food: Item.RomashkaLoaf,
-      satiety: 60,
-    },
-    {
-      food: Item.SmilePizza,
-      satiety: 100,
-    },
-  ])('Если съели $food, восполняет $satiety сытости', ({ food, satiety }) => {
-    const need = createSatiety(0);
-    const time = new ManualTime(since);
+      need.perform(Activity.Eat, { food: Item.RomashkaLoaf }, time);
 
-    need.perform(Activity.Eat, { food }, time);
+      // За четверть суток сытость упала с 50 на 25, а батон прибавил 60
+      expect(need.get(time)).toBeCloseTo(50 - 25 + 60);
+    });
 
-    expect(need.get(time)).toBe(satiety);
+    it('Отсчитывает падение от момента, когда NPC поел', () => {
+      const need = new Satiety(
+        {
+          ...DEFAULT_RECORD,
+          value: 50,
+        },
+        DEFAULT_SATIETY_DEPS
+      );
+      const end = {
+        ...DEFAULT_RECORD.since,
+        hours: DEFAULT_RECORD.since.hours + 6,
+      };
+
+      need.perform(Activity.Eat, { food: Item.RomashkaLoaf }, new ManualTime(end));
+
+      expect(need.getState().since).toStrictEqual(end);
+    });
+
+    it('Не поднимает сытость выше максимума', () => {
+      const need = new Satiety(
+        {
+          ...DEFAULT_RECORD,
+          value: 90,
+        },
+        DEFAULT_SATIETY_DEPS
+      );
+      const time = new ManualTime(DEFAULT_RECORD.since);
+
+      need.perform(Activity.Eat, { food: Item.SmilePizza }, time);
+
+      expect(need.get(time)).toBe(100);
+    });
   });
 });

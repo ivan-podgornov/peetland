@@ -1,40 +1,55 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { BaseNeed, NeedCategory } from '../src';
-import type { INeed, INeedFactory, NeedContributors, NeedRecord } from '../src';
+import { NeedCategory, NeedStatus, NeedsValidator } from '../src';
+import type { NeedRecord } from '../src';
+import { BaseNeed } from '../src/base-need';
+import type { INeed, NeedDeps, NeedOptions } from '../src/base-need';
+import type { INeedFactory } from '../src/need-factory';
 
-import { createMockedNeedsValidator } from './needs';
+/** Запись потребности: удовлетворена полностью с полуночи первого дня */
+export const DEFAULT_RECORD: NeedRecord = {
+  value: BaseNeed.MAX_NEED,
+  since: {
+    day: 1,
+    hours: 0,
+    minutes: 0,
+  },
+};
+
+/** Зависимости сытости с настоящим валидатором */
+export const DEFAULT_SATIETY_DEPS: NeedDeps = { validator: new NeedsValidator() };
 
 /**
- * Потребность для тестов общей логики BaseNeed: падает до нуля за сутки, срочная ниже
- * TestNeed.URGENT_BELOW и спокойная выше TestNeed.CALM_ABOVE. Вклад занятий передаётся в
- * конструктор, а валидатор пропускает любые значения
+ * Потребность для тестов общей логики BaseNeed. Падает до нуля за сутки. perform выставляет
+ * переданную запись через сеттер BaseNeed
  */
 export class TestNeed extends BaseNeed {
-  static readonly URGENT_BELOW = 25;
-  static readonly CALM_ABOVE = 60;
+  static readonly OPTIONS: NeedOptions = {
+    category: NeedCategory.Vital,
+    depletionMinutes: 24 * 60,
+    urgentBelow: 25,
+    calmAbove: 60,
+  };
 
-  readonly category = NeedCategory.Vital;
+  constructor(record: NeedRecord, deps: NeedDeps = DEFAULT_SATIETY_DEPS) {
+    super(record, TestNeed.OPTIONS, deps);
+  }
 
-  protected readonly depletionMinutes = 24 * 60;
-  protected readonly urgentBelow = TestNeed.URGENT_BELOW;
-  protected readonly calmAbove = TestNeed.CALM_ABOVE;
-  protected readonly contributors: NeedContributors;
+  perform(): void {}
 
-  constructor(record: NeedRecord, contributors: NeedContributors = {}) {
-    super(record, { validator: createMockedNeedsValidator() });
-    this.contributors = contributors;
+  /** Выставляет запись через сеттер BaseNeed */
+  setRecord(record: NeedRecord): void {
+    this.record = record;
   }
 }
 
-/** Создаёт мок потребности. Значение всегда 0, потребность не срочная и не спокойная */
-export function createMockedNeed(record: NeedRecord = createRecord()): Mocked<INeed> {
+/** Создаёт мок потребности со статусом NeedStatus.Moderate */
+export function createMockedNeed(record: NeedRecord = DEFAULT_RECORD): Mocked<INeed> {
   return {
     category: NeedCategory.Vital,
-    get: vi.fn(() => 0),
-    isUrgent: vi.fn(() => false),
-    isCalm: vi.fn(() => false),
+    get: vi.fn<INeed['get']>(() => 0),
+    getStatus: vi.fn<INeed['getStatus']>(() => NeedStatus.Moderate),
     getState: vi.fn(() => record),
     perform: vi.fn(),
   };
@@ -43,15 +58,4 @@ export function createMockedNeed(record: NeedRecord = createRecord()): Mocked<IN
 /** Создаёт фабрику, которая всегда возвращает переданную потребность */
 export function createMockedNeedFactory(need: INeed = createMockedNeed()): Mocked<INeedFactory> {
   return { create: vi.fn(() => need) };
-}
-
-function createRecord(): NeedRecord {
-  return {
-    value: BaseNeed.MAX_NEED,
-    since: {
-      day: 1,
-      hours: 0,
-      minutes: 0,
-    },
-  };
 }

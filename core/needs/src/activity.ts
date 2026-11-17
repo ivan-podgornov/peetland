@@ -6,7 +6,7 @@ export enum Activity {
   Eat = 'eat',
 }
 
-/** Детали еды: что съели. От этого зависит, сколько восполнится сытости (см. FOOD_SATIETY) */
+/** Детали еды: что съели. От этого зависит, сколько восполнится сытости */
 export type EatDetails = Readonly<{
   food: Food;
 }>;

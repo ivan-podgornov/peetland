@@ -1,23 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNeedsValidator } from '../../dev';
-import { BaseNeed, Satiety } from '../../src';
-
-const since = {
-  day: 1,
-  hours: 0,
-  minutes: 0,
-};
+import { createMockedNeedsValidator, DEFAULT_RECORD, TestNeed } from '../../dev';
+import { BaseNeed } from '../../src/base-need';
 
 describe('BaseNeed', () => {
   describe('#constructor', () => {
     it('Валидирует значение в пределах потребности', () => {
       const validator = createMockedNeedsValidator();
 
-      new Satiety(
+      new TestNeed(
         {
+          ...DEFAULT_RECORD,
           value: 40,
-          since,
         },
         { validator }
       );
@@ -34,13 +28,7 @@ describe('BaseNeed', () => {
       const validator = createMockedNeedsValidator();
       validator.validateValue.mockThrow(error);
       function create() {
-        return new Satiety(
-          {
-            value: 40,
-            since,
-          },
-          { validator }
-        );
+        return new TestNeed(DEFAULT_RECORD, { validator });
       }
 
       expect(create).toThrow(error);

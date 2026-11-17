@@ -1,7 +1,8 @@
+import { Item } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps, createNeedsState } from '../dev';
+import { createNeedsDeps, createNeedsState, DEFAULT_RECORD } from '../dev';
 import { Activity, Need, Needs } from '../src';
 
 describe('Needs', () => {
@@ -10,12 +11,8 @@ describe('Needs', () => {
       const needs = new Needs(
         createNeedsState({
           [Need.Satiety]: {
+            ...DEFAULT_RECORD,
             value: 80,
-            since: {
-              day: 1,
-              hours: 10,
-              minutes: 0,
-            },
           },
         }),
         createNeedsDeps()
@@ -25,46 +22,28 @@ describe('Needs', () => {
     });
 
     it('Занятие в копии не меняет исходные потребности', () => {
-      const since = {
-        day: 1,
-        hours: 10,
-        minutes: 0,
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 50,
       };
-      const needs = new Needs(
-        createNeedsState({
-          [Need.Satiety]: {
-            value: 50,
-            since,
-          },
-        }),
-        createNeedsDeps()
-      );
-      const time = new ManualTime(since);
+      const needs = new Needs(createNeedsState({ [Need.Satiety]: record }), createNeedsDeps());
+      const time = new ManualTime(record.since);
 
-      needs.clone().perform(Activity.Eat, {}, time);
+      needs.clone().perform(Activity.Eat, { food: Item.SmilePizza }, time);
 
       expect(needs.get(Need.Satiety, time)).toBe(50);
     });
 
     it('Занятие в исходных потребностях не меняет копию', () => {
-      const since = {
-        day: 1,
-        hours: 10,
-        minutes: 0,
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 50,
       };
-      const needs = new Needs(
-        createNeedsState({
-          [Need.Satiety]: {
-            value: 50,
-            since,
-          },
-        }),
-        createNeedsDeps()
-      );
+      const needs = new Needs(createNeedsState({ [Need.Satiety]: record }), createNeedsDeps());
       const copy = needs.clone();
-      const time = new ManualTime(since);
+      const time = new ManualTime(record.since);
 
-      needs.perform(Activity.Eat, {}, time);
+      needs.perform(Activity.Eat, { food: Item.SmilePizza }, time);
 
       expect(copy.get(Need.Satiety, time)).toBe(50);
     });

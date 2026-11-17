@@ -2,6 +2,7 @@ import type { IReadonlyTime } from '@peetland/timings';
 
 import { Need } from './need';
 import type { IReadonlyNeeds } from './needs';
+import { NeedStatus } from './status';
 
 /** Следит, когда потребности становятся срочными (см. UrgencyWatcher) */
 export interface IUrgencyWatcher {
@@ -16,8 +17,8 @@ export interface IUrgencyWatcher {
 
 /**
  * Следит, когда потребности становятся срочными. Помнит, какие потребности горят: потребность
- * загорается, когда стала срочной (см. IReadonlyNeeds.isUrgent), и гаснет, только когда стала
- * спокойной (см. IReadonlyNeeds.isCalm). Пока потребность горит, она не загорается снова, поэтому
+ * загорается, когда стала срочной (NeedStatus.Urgent), и гаснет, только когда стала
+ * спокойной (NeedStatus.Calm). Пока потребность горит, она не загорается снова, поэтому
  * значение, которое скачет около порога срочности, не поднимает тревогу на каждой проверке. Сами
  * потребности наблюдатель не меняет
  */
@@ -29,14 +30,14 @@ export class UrgencyWatcher implements IUrgencyWatcher {
 
     Object.values(Need).forEach((need) => {
       if (this.burning.has(need)) {
-        if (needs.isCalm(need, time)) {
+        if (needs.getStatus(need, time) === NeedStatus.Calm) {
           this.burning.delete(need);
         }
 
         return;
       }
 
-      if (needs.isUrgent(need, time)) {
+      if (needs.getStatus(need, time) === NeedStatus.Urgent) {
         this.burning.add(need);
         ignited = true;
       }

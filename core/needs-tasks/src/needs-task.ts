@@ -1,5 +1,5 @@
 import type { CompoundTask, Method } from '@peetland/htn';
-import { Need } from '@peetland/needs';
+import { Need, NeedStatus } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { INeedsTaskFactory } from './types';
@@ -26,7 +26,8 @@ export class NeedsTask implements CompoundTask<NpcState, NpcContext> {
     this.methods = [
       {
         name: 'satisfy-hunger',
-        preconditions: (state) => state.self.needs.isUrgent(Need.Satiety, state.world.time),
+        preconditions: (state) =>
+          state.self.needs.getStatus(Need.Satiety, state.world.time) === NeedStatus.Urgent,
         tasks: [needsTaskFactory.satisfyHunger()],
       },
     ];

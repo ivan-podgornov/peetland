@@ -1,44 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps, createNeedsState } from '../dev';
+import {
+  createMockedNeed,
+  createMockedNeedFactory,
+  createNeedsState,
+  DEFAULT_RECORD,
+} from '../dev';
 import { Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#getState', () => {
-    it('Возвращает выставленное значение и момент, когда его выставили', () => {
-      const state = createNeedsState({
-        [Need.Satiety]: {
-          value: 80,
-          since: {
-            day: 1,
-            hours: 10,
-            minutes: 0,
-          },
-        },
+    it('Возвращает состояние каждой потребности', () => {
+      const record = {
+        ...DEFAULT_RECORD,
+        value: 80,
+      };
+      const needs = new Needs(createNeedsState(), {
+        needFactory: createMockedNeedFactory(createMockedNeed(record)),
       });
-      const needs = new Needs(state, createNeedsDeps());
 
-      expect(needs.getState()).toStrictEqual(state);
-    });
-
-    it('Из состояния собираются такие же потребности', () => {
-      const needs = new Needs(
-        createNeedsState({
-          [Need.Satiety]: {
-            value: 80,
-            since: {
-              day: 1,
-              hours: 10,
-              minutes: 0,
-            },
-          },
-        }),
-        createNeedsDeps()
-      );
-
-      const restored = new Needs(needs.getState(), createNeedsDeps());
-
-      expect(restored.getState()).toStrictEqual(needs.getState());
+      expect(needs.getState()).toStrictEqual({ [Need.Satiety]: record });
     });
   });
 });

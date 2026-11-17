@@ -1,7 +1,12 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsDeps, createNeedValues } from '../dev';
+import {
+  createMockedNeedFactory,
+  createMockedNeedsValidator,
+  createNeedsDeps,
+  createNeedValues,
+} from '../dev';
 import { Need, Needs, NeedsFactory } from '../src';
 
 describe('NeedsFactory', () => {
@@ -43,6 +48,22 @@ describe('NeedsFactory', () => {
       }
 
       expect(create).toThrow(RangeError);
+    });
+
+    it('Собирает потребности переданной фабрикой потребностей', () => {
+      const needFactory = createMockedNeedFactory();
+
+      new NeedsFactory({ needFactory }).create(createNeedValues(), new ManualTime());
+
+      expect(needFactory.create).toHaveBeenCalledOnce();
+    });
+
+    it('Проверяет значения переданным валидатором', () => {
+      const validator = createMockedNeedsValidator();
+
+      new NeedsFactory({ validator }).create(createNeedValues(), new ManualTime());
+
+      expect(validator.validateValue).toHaveBeenCalled();
     });
   });
 });

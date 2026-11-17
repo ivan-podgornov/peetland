@@ -6,7 +6,12 @@ import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSatisfyHungerTask, TEST_CAMP, TEST_SHOP } from '../../../dev';
+import {
+  createMockedFoodChooser,
+  createSatisfyHungerTask,
+  TEST_CAMP,
+  TEST_SHOP,
+} from '../../../dev';
 import { FOOD_PRICES } from '../../../src/constants';
 
 describe('SatisfyHungerTask', () => {
@@ -64,13 +69,27 @@ describe('SatisfyHungerTask', () => {
         });
       });
 
-      it('Если денег хватает на «Смайл», покупает «Смайл» по его цене: он добивает сытость до максимума', () => {
+      it('Выбирает, что купить, из еды, на которую хватает денег', () => {
+        const foodChooser = createMockedFoodChooser(Item.RomashkaLoaf);
+        const task = createSatisfyHungerTask({ foodChooser });
+        const state = new NpcStateBuilder()
+          .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] - 1 })
+          .withNeeds({ [Need.Satiety]: 10 })
+          .build();
+
+        planSteps(task, state);
+
+        expect(foodChooser.choose).toHaveBeenCalledExactlyOnceWith(state, [Item.RomashkaLoaf]);
+      });
+
+      it('Покупает одну штуку выбранной еды по её цене', () => {
         const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
         const task = createSatisfyHungerTask({
           npcTaskFactory: createNpcTaskFactory({ purchase }),
+          foodChooser: createMockedFoodChooser(Item.SmilePizza),
         });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] })
+          .withInventory({ [Item.Money]: 1000 })
           .withNeeds({ [Need.Satiety]: 10 })
           .build();
 
@@ -80,25 +99,6 @@ describe('SatisfyHungerTask', () => {
           item: Item.SmilePizza,
           count: 1,
           price: FOOD_PRICES[Item.SmilePizza],
-        });
-      });
-
-      it('Если денег хватает только на «Ромашку», покупает «Ромашку» по её цене', () => {
-        const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
-        const task = createSatisfyHungerTask({
-          npcTaskFactory: createNpcTaskFactory({ purchase }),
-        });
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] - 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
-          .build();
-
-        planSteps(task, state);
-
-        expect(purchase).toHaveBeenCalledExactlyOnceWith({
-          item: Item.RomashkaLoaf,
-          count: 1,
-          price: FOOD_PRICES[Item.RomashkaLoaf],
         });
       });
 

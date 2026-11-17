@@ -1,6 +1,6 @@
 import { createStubTask, planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
-import { createMockedItemClassifier } from '@peetland/inventory/dev';
+import { createSpiedItemClassifier } from '@peetland/inventory/dev';
 import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
@@ -8,7 +8,7 @@ import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createNeedsTaskFactoryDeps } from '../dev';
+import { createMockedFoodChooser, createNeedsTaskFactoryDeps } from '../dev';
 import { NeedsTask, NeedsTaskFactory } from '../src';
 import { SatisfyHungerTask } from '../src/satisfy-hunger-task';
 
@@ -58,12 +58,29 @@ describe('NeedsTaskFactory', () => {
     });
 
     it('Задача получает классификатор предметов из зависимостей', () => {
-      const itemClassifier = createMockedItemClassifier();
+      const itemClassifier = createSpiedItemClassifier();
       const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ itemClassifier }));
+      const state = new NpcStateBuilder()
+        .withInventory({ [Item.SmilePizza]: 1 })
+        .withNeeds({ [Need.Satiety]: 0 })
+        .build();
 
-      factory.satisfyHunger();
+      planSteps(factory.satisfyHunger(), state);
 
       expect(itemClassifier.isFood).toHaveBeenCalled();
+    });
+
+    it('Задача получает выбор еды из зависимостей', () => {
+      const foodChooser = createMockedFoodChooser();
+      const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ foodChooser }));
+      const state = new NpcStateBuilder()
+        .withInventory({ [Item.SmilePizza]: 1 })
+        .withNeeds({ [Need.Satiety]: 0 })
+        .build();
+
+      planSteps(factory.satisfyHunger(), state);
+
+      expect(foodChooser.choose).toHaveBeenCalledOnce();
     });
 
     it('Задача получает места из зависимостей', () => {

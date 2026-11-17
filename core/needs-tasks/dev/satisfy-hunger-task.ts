@@ -1,9 +1,14 @@
-import { ItemClassifier } from '@peetland/inventory';
+import { Item, ItemClassifier } from '@peetland/inventory';
+import type { Food } from '@peetland/inventory';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 import { createPlace, createPlaces } from '@peetland/places/dev';
+import { vi } from 'vitest';
+import type { Mocked } from 'vitest';
 
+import type { IFoodChooser } from '../src';
+import { FoodChooser } from '../src/food-chooser';
 import { SatisfyHungerTask } from '../src/satisfy-hunger-task';
 import type { SatisfyHungerTaskDeps } from '../src/satisfy-hunger-task';
 
@@ -31,8 +36,8 @@ export function createPlacesWithShopAndCamp(): IPlaces {
 }
 
 /**
- * Создаёт задачу утолить голод с настоящими фабрикой задач NPC и классификатором, если другие не
- * переданы. Если места не переданы, в мире есть магазин и бомжарня
+ * Создаёт задачу утолить голод с настоящими зависимостями, если другие не переданы. Если места не
+ * переданы, в мире есть магазин и бомжарня
  */
 export function createSatisfyHungerTask(
   deps: Partial<SatisfyHungerTaskDeps> = {}
@@ -41,6 +46,12 @@ export function createSatisfyHungerTask(
     npcTaskFactory: createNpcTaskFactory(),
     places: createPlacesWithShopAndCamp(),
     itemClassifier: new ItemClassifier(),
+    foodChooser: new FoodChooser(),
     ...deps,
   });
+}
+
+/** Создаёт мок выбора еды, который всегда выбирает переданную еду */
+export function createMockedFoodChooser(food: Food = Item.SmilePizza): Mocked<IFoodChooser> {
+  return { choose: vi.fn(() => food) };
 }

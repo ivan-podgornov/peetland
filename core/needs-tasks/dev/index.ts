@@ -1,5 +1,6 @@
 export { createMockedNeedsTaskFactory, createNeedsTaskFactoryDeps } from './factory';
 export {
+  createMockedFoodChooser,
   createPlacesWithShopAndCamp,
   createSatisfyHungerTask,
   TEST_CAMP,

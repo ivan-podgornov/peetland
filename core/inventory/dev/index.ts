@@ -1,2 +1,2 @@
 export { createMockedInventoryFactory } from './factory';
-export { createMockedItemClassifier } from './classifier';
+export { createSpiedItemClassifier } from './classifier';

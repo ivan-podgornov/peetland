@@ -2,26 +2,27 @@ import type { Vector3 } from '@peetland/geometry';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import type { Food, IItemClassifier } from '@peetland/inventory';
-import { Activity, Need, Needs } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces, PlaceData } from '@peetland/places';
 
 import { FOOD_PRICES } from './constants';
+import type { IFoodChooser } from './food-chooser';
 
 export type SatisfyHungerTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Места мира. Еда покупается в магазинах, а съедается в бомжарне */
   places: IPlaces;
-  /** Определяет, какие предметы — еда */
+  /** Определяет, какие предметы в инвентаре — еда */
   itemClassifier: IItemClassifier;
+  /** Выбирает, что съесть или купить */
+  foodChooser: IFoodChooser;
 };
 
 /**
  * Утолить голод. Если еда есть, NPC съедает ту, что лучше всего подходит. Если еды нет, покупает её в
- * ближайшем магазине и съедает. Лучше всего подходит еда, которая восполнит сытость до максимума с
- * наименьшим перееданием, а если до максимума не восполнит никакая, — та, что восполнит больше всего
+ * ближайшем магазине и съедает. Что лучше подходит, решает IFoodChooser
  */
 export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
   /** На каком расстоянии от магазина можно считать, что NPC до него дошёл, в метрах */
@@ -37,14 +38,13 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
 
   readonly methods: Method<NpcState, NpcContext>[];
 
+  /** Еда, которая продаётся в магазине */
+  private static readonly SHOP_FOOD = Object.keys(FOOD_PRICES) as Food[];
+
   private readonly deps: SatisfyHungerTaskDeps;
-  private readonly foods: readonly Food[];
 
   constructor(deps: SatisfyHungerTaskDeps) {
-    const { itemClassifier } = deps;
-
     this.deps = deps;
-    this.foods = Object.values(Item).filter((item): item is Food => itemClassifier.isFood(item));
     this.methods = [
       {
         name: 'eat-from-inventory',
@@ -60,13 +60,16 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   private foodInInventory(state: NpcState): Food[] {
-    return this.foods.filter((food) => state.self.inventory.has(food));
+    const { itemClassifier } = this.deps;
+    const items = Object.keys(state.self.inventory.getAll()) as Item[];
+
+    return items.filter((item): item is Food => itemClassifier.isFood(item));
   }
 
   private affordableFood(state: NpcState): Food[] {
     const money = state.self.inventory.get(Item.Money);
 
-    return this.foods.filter((food) => FOOD_PRICES[food] <= money);
+    return SatisfyHungerTask.SHOP_FOOD.filter((food) => FOOD_PRICES[food] <= money);
   }
 
   /** Купить еду можно, если на неё хватает денег, есть магазин и есть бомжарня, где её съесть */
@@ -81,14 +84,14 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   private eatFromInventory(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { npcTaskFactory } = this.deps;
+    const { npcTaskFactory, foodChooser } = this.deps;
 
-    return [npcTaskFactory.eat({ food: this.choose(state, this.foodInInventory(state)) })];
+    return [npcTaskFactory.eat({ food: foodChooser.choose(state, this.foodInInventory(state)) })];
   }
 
   private buyFood(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { npcTaskFactory } = this.deps;
-    const food = this.choose(state, this.affordableFood(state));
+    const { npcTaskFactory, foodChooser } = this.deps;
+    const food = foodChooser.choose(state, this.affordableFood(state));
     const shop = this.findNearest(state.self.actor.position, PlaceType.Shop);
     // Есть у дверей магазина не дело, поэтому NPC идёт есть в бомжарню. Когда появится поиск пути,
     // будет есть где-нибудь рядом с магазином
@@ -114,32 +117,6 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
       }),
       npcTaskFactory.eat({ food }),
     ];
-  }
-
-  /** Выбирает из еды ту, что лучше всего подходит (см. SatisfyHungerTask) */
-  private choose(state: NpcState, foods: readonly Food[]): Food {
-    const satiety = state.self.needs.get(Need.Satiety, state.world.time);
-    const filling = foods.filter((food) => satiety + this.gain(state, food) >= Needs.MAX_NEED);
-    const [first, ...rest] = filling.length > 0 ? filling : foods;
-
-    if (first === undefined) {
-      throw new Error('Не из чего выбрать еду');
-    }
-
-    return rest.reduce((best, food) => {
-      const gain = this.gain(state, food);
-      const bestGain = this.gain(state, best);
-      // Из того, что добивает до максимума, лучше то, что меньше переедает, а иначе — то, что
-      // восполняет больше
-      const better = filling.length > 0 ? gain < bestGain : gain > bestGain;
-
-      return better ? food : best;
-    }, first);
-  }
-
-  /** Сколько сытости восполнит еда */
-  private gain(state: NpcState, food: Food): number {
-    return state.self.needs.getGain(Need.Satiety, Activity.Eat, { food });
   }
 
   private findNearest(position: Vector3, type: PlaceType): PlaceData {

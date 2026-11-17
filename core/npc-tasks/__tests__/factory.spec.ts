@@ -1,5 +1,6 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
+import { Activity } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling, Trait } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
@@ -9,6 +10,7 @@ import { NpcTaskFactory } from '../src';
 import { AchieveAngleTask } from '../src/achieve-angle-task';
 import { AddItemTask } from '../src/add-item-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
+import { NeedsPerformTask } from '../src/needs-perform-task';
 import { PlayAnimationTask } from '../src/play-animation-task';
 import { PsycheReactTask } from '../src/psyche-react-task';
 import { PurchaseTask } from '../src/purchase-task';
@@ -139,6 +141,19 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(PurchaseTask);
+    });
+  });
+
+  describe('#needsPerform', () => {
+    it('Возвращает NeedsPerformTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.needsPerform({
+        activity: Activity.Eat,
+        details: { food: Item.SmilePizza },
+      });
+
+      expect(task).toBeInstanceOf(NeedsPerformTask);
     });
   });
 });

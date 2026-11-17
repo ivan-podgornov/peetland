@@ -4,6 +4,7 @@ import type { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { AddItemTaskOptions } from './add-item-task';
+import type { NeedsPerformTaskOptions } from './needs-perform-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import type { PsycheReactTaskOptions } from './psyche-react-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
@@ -25,6 +26,8 @@ export interface INpcTaskFactory {
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
   /** Сообщить психике о поступке (см. PsycheReactTask) */
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask;
+  /** Сообщить потребностям о занятии (см. NeedsPerformTask) */
+  needsPerform(options: NeedsPerformTaskOptions): NpcPrimitiveTask;
   /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
   /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */

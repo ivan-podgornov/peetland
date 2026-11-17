@@ -10,6 +10,8 @@ import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
 import { GoToCoordsTask } from './go-to-coords-task';
+import { NeedsPerformTask } from './needs-perform-task';
+import type { NeedsPerformTaskOptions } from './needs-perform-task';
 import { PlayAnimationTask } from './play-animation-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import { PsycheReactTask } from './psyche-react-task';
@@ -56,6 +58,10 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask {
     return new PsycheReactTask(options);
+  }
+
+  needsPerform(options: NeedsPerformTaskOptions): NpcPrimitiveTask {
+    return new NeedsPerformTask(options);
   }
 
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask {

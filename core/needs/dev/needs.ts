@@ -1,8 +1,8 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { Need, Needs } from '../src';
-import type { INeedsValidator, NeedsDeps, NeedsState, NeedValues } from '../src';
+import { Need, Needs, NeedStatus } from '../src';
+import type { INeeds, INeedsValidator, NeedsDeps, NeedsState, NeedValues } from '../src';
 import { NeedFactory } from '../src/need-factory';
 
 /** Создаёт валидатор, который пропускает любые значения */
@@ -43,5 +43,17 @@ export function createNeedsState(state: Partial<NeedsState> = {}): NeedsState {
       },
     },
     ...state,
+  };
+}
+
+/** Создаёт мок потребностей. Копия из clone() — новый такой же мок */
+export function createMockedNeeds(): Mocked<INeeds> {
+  return {
+    get: vi.fn(() => Needs.MAX_NEED),
+    getAll: vi.fn(() => createNeedValues()),
+    getStatus: vi.fn(() => NeedStatus.Calm),
+    getState: vi.fn(() => createNeedsState()),
+    clone: vi.fn(() => createMockedNeeds()),
+    perform: vi.fn(),
   };
 }

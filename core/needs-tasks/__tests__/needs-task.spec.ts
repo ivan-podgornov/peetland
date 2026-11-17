@@ -1,6 +1,5 @@
 import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Need } from '@peetland/needs';
-import { Satiety } from '@peetland/needs/dev';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -22,11 +21,11 @@ describe('NeedsTask', () => {
   });
 
   describe('Метод satisfy-hunger', () => {
-    it('Если сытость ниже порога срочности, планирует утолить голод', () => {
+    it('Если голод срочный, планирует утолить голод', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
-      const state = createStateWithSatiety(Satiety.OPTIONS.urgentBelow - 1);
+      const state = createStateWithSatiety(0);
 
       expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
         new PlanStructureBuilder()
@@ -35,11 +34,11 @@ describe('NeedsTask', () => {
       );
     });
 
-    it('Если сытость на пороге срочности, план не составляется', () => {
+    it('Если голод не срочный, план не составляется', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
-      const state = createStateWithSatiety(Satiety.OPTIONS.urgentBelow);
+      const state = createStateWithSatiety(100);
 
       expect(planSteps(task, state)).toBeNull();
     });
@@ -50,7 +49,7 @@ describe('NeedsTask', () => {
           satisfyHunger: () => createStubTask('satisfy-hunger', false),
         }),
       });
-      const state = createStateWithSatiety(Satiety.OPTIONS.urgentBelow - 1);
+      const state = createStateWithSatiety(0);
 
       expect(planSteps(task, state)).toBeNull();
     });

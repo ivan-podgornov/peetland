@@ -3,8 +3,9 @@ import type { Food } from '@peetland/inventory';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_RECORD, DEFAULT_SATIETY_DEPS, Satiety } from '../dev';
+import { DEFAULT_RECORD, DEFAULT_SATIETY_DEPS } from '../dev';
 import { Activity, NeedCategory } from '../src';
+import { Satiety } from '../src/satiety';
 
 describe('Satiety', () => {
   it('Сытость — жизненная потребность', () => {

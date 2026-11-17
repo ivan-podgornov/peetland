@@ -8,7 +8,6 @@ import {
   createMockedNeedsFactory,
   createMockedUrgencyWatcherFactory,
   createNeedValues,
-  Satiety,
 } from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createMockedPsycheFactory } from '@peetland/psyche/dev';
@@ -119,7 +118,7 @@ describe('NpcFactory', () => {
       factory.create(
         createNpcData({
           needs: createNeedValues({
-            [Need.Satiety]: Satiety.OPTIONS.urgentBelow - 1,
+            [Need.Satiety]: 0,
           }),
         })
       );

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNeedsValidator, DEFAULT_RECORD, DEFAULT_SATIETY_DEPS, Satiety } from '../dev';
+import { createMockedNeedsValidator, DEFAULT_RECORD, DEFAULT_SATIETY_DEPS } from '../dev';
 import { Need } from '../src';
 import { NeedFactory } from '../src/need-factory';
+import { Satiety } from '../src/satiety';
 
 describe('NeedFactory', () => {
   describe('#create', () => {

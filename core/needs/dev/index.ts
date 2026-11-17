@@ -6,7 +6,6 @@ export {
   DEFAULT_SATIETY_DEPS,
   TestNeed,
 } from './need';
-export { Satiety } from '../src/satiety';
 export {
   createMockedNeedsValidator,
   createNeedsDeps,

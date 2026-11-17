@@ -5,7 +5,7 @@ import { BaseNeed } from './base-need';
 import type { INeed } from './base-need';
 import { Need } from './need';
 import type { INeedFactory } from './need-factory';
-import { NeedStatus } from './status';
+import type { NeedStatus } from './status';
 import type { NeedsState, NeedValues } from './types';
 
 /**
@@ -25,10 +25,8 @@ export interface IReadonlyNeeds {
    * @param time - время, на момент которого нужны значения
    */
   getAll(time: IReadonlyTime): NeedValues;
-  /** Возвращает, срочная ли потребность на момент time (см. NeedStatus) */
-  isUrgent(need: Need, time: IReadonlyTime): boolean;
-  /** Возвращает, спокойна ли потребность на момент time (см. NeedStatus) */
-  isCalm(need: Need, time: IReadonlyTime): boolean;
+  /** Возвращает статус потребности на момент time */
+  getStatus(need: Need, time: IReadonlyTime): NeedStatus;
   /** Возвращает состояние потребностей. Из него конструктор собирает такие же потребности */
   getState(): NeedsState;
   /** Возвращает копию потребностей, в которую можно писать. Исходные потребности копия не меняет */
@@ -76,12 +74,8 @@ export class Needs implements INeeds {
     ) as NeedValues;
   }
 
-  isUrgent(need: Need, time: IReadonlyTime): boolean {
-    return this.needs[need].getStatus(time) === NeedStatus.Urgent;
-  }
-
-  isCalm(need: Need, time: IReadonlyTime): boolean {
-    return this.needs[need].getStatus(time) === NeedStatus.Calm;
+  getStatus(need: Need, time: IReadonlyTime): NeedStatus {
+    return this.needs[need].getStatus(time);
   }
 
   getState(): NeedsState {

@@ -57,7 +57,7 @@ describe('EatTask', () => {
         const task = createEatTask({ food: Item.SmilePizza });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.SmilePizza]: 1 })
-          .withNeeds({ [Need.Satiety]: 0 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
           .build();
 
         const after = applyPlanEffects(task, state);

@@ -47,14 +47,7 @@ describe('NeedsPerformTask', () => {
       const copy = createMockedNeeds();
       const needs = createMockedNeeds();
       needs.clone.mockReturnValue(copy);
-      const initial = NpcStateBuilder.default();
-      const state = {
-        ...initial,
-        self: {
-          ...initial.self,
-          needs,
-        },
-      };
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
       const details = { food: Item.RomashkaLoaf } as const;
       const task = new NeedsPerformTask({
         activity: Activity.Eat,
@@ -70,19 +63,12 @@ describe('NeedsPerformTask', () => {
       const copy = createMockedNeeds();
       const needs = createMockedNeeds();
       needs.clone.mockReturnValue(copy);
-      const initial = NpcStateBuilder.default();
       const task = new NeedsPerformTask({
         activity: Activity.Eat,
         details: { food: Item.SmilePizza },
       });
 
-      const state = task.applyEffects({
-        ...initial,
-        self: {
-          ...initial.self,
-          needs,
-        },
-      });
+      const state = task.applyEffects(new NpcStateBuilder().withNeeds(() => needs).build());
 
       expect(state.self.needs).toBe(copy);
     });

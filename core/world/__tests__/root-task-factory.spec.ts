@@ -1,10 +1,14 @@
 import { Geometry } from '@peetland/geometry';
 import { HomelessActivityTask } from '@peetland/homeless';
-import { createStubTask, methodTasks } from '@peetland/htn/dev';
+import { createStubTask, methodTasks, planSteps } from '@peetland/htn/dev';
+import { Item } from '@peetland/inventory';
+import { Need } from '@peetland/needs';
 import { NeedsTask } from '@peetland/needs-tasks';
 import { createMockedNeedsTaskFactory } from '@peetland/needs-tasks/dev';
 import { NpcKind } from '@peetland/npc';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { NpcStateBuilder } from '@peetland/npc/dev';
+import { PlaceType } from '@peetland/places';
 import { createMockedPlaces } from '@peetland/places/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
@@ -90,6 +94,19 @@ describe('RootTaskFactory', () => {
       const task = factory.create(NpcKind.Homeless);
 
       expect(methodTasks(task, 'needs')).toStrictEqual([expect.any(NeedsTask)]);
+    });
+
+    it('Если needsTaskFactory не передана, задачи потребностей получают места из зависимостей', () => {
+      const places = createMockedPlaces();
+      const factory = new RootTaskFactory(createDeps({ places }));
+      const state = new NpcStateBuilder()
+        .withInventory({ [Item.Money]: 1000 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
+        .build();
+
+      planSteps(factory.create(NpcKind.Homeless), state);
+
+      expect(places.ofType).toHaveBeenCalledWith(PlaceType.Shop);
     });
   });
 });

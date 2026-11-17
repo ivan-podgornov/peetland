@@ -44,7 +44,12 @@ export class RootTaskFactory implements IRootTaskFactory {
       places,
       random,
       timer,
-      needsTaskFactory = new NeedsTaskFactory(),
+      needsTaskFactory = new NeedsTaskFactory({
+        geometry,
+        places,
+        random,
+        timer,
+      }),
       addictionsTaskFactory = new AddictionsTaskFactory(),
       activityTaskFactory = new ActivityTaskFactory({
         geometry,

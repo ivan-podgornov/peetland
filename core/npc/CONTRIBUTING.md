@@ -48,11 +48,13 @@ NPC не зависит от задач. Корневую задачу HTN-аг�
 заполняется незначимыми значениями. NPC — бомж, стоит в начале координат, инвентарь пуст,
 потребности удовлетворены полностью, а в мире полночь первого дня. Психику собирает
 `PsycheBuilder` из `@peetland/psyche/dev`: `withPsyche` получает функцию, которой передаётся новый
-билдер психики, а то, что она вернёт, ляжет в состояние. `withKind` задаёт тип NPC, а `withNeeds` —
-значения потребностей на момент времени из состояния.
+билдер психики, а то, что она вернёт, ляжет в состояние. Потребности так же собирает `NeedsBuilder`
+из `@peetland/needs/dev`: `withNeeds` получает функцию, которой передаётся новый билдер потребностей
+со временем из состояния, а вернуть она может и мок потребностей. `withKind` задаёт тип NPC.
 
 ```ts
 import { Item } from '@peetland/inventory';
+import { Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { Feeling, Trait } from '@peetland/psyche';
 
@@ -61,6 +63,7 @@ const state = new NpcStateBuilder()
   .withAngle(90)
   .withInventory({ [Item.Money]: 50 })
   .withPsyche((psyche) => psyche.withTrait(Trait.Luck, 80).withFeeling(Feeling.Shame, 30).build())
+  .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
   .withTime({ day: 1, hours: 20, minutes: 0 })
   .build();
 ```

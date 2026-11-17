@@ -1,13 +1,9 @@
-import { Geometry } from '@peetland/geometry';
 import { createStubTask } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import { createMockedPlaces } from '@peetland/places/dev';
-import { createMockedRandom } from '@peetland/random/dev';
-import { ManualTimer } from '@peetland/timings';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { INeedsTaskFactory, NeedsTaskFactoryDeps } from '../src';
+import type { INeedsTaskFactory } from '../src';
 
 /**
  * Создаёт фабрику задач удовлетворения потребностей. Задачи, которые не переданы, — заглушки,
@@ -21,17 +17,4 @@ export function createMockedNeedsTaskFactory(
     satisfyHunger: vi.fn(() => createStubTask<NpcState, NpcContext>('satisfy-hunger')),
     ...factory,
   } as Mocked<INeedsTaskFactory>;
-}
-
-/** Создаёт зависимости фабрики задач удовлетворения потребностей. Мест в мире нет */
-export function createNeedsTaskFactoryDeps(
-  deps: Partial<NeedsTaskFactoryDeps> = {}
-): NeedsTaskFactoryDeps {
-  return {
-    geometry: new Geometry(),
-    places: createMockedPlaces(),
-    random: createMockedRandom(false),
-    timer: new ManualTimer(),
-    ...deps,
-  };
 }

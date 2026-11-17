@@ -1,4 +1,3 @@
-import { Item } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcKind } from '@peetland/npc';
 import type { NpcData } from '@peetland/npc';
@@ -26,13 +25,11 @@ export const npcs: NpcData[] = [
         [Feeling.Shame]: 0,
       },
     },
-    // Денег ровно на «Ромашку», а голод срочный: бомж сразу идёт её купить и съесть, а потом без
-    // денег и пойла идёт собирать бутылки
-    inventory: {
-      [Item.Money]: 80,
-    },
+    // Без денег и пойла: так бомж сразу идёт собирать бутылки
+    inventory: {},
+    // Сытый: голод придёт к нему только к концу суток
     needs: {
-      [Need.Satiety]: 20,
+      [Need.Satiety]: 100,
     },
   },
 ];

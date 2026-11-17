@@ -118,6 +118,8 @@ const satiety = state.self.needs.get(Need.Satiety, state.world.time);
 
 Точка входа `@peetland/needs/dev` даёт:
 
+- билдер потребностей (`NeedsBuilder`): задаёте значения, важные для теста, а остальные
+  удовлетворены полностью;
 - зависимости потребностей (`createNeedsDeps`) с валидатором, который пропускает любые значения
   (`createMockedNeedsValidator`), и настоящей фабрикой потребностей;
 - мок потребности (`createMockedNeed`) и мок фабрики потребностей (`createMockedNeedFactory`);

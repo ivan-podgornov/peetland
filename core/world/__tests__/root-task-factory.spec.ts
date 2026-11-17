@@ -101,7 +101,7 @@ describe('RootTaskFactory', () => {
       const factory = new RootTaskFactory(createDeps({ places }));
       const state = new NpcStateBuilder()
         .withInventory({ [Item.Money]: 1000 })
-        .withNeeds({ [Need.Satiety]: 0 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
         .build();
 
       planSteps(factory.create(NpcKind.Homeless), state);

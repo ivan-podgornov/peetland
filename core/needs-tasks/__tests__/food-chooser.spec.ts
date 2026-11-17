@@ -7,36 +7,18 @@ import { describe, expect, it } from 'vitest';
 
 import { FoodChooser } from '../src/food-chooser';
 
-/**
- * Создаёт состояние NPC, у которого сытость равна satiety, а еда восполняет сытость на gains.
- * Потребности — мок: так видно, что выбор зависит только от сытости и того, сколько даёт еда
- */
-function createState(satiety: number, gains: Partial<Record<Food, number>>) {
-  const needs = createMockedNeeds();
-  needs.get.mockReturnValue(satiety);
-  needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
-  const state = NpcStateBuilder.default();
-
-  return {
-    needs,
-    state: {
-      ...state,
-      self: {
-        ...state.self,
-        needs,
-      },
-    },
-  };
-}
-
 describe('FoodChooser', () => {
   describe('#choose', () => {
     it('Если до максимума добивает несколько еды, выбирает ту, что меньше переедает', () => {
       // Обе добивают сытость 50 до 100, но первая переедает на 50, а вторая — на 10
-      const { state } = createState(50, {
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(50);
+      const gains: Partial<Record<Food, number>> = {
         [Item.SmilePizza]: 100,
         [Item.RomashkaLoaf]: 60,
-      });
+      };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       const food = new FoodChooser().choose(state, [Item.SmilePizza, Item.RomashkaLoaf]);
 
@@ -45,10 +27,14 @@ describe('FoodChooser', () => {
 
     it('Еду, которая добивает до максимума, предпочитает той, что не добивает', () => {
       // Сытость 30: первая восполнит до 90, вторая — до максимума
-      const { state } = createState(30, {
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(30);
+      const gains: Partial<Record<Food, number>> = {
         [Item.RomashkaLoaf]: 60,
         [Item.SmilePizza]: 100,
-      });
+      };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       const food = new FoodChooser().choose(state, [Item.RomashkaLoaf, Item.SmilePizza]);
 
@@ -57,10 +43,14 @@ describe('FoodChooser', () => {
 
     it('Если до максимума не добивает никакая еда, выбирает ту, что восполняет больше', () => {
       // Сытость 10: первая восполнит до 70, вторая — до 90
-      const { state } = createState(10, {
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(10);
+      const gains: Partial<Record<Food, number>> = {
         [Item.RomashkaLoaf]: 60,
         [Item.SmilePizza]: 80,
-      });
+      };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       const food = new FoodChooser().choose(state, [Item.RomashkaLoaf, Item.SmilePizza]);
 
@@ -69,10 +59,14 @@ describe('FoodChooser', () => {
 
     it('Выбирает только из переданной еды', () => {
       // Лучше подошла бы вторая еда, но её не передали
-      const { state } = createState(30, {
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(30);
+      const gains: Partial<Record<Food, number>> = {
         [Item.RomashkaLoaf]: 60,
         [Item.SmilePizza]: 100,
-      });
+      };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       const food = new FoodChooser().choose(state, [Item.RomashkaLoaf]);
 
@@ -80,7 +74,11 @@ describe('FoodChooser', () => {
     });
 
     it('Берёт сытость на момент времени из состояния', () => {
-      const { needs, state } = createState(30, { [Item.RomashkaLoaf]: 60 });
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(30);
+      const gains: Partial<Record<Food, number>> = { [Item.RomashkaLoaf]: 60 };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       new FoodChooser().choose(state, [Item.RomashkaLoaf]);
 
@@ -88,7 +86,11 @@ describe('FoodChooser', () => {
     });
 
     it('Сколько еда восполнит сытости, спрашивает у потребностей', () => {
-      const { needs, state } = createState(30, { [Item.RomashkaLoaf]: 60 });
+      const needs = createMockedNeeds();
+      needs.get.mockReturnValue(30);
+      const gains: Partial<Record<Food, number>> = { [Item.RomashkaLoaf]: 60 };
+      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food] ?? 0);
+      const state = new NpcStateBuilder().withNeeds(() => needs).build();
 
       new FoodChooser().choose(state, [Item.RomashkaLoaf]);
 

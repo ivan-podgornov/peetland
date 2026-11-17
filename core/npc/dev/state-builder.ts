@@ -1,9 +1,8 @@
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
-import { NeedsFactory } from '@peetland/needs';
-import type { NeedValues } from '@peetland/needs';
-import { createNeedValues } from '@peetland/needs/dev';
+import type { INeeds } from '@peetland/needs';
+import { NeedsBuilder } from '@peetland/needs/dev';
 import type { IPsyche } from '@peetland/psyche';
 import { PsycheBuilder } from '@peetland/psyche/dev';
 import { ManualTime } from '@peetland/timings';
@@ -15,6 +14,9 @@ import type { NpcState } from '../src';
 /** Собирает психику из переданного билдера психики */
 type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
 
+/** Собирает потребности из переданного билдера потребностей */
+type NeedsBuild = (builder: NeedsBuilder) => INeeds;
+
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC —
  * бомж, стоит в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder
@@ -25,6 +27,7 @@ type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
  * const state = new NpcStateBuilder()
  *   .withInventory({ [Item.Money]: 50 })
  *   .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, 30).build())
+ *   .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
  *   .build();
  */
 export class NpcStateBuilder {
@@ -37,7 +40,7 @@ export class NpcStateBuilder {
   private angle = 0;
   private inventory: InventoryCounts = {};
   private psyche: PsycheBuild = (builder) => builder.build();
-  private needs: NeedValues = createNeedValues();
+  private needs: NeedsBuild = (builder) => builder.build();
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -92,10 +95,11 @@ export class NpcStateBuilder {
   }
 
   /**
-   * Задаёт значения потребностей на момент времени из состояния. Падают они по описаниям
-   * потребностей по умолчанию
+   * Задаёт потребности: функция получает новый билдер потребностей, значения которого выставлены на
+   * время из состояния, и возвращает потребности, которые лягут в состояние. Функция вызывается на
+   * каждый build, поэтому каждое состояние получает свои потребности
    */
-  withNeeds(needs: NeedValues): this {
+  withNeeds(needs: NeedsBuild): this {
     this.needs = needs;
     return this;
   }
@@ -119,7 +123,7 @@ export class NpcStateBuilder {
         },
         inventory: new Inventory(this.inventory),
         psyche: this.psyche(new PsycheBuilder()),
-        needs: new NeedsFactory().create(this.needs, time),
+        needs: this.needs(new NeedsBuilder().withTime(this.time)),
       },
       world: {
         time,

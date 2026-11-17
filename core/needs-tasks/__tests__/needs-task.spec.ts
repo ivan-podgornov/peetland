@@ -8,7 +8,9 @@ import { NeedsTask } from '../src';
 
 /** Создаёт состояние NPC с переданной сытостью */
 function createStateWithSatiety(satiety: number) {
-  return new NpcStateBuilder().withNeeds({ [Need.Satiety]: satiety }).build();
+  return new NpcStateBuilder()
+    .withNeeds((needs) => needs.withValue(Need.Satiety, satiety).build())
+    .build();
 }
 
 describe('NeedsTask', () => {

@@ -1,3 +1,4 @@
+export { NeedsBuilder } from './builder';
 export { createMockedNeedsFactory } from './factory';
 export {
   createMockedNeed,

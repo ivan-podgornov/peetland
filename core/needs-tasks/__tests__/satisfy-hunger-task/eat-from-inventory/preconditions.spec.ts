@@ -15,7 +15,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask({ places: createMockedPlaces() });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.RomashkaLoaf]: 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).not.toBeNull();
@@ -25,7 +25,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask({ places: createMockedPlaces() });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Booze]: 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).toBeNull();
@@ -40,7 +40,7 @@ describe('SatisfyHungerTask', () => {
         });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Booze]: 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);

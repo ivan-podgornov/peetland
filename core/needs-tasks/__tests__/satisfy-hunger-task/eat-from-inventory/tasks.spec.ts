@@ -24,7 +24,7 @@ describe('SatisfyHungerTask', () => {
             [Item.SmilePizza]: 1,
             [Item.Money]: 10,
           })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
@@ -47,7 +47,7 @@ describe('SatisfyHungerTask', () => {
             [Item.RomashkaLoaf]: 1,
             [Item.SmilePizza]: 1,
           })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);

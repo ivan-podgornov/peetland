@@ -48,7 +48,7 @@ describe('NeedsTaskFactory', () => {
       );
       const state = new NpcStateBuilder()
         .withInventory({ [Item.SmilePizza]: 1 })
-        .withNeeds({ [Need.Satiety]: 0 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
         .build();
 
       planSteps(factory.satisfyHunger(), state);
@@ -62,7 +62,7 @@ describe('NeedsTaskFactory', () => {
       const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ itemClassifier }));
       const state = new NpcStateBuilder()
         .withInventory({ [Item.SmilePizza]: 1 })
-        .withNeeds({ [Need.Satiety]: 0 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
         .build();
 
       planSteps(factory.satisfyHunger(), state);
@@ -75,7 +75,7 @@ describe('NeedsTaskFactory', () => {
       const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ foodChooser }));
       const state = new NpcStateBuilder()
         .withInventory({ [Item.SmilePizza]: 1 })
-        .withNeeds({ [Need.Satiety]: 0 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
         .build();
 
       planSteps(factory.satisfyHunger(), state);
@@ -88,7 +88,7 @@ describe('NeedsTaskFactory', () => {
       const factory = new NeedsTaskFactory(createNeedsTaskFactoryDeps({ places }));
       const state = new NpcStateBuilder()
         .withInventory({ [Item.Money]: 1000 })
-        .withNeeds({ [Need.Satiety]: 0 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 0).build())
         .build();
 
       planSteps(factory.satisfyHunger(), state);

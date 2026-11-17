@@ -15,7 +15,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask();
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: FOOD_PRICES[Item.RomashkaLoaf] })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).not.toBeNull();
@@ -25,7 +25,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask();
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: FOOD_PRICES[Item.RomashkaLoaf] - 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).toBeNull();
@@ -35,7 +35,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask({ places: createPlaces([TEST_CAMP]) });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: 1000 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).toBeNull();
@@ -45,7 +45,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask({ places: createPlaces([TEST_SHOP]) });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: 1000 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).toBeNull();

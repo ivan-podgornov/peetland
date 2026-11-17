@@ -26,7 +26,7 @@ describe('SatisfyHungerTask', () => {
         });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: 1000 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
@@ -54,7 +54,7 @@ describe('SatisfyHungerTask', () => {
         });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: 1000 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
@@ -74,7 +74,7 @@ describe('SatisfyHungerTask', () => {
         const task = createSatisfyHungerTask({ foodChooser });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] - 1 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
@@ -90,7 +90,7 @@ describe('SatisfyHungerTask', () => {
         });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: 1000 })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
@@ -113,7 +113,7 @@ describe('SatisfyHungerTask', () => {
         });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] })
-          .withNeeds({ [Need.Satiety]: 10 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);

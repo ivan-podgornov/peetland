@@ -18,7 +18,7 @@ describe('SatisfyHungerTask', () => {
           [Item.RomashkaLoaf]: 1,
           [Item.Money]: 1000,
         })
-        .withNeeds({ [Need.Satiety]: 10 })
+        .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
         .build();
 
       expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(

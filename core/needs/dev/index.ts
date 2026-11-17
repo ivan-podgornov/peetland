@@ -7,6 +7,7 @@ export {
   TestNeed,
 } from './need';
 export {
+  createMockedNeeds,
   createMockedNeedsValidator,
   createNeedsDeps,
   createNeedsState,

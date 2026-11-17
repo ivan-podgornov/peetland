@@ -121,6 +121,7 @@ const satiety = state.self.needs.get(Need.Satiety, state.world.time);
   и зависимости потребности с настоящим валидатором (`DEFAULT_SATIETY_DEPS`);
 - значения и состояние потребностей (`createNeedValues`, `createNeedsState`), в которых всё, что не
   передано, удовлетворено полностью;
+- мок потребностей (`createMockedNeeds`), у которого копия из `clone()` — новый такой же мок;
 - мок фабрики (`createMockedNeedsFactory`), который всегда возвращает переданные потребности;
 - мок наблюдателя срочности (`createMockedUrgencyWatcher`), который на каждой проверке возвращает
   переданный результат, и мок его фабрики (`createMockedUrgencyWatcherFactory`).

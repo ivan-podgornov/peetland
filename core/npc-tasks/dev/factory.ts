@@ -31,6 +31,7 @@ export function createNpcTaskFactory(factory: Partial<INpcTaskFactory> = {}): IN
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
     psycheReact: (options) => real.psycheReact(options),
+    needsPerform: (options) => real.needsPerform(options),
     tryLuck: (options) => real.tryLuck(options),
     parallel: (options) => real.parallel(options),
     purchase: (options) => real.purchase(options),

@@ -23,4 +23,5 @@ export const VIRTUAL_ANIMATIONS: VirtualAnimations = {
   pay: { duration: 4670 },
   'drink-standing-1': { duration: 2330 },
   'drink-standing-2': { duration: 2330 },
+  'eat-pizza': { duration: 5000 },
 };

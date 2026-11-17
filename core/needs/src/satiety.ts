@@ -30,13 +30,19 @@ export class Satiety extends BaseNeed {
     super(record, Satiety.OPTIONS, deps);
   }
 
-  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
+  getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number {
     switch (activity) {
       case Activity.Eat:
-        this.record = {
-          value: this.get(time) + Satiety.FOOD_SATIETY[details.food],
-          since: time.getState(),
-        };
+        return Satiety.FOOD_SATIETY[details.food];
     }
+
+    return 0;
+  }
+
+  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
+    this.record = {
+      value: this.get(time) + this.getGain(activity, details),
+      since: time.getState(),
+    };
   }
 }

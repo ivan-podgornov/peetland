@@ -59,6 +59,10 @@ export const TEST_ANIMATIONS: AnimationTable<TestAnimation> = {
     duration: 2330,
     group: 'drink-standing-2',
   },
+  'eat-pizza': {
+    duration: 5000,
+    group: 'eat-pizza',
+  },
 };
 
 /** Создаёт загрузчик, который загружает группу анимаций, только когда это скажет тест */

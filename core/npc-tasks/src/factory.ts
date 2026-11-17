@@ -9,6 +9,7 @@ import type { ITimer } from '@peetland/timings';
 import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
+import { EatTask } from './eat-task';
 import { GoToCoordsTask } from './go-to-coords-task';
 import { NeedsPerformTask } from './needs-perform-task';
 import type { NeedsPerformTaskOptions } from './needs-perform-task';
@@ -21,7 +22,12 @@ import { RemoveItemTask } from './remove-item-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
 import { TryLuckTask } from './try-luck-task';
 import type { TryLuckTaskOptions } from './try-luck-task';
-import type { INpcTaskFactory, NpcPrimitiveTask, PurchaseTaskOptions } from './types';
+import type {
+  EatTaskOptions,
+  INpcTaskFactory,
+  NpcPrimitiveTask,
+  PurchaseTaskOptions,
+} from './types';
 
 export type NpcTaskFactoryDeps = {
   geometry: IGeometry;
@@ -79,5 +85,9 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   purchase(options: PurchaseTaskOptions): Task<NpcState, NpcContext> {
     return new PurchaseTask(options, { npcTaskFactory: this });
+  }
+
+  eat(options: EatTaskOptions): Task<NpcState, NpcContext> {
+    return new EatTask(options, { npcTaskFactory: this });
   }
 }

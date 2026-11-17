@@ -27,6 +27,8 @@ export interface IReadonlyNeeds {
   getAll(time: IReadonlyTime): NeedValues;
   /** Возвращает статус потребности на момент time */
   getStatus(need: Need, time: IReadonlyTime): NeedStatus;
+  /** Возвращает, на сколько занятие изменит потребность, без учёта пределов */
+  getGain<A extends Activity>(need: Need, activity: A, details: ActivityDetails[A]): number;
   /** Возвращает состояние потребностей. Из него конструктор собирает такие же потребности */
   getState(): NeedsState;
   /** Возвращает копию потребностей, в которую можно писать. Исходные потребности копия не меняет */
@@ -76,6 +78,10 @@ export class Needs implements INeeds {
 
   getStatus(need: Need, time: IReadonlyTime): NeedStatus {
     return this.needs[need].getStatus(time);
+  }
+
+  getGain<A extends Activity>(need: Need, activity: A, details: ActivityDetails[A]): number {
+    return this.needs[need].getGain(activity, details);
   }
 
   getState(): NeedsState {

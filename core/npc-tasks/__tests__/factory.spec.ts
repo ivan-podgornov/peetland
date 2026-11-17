@@ -9,6 +9,7 @@ import { createNpcTaskFactoryDeps } from '../dev';
 import { NpcTaskFactory } from '../src';
 import { AchieveAngleTask } from '../src/achieve-angle-task';
 import { AddItemTask } from '../src/add-item-task';
+import { EatTask } from '../src/eat-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
 import { NeedsPerformTask } from '../src/needs-perform-task';
 import { PlayAnimationTask } from '../src/play-animation-task';
@@ -154,6 +155,16 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(NeedsPerformTask);
+    });
+  });
+
+  describe('#eat', () => {
+    it('Возвращает EatTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.eat({ food: Item.SmilePizza });
+
+      expect(task).toBeInstanceOf(EatTask);
     });
   });
 });

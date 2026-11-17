@@ -1,17 +1,8 @@
 import type { CompoundTask, Method } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
-
 import type { NpcContext, NpcState } from '@peetland/npc';
-import type { INpcTaskFactory } from '@peetland/npc-tasks';
 
-export type PurchaseTaskOptions = {
-  /** Какой предмет купить */
-  item: Exclude<Item, Item.Money>;
-  /** Сколько предмета купить */
-  count: number;
-  /** Сколько заплатить, в долларах */
-  price: number;
-};
+import type { INpcTaskFactory, PurchaseTaskOptions } from './types';
 
 export type PurchaseTaskDeps = {
   npcTaskFactory: INpcTaskFactory;

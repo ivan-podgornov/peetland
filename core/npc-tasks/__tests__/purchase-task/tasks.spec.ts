@@ -1,10 +1,9 @@
 import { applyPlanEffects, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createPurchaseTask } from '../../dev';
+import { createNpcTaskFactory, createPurchaseTask } from '../../dev';
 
 describe('PurchaseTask', () => {
   describe('Метод pay', () => {

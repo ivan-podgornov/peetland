@@ -8,8 +8,6 @@ import { BegTask } from './beg-task';
 import { BuyBoozeTask } from './buy-booze-task';
 import { CollectBottlesTask } from './collect-bottles-task';
 import { DrinkTask } from './drink-task';
-import { PurchaseTask } from './purchase-task';
-import type { PurchaseTaskOptions } from './purchase-task';
 import { SellBottlesTask } from './sell-bottles-task';
 import type { IHomelessTaskFactory } from './types';
 
@@ -30,18 +28,11 @@ export class HomelessTaskFactory implements IHomelessTaskFactory {
     this.deps = deps;
   }
 
-  purchase(options: PurchaseTaskOptions): NpcTask {
-    const { npcTaskFactory } = this.deps;
-
-    return new PurchaseTask(options, { npcTaskFactory });
-  }
-
   buyBooze(): NpcTask {
     const { npcTaskFactory, places } = this.deps;
 
     return new BuyBoozeTask({
       npcTaskFactory,
-      homelessTaskFactory: this,
       places,
     });
   }

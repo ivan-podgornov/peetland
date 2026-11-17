@@ -1,9 +1,10 @@
 import { Item } from '@peetland/inventory';
-import type { INpcTaskFactory } from '@peetland/npc-tasks';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
 
+import type { INpcTaskFactory } from '../src';
+import type { PurchaseTaskOptions } from '../src';
 import { PurchaseTask } from '../src/purchase-task';
-import type { PurchaseTaskOptions } from '../src/purchase-task';
+
+import { createNpcTaskFactory } from './factory';
 
 /**
  * Создаёт задачу покупки с настоящей фабрикой примитивов, если другая не передана. Опции, которые не

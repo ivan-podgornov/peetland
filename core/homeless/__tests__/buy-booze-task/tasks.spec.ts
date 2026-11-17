@@ -7,7 +7,7 @@ import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createBuyBoozeTask, createHomelessTaskFactory, createPlacesWithShop } from '../../dev';
+import { createBuyBoozeTask, createPlacesWithShop } from '../../dev';
 import { BOOZE_PRICE } from '../../src/constants';
 
 /** Создаёт состояние NPC, у которого хватает денег на пойло: без них план не составляется */
@@ -20,7 +20,7 @@ describe('BuyBoozeTask', () => {
     describe('Задачи', () => {
       it('Планирует дойти до магазина, повернуться к прилавку и купить пойло', () => {
         const task = createBuyBoozeTask(createPlacesWithShop(), {
-          homelessTaskFactory: createHomelessTaskFactory({
+          npcTaskFactory: createNpcTaskFactory({
             purchase: () => createStubTask('purchase'),
           }),
         });
@@ -96,7 +96,7 @@ describe('BuyBoozeTask', () => {
       it('Покупает одну бутылку пойла за BOOZE_PRICE', () => {
         const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
         const task = createBuyBoozeTask(createPlacesWithShop(), {
-          homelessTaskFactory: createHomelessTaskFactory({ purchase }),
+          npcTaskFactory: createNpcTaskFactory({ purchase }),
         });
 
         plan(task, createStateWithMoney());

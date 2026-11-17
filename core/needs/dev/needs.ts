@@ -53,6 +53,7 @@ export function createMockedNeeds(): Mocked<INeeds> {
     getAll: vi.fn(() => createNeedValues()),
     getStatus: vi.fn(() => NeedStatus.Calm),
     getState: vi.fn(() => createNeedsState()),
+    getGain: vi.fn(() => 0),
     clone: vi.fn(() => createMockedNeeds()),
     perform: vi.fn(),
   };

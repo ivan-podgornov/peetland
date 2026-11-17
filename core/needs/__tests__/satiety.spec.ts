@@ -31,6 +31,35 @@ describe('Satiety', () => {
     expect(value).toBe(0);
   });
 
+  describe('#getGain', () => {
+    it.each<{ food: Food; gain: number }>([
+      {
+        food: Item.RomashkaLoaf,
+        gain: 60,
+      },
+      {
+        food: Item.SmilePizza,
+        gain: 100,
+      },
+    ])('Если съели $food, возвращает $gain', ({ food, gain }) => {
+      const satiety = new Satiety(DEFAULT_RECORD, DEFAULT_SATIETY_DEPS);
+
+      expect(satiety.getGain(Activity.Eat, { food })).toBe(gain);
+    });
+
+    it('Не учитывает пределы: сытая сытость всё равно возвращает весь вклад еды', () => {
+      const satiety = new Satiety(
+        {
+          ...DEFAULT_RECORD,
+          value: 100,
+        },
+        DEFAULT_SATIETY_DEPS
+      );
+
+      expect(satiety.getGain(Activity.Eat, { food: Item.SmilePizza })).toBe(100);
+    });
+  });
+
   describe('#perform', () => {
     it.each<{ food: Food; satiety: number }>([
       {

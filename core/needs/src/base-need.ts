@@ -16,6 +16,8 @@ export interface INeed {
   getStatus(time: IReadonlyTime): NeedStatus;
   /** Возвращает значение и момент, когда его выставили */
   getState(): NeedRecord;
+  /** Возвращает, на сколько занятие изменит значение, без учёта пределов */
+  getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number;
   /**
    * Меняет потребность от занятия
    * @param time - момент, когда занятие закончилось
@@ -83,6 +85,8 @@ export abstract class BaseNeed implements INeed {
   getState(): NeedRecord {
     return this.current;
   }
+
+  abstract getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number;
 
   abstract perform<A extends Activity>(
     activity: A,

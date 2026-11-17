@@ -1,6 +1,6 @@
 import type { AchieveAngleOptions, GoToCoordsOptions } from '@peetland/game';
 import type { ParallelTaskOptions, PrimitiveTask, Task } from '@peetland/htn';
-import type { Item } from '@peetland/inventory';
+import type { Food, Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { AddItemTaskOptions } from './add-item-task';
@@ -34,6 +34,8 @@ export interface INpcTaskFactory {
   parallel(options: ParallelTaskOptions<NpcState, NpcContext>): NpcPrimitiveTask;
   /** Купить предмет там, где NPC стоит (см. PurchaseTask) */
   purchase(options: PurchaseTaskOptions): Task<NpcState, NpcContext>;
+  /** Съесть еду из инвентаря там, где NPC стоит (см. EatTask) */
+  eat(options: EatTaskOptions): Task<NpcState, NpcContext>;
 }
 
 export type PurchaseTaskOptions = {
@@ -43,4 +45,9 @@ export type PurchaseTaskOptions = {
   count: number;
   /** Сколько заплатить, в долларах */
   price: number;
+};
+
+export type EatTaskOptions = {
+  /** Что съесть */
+  food: Food;
 };

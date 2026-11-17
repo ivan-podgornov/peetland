@@ -28,7 +28,9 @@ export type AnimationId =
   /** Пить стоя, вариант 1 */
   | 'drink-standing-1'
   /** Пить стоя, вариант 2 */
-  | 'drink-standing-2';
+  | 'drink-standing-2'
+  /** Есть пиццу стоя */
+  | 'eat-pizza';
 
 /** Описание анимации, общее для всех реализаций актора */
 export type AnimationInfo = {
@@ -52,4 +54,5 @@ export const ANIMATIONS: Record<AnimationId, AnimationInfo> = {
   pay: { loop: false },
   'drink-standing-1': { loop: true },
   'drink-standing-2': { loop: true },
+  'eat-pizza': { loop: false },
 };

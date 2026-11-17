@@ -81,4 +81,9 @@ export const GTA_ANIMATIONS: Record<AnimationId, GtaAnimation> = {
     name: 'dnk_stndF_loop',
     duration: 2330,
   },
+  'eat-pizza': {
+    block: 'FOOD',
+    name: 'EAT_Pizza',
+    duration: 5000,
+  },
 };

@@ -36,6 +36,10 @@ export class TestNeed extends BaseNeed {
     super(record, TestNeed.OPTIONS, deps);
   }
 
+  getGain(): number {
+    return 0;
+  }
+
   perform(): void {}
 
   /** Выставляет запись через сеттер BaseNeed */
@@ -51,6 +55,7 @@ export function createMockedNeed(record: NeedRecord = DEFAULT_RECORD): Mocked<IN
     get: vi.fn<INeed['get']>(() => 0),
     getStatus: vi.fn<INeed['getStatus']>(() => NeedStatus.Moderate),
     getState: vi.fn(() => record),
+    getGain: vi.fn<INeed['getGain']>(() => 0),
     perform: vi.fn(),
   };
 }

@@ -3897,7 +3897,8 @@ ____exports.ANIMATIONS = {
     ["item-receive"] = {loop = false},
     pay = {loop = false},
     ["drink-standing-1"] = {loop = true},
-    ["drink-standing-2"] = {loop = true}
+    ["drink-standing-2"] = {loop = true},
+    ["eat-pizza"] = {loop = false}
 }
 return ____exports
  end,
@@ -5435,7 +5436,8 @@ ____exports.GTA_ANIMATIONS = {
     ["item-receive"] = {block = "KISSING", name = "gift_get", duration = 5330},
     pay = {block = "DEALER", name = "shop_pay", duration = 4670},
     ["drink-standing-1"] = {block = "BAR", name = "dnk_stndM_loop", duration = 2330},
-    ["drink-standing-2"] = {block = "BAR", name = "dnk_stndF_loop", duration = 2330}
+    ["drink-standing-2"] = {block = "BAR", name = "dnk_stndF_loop", duration = 2330},
+    ["eat-pizza"] = {block = "FOOD", name = "EAT_Pizza", duration = 5000}
 }
 return ____exports
  end,
@@ -6494,18 +6496,21 @@ __TS__ClassExtends(Satiety, BaseNeed)
 function Satiety.prototype.____constructor(self, record, deps)
     BaseNeed.prototype.____constructor(self, record, ____exports.Satiety.OPTIONS, deps)
 end
-function Satiety.prototype.perform(self, activity, details, time)
+function Satiety.prototype.getGain(self, activity, details)
     repeat
         local ____switch4 = activity
         local ____cond4 = ____switch4 == Activity.Eat
         if ____cond4 then
-            self.record = {
-                value = self:get(time) + ____exports.Satiety.FOOD_SATIETY[details.food],
-                since = time:getState()
-            }
-            break
+            return ____exports.Satiety.FOOD_SATIETY[details.food]
         end
     until true
+    return 0
+end
+function Satiety.prototype.perform(self, activity, details, time)
+    self.record = {
+        value = self:get(time) + self:getGain(activity, details),
+        since = time:getState()
+    }
 end
 Satiety.OPTIONS = {category = NeedCategory.Vital, depletionMinutes = 24 * 60, urgentBelow = 25, calmAbove = 60}
 Satiety.FOOD_SATIETY = {[Item.RomashkaLoaf] = 60, [Item.SmilePizza] = 100}
@@ -6580,6 +6585,9 @@ function Needs.prototype.getAll(self, time)
 end
 function Needs.prototype.getStatus(self, need, time)
     return self.needs[need]:getStatus(time)
+end
+function Needs.prototype.getGain(self, need, activity, details)
+    return self.needs[need]:getGain(activity, details)
 end
 function Needs.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -8266,42 +8274,6 @@ function AddItemTask.prototype.stop(self)
 end
 return ____exports
  end,
-["core.npc-tasks.src.go-to-coords-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ClassExtends = ____lualib.__TS__ClassExtends
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local ____exports = {}
-local ____command_2Dtask = require("core.npc-tasks.src.command-task")
-local CommandTask = ____command_2Dtask.CommandTask
---- Идти к координатам (см. IActor.goToCoords)
-____exports.GoToCoordsTask = __TS__Class()
-local GoToCoordsTask = ____exports.GoToCoordsTask
-GoToCoordsTask.name = "GoToCoordsTask"
-__TS__ClassExtends(GoToCoordsTask, CommandTask)
-function GoToCoordsTask.prototype.____constructor(self, options)
-    CommandTask.prototype.____constructor(self)
-    self.name = "go-to-coords"
-    self.options = options
-end
-function GoToCoordsTask.prototype.applyEffects(self, state)
-    local ____self_options_0 = self.options
-    local coords = ____self_options_0.coords
-    local actor = __TS__ObjectAssign({}, state.self.actor, {position = coords})
-    return __TS__ObjectAssign(
-        {},
-        state,
-        {self = __TS__ObjectAssign({}, state.self, {actor = actor})}
-    )
-end
-function GoToCoordsTask.prototype.createCommand(self, actor)
-    local ____self_options_1 = self.options
-    local coords = ____self_options_1.coords
-    local completeRadius = ____self_options_1.completeRadius
-    return actor:goToCoords(coords, completeRadius)
-end
-return ____exports
- end,
 ["core.npc-tasks.src.needs-perform-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8553,6 +8525,75 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
+["core.npc-tasks.src.eat-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+local ____needs = require("core.needs.src.index")
+local Activity = ____needs.Activity
+--- Съесть еду из инвентаря там, где NPC стоит. Съесть — транзакция: если NPC начал есть, он доест,
+-- еда пропадёт из инвентаря, а потребности узнают, что он поел
+____exports.EatTask = __TS__Class()
+local EatTask = ____exports.EatTask
+EatTask.name = "EatTask"
+function EatTask.prototype.____constructor(self, options, deps)
+    self.name = "eat"
+    self.transaction = true
+    local ____options_0 = options
+    local food = ____options_0.food
+    local ____deps_1 = deps
+    local npcTaskFactory = ____deps_1.npcTaskFactory
+    self.methods = {{
+        name = "eat-food",
+        preconditions = function(____, state) return state.self.inventory:has(food) end,
+        tasks = {
+            npcTaskFactory:playAnimation({animation = ____exports.EatTask.ANIMATIONS[food]}),
+            npcTaskFactory:removeItem({item = food, count = 1}),
+            npcTaskFactory:needsPerform({activity = Activity.Eat, details = {food = food}})
+        }
+    }}
+end
+EatTask.ANIMATIONS = {[Item.RomashkaLoaf] = "eat-pizza", [Item.SmilePizza] = "eat-pizza"}
+return ____exports
+ end,
+["core.npc-tasks.src.go-to-coords-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____command_2Dtask = require("core.npc-tasks.src.command-task")
+local CommandTask = ____command_2Dtask.CommandTask
+--- Идти к координатам (см. IActor.goToCoords)
+____exports.GoToCoordsTask = __TS__Class()
+local GoToCoordsTask = ____exports.GoToCoordsTask
+GoToCoordsTask.name = "GoToCoordsTask"
+__TS__ClassExtends(GoToCoordsTask, CommandTask)
+function GoToCoordsTask.prototype.____constructor(self, options)
+    CommandTask.prototype.____constructor(self)
+    self.name = "go-to-coords"
+    self.options = options
+end
+function GoToCoordsTask.prototype.applyEffects(self, state)
+    local ____self_options_0 = self.options
+    local coords = ____self_options_0.coords
+    local actor = __TS__ObjectAssign({}, state.self.actor, {position = coords})
+    return __TS__ObjectAssign(
+        {},
+        state,
+        {self = __TS__ObjectAssign({}, state.self, {actor = actor})}
+    )
+end
+function GoToCoordsTask.prototype.createCommand(self, actor)
+    local ____self_options_1 = self.options
+    local coords = ____self_options_1.coords
+    local completeRadius = ____self_options_1.completeRadius
+    return actor:goToCoords(coords, completeRadius)
+end
+return ____exports
+ end,
 ["core.npc-tasks.src.purchase-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8597,6 +8638,8 @@ local ____achieve_2Dangle_2Dtask = require("core.npc-tasks.src.achieve-angle-tas
 local AchieveAngleTask = ____achieve_2Dangle_2Dtask.AchieveAngleTask
 local ____add_2Ditem_2Dtask = require("core.npc-tasks.src.add-item-task")
 local AddItemTask = ____add_2Ditem_2Dtask.AddItemTask
+local ____eat_2Dtask = require("core.npc-tasks.src.eat-task")
+local EatTask = ____eat_2Dtask.EatTask
 local ____go_2Dto_2Dcoords_2Dtask = require("core.npc-tasks.src.go-to-coords-task")
 local GoToCoordsTask = ____go_2Dto_2Dcoords_2Dtask.GoToCoordsTask
 local ____needs_2Dperform_2Dtask = require("core.npc-tasks.src.needs-perform-task")
@@ -8649,6 +8692,9 @@ function NpcTaskFactory.prototype.parallel(self, options)
 end
 function NpcTaskFactory.prototype.purchase(self, options)
     return __TS__New(PurchaseTask, options, {npcTaskFactory = self})
+end
+function NpcTaskFactory.prototype.eat(self, options)
+    return __TS__New(EatTask, options, {npcTaskFactory = self})
 end
 return ____exports
  end,

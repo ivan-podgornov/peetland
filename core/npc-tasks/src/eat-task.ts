@@ -18,7 +18,7 @@ export type EatTaskDeps = {
 export class EatTask implements CompoundTask<NpcState, NpcContext> {
   /** Какой анимацией NPC ест каждую еду */
   private static readonly ANIMATIONS: Readonly<Record<Food, AnimationId>> = {
-    // Батон круглый, его едят как пиццу
+    // «Ромашка» круглая, её едят как пиццу
     [Item.RomashkaLoaf]: 'eat-pizza',
     [Item.SmilePizza]: 'eat-pizza',
   };

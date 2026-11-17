@@ -10,7 +10,7 @@ import { createEatTask, createNpcTaskFactory } from '../../dev';
 describe('EatTask', () => {
   describe('Метод eat-food', () => {
     describe('Задачи', () => {
-      it('Планирует проиграть анимацию, отнять еду и сообщить потребностям одной транзакцией: если NPC начал есть, он доест', () => {
+      it('Планирует проиграть анимацию, отнять еду и сообщить потребностям одной транзакцией', () => {
         const task = createEatTask({ food: Item.SmilePizza });
         const state = new NpcStateBuilder().withInventory({ [Item.SmilePizza]: 1 }).build();
 
@@ -31,7 +31,7 @@ describe('EatTask', () => {
         expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'eat-pizza' });
       });
 
-      it('Отнимает одну штуку еды', () => {
+      it('Отнимает одну штуку той еды, которую съел NPC', () => {
         const removeItem = vi.fn();
 
         createEatTask({ food: Item.RomashkaLoaf }, createNpcTaskFactory({ removeItem }));

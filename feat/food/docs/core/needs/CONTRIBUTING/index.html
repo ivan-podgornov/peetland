@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/feat/food/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/food/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/food/docs/assets/js/runtime~main.addea2b9.js" defer="defer"></script>
+<script src="/peetland/feat/food/docs/assets/js/runtime~main.a125744d.js" defer="defer"></script>
 <script src="/peetland/feat/food/docs/assets/js/main.510122c7.js" defer="defer"></script>
 </head>
 <body>
@@ -37,8 +37,7 @@
 она спокойная (<code>Calm</code>). Между порогами она <code>Moderate</code>: уже не срочная, но ещё не спокойная. Так
 значение, которое скачет около нижнего порога, не поднимает тревогу снова (см. наблюдатель
 срочности). У сытости пороги 25 и 60: срочно становится за 6 часов до голода.</p>
-<p><code>isUrgent(need, time)</code> и <code>isCalm(need, time)</code> у <code>Needs</code> возвращают, срочная ли и спокойная ли
-потребность на момент времени.</p>
+<p><code>getStatus(need, time)</code> у <code>Needs</code> возвращает статус потребности на момент времени.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="наблюдатель-срочности">Наблюдатель срочности<a href="#наблюдатель-срочности" class="hash-link" aria-label="Прямая ссылка на Наблюдатель срочности" title="Прямая ссылка на Наблюдатель срочности" translate="no">​</a></h2>
 <p><code>UrgencyWatcher</code> следит, когда потребности становятся срочными. <code>check(needs, time)</code> возвращает,
 стала ли с прошлой проверки срочной хоть одна потребность. Наблюдатель помнит, какие потребности
@@ -98,7 +97,6 @@
 <li class="">мок потребности (<code>createMockedNeed</code>) и мок фабрики потребностей (<code>createMockedNeedFactory</code>);</li>
 <li class="">потребность для тестов общей логики <code>BaseNeed</code> (<code>TestNeed</code>), запись потребности (<code>DEFAULT_RECORD</code>)
 и зависимости потребности с настоящим валидатором (<code>DEFAULT_SATIETY_DEPS</code>);</li>
-<li class="">сытость (<code>Satiety</code>), например чтобы взять её пороги из <code>Satiety.OPTIONS</code>;</li>
 <li class="">значения и состояние потребностей (<code>createNeedValues</code>, <code>createNeedsState</code>), в которых всё, что не
 передано, удовлетворено полностью;</li>
 <li class="">мок фабрики (<code>createMockedNeedsFactory</code>), который всегда возвращает переданные потребности;</li>

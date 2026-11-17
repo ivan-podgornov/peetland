@@ -6550,8 +6550,6 @@ local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
-local ____status = require("core.needs.src.status")
-local NeedStatus = ____status.NeedStatus
 --- Потребности NPC
 ____exports.Needs = __TS__Class()
 local Needs = ____exports.Needs
@@ -6580,11 +6578,8 @@ function Needs.prototype.getAll(self, time)
         } end
     ))
 end
-function Needs.prototype.isUrgent(self, need, time)
-    return self.needs[need]:getStatus(time) == NeedStatus.Urgent
-end
-function Needs.prototype.isCalm(self, need, time)
-    return self.needs[need]:getStatus(time) == NeedStatus.Calm
+function Needs.prototype.getStatus(self, need, time)
+    return self.needs[need]:getStatus(time)
 end
 function Needs.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6667,9 +6662,11 @@ local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local ____exports = {}
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
+local ____status = require("core.needs.src.status")
+local NeedStatus = ____status.NeedStatus
 --- Следит, когда потребности становятся срочными. Помнит, какие потребности горят: потребность
--- загорается, когда стала срочной (см. IReadonlyNeeds.isUrgent), и гаснет, только когда стала
--- спокойной (см. IReadonlyNeeds.isCalm). Пока потребность горит, она не загорается снова, поэтому
+-- загорается, когда стала срочной (NeedStatus.Urgent), и гаснет, только когда стала
+-- спокойной (NeedStatus.Calm). Пока потребность горит, она не загорается снова, поэтому
 -- значение, которое скачет около порога срочности, не поднимает тревогу на каждой проверке. Сами
 -- потребности наблюдатель не меняет
 ____exports.UrgencyWatcher = __TS__Class()
@@ -6684,12 +6681,12 @@ function UrgencyWatcher.prototype.check(self, needs, time)
         __TS__ObjectValues(Need),
         function(____, need)
             if self.burning:has(need) then
-                if needs:isCalm(need, time) then
+                if needs:getStatus(need, time) == NeedStatus.Calm then
                     self.burning:delete(need)
                 end
                 return
             end
-            if needs:isUrgent(need, time) then
+            if needs:getStatus(need, time) == NeedStatus.Urgent then
                 self.burning:add(need)
                 ignited = true
             end
@@ -8004,6 +8001,7 @@ local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
 local ____needs = require("core.needs.src.index")
 local Need = ____needs.Need
+local NeedStatus = ____needs.NeedStatus
 --- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
 -- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
 -- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
@@ -8017,7 +8015,7 @@ function NeedsTask.prototype.____constructor(self, deps)
     local needsTaskFactory = ____deps_0.needsTaskFactory
     self.methods = {{
         name = "satisfy-hunger",
-        preconditions = function(____, state) return state.self.needs:isUrgent(Need.Satiety, state.world.time) end,
+        preconditions = function(____, state) return state.self.needs:getStatus(Need.Satiety, state.world.time) == NeedStatus.Urgent end,
         tasks = {needsTaskFactory:satisfyHunger()}
     }}
 end

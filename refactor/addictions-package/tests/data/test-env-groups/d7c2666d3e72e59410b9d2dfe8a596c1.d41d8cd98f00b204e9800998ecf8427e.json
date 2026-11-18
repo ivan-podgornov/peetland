@@ -1,1 +1,0 @@
-{"id":"d7c2666d3e72e59410b9d2dfe8a596c1.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/record.spec.ts#BaseAddiction Сеттер record Не опускает тягу ниже BaseAddiction.MIN_CRAVING","name":"Не опускает тягу ниже BaseAddiction.MIN_CRAVING","status":"passed","testResultsByEnv":{"default":"7721906456a5e140c4395a425c20ecb1"}}

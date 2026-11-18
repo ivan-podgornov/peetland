@@ -6345,7 +6345,7 @@ return ____exports
 ["core.addictions.src.addiction"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Зависимость NPC: тяга, которая растёт со временем тем быстрее, чем сильнее зависимость
+--- Зависимость NPC: удовлетворённость, которая падает со временем тем быстрее, чем сильнее зависимость
 ____exports.Addiction = ____exports.Addiction or ({})
 ____exports.Addiction.Alcoholism = "alcoholism"
 return ____exports
@@ -6382,12 +6382,12 @@ local AddictionsValidator = ____exports.AddictionsValidator
 AddictionsValidator.name = "AddictionsValidator"
 function AddictionsValidator.prototype.____constructor(self)
 end
-function AddictionsValidator.prototype.validateCraving(self, craving, min, max)
-    if not __TS__NumberIsFinite(craving) or craving < min or craving > max then
+function AddictionsValidator.prototype.validateSatisfaction(self, satisfaction, min, max)
+    if not __TS__NumberIsFinite(satisfaction) or satisfaction < min or satisfaction > max then
         error(
             __TS__New(
                 RangeError,
-                (((("Тяга должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(craving)
+                (((("Удовлетворённость зависимости должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(satisfaction)
             ),
             0
         )
@@ -6417,9 +6417,10 @@ local ____timings = require("toolkit.timings.src.index")
 local TimeSpan = ____timings.TimeSpan
 local ____status = require("core.addictions.src.status")
 local AddictionStatus = ____status.AddictionStatus
---- Общая логика зависимостей: рост тяги, статус, проверка тяги и силы, пределы и снятие тяги
--- употреблением. Тяга растёт со скоростью, пропорциональной силе, а при силе 0 не растёт. Подкласс
--- задаёт скорость при максимальной силе опциями, а сколько тяги снимает употребление — в getRelief
+--- Общая логика зависимостей: падение удовлетворённости, статус, проверка удовлетворённости и силы,
+-- пределы и изменение от употребления. Удовлетворённость падает со скоростью, пропорциональной силе,
+-- а при силе 0 не падает. Подкласс задаёт скорость при максимальной силе опциями, а вклад
+-- употребления — в getGain
 ____exports.BaseAddiction = __TS__Class()
 local BaseAddiction = ____exports.BaseAddiction
 BaseAddiction.name = "BaseAddiction"
@@ -6427,14 +6428,14 @@ function BaseAddiction.prototype.____constructor(self, record, options, deps)
     self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
     local validator = ____deps_0.validator
-    validator:validateCraving(record.craving, ____exports.BaseAddiction.MIN_CRAVING, ____exports.BaseAddiction.MAX_CRAVING)
+    validator:validateSatisfaction(record.satisfaction, ____exports.BaseAddiction.MIN_SATISFACTION, ____exports.BaseAddiction.MAX_SATISFACTION)
     validator:validateStrength(record.strength, ____exports.BaseAddiction.MIN_STRENGTH, ____exports.BaseAddiction.MAX_STRENGTH)
     self.options = options
     self.current = record
 end
 function BaseAddiction.prototype.get(self, time)
     local ____self_current_1 = self.current
-    local craving = ____self_current_1.craving
+    local satisfaction = ____self_current_1.satisfaction
     local since = ____self_current_1.since
     local strength = ____self_current_1.strength
     local ____self_options_2 = self.options
@@ -6446,15 +6447,15 @@ function BaseAddiction.prototype.get(self, time)
             time:getState()
         )
     )
-    local growth = (____exports.BaseAddiction.CRAVING_ABOVE - ____exports.BaseAddiction.MIN_CRAVING) * strength * elapsed / (cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH)
-    return math.min(____exports.BaseAddiction.MAX_CRAVING, craving + growth)
+    local drop = (____exports.BaseAddiction.MAX_SATISFACTION - ____exports.BaseAddiction.CRAVING_BELOW) * strength * elapsed / (cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH)
+    return math.max(____exports.BaseAddiction.MIN_SATISFACTION, satisfaction - drop)
 end
 function BaseAddiction.prototype.getStatus(self, time)
-    local craving = self:get(time)
-    if craving > ____exports.BaseAddiction.CRAVING_ABOVE then
+    local satisfaction = self:get(time)
+    if satisfaction < ____exports.BaseAddiction.CRAVING_BELOW then
         return AddictionStatus.Craving
     end
-    return craving < ____exports.BaseAddiction.CALM_BELOW and AddictionStatus.Calm or AddictionStatus.Moderate
+    return satisfaction > ____exports.BaseAddiction.CALM_ABOVE and AddictionStatus.Calm or AddictionStatus.Moderate
 end
 function BaseAddiction.prototype.getState(self)
     return self.current
@@ -6464,15 +6465,15 @@ function BaseAddiction.prototype.consume(self, consumption, time)
         {},
         self.current,
         {
-            craving = self:get(time) - self:getRelief(consumption),
+            satisfaction = self:get(time) + self:getGain(consumption),
             since = time:getState()
         }
     )
 end
-BaseAddiction.MIN_CRAVING = 0
-BaseAddiction.MAX_CRAVING = 100
-BaseAddiction.CRAVING_ABOVE = 75
-BaseAddiction.CALM_BELOW = 40
+BaseAddiction.MIN_SATISFACTION = 0
+BaseAddiction.MAX_SATISFACTION = 100
+BaseAddiction.CRAVING_BELOW = 25
+BaseAddiction.CALM_ABOVE = 60
 BaseAddiction.MIN_STRENGTH = 0
 BaseAddiction.MAX_STRENGTH = 100
 __TS__SetDescriptor(
@@ -6486,9 +6487,9 @@ __TS__SetDescriptor(
             self.current = __TS__ObjectAssign(
                 {},
                 record,
-                {craving = math.min(
-                    ____exports.BaseAddiction.MAX_CRAVING,
-                    math.max(____exports.BaseAddiction.MIN_CRAVING, record.craving)
+                {satisfaction = math.min(
+                    ____exports.BaseAddiction.MAX_SATISFACTION,
+                    math.max(____exports.BaseAddiction.MIN_SATISFACTION, record.satisfaction)
                 )}
             )
         end
@@ -6514,12 +6515,12 @@ __TS__ClassExtends(Alcoholism, BaseAddiction)
 function Alcoholism.prototype.____constructor(self, record, deps)
     BaseAddiction.prototype.____constructor(self, record, ____exports.Alcoholism.OPTIONS, deps)
 end
-function Alcoholism.prototype.getRelief(self, consumption)
+function Alcoholism.prototype.getGain(self, consumption)
     repeat
         local ____switch4 = consumption.type
         local ____cond4 = ____switch4 == ConsumptionType.Drink
         if ____cond4 then
-            return BaseAddiction.MAX_CRAVING
+            return BaseAddiction.MAX_SATISFACTION
         end
     until true
 end
@@ -6596,8 +6597,8 @@ end
 function Addictions.prototype.getStatus(self, addiction, time)
     return self.addictions[addiction]:getStatus(time)
 end
-function Addictions.prototype.getRelief(self, addiction, consumption)
-    return self.addictions[addiction]:getRelief(consumption)
+function Addictions.prototype.getGain(self, addiction, consumption)
+    return self.addictions[addiction]:getGain(consumption)
 end
 function Addictions.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6621,10 +6622,10 @@ function Addictions.prototype.consume(self, consumption, time)
         function(____, addiction) return self.addictions[addiction]:consume(consumption, time) end
     )
 end
-Addictions.MIN_CRAVING = BaseAddiction.MIN_CRAVING
-Addictions.MAX_CRAVING = BaseAddiction.MAX_CRAVING
-Addictions.CRAVING_ABOVE = BaseAddiction.CRAVING_ABOVE
-Addictions.CALM_BELOW = BaseAddiction.CALM_BELOW
+Addictions.MIN_SATISFACTION = BaseAddiction.MIN_SATISFACTION
+Addictions.MAX_SATISFACTION = BaseAddiction.MAX_SATISFACTION
+Addictions.CRAVING_BELOW = BaseAddiction.CRAVING_BELOW
+Addictions.CALM_ABOVE = BaseAddiction.CALM_ABOVE
 Addictions.MIN_STRENGTH = BaseAddiction.MIN_STRENGTH
 Addictions.MAX_STRENGTH = BaseAddiction.MAX_STRENGTH
 return ____exports
@@ -10301,7 +10302,7 @@ ____exports.npcs = {{
     psyche = {traits = {[Trait.Conscientiousness] = 100, [Trait.Luck] = 50, [Trait.Optimism] = 50}, feelings = {[Feeling.Shame] = 0}},
     inventory = {[Item.Money] = 80},
     needs = {[Need.Satiety] = 20},
-    addictions = {[Addiction.Alcoholism] = {craving = 0, strength = 100}}
+    addictions = {[Addiction.Alcoholism] = {satisfaction = 100, strength = 100}}
 }}
 return ____exports
  end,

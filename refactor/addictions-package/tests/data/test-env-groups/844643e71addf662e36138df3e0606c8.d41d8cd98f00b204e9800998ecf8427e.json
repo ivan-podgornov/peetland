@@ -1,1 +1,0 @@
-{"id":"844643e71addf662e36138df3e0606c8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/record.spec.ts#BaseAddiction Сеттер record Не поднимает тягу выше BaseAddiction.MAX_CRAVING","name":"Не поднимает тягу выше BaseAddiction.MAX_CRAVING","status":"passed","testResultsByEnv":{"default":"6b02f19bd92c0a505a4f739fd41c5c12"}}

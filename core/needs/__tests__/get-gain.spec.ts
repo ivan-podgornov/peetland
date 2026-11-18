@@ -2,7 +2,7 @@ import { Item } from '@peetland/inventory';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedNeed, createMockedNeedFactory, createNeedsState } from '../dev';
-import { Activity, Need, Needs } from '../src';
+import { ActivityType, Need, Needs } from '../src';
 import type { EatDetails } from '../src';
 
 describe('Needs', () => {
@@ -15,9 +15,15 @@ describe('Needs', () => {
       });
       const details: EatDetails = { food: Item.SmilePizza };
 
-      const gain = needs.getGain(Need.Satiety, Activity.Eat, details);
+      const gain = needs.getGain(Need.Satiety, {
+        type: ActivityType.Eat,
+        details,
+      });
 
-      expect(need.getGain).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details);
+      expect(need.getGain).toHaveBeenCalledExactlyOnceWith({
+        type: ActivityType.Eat,
+        details,
+      });
       expect(gain).toBe(42);
     });
   });

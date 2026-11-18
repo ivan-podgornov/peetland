@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createNeedsDeps, createNeedsState, DEFAULT_RECORD } from '../dev';
-import { Activity, Need, Needs } from '../src';
+import { ActivityType, Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#clone', () => {
@@ -29,7 +29,13 @@ describe('Needs', () => {
       const needs = new Needs(createNeedsState({ [Need.Satiety]: record }), createNeedsDeps());
       const time = new ManualTime(record.since);
 
-      needs.clone().perform(Activity.Eat, { food: Item.SmilePizza }, time);
+      needs.clone().perform(
+        {
+          type: ActivityType.Eat,
+          details: { food: Item.SmilePizza },
+        },
+        time
+      );
 
       expect(needs.get(Need.Satiety, time)).toBe(50);
     });
@@ -43,7 +49,13 @@ describe('Needs', () => {
       const copy = needs.clone();
       const time = new ManualTime(record.since);
 
-      needs.perform(Activity.Eat, { food: Item.SmilePizza }, time);
+      needs.perform(
+        {
+          type: ActivityType.Eat,
+          details: { food: Item.SmilePizza },
+        },
+        time
+      );
 
       expect(copy.get(Need.Satiety, time)).toBe(50);
     });

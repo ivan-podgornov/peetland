@@ -1,9 +1,8 @@
 import { Item } from '@peetland/inventory';
 import type { Food } from '@peetland/inventory';
-import type { IReadonlyTime } from '@peetland/timings';
 
-import { Activity } from './activity';
-import type { ActivityDetails } from './activity';
+import { ActivityType } from './activity';
+import type { Activity } from './activity';
 import { BaseNeed } from './base-need';
 import type { NeedDeps, NeedOptions } from './base-need';
 import { NeedCategory } from './category';
@@ -13,11 +12,7 @@ import type { NeedRecord } from './types';
 export class Satiety extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
     category: NeedCategory.Vital,
-    // Сутки, а не 8 часов: иначе вся жизнь NPC крутится вокруг еды
     depletionMinutes: 24 * 60,
-    // Срочно за 6 часов до голода
-    urgentBelow: 25,
-    calmAbove: 60,
   };
 
   /** Сколько сытости восполняет еда */
@@ -30,19 +25,13 @@ export class Satiety extends BaseNeed {
     super(record, Satiety.OPTIONS, deps);
   }
 
-  getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number {
-    switch (activity) {
-      case Activity.Eat:
-        return Satiety.FOOD_SATIETY[details.food];
+  getGain(activity: Activity): number {
+    switch (activity.type) {
+      case ActivityType.Eat:
+        return Satiety.FOOD_SATIETY[activity.details.food];
     }
 
+    // Пока все занятия — еда, сюда не дойти. Остальные занятия сытость не меняют
     return 0;
-  }
-
-  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void {
-    this.record = {
-      value: this.get(time) + this.getGain(activity, details),
-      since: time.getState(),
-    };
   }
 }

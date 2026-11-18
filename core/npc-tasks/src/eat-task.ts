@@ -2,7 +2,7 @@ import type { AnimationId } from '@peetland/game';
 import type { CompoundTask, Method } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import type { Food } from '@peetland/inventory';
-import { Activity } from '@peetland/needs';
+import { ActivityType } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { EatTaskOptions, INpcTaskFactory } from './types';
@@ -44,7 +44,7 @@ export class EatTask implements CompoundTask<NpcState, NpcContext> {
             count: 1,
           }),
           npcTaskFactory.needsPerform({
-            activity: Activity.Eat,
+            type: ActivityType.Eat,
             details: { food },
           }),
         ],

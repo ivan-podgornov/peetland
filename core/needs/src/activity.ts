@@ -1,7 +1,7 @@
 import type { Food } from '@peetland/inventory';
 
-/** Занятия, от которых меняются потребности */
-export enum Activity {
+/** Виды занятий, от которых меняются потребности */
+export enum ActivityType {
   /** Поел */
   Eat = 'eat',
 }
@@ -11,7 +11,15 @@ export type EatDetails = Readonly<{
   food: Food;
 }>;
 
-/** Детали каждого занятия */
+/** Детали каждого вида занятий */
 export type ActivityDetails = {
-  [Activity.Eat]: EatDetails;
+  [ActivityType.Eat]: EatDetails;
 };
+
+/** Занятие, от которого меняются потребности: его вид и детали */
+export type Activity = {
+  [T in ActivityType]: Readonly<{
+    type: T;
+    details: ActivityDetails[T];
+  }>;
+}[ActivityType];

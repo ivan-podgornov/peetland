@@ -1,5 +1,6 @@
 import { planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
+import { Needs } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -9,7 +10,6 @@ import {
   createStockFoodTask,
   TEST_SHOP,
 } from '../../dev';
-import { EATING_SATIETY } from '../../src/constants';
 
 describe('StockFoodTask', () => {
   describe('Метод buy-food', () => {
@@ -33,7 +33,7 @@ describe('StockFoodTask', () => {
 
         planSteps(task, state);
 
-        expect(foodChooser.chooseToBuy).toHaveBeenCalledWith(state, EATING_SATIETY);
+        expect(foodChooser.chooseToBuy).toHaveBeenCalledWith(state, Needs.URGENT_BELOW);
       });
 
       it('Покупает выбранную еду в ближайшем магазине', () => {

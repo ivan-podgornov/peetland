@@ -1,5 +1,5 @@
 import { Item } from '@peetland/inventory';
-import { Activity } from '@peetland/needs';
+import { ActivityType } from '@peetland/needs';
 import { createMockedNeeds } from '@peetland/needs/dev';
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
@@ -17,22 +17,24 @@ describe('NeedsPerformTask', () => {
       const state = NpcStateBuilder.default();
       const details = { food: Item.SmilePizza } as const;
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details,
       });
 
       task.start(state, context);
 
       expect(needs.perform).toHaveBeenCalledExactlyOnceWith(
-        Activity.Eat,
-        details,
+        {
+          type: ActivityType.Eat,
+          details,
+        },
         state.world.time
       );
     });
 
     it("Возвращает 'success'", () => {
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
 
@@ -50,13 +52,19 @@ describe('NeedsPerformTask', () => {
       const state = new NpcStateBuilder().withNeeds(() => needs).build();
       const details = { food: Item.RomashkaLoaf } as const;
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details,
       });
 
       task.applyEffects(state);
 
-      expect(copy.perform).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details, state.world.time);
+      expect(copy.perform).toHaveBeenCalledExactlyOnceWith(
+        {
+          type: ActivityType.Eat,
+          details,
+        },
+        state.world.time
+      );
     });
 
     it('Кладёт в состояние копию потребностей', () => {
@@ -64,7 +72,7 @@ describe('NeedsPerformTask', () => {
       const needs = createMockedNeeds();
       needs.clone.mockReturnValue(copy);
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
 
@@ -75,7 +83,7 @@ describe('NeedsPerformTask', () => {
 
     it('Не меняет то, что NPC знает о мире', () => {
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
       const state = NpcStateBuilder.default();

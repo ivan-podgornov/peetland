@@ -1,9 +1,9 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
+import { Needs } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
-import { EATING_SATIETY } from './constants';
 import type { IFoodChooser } from './food-chooser';
 import type { INeedsTaskFactory } from './types';
 
@@ -18,7 +18,7 @@ export type StockFoodTaskDeps = {
 
 /**
  * Обзавестись жратвой: если еды нет, купить её про запас в ближайшем магазине и не есть сразу. Что
- * купить, IFoodChooser выбирает на сытость, при которой NPC её съест (EATING_SATIETY)
+ * купить, IFoodChooser выбирает на сытость, при которой NPC её съест (Needs.URGENT_BELOW: ниже него голод загорается)
  */
 export class StockFoodTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'stock-food';
@@ -43,15 +43,15 @@ export class StockFoodTask implements CompoundTask<NpcState, NpcContext> {
     const { places, foodChooser } = this.deps;
 
     return (
-      foodChooser.chooseFromInventory(state, EATING_SATIETY) === null &&
-      foodChooser.chooseToBuy(state, EATING_SATIETY) !== null &&
+      foodChooser.chooseFromInventory(state, Needs.URGENT_BELOW) === null &&
+      foodChooser.chooseToBuy(state, Needs.URGENT_BELOW) !== null &&
       places.ofType(PlaceType.Shop).length > 0
     );
   }
 
   private buyFood(state: NpcState): Task<NpcState, NpcContext>[] {
     const { needsTaskFactory, places, foodChooser } = this.deps;
-    const food = foodChooser.chooseToBuy(state, EATING_SATIETY);
+    const food = foodChooser.chooseToBuy(state, Needs.URGENT_BELOW);
     const shop = places.findNearest(state.self.actor.position, PlaceType.Shop);
 
     if (food === null || !shop) {

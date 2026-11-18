@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedNeed, createMockedNeedFactory, createNeedsState } from '../dev';
-import { Activity, Needs } from '../src';
+import { ActivityType, Needs } from '../src';
 import type { EatDetails } from '../src';
 
 describe('Needs', () => {
@@ -16,9 +16,21 @@ describe('Needs', () => {
       const details: EatDetails = { food: Item.SmilePizza };
       const time = new ManualTime();
 
-      needs.perform(Activity.Eat, details, time);
+      needs.perform(
+        {
+          type: ActivityType.Eat,
+          details,
+        },
+        time
+      );
 
-      expect(need.perform).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details, time);
+      expect(need.perform).toHaveBeenCalledExactlyOnceWith(
+        {
+          type: ActivityType.Eat,
+          details,
+        },
+        time
+      );
     });
   });
 });

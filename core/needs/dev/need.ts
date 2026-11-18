@@ -17,30 +17,29 @@ export const DEFAULT_RECORD: NeedRecord = {
   },
 };
 
-/** Зависимости сытости с настоящим валидатором */
-export const DEFAULT_SATIETY_DEPS: NeedDeps = { validator: new NeedsValidator() };
+/** Зависимости потребности с настоящим валидатором */
+export const DEFAULT_NEED_DEPS: NeedDeps = { validator: new NeedsValidator() };
 
 /**
- * Потребность для тестов общей логики BaseNeed. Падает до нуля за сутки. perform выставляет
- * переданную запись через сеттер BaseNeed
+ * Потребность для тестов общей логики BaseNeed. Падает до нуля за сутки, а любое занятие прибавляет
+ * ей TestNeed.GAIN. setRecord выставляет переданную запись через сеттер BaseNeed
  */
 export class TestNeed extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
     category: NeedCategory.Vital,
     depletionMinutes: 24 * 60,
-    urgentBelow: 25,
-    calmAbove: 60,
   };
 
-  constructor(record: NeedRecord, deps: NeedDeps = DEFAULT_SATIETY_DEPS) {
+  /** Сколько прибавляет любое занятие */
+  static readonly GAIN = 10;
+
+  constructor(record: NeedRecord, deps: NeedDeps = DEFAULT_NEED_DEPS) {
     super(record, TestNeed.OPTIONS, deps);
   }
 
   getGain(): number {
-    return 0;
+    return TestNeed.GAIN;
   }
-
-  perform(): void {}
 
   /** Выставляет запись через сеттер BaseNeed */
   setRecord(record: NeedRecord): void {

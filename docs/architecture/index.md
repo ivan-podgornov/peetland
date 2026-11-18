@@ -95,6 +95,7 @@ flowchart TD
     npc --> psyche
     npc --> inventory
     npc --> needs
+    npc --> addictions
     npc --> game
     virtualactor[virtual-actor] --> actorcommand[actor-command]
     virtualactor --> animationmanager[animation-manager]

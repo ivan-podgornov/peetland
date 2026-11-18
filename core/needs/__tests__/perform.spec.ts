@@ -8,7 +8,7 @@ import type { EatDetails } from '../src';
 
 describe('Needs', () => {
   describe('#perform', () => {
-    it('Передаёт каждой потребности занятие и время', () => {
+    it('Передаёт потребности занятие, детали и время', () => {
       const need = createMockedNeed();
       const needs = new Needs(createNeedsState(), {
         needFactory: createMockedNeedFactory(need),
@@ -24,7 +24,7 @@ describe('Needs', () => {
         time
       );
 
-      expect(need.perform).toHaveBeenCalledWith(
+      expect(need.perform).toHaveBeenCalledExactlyOnceWith(
         {
           type: ActivityType.Eat,
           details,

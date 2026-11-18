@@ -1,9 +1,9 @@
+import { createAddictionsData, createMockedAddictionsFactory } from '@peetland/addictions/dev';
 import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import {
-  createAddictions,
   createMockedNeedsFactory,
   createMockedUrgencyWatcherFactory,
   createNeedValues,
@@ -34,7 +34,7 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
     psyche: createPsycheState(),
     inventory: {},
     needs: createNeedValues(),
-    addictions: createAddictions(),
+    addictions: createAddictionsData(),
     ...data,
   };
 }
@@ -47,6 +47,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),
     needsFactory: createMockedNeedsFactory(),
+    addictionsFactory: createMockedAddictionsFactory(),
     urgencyWatcherFactory: createMockedUrgencyWatcherFactory(),
     rootTaskFactory: {
       create: vi.fn(() => ({

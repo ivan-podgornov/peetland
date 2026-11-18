@@ -1,3 +1,5 @@
+import { Addictions } from '@peetland/addictions';
+import { createAddictionsDeps, createAddictionsState } from '@peetland/addictions/dev';
 import type { IActor } from '@peetland/game';
 import { Inventory } from '@peetland/inventory';
 import { Needs } from '@peetland/needs';
@@ -10,7 +12,7 @@ import type { NpcContext } from '../src';
 
 /**
  * Создаёт контекст NPC. Если актор не передан, создаётся виртуальный актор. Черты психики не меняют
- * чувства и модификаторы, потребности удовлетворены полностью
+ * чувства и модификаторы, потребности удовлетворены полностью, а зависимостей нет
  */
 export function createNpcContext(actor: IActor = createActor()): NpcContext {
   return {
@@ -18,5 +20,6 @@ export function createNpcContext(actor: IActor = createActor()): NpcContext {
     inventory: new Inventory(),
     psyche: new Psyche(createPsycheState(), createPsycheDeps()),
     needs: new Needs(createNeedsState(), createNeedsDeps()),
+    addictions: new Addictions(createAddictionsState(), createAddictionsDeps()),
   };
 }

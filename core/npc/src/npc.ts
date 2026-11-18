@@ -1,3 +1,4 @@
+import type { IAddictions, IAddictionsFactory } from '@peetland/addictions';
 import { AbortController } from '@peetland/events';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
@@ -29,6 +30,8 @@ export type NpcDeps = {
   psycheFactory: IPsycheFactory;
   /** Фабрика, которой NPC создаёт свои потребности */
   needsFactory: INeedsFactory;
+  /** Фабрика, которой NPC создаёт свои зависимости */
+  addictionsFactory: IAddictionsFactory;
   /** Фабрика, которой NPC создаёт наблюдателя, который следит, когда потребности становятся срочными */
   urgencyWatcherFactory: IUrgencyWatcherFactory;
   /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
@@ -48,6 +51,7 @@ export class Npc {
   readonly inventory: Inventory;
   readonly psyche: IPsyche;
   readonly needs: INeeds;
+  readonly addictions: IAddictions;
 
   private readonly actor: IActor;
   private readonly context: NpcContext;
@@ -57,9 +61,9 @@ export class Npc {
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
-   * Создаёт актора, инвентарь, психику, потребности и HTN-агента по данным NPC и каждый тик передаёт
-   * агенту актуальное состояние и контекст с актором, инвентарём, психикой и потребностями.
-   * Потребности начинают падать со времени, которое NPC знает о мире в момент создания. Когда игра завершается, деспавнится, а если она уже
+   * Создаёт актора, инвентарь, психику, потребности, зависимости и HTN-агента по данным NPC и каждый
+   * тик передаёт агенту актуальное состояние и контекст с ними. Потребности начинают падать, а тяга
+   * зависимостей расти со времени, которое NPC знает о мире в момент создания. Когда игра завершается, деспавнится, а если она уже
    * завершилась, деспавнится сразу
    * @param data - данные NPC
    */
@@ -71,18 +75,21 @@ export class Npc {
       inventoryFactory,
       psycheFactory,
       needsFactory,
+      addictionsFactory,
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
       worldKnowledge,
     } = deps;
+    const { time } = worldKnowledge.getState();
 
     this.id = data.id;
     this.kind = data.kind;
     this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
-    this.needs = needsFactory.create(data.needs, data.addictions, worldKnowledge.getState().time);
+    this.needs = needsFactory.create(data.needs, time);
+    this.addictions = addictionsFactory.create(data.addictions, time);
     this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({
@@ -95,6 +102,7 @@ export class Npc {
       inventory: this.inventory,
       psyche: this.psyche,
       needs: this.needs,
+      addictions: this.addictions,
     };
     this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
 
@@ -123,6 +131,7 @@ export class Npc {
         inventory: this.inventory,
         psyche: this.psyche,
         needs: this.needs,
+        addictions: this.addictions,
       },
       world: this.worldKnowledge.getState(),
     };

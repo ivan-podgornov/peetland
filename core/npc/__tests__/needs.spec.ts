@@ -2,7 +2,6 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
 import { Need, Needs } from '@peetland/needs';
 import {
-  createAddictions,
   createMockedNeedsFactory,
   createNeedsDeps,
   createNeedsState,
@@ -17,17 +16,14 @@ import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
   describe('Потребности', () => {
-    it('Вызывает needsFactory.create с начальными потребностями и зависимостями из данных и временем мира', () => {
+    it('Вызывает needsFactory.create с начальными потребностями из данных и временем мира', () => {
       const needsFactory = createMockedNeedsFactory();
       const time = new ManualTime({
         day: 3,
         hours: 8,
         minutes: 0,
       });
-      const data = createNpcData({
-        needs: createNeedValues({ [Need.Satiety]: 70 }),
-        addictions: createAddictions({ [Need.Alcoholism]: 40 }),
-      });
+      const data = createNpcData({ needs: createNeedValues({ [Need.Satiety]: 70 }) });
 
       new Npc(
         data,
@@ -37,11 +33,7 @@ describe('Npc', () => {
         })
       );
 
-      expect(needsFactory.create).toHaveBeenCalledExactlyOnceWith(
-        data.needs,
-        data.addictions,
-        time
-      );
+      expect(needsFactory.create).toHaveBeenCalledExactlyOnceWith(data.needs, time);
     });
 
     it('Использует потребности, которые вернула needsFactory', () => {

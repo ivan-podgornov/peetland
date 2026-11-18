@@ -1,20 +1,17 @@
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Need, NeedCategory, NeedStatus, UrgencyWatcher } from '../src';
+import { NeedStatus, UrgencyWatcher } from '../src';
 import type { IReadonlyNeeds } from '../src';
 
-/** Создаёт потребности с указанными статусами */
-function createNeeds(satiety: NeedStatus, booze: NeedStatus = NeedStatus.Calm): IReadonlyNeeds {
+/** Создаёт потребности, у которых сытость с переданным статусом */
+function createNeeds(satiety: NeedStatus): IReadonlyNeeds {
   return {
     get: vi.fn(),
     getAll: vi.fn(),
     getState: vi.fn(),
     clone: vi.fn(),
-    getCategory: vi.fn((need: Need) =>
-      need === Need.Satiety ? NeedCategory.Vital : NeedCategory.Addiction
-    ),
-    getStatus: vi.fn((need: Need) => (need === Need.Satiety ? satiety : booze)),
+    getStatus: vi.fn(() => satiety),
   } as unknown as IReadonlyNeeds;
 }
 
@@ -24,14 +21,6 @@ describe('UrgencyWatcher', () => {
       const watcher = new UrgencyWatcher();
 
       expect(watcher.check(createNeeds(NeedStatus.Urgent), new ManualTime())).toBe(true);
-    });
-
-    it('Если срочной стала зависимость, возвращает false: тяга не прерывает план', () => {
-      const watcher = new UrgencyWatcher();
-
-      expect(watcher.check(createNeeds(NeedStatus.Calm, NeedStatus.Urgent), new ManualTime())).toBe(
-        false
-      );
     });
 
     it('Если срочных потребностей нет, возвращает false', () => {

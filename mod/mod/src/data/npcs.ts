@@ -1,3 +1,4 @@
+import { Addiction } from '@peetland/addictions';
 import { Item } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcKind } from '@peetland/npc';
@@ -33,11 +34,13 @@ export const npcs: NpcData[] = [
     },
     needs: {
       [Need.Satiety]: 20,
-      [Need.Alcoholism]: 100,
     },
-    // Алкаш: зависимость от пойла максимальная
+    // Алкаш: зависимость от пойла максимальная, но только что выпил, и пока не тянет
     addictions: {
-      [Need.Alcoholism]: 100,
+      [Addiction.Alcoholism]: {
+        satisfaction: 100,
+        strength: 100,
+      },
     },
   },
 ];

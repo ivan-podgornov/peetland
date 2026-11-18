@@ -1,9 +1,7 @@
-import { ActivityType } from './activity';
-import type { Activity } from './activity';
 import { BaseAddiction } from './base-addiction';
-import type { AddictionOptions } from './base-addiction';
-import { BaseNeed } from './base-need';
-import type { NeedDeps } from './base-need';
+import type { AddictionDeps, AddictionOptions } from './base-addiction';
+import { ConsumptionType } from './consumption';
+import type { Consumption } from './consumption';
 import type { AddictionRecord } from './types';
 
 /** Алкоголизм: зависимость от пойла */
@@ -11,16 +9,14 @@ export class Alcoholism extends BaseAddiction {
   /** Алкаша с максимальной силой тянет выпить раз в сутки */
   static readonly OPTIONS: AddictionOptions = { cravingMinutes: 24 * 60 };
 
-  constructor(record: AddictionRecord, deps: NeedDeps) {
+  constructor(record: AddictionRecord, deps: AddictionDeps) {
     super(record, Alcoholism.OPTIONS, deps);
   }
 
-  getGain(activity: Activity): number {
-    switch (activity.type) {
-      case ActivityType.Drink:
-        return BaseNeed.MAX_NEED;
+  getGain(consumption: Consumption): number {
+    switch (consumption.type) {
+      case ConsumptionType.Drink:
+        return BaseAddiction.MAX_SATISFACTION;
     }
-
-    return 0;
   }
 }

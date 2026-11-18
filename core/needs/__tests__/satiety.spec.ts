@@ -4,16 +4,10 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_RECORD, DEFAULT_NEED_DEPS } from '../dev';
-import { ActivityType, NeedCategory } from '../src';
+import { ActivityType } from '../src';
 import { Satiety } from '../src/satiety';
 
 describe('Satiety', () => {
-  it('Сытость — жизненная потребность', () => {
-    const satiety = new Satiety(DEFAULT_RECORD, DEFAULT_NEED_DEPS);
-
-    expect(satiety.category).toBe(NeedCategory.Vital);
-  });
-
   it('Падает от максимума до нуля за игровые сутки', () => {
     const record = {
       ...DEFAULT_RECORD,
@@ -50,17 +44,6 @@ describe('Satiety', () => {
           details: { food },
         })
       ).toBe(gain);
-    });
-
-    it('Питьё не влияет на сытость: возвращает 0', () => {
-      const satiety = new Satiety(DEFAULT_RECORD, DEFAULT_NEED_DEPS);
-
-      expect(
-        satiety.getGain({
-          type: ActivityType.Drink,
-          details: { booze: Item.Booze },
-        })
-      ).toBe(0);
     });
 
     it('Не учитывает пределы: сытая сытость всё равно возвращает весь вклад еды', () => {

@@ -1,10 +1,8 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { NeedCategory, NeedStatus, NeedsValidator } from '../src';
-import type { AddictionRecord, NeedRecord } from '../src';
-import { BaseAddiction } from '../src/base-addiction';
-import type { AddictionOptions } from '../src/base-addiction';
+import { NeedStatus, NeedsValidator } from '../src';
+import type { NeedRecord } from '../src';
 import { BaseNeed } from '../src/base-need';
 import type { INeed, NeedDeps, NeedOptions } from '../src/base-need';
 import type { INeedFactory } from '../src/need-factory';
@@ -28,7 +26,6 @@ export const DEFAULT_NEED_DEPS: NeedDeps = { validator: new NeedsValidator() };
  */
 export class TestNeed extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
-    category: NeedCategory.Vital,
     depletionMinutes: 24 * 60,
   };
 
@@ -49,26 +46,9 @@ export class TestNeed extends BaseNeed {
   }
 }
 
-/**
- * Зависимость для тестов общей логики BaseAddiction. При максимальной силе тянет через сутки после
- * употребления, а занятия её не меняют
- */
-export class TestAddiction extends BaseAddiction {
-  static readonly OPTIONS: AddictionOptions = { cravingMinutes: 24 * 60 };
-
-  constructor(record: AddictionRecord, deps: NeedDeps = DEFAULT_NEED_DEPS) {
-    super(record, TestAddiction.OPTIONS, deps);
-  }
-
-  getGain(): number {
-    return 0;
-  }
-}
-
 /** Создаёт мок потребности со статусом NeedStatus.Moderate */
 export function createMockedNeed(record: NeedRecord = DEFAULT_RECORD): Mocked<INeed> {
   return {
-    category: NeedCategory.Vital,
     get: vi.fn<INeed['get']>(() => 0),
     getStatus: vi.fn<INeed['getStatus']>(() => NeedStatus.Moderate),
     getState: vi.fn(() => record),

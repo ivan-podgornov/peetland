@@ -2,14 +2,12 @@ import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
 import type { Activity } from './activity';
-import type { NeedCategory } from './category';
 import { NeedStatus } from './status';
 import type { NeedRecord } from './types';
 import type { INeedsValidator } from './validator';
 
 /** Потребность NPC */
 export interface INeed {
-  readonly category: NeedCategory;
   /** Возвращает значение на момент time */
   get(time: IReadonlyTime): number;
   /** Возвращает статус на момент time */
@@ -30,7 +28,6 @@ export interface INeed {
  * статусов у всех потребностей одни (см. BaseNeed)
  */
 export type NeedOptions = Readonly<{
-  category: NeedCategory;
   /** За сколько игровых минут потребность падает от MAX_NEED до MIN_NEED */
   depletionMinutes: number;
 }>;
@@ -41,7 +38,7 @@ export type NeedDeps = {
 
 /**
  * Общая логика потребностей: падение, статус, проверка значения, пределы и изменение от занятий.
- * Подкласс задаёт категорию и скорость падения опциями, а вклад занятий — в getGain
+ * Подкласс задаёт скорость падения опциями, а вклад занятий — в getGain
  */
 export abstract class BaseNeed implements INeed {
   static readonly MIN_NEED = 0;
@@ -54,8 +51,6 @@ export abstract class BaseNeed implements INeed {
   /** Выше этого значения любая потребность спокойная */
   static readonly CALM_ABOVE = 60;
 
-  readonly category: NeedCategory;
-
   private readonly options: NeedOptions;
   private readonly timeSpan = new TimeSpan();
   private current: NeedRecord;
@@ -65,7 +60,6 @@ export abstract class BaseNeed implements INeed {
     const { validator } = deps;
 
     validator.validateValue(record.value, BaseNeed.MIN_NEED, BaseNeed.MAX_NEED);
-    this.category = options.category;
     this.options = options;
     this.current = record;
   }

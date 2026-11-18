@@ -4,6 +4,7 @@ import type { Food, Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { AddItemTaskOptions } from './add-item-task';
+import type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
 import type { NeedsPerformTaskOptions } from './needs-perform-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import type { PsycheReactTaskOptions } from './psyche-react-task';
@@ -28,6 +29,8 @@ export interface INpcTaskFactory {
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask;
   /** Сообщить потребностям о занятии (см. NeedsPerformTask) */
   needsPerform(options: NeedsPerformTaskOptions): NpcPrimitiveTask;
+  /** Сообщить зависимостям об употреблении (см. AddictionsConsumeTask) */
+  addictionsConsume(options: AddictionsConsumeTaskOptions): NpcPrimitiveTask;
   /** Пытать удачу, пока не повезёт (см. TryLuckTask) */
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask;
   /** Выполнять основную задачу и одновременно с ней фоновую (см. ParallelTask) */

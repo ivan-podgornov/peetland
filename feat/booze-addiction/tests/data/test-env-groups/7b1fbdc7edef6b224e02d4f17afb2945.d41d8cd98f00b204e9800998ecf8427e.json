@@ -1,1 +1,0 @@
-{"id":"7b1fbdc7edef6b224e02d4f17afb2945.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/satiety.spec.ts#Satiety #getGain Питьё не влияет на сытость: возвращает 0","name":"Питьё не влияет на сытость: возвращает 0","status":"passed","testResultsByEnv":{"default":"32f840f40daed9f394562ed3c97b0a4a"}}

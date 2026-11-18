@@ -10,10 +10,10 @@ export type NeedsTaskDeps = {
 };
 
 /**
- * Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
- * срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
- * срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
- * нет, задачу не спланировать
+ * Удовлетворить потребности. Методы в порядке приоритета: сначала срочные потребности — метод
+ * подходит, если его потребность срочная, — а затем запасы на будущее: обзавестись жратвой, если
+ * сытость не спокойная. Если удовлетворить потребность нечем, планировщик переходит к следующему
+ * методу, а если не подходит ни один, задачу не спланировать
  */
 export class NeedsTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'needs';
@@ -29,6 +29,12 @@ export class NeedsTask implements CompoundTask<NpcState, NpcContext> {
         preconditions: (state) =>
           state.self.needs.getStatus(Need.Satiety, state.world.time) === NeedStatus.Urgent,
         tasks: [needsTaskFactory.satisfyHunger()],
+      },
+      {
+        name: 'stock-food',
+        preconditions: (state) =>
+          state.self.needs.getStatus(Need.Satiety, state.world.time) !== NeedStatus.Calm,
+        tasks: [needsTaskFactory.stockFood()],
       },
     ];
   }

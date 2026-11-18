@@ -1,0 +1,68 @@
+import { planSteps } from '@peetland/htn/dev';
+import { Item } from '@peetland/inventory';
+import { Need } from '@peetland/needs';
+import { NpcStateBuilder } from '@peetland/npc/dev';
+import { createPlaces } from '@peetland/places/dev';
+import { describe, expect, it } from 'vitest';
+
+import { createStockFoodTask, TEST_CAMP, TEST_SHOP } from '../../dev';
+import { FOOD_PRICES } from '../../src/constants';
+
+describe('StockFoodTask', () => {
+  describe('Метод buy-food', () => {
+    describe('Предусловия', () => {
+      it('Если еды нет, а денег хватает на самую дешёвую, план составляется', () => {
+        const task = createStockFoodTask();
+        const state = new NpcStateBuilder()
+          .withInventory({ [Item.Money]: FOOD_PRICES[Item.RomashkaLoaf] })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 40).build())
+          .build();
+
+        expect(planSteps(task, state)).not.toBeNull();
+      });
+
+      it('Если еда уже есть, план не составляется', () => {
+        const task = createStockFoodTask();
+        const state = new NpcStateBuilder()
+          .withInventory({
+            [Item.RomashkaLoaf]: 1,
+            [Item.Money]: 1000,
+          })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 40).build())
+          .build();
+
+        expect(planSteps(task, state)).toBeNull();
+      });
+
+      it('Если денег не хватает ни на какую еду, план не составляется', () => {
+        const task = createStockFoodTask();
+        const state = new NpcStateBuilder()
+          .withInventory({ [Item.Money]: FOOD_PRICES[Item.RomashkaLoaf] - 1 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 40).build())
+          .build();
+
+        expect(planSteps(task, state)).toBeNull();
+      });
+
+      it('Если магазинов нет, план не составляется', () => {
+        const task = createStockFoodTask({ places: createPlaces([TEST_CAMP]) });
+        const state = new NpcStateBuilder()
+          .withInventory({ [Item.Money]: 1000 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 40).build())
+          .build();
+
+        expect(planSteps(task, state)).toBeNull();
+      });
+
+      it('Если бомжарен нет, план составляется: есть сразу не нужно', () => {
+        const task = createStockFoodTask({ places: createPlaces([TEST_SHOP]) });
+        const state = new NpcStateBuilder()
+          .withInventory({ [Item.Money]: 1000 })
+          .withNeeds((needs) => needs.withValue(Need.Satiety, 40).build())
+          .build();
+
+        expect(planSteps(task, state)).not.toBeNull();
+      });
+    });
+  });
+});

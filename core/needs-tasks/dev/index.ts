@@ -6,3 +6,4 @@ export {
   TEST_CAMP,
   TEST_SHOP,
 } from './satisfy-hunger-task';
+export { createStockFoodTask } from './stock-food-task';

@@ -13,6 +13,7 @@ import { FoodChooser } from './food-chooser';
 import type { IFoodChooser } from './food-chooser';
 import { NeedsTask } from './needs-task';
 import { SatisfyHungerTask } from './satisfy-hunger-task';
+import { StockFoodTask } from './stock-food-task';
 import type { INeedsTaskFactory } from './types';
 
 export type NeedsTaskFactoryDeps = {
@@ -25,7 +26,7 @@ export type NeedsTaskFactoryDeps = {
   npcTaskFactory?: INpcTaskFactory;
   /** Классификатор предметов. По умолчанию — ItemClassifier */
   itemClassifier?: IItemClassifier;
-  /** Выбирает, что съесть. По умолчанию — FoodChooser */
+  /** Выбирает, что съесть или купить. По умолчанию — FoodChooser */
   foodChooser?: IFoodChooser;
 };
 
@@ -65,6 +66,17 @@ export class NeedsTaskFactory implements INeedsTaskFactory {
     const { places, npcTaskFactory, itemClassifier, foodChooser } = this;
 
     return new SatisfyHungerTask({
+      npcTaskFactory,
+      places,
+      itemClassifier,
+      foodChooser,
+    });
+  }
+
+  stockFood(): Task<NpcState, NpcContext> {
+    const { places, npcTaskFactory, itemClassifier, foodChooser } = this;
+
+    return new StockFoodTask({
       npcTaskFactory,
       places,
       itemClassifier,

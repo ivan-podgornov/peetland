@@ -7,4 +7,6 @@ export interface INeedsTaskFactory {
   satisfyNeeds(): Task<NpcState, NpcContext>;
   /** Создаёт задачу утолить голод (см. SatisfyHungerTask) */
   satisfyHunger(): Task<NpcState, NpcContext>;
+  /** Создаёт задачу обзавестись жратвой про запас (см. StockFoodTask) */
+  stockFood(): Task<NpcState, NpcContext>;
 }

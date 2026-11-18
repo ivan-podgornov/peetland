@@ -1,0 +1,1 @@
+{"id":"115e69690bb3ad175232749a8fde37eb.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/alcoholism.spec.ts#Alcoholism #getGain Выпивка снимает тягу полностью: возвращает MAX_NEED","name":"Выпивка снимает тягу полностью: возвращает MAX_NEED","status":"passed","testResultsByEnv":{"default":"21fb40845e63ee7bbd9a87eb075f36c9"}}

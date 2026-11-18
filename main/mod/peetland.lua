@@ -6340,6 +6340,7 @@ local ____exports = {}
 --- Виды занятий, от которых меняются потребности
 ____exports.ActivityType = ____exports.ActivityType or ({})
 ____exports.ActivityType.Eat = "eat"
+____exports.ActivityType.Drink = "drink"
 return ____exports
  end,
 ["core.needs.src.category"] = function(...) 
@@ -6357,6 +6358,7 @@ local ____exports = {}
 --- Потребность NPC: значение, которое само падает со временем и восполняется занятиями
 ____exports.Need = ____exports.Need or ({})
 ____exports.Need.Satiety = "satiety"
+____exports.Need.Alcoholism = "alcoholism"
 return ____exports
  end,
 ["core.needs.src.status"] = function(...) 
@@ -6397,6 +6399,17 @@ function NeedsValidator.prototype.validateValue(self, value, min, max)
             __TS__New(
                 RangeError,
                 (((("Потребность должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(value)
+            ),
+            0
+        )
+    end
+end
+function NeedsValidator.prototype.validateStrength(self, strength, min, max)
+    if not __TS__NumberIsFinite(strength) or strength < min or strength > max then
+        error(
+            __TS__New(
+                RangeError,
+                (((("Сила зависимости должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(strength)
             ),
             0
         )
@@ -6485,6 +6498,80 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
+["core.needs.src.base-addiction"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+local ____base_2Dneed = require("core.needs.src.base-need")
+local BaseNeed = ____base_2Dneed.BaseNeed
+local ____category = require("core.needs.src.category")
+local NeedCategory = ____category.NeedCategory
+--- Общая логика зависимостей. Значение — насколько NPC не тянет употребить: падает со скоростью,
+-- пропорциональной силе зависимости, а при силе 0 не падает. Подкласс задаёт скорость при
+-- максимальной силе опциями, а вклад занятий — в getGain
+____exports.BaseAddiction = __TS__Class()
+local BaseAddiction = ____exports.BaseAddiction
+BaseAddiction.name = "BaseAddiction"
+__TS__ClassExtends(BaseAddiction, BaseNeed)
+function BaseAddiction.prototype.____constructor(self, record, options, deps)
+    BaseNeed.prototype.____constructor(
+        self,
+        record,
+        ____exports.BaseAddiction:needOptions(record.strength, options),
+        deps
+    )
+    deps.validator:validateStrength(record.strength, ____exports.BaseAddiction.MIN_STRENGTH, ____exports.BaseAddiction.MAX_STRENGTH)
+    self.strength = record.strength
+end
+function BaseAddiction.prototype.getState(self)
+    return __TS__ObjectAssign(
+        {},
+        BaseNeed.prototype.getState(self),
+        {strength = self.strength}
+    )
+end
+function BaseAddiction.needOptions(self, strength, options)
+    local fullDepletionAtMax = options.cravingMinutes * BaseNeed.MAX_NEED / (BaseNeed.MAX_NEED - BaseNeed.URGENT_BELOW)
+    return {category = NeedCategory.Addiction, depletionMinutes = strength > 0 and fullDepletionAtMax * ____exports.BaseAddiction.MAX_STRENGTH / strength or math.huge}
+end
+BaseAddiction.MIN_STRENGTH = 0
+BaseAddiction.MAX_STRENGTH = 100
+return ____exports
+ end,
+["core.needs.src.alcoholism"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ClassExtends = ____lualib.__TS__ClassExtends
+local ____exports = {}
+local ____activity = require("core.needs.src.activity")
+local ActivityType = ____activity.ActivityType
+local ____base_2Daddiction = require("core.needs.src.base-addiction")
+local BaseAddiction = ____base_2Daddiction.BaseAddiction
+local ____base_2Dneed = require("core.needs.src.base-need")
+local BaseNeed = ____base_2Dneed.BaseNeed
+--- Алкоголизм: зависимость от пойла
+____exports.Alcoholism = __TS__Class()
+local Alcoholism = ____exports.Alcoholism
+Alcoholism.name = "Alcoholism"
+__TS__ClassExtends(Alcoholism, BaseAddiction)
+function Alcoholism.prototype.____constructor(self, record, deps)
+    BaseAddiction.prototype.____constructor(self, record, ____exports.Alcoholism.OPTIONS, deps)
+end
+function Alcoholism.prototype.getGain(self, activity)
+    repeat
+        local ____switch4 = activity.type
+        local ____cond4 = ____switch4 == ActivityType.Drink
+        if ____cond4 then
+            return BaseNeed.MAX_NEED
+        end
+    until true
+    return 0
+end
+Alcoholism.OPTIONS = {cravingMinutes = 24 * 60}
+return ____exports
+ end,
 ["core.needs.src.satiety"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -6525,6 +6612,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____alcoholism = require("core.needs.src.alcoholism")
+local Alcoholism = ____alcoholism.Alcoholism
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 local ____satiety = require("core.needs.src.satiety")
@@ -6533,16 +6622,13 @@ ____exports.NeedFactory = __TS__Class()
 local NeedFactory = ____exports.NeedFactory
 NeedFactory.name = "NeedFactory"
 function NeedFactory.prototype.____constructor(self, deps)
-    self.deps = deps
+    self.creators = {
+        [Need.Satiety] = function(record) return __TS__New(Satiety, record, deps) end,
+        [Need.Alcoholism] = function(record) return __TS__New(Alcoholism, record, deps) end
+    }
 end
 function NeedFactory.prototype.create(self, need, record)
-    repeat
-        local ____switch4 = need
-        local ____cond4 = ____switch4 == Need.Satiety
-        if ____cond4 then
-            return __TS__New(Satiety, record, self.deps)
-        end
-    until true
+    return self.creators[need](record)
 end
 return ____exports
  end,
@@ -6555,6 +6641,8 @@ local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local ____exports = {}
+local ____base_2Daddiction = require("core.needs.src.base-addiction")
+local BaseAddiction = ____base_2Daddiction.BaseAddiction
 local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
 local ____need = require("core.needs.src.need")
@@ -6586,6 +6674,9 @@ function Needs.prototype.getAll(self, time)
             self:get(need, time)
         } end
     ))
+end
+function Needs.prototype.getCategory(self, need)
+    return self.needs[need].category
 end
 function Needs.prototype.getStatus(self, need, time)
     return self.needs[need]:getStatus(time)
@@ -6619,15 +6710,14 @@ Needs.MIN_NEED = BaseNeed.MIN_NEED
 Needs.MAX_NEED = BaseNeed.MAX_NEED
 Needs.URGENT_BELOW = BaseNeed.URGENT_BELOW
 Needs.CALM_ABOVE = BaseNeed.CALM_ABOVE
+Needs.MIN_STRENGTH = BaseAddiction.MIN_STRENGTH
+Needs.MAX_STRENGTH = BaseAddiction.MAX_STRENGTH
 return ____exports
  end,
 ["core.needs.src.factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local __TS__ObjectValues = ____lualib.__TS__ObjectValues
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
-local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local ____exports = {}
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
@@ -6656,12 +6746,9 @@ function NeedsFactory.prototype.____constructor(self, deps)
     end
     self.deps = {needFactory = needFactory}
 end
-function NeedsFactory.prototype.create(self, values, time)
+function NeedsFactory.prototype.create(self, values, addictions, time)
     local since = time:getState()
-    local state = __TS__ObjectFromEntries(__TS__ArrayMap(
-        __TS__ObjectValues(Need),
-        function(____, need) return {need, {value = values[need], since = since}} end
-    ))
+    local state = {[Need.Satiety] = {value = values[Need.Satiety], since = since}, [Need.Alcoholism] = {value = values[Need.Alcoholism], since = since, strength = addictions[Need.Alcoholism]}}
     return __TS__New(Needs, state, self.deps)
 end
 return ____exports
@@ -6674,11 +6761,14 @@ local __TS__New = ____lualib.__TS__New
 local __TS__ObjectValues = ____lualib.__TS__ObjectValues
 local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local ____exports = {}
+local ____category = require("core.needs.src.category")
+local NeedCategory = ____category.NeedCategory
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 local ____status = require("core.needs.src.status")
 local NeedStatus = ____status.NeedStatus
---- Следит, когда потребности становятся срочными. Помнит, какие потребности горят: потребность
+--- Следит, когда жизненные потребности становятся срочными. Зависимости не следит: тяга не прерывает
+-- текущий план, а дожидается следующего планирования. Помнит, какие потребности горят: потребность
 -- загорается, когда стала срочной (NeedStatus.Urgent), и гаснет, только когда стала
 -- спокойной (NeedStatus.Calm). Пока потребность горит, она не загорается снова, поэтому
 -- значение, которое скачет около порога срочности, не поднимает тревогу на каждой проверке. Сами
@@ -6694,6 +6784,9 @@ function UrgencyWatcher.prototype.check(self, needs, time)
     __TS__ArrayForEach(
         __TS__ObjectValues(Need),
         function(____, need)
+            if needs:getCategory(need) ~= NeedCategory.Vital then
+                return
+            end
             if self.burning:has(need) then
                 if needs:getStatus(need, time) == NeedStatus.Calm then
                     self.burning:delete(need)
@@ -7711,6 +7804,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.psyche = psycheFactory:create(data.psyche)
     self.needs = needsFactory:create(
         data.needs,
+        data.addictions,
         worldKnowledge:getState().time
     )
     self.urgencyWatcher = urgencyWatcherFactory:create()
@@ -9885,7 +9979,8 @@ ____exports.npcs = {{
     spawnAngle = 242,
     psyche = {traits = {[Trait.Conscientiousness] = 100, [Trait.Luck] = 50, [Trait.Optimism] = 50}, feelings = {[Feeling.Shame] = 0}},
     inventory = {[Item.Money] = 80},
-    needs = {[Need.Satiety] = 20}
+    needs = {[Need.Satiety] = 20, [Need.Alcoholism] = 100},
+    addictions = {[Need.Alcoholism] = 100}
 }}
 return ____exports
  end,

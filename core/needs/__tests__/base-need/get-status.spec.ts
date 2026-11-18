@@ -5,67 +5,28 @@ import { DEFAULT_RECORD, TestNeed } from '../../dev';
 import { NeedStatus } from '../../src';
 import { BaseNeed } from '../../src/base-need';
 
+/** Статус потребности с переданным значением на момент, когда его выставили */
+function statusAt(value: number): NeedStatus {
+  const record = {
+    ...DEFAULT_RECORD,
+    value,
+  };
+
+  return new TestNeed(record).getStatus(new ManualTime(record.since));
+}
+
 describe('BaseNeed', () => {
   describe('#getStatus', () => {
-    it('Если значение ниже порога срочности, возвращает NeedStatus.Urgent', () => {
-      const record = {
-        ...DEFAULT_RECORD,
-        value: BaseNeed.URGENT_BELOW - 1,
-      };
-
-      const status = new TestNeed(record).getStatus(new ManualTime(record.since));
-
-      expect(status).toBe(NeedStatus.Urgent);
+    it('Если значение ниже URGENT_BELOW, возвращает NeedStatus.Urgent', () => {
+      expect(statusAt(BaseNeed.URGENT_BELOW - 1)).toBe(NeedStatus.Urgent);
     });
 
-    it('Если значение на пороге срочности, возвращает NeedStatus.Moderate', () => {
-      const record = {
-        ...DEFAULT_RECORD,
-        value: BaseNeed.URGENT_BELOW,
-      };
-
-      const status = new TestNeed(record).getStatus(new ManualTime(record.since));
-
-      expect(status).toBe(NeedStatus.Moderate);
+    it('Если значение от URGENT_BELOW до CALM_ABOVE, возвращает NeedStatus.Moderate', () => {
+      expect(statusAt(BaseNeed.URGENT_BELOW)).toBe(NeedStatus.Moderate);
     });
 
-    it('Если значение на пороге спокойствия, возвращает NeedStatus.Moderate', () => {
-      const record = {
-        ...DEFAULT_RECORD,
-        value: BaseNeed.CALM_ABOVE,
-      };
-
-      const status = new TestNeed(record).getStatus(new ManualTime(record.since));
-
-      expect(status).toBe(NeedStatus.Moderate);
-    });
-
-    it('Если значение выше порога спокойствия, возвращает NeedStatus.Calm', () => {
-      const record = {
-        ...DEFAULT_RECORD,
-        value: BaseNeed.CALM_ABOVE + 1,
-      };
-
-      const status = new TestNeed(record).getStatus(new ManualTime(record.since));
-
-      expect(status).toBe(NeedStatus.Calm);
-    });
-
-    it('Считает статус по значению на момент переданного времени', () => {
-      const record = {
-        ...DEFAULT_RECORD,
-        value: BaseNeed.URGENT_BELOW,
-      };
-
-      // Через час потребность упала ниже порога срочности
-      const status = new TestNeed(record).getStatus(
-        new ManualTime({
-          ...record.since,
-          hours: record.since.hours + 1,
-        })
-      );
-
-      expect(status).toBe(NeedStatus.Urgent);
+    it('Если значение выше CALM_ABOVE, возвращает NeedStatus.Calm', () => {
+      expect(statusAt(BaseNeed.CALM_ABOVE + 1)).toBe(NeedStatus.Calm);
     });
   });
 });

@@ -23,8 +23,7 @@ export const DEFAULT_ADDICTION_DEPS: AddictionDeps = { validator: new Addictions
 
 /**
  * Зависимость для тестов общей логики BaseAddiction. При максимальной силе удовлетворённость падает от
- * MAX_SATISFACTION до нуля за сутки, а любое употребление прибавляет ей TestAddiction.GAIN. setRecord выставляет
- * переданную запись через сеттер BaseAddiction
+ * MAX_SATISFACTION до нуля за сутки, а любое употребление прибавляет ей TestAddiction.GAIN
  */
 export class TestAddiction extends BaseAddiction {
   static readonly OPTIONS: AddictionOptions = {
@@ -41,11 +40,6 @@ export class TestAddiction extends BaseAddiction {
 
   getGain(): number {
     return TestAddiction.GAIN;
-  }
-
-  /** Выставляет запись через сеттер BaseAddiction */
-  setRecord(record: AddictionRecord): void {
-    this.record = record;
   }
 }
 

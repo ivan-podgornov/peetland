@@ -22,7 +22,7 @@ export const DEFAULT_NEED_DEPS: NeedDeps = { validator: new NeedsValidator() };
 
 /**
  * Потребность для тестов общей логики BaseNeed. Падает до нуля за сутки, а любое занятие прибавляет
- * ей TestNeed.GAIN. setRecord выставляет переданную запись через сеттер BaseNeed
+ * ей TestNeed.GAIN
  */
 export class TestNeed extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
@@ -38,11 +38,6 @@ export class TestNeed extends BaseNeed {
 
   getGain(): number {
     return TestNeed.GAIN;
-  }
-
-  /** Выставляет запись через сеттер BaseNeed */
-  setRecord(record: NeedRecord): void {
-    this.record = record;
   }
 }
 

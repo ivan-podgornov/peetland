@@ -9,6 +9,7 @@
     "./dev": "./dev/index.ts"
   },
   "dependencies": {
+    "@peetland/gauge": "0.0.0",
     "@peetland/inventory": "0.0.0",
     "@peetland/timings": "0.0.0"
   }

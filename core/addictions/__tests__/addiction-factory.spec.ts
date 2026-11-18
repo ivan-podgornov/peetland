@@ -16,7 +16,9 @@ describe('AddictionFactory', () => {
     it('Создаёт зависимость из переданной записи', () => {
       const factory = new AddictionFactory(DEFAULT_ADDICTION_DEPS);
 
-      expect(factory.create(Addiction.Alcoholism, DEFAULT_RECORD).getState()).toBe(DEFAULT_RECORD);
+      expect(factory.create(Addiction.Alcoholism, DEFAULT_RECORD).getState()).toStrictEqual(
+        DEFAULT_RECORD
+      );
     });
 
     it('Передаёт зависимости валидатор', () => {

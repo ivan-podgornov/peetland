@@ -14,7 +14,7 @@ describe('Needs', () => {
 
       new Needs(createNeedsState({ [Need.Satiety]: record }), { needFactory });
 
-      expect(needFactory.create).toHaveBeenCalledWith(Need.Satiety, record);
+      expect(needFactory.create).toHaveBeenCalledExactlyOnceWith(Need.Satiety, record);
     });
 
     it('Если фабрика выбросила ошибку, выбрасывает ту же ошибку', () => {

@@ -3,7 +3,6 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTNFactory } from '@peetland/htn/dev';
 import { createMockedInventoryFactory } from '@peetland/inventory/dev';
 import {
-  createAddictions,
   createMockedNeedsFactory,
   createMockedUrgencyWatcherFactory,
   createNeedValues,
@@ -34,7 +33,6 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
     psyche: createPsycheState(),
     inventory: {},
     needs: createNeedValues(),
-    addictions: createAddictions(),
     ...data,
   };
 }

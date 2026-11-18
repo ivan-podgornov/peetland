@@ -82,7 +82,7 @@ export class Npc {
     this.worldKnowledge = worldKnowledge;
     this.inventory = inventoryFactory.create(data.inventory);
     this.psyche = psycheFactory.create(data.psyche);
-    this.needs = needsFactory.create(data.needs, data.addictions, worldKnowledge.getState().time);
+    this.needs = needsFactory.create(data.needs, worldKnowledge.getState().time);
     this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
     this.actor = actorFactory.create({

@@ -2,13 +2,13 @@ import { ManualTime } from '@peetland/timings';
 import type { TimeState } from '@peetland/timings';
 
 import { NeedsFactory } from '../src';
-import type { Addiction, Addictions, INeeds, Need, NeedValues } from '../src';
+import type { INeeds, Need, NeedValues } from '../src';
 
-import { createAddictions, createNeedValues } from './needs';
+import { createNeedValues } from './needs';
 
 /**
  * Собирает потребности по шагам. То, что не задано, заполняется незначимыми значениями: все
- * потребности удовлетворены полностью с полуночи первого дня, а зависимостей нет. Каждый вызов build возвращает новые
+ * потребности удовлетворены полностью с полуночи первого дня. Каждый вызов build возвращает новые
  * потребности
  *
  * @example
@@ -16,7 +16,6 @@ import { createAddictions, createNeedValues } from './needs';
  */
 export class NeedsBuilder {
   private values: NeedValues = createNeedValues();
-  private addictions: Addictions = createAddictions();
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -32,15 +31,6 @@ export class NeedsBuilder {
     return this;
   }
 
-  /** Задаёт силу зависимости */
-  withAddiction(addiction: Addiction, strength: number): this {
-    this.addictions = {
-      ...this.addictions,
-      [addiction]: strength,
-    };
-    return this;
-  }
-
   /** Задаёт момент, с которого потребности падают */
   withTime(time: TimeState): this {
     this.time = time;
@@ -49,6 +39,6 @@ export class NeedsBuilder {
 
   /** Возвращает собранные потребности */
   build(): INeeds {
-    return new NeedsFactory().create(this.values, this.addictions, new ManualTime(this.time));
+    return new NeedsFactory().create(this.values, new ManualTime(this.time));
   }
 }

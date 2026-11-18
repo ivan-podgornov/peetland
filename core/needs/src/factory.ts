@@ -4,7 +4,7 @@ import { Need } from './need';
 import { NeedFactory } from './need-factory';
 import { Needs } from './needs';
 import type { INeeds, NeedsDeps } from './needs';
-import type { Addictions, NeedsState, NeedValues } from './types';
+import type { NeedsState, NeedValues } from './types';
 import { NeedsValidator } from './validator';
 import type { INeedsValidator } from './validator';
 
@@ -12,10 +12,9 @@ export interface INeedsFactory {
   /**
    * Создаёт потребности с начальными значениями, которые падают с момента time (см. Needs)
    * @param values - начальное значение каждой потребности
-   * @param addictions - сила каждой зависимости
    * @param time - время, с которого потребности начинают падать
    */
-  create(values: NeedValues, addictions: Addictions, time: IReadonlyTime): INeeds;
+  create(values: NeedValues, time: IReadonlyTime): INeeds;
 }
 
 export type NeedsFactoryDeps = Partial<
@@ -34,19 +33,17 @@ export class NeedsFactory implements INeedsFactory {
     this.deps = { needFactory };
   }
 
-  create(values: NeedValues, addictions: Addictions, time: IReadonlyTime): INeeds {
+  create(values: NeedValues, time: IReadonlyTime): INeeds {
     const since = time.getState();
-    const state: NeedsState = {
-      [Need.Satiety]: {
-        value: values[Need.Satiety],
-        since,
-      },
-      [Need.Alcoholism]: {
-        value: values[Need.Alcoholism],
-        since,
-        strength: addictions[Need.Alcoholism],
-      },
-    };
+    const state = Object.fromEntries(
+      Object.values(Need).map((need) => [
+        need,
+        {
+          value: values[need],
+          since,
+        },
+      ])
+    ) as NeedsState;
 
     return new Needs(state, this.deps);
   }

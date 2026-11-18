@@ -5,11 +5,9 @@ export {
   createMockedNeedFactory,
   DEFAULT_RECORD,
   DEFAULT_NEED_DEPS,
-  TestAddiction,
   TestNeed,
 } from './need';
 export {
-  createAddictions,
   createMockedNeeds,
   createMockedNeedsValidator,
   createNeedsDeps,

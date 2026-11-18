@@ -18,4 +18,17 @@ describe('ItemClassifier', () => {
       }
     );
   });
+
+  describe('#isBooze', () => {
+    it('Если предмет — пойло, возвращает true', () => {
+      expect(new ItemClassifier().isBooze(Item.Booze)).toBe(true);
+    });
+
+    it.each([Item.Money, Item.Bottles, Item.RomashkaLoaf, Item.SmilePizza])(
+      'Если предмет не пойло (%s), возвращает false',
+      (item) => {
+        expect(new ItemClassifier().isBooze(item)).toBe(false);
+      }
+    );
+  });
 });

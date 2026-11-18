@@ -10,3 +10,6 @@ export enum Item {
 
 /** Еда: предмет, который можно съесть (см. ItemClassifier) */
 export type Food = Item.RomashkaLoaf | Item.SmilePizza;
+
+/** Пойло: предмет, который можно выпить (см. ItemClassifier) */
+export type Booze = Item.Booze;

@@ -1,18 +1,21 @@
 import { planSteps } from '@peetland/htn/dev';
-import { Item, ItemClassifier } from '@peetland/inventory';
+import { Item } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createMockedPlaces } from '@peetland/places/dev';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
-import { createSatisfyHungerTask } from '../../../dev';
+import { createMockedFoodChooser, createSatisfyHungerTask } from '../../../dev';
 
 describe('SatisfyHungerTask', () => {
   describe('Метод eat-from-inventory', () => {
     describe('Предусловия', () => {
-      it('Если в инвентаре есть еда, план составляется', () => {
+      it('Если IFoodChooser выбрал еду из инвентаря, план составляется', () => {
         // Магазинов нет: план составляется только из того, что есть
-        const task = createSatisfyHungerTask({ places: createMockedPlaces() });
+        const task = createSatisfyHungerTask({
+          foodChooser: createMockedFoodChooser({ fromInventory: Item.RomashkaLoaf }),
+          places: createMockedPlaces(),
+        });
         const state = new NpcStateBuilder()
           .withInventory({ [Item.RomashkaLoaf]: 1 })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
@@ -21,31 +24,16 @@ describe('SatisfyHungerTask', () => {
         expect(planSteps(task, state)).not.toBeNull();
       });
 
-      it('Если еды в инвентаре нет, план не составляется', () => {
-        const task = createSatisfyHungerTask({ places: createMockedPlaces() });
+      it('Если IFoodChooser не нашёл еды в инвентаре, план не составляется', () => {
+        const task = createSatisfyHungerTask({
+          foodChooser: createMockedFoodChooser({ fromInventory: null }),
+          places: createMockedPlaces(),
+        });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Booze]: 1 })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planSteps(task, state)).toBeNull();
-      });
-
-      it('Что из инвентаря еда, решает классификатор предметов', () => {
-        const itemClassifier = new ItemClassifier();
-        vi.spyOn(itemClassifier, 'isFood');
-        const task = createSatisfyHungerTask({
-          itemClassifier,
-          places: createMockedPlaces(),
-        });
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Booze]: 1 })
-          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
-          .build();
-
-        planSteps(task, state);
-
-        expect(itemClassifier.isFood).toHaveBeenCalledWith(Item.Booze);
       });
     });
   });

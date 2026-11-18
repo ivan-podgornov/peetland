@@ -1,20 +1,17 @@
 import type { CompoundTask, Method, Task } from '@peetland/htn';
-import type { IItemClassifier } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
-import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
 import { EATING_SATIETY } from './constants';
 import type { IFoodChooser } from './food-chooser';
-import { affordableFood, buyFoodTasks, foodInInventory } from './food-shop';
+import type { INeedsTaskFactory } from './types';
 
 export type StockFoodTaskDeps = {
-  npcTaskFactory: INpcTaskFactory;
+  /** Фабрика, которой задача создаёт задачу купить еду */
+  needsTaskFactory: INeedsTaskFactory;
   /** Места мира. Еда покупается в магазинах */
   places: IPlaces;
-  /** Определяет, какие предметы в инвентаре — еда */
-  itemClassifier: IItemClassifier;
   /** Выбирает, что купить */
   foodChooser: IFoodChooser;
 };
@@ -43,24 +40,29 @@ export class StockFoodTask implements CompoundTask<NpcState, NpcContext> {
 
   /** Затариться можно, если еды нет, на неё хватает денег и есть магазин */
   private canStock(state: NpcState): boolean {
-    const { places, itemClassifier } = this.deps;
+    const { places, foodChooser } = this.deps;
 
     return (
-      foodInInventory(state, itemClassifier).length === 0 &&
-      affordableFood(state).length > 0 &&
+      foodChooser.chooseFromInventory(state, EATING_SATIETY) === null &&
+      foodChooser.chooseToBuy(state, EATING_SATIETY) !== null &&
       places.ofType(PlaceType.Shop).length > 0
     );
   }
 
   private buyFood(state: NpcState): Task<NpcState, NpcContext>[] {
-    const { npcTaskFactory, places, foodChooser } = this.deps;
-    const food = foodChooser.choose(state, affordableFood(state), EATING_SATIETY);
+    const { needsTaskFactory, places, foodChooser } = this.deps;
+    const food = foodChooser.chooseToBuy(state, EATING_SATIETY);
     const shop = places.findNearest(state.self.actor.position, PlaceType.Shop);
 
-    if (!shop) {
-      throw new Error(`Не из чего выбрать место ${PlaceType.Shop}`);
+    if (food === null || !shop) {
+      throw new Error('Купить еду не на что или негде');
     }
 
-    return buyFoodTasks(npcTaskFactory, shop, food);
+    return [
+      needsTaskFactory.buyFood({
+        food,
+        shop,
+      }),
+    ];
   }
 }

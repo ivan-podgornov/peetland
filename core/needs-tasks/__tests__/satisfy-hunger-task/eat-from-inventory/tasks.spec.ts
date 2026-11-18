@@ -12,41 +12,29 @@ import { createMockedFoodChooser, createSatisfyHungerTask } from '../../../dev';
 describe('SatisfyHungerTask', () => {
   describe('Метод eat-from-inventory', () => {
     describe('Задачи', () => {
-      it('Выбирает, что съесть, из еды в инвентаре', () => {
-        const foodChooser = createMockedFoodChooser();
+      it('Выбирает еду из инвентаря на текущую сытость', () => {
+        const foodChooser = createMockedFoodChooser({ fromInventory: Item.RomashkaLoaf });
         const task = createSatisfyHungerTask({
           foodChooser,
           places: createMockedPlaces(),
         });
         const state = new NpcStateBuilder()
-          .withInventory({
-            [Item.RomashkaLoaf]: 1,
-            [Item.SmilePizza]: 1,
-            [Item.Money]: 10,
-          })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
 
-        expect(foodChooser.choose).toHaveBeenCalledExactlyOnceWith(state, [
-          Item.RomashkaLoaf,
-          Item.SmilePizza,
-        ]);
+        expect(foodChooser.chooseFromInventory).toHaveBeenCalledWith(state, 10);
       });
 
       it('Съедает выбранную еду', () => {
         const eat = vi.fn(() => createStubTask<NpcState, NpcContext>('eat'));
         const task = createSatisfyHungerTask({
           npcTaskFactory: createNpcTaskFactory({ eat }),
-          foodChooser: createMockedFoodChooser(Item.RomashkaLoaf),
+          foodChooser: createMockedFoodChooser({ fromInventory: Item.RomashkaLoaf }),
           places: createMockedPlaces(),
         });
         const state = new NpcStateBuilder()
-          .withInventory({
-            [Item.RomashkaLoaf]: 1,
-            [Item.SmilePizza]: 1,
-          })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 

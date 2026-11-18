@@ -20,6 +20,7 @@ export function createMockedNeedsTaskFactory(
     satisfyNeeds: vi.fn(() => createStubTask<NpcState, NpcContext>('needs')),
     satisfyHunger: vi.fn(() => createStubTask<NpcState, NpcContext>('satisfy-hunger')),
     stockFood: vi.fn(() => createStubTask<NpcState, NpcContext>('stock-food')),
+    buyFood: vi.fn(() => createStubTask<NpcState, NpcContext>('buy-food')),
     ...factory,
   } as Mocked<INeedsTaskFactory>;
 }

@@ -52,6 +52,17 @@ describe('Satiety', () => {
       ).toBe(gain);
     });
 
+    it('Питьё не влияет на сытость: возвращает 0', () => {
+      const satiety = new Satiety(DEFAULT_RECORD, DEFAULT_NEED_DEPS);
+
+      expect(
+        satiety.getGain({
+          type: ActivityType.Drink,
+          details: { booze: Item.Booze },
+        })
+      ).toBe(0);
+    });
+
     it('Не учитывает пределы: сытая сытость всё равно возвращает весь вклад еды', () => {
       const satiety = new Satiety(
         {

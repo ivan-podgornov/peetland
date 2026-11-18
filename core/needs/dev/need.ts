@@ -2,7 +2,9 @@ import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { NeedCategory, NeedStatus, NeedsValidator } from '../src';
-import type { NeedRecord } from '../src';
+import type { AddictionRecord, NeedRecord } from '../src';
+import { BaseAddiction } from '../src/base-addiction';
+import type { AddictionOptions } from '../src/base-addiction';
 import { BaseNeed } from '../src/base-need';
 import type { INeed, NeedDeps, NeedOptions } from '../src/base-need';
 import type { INeedFactory } from '../src/need-factory';
@@ -44,6 +46,22 @@ export class TestNeed extends BaseNeed {
   /** Выставляет запись через сеттер BaseNeed */
   setRecord(record: NeedRecord): void {
     this.record = record;
+  }
+}
+
+/**
+ * Зависимость для тестов общей логики BaseAddiction. При максимальной силе тянет через сутки после
+ * употребления, а занятия её не меняют
+ */
+export class TestAddiction extends BaseAddiction {
+  static readonly OPTIONS: AddictionOptions = { cravingMinutes: 24 * 60 };
+
+  constructor(record: AddictionRecord, deps: NeedDeps = DEFAULT_NEED_DEPS) {
+    super(record, TestAddiction.OPTIONS, deps);
+  }
+
+  getGain(): number {
+    return 0;
   }
 }
 

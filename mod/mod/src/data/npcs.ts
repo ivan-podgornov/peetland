@@ -33,6 +33,11 @@ export const npcs: NpcData[] = [
     },
     needs: {
       [Need.Satiety]: 20,
+      [Need.Alcoholism]: 100,
+    },
+    // Алкаш: зависимость от пойла максимальная
+    addictions: {
+      [Need.Alcoholism]: 100,
     },
   },
 ];

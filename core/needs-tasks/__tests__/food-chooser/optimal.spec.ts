@@ -58,7 +58,9 @@ describe('FoodChooser', () => {
         [Item.RomashkaLoaf]: 0.75 * FOOD_PRICES[Item.RomashkaLoaf],
         [Item.SmilePizza]: 0.75 * FOOD_PRICES[Item.SmilePizza],
       };
-      needs.getGain.mockImplementation((_need, activity) => gains[activity.details.food]);
+      needs.getGain.mockImplementation((_need, activity) =>
+        activity.type === ActivityType.Eat ? gains[activity.details.food] : 0
+      );
       const chooser = new FoodChooser({ itemClassifier: new ItemClassifier() });
       const state = new NpcStateBuilder()
         .withInventory({

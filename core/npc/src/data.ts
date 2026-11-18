@@ -1,6 +1,6 @@
 import type { Vector3 } from '@peetland/geometry';
 import type { InventoryCounts } from '@peetland/inventory';
-import type { NeedValues } from '@peetland/needs';
+import type { Addictions, NeedValues } from '@peetland/needs';
 import type { PsycheState } from '@peetland/psyche';
 
 import type { NpcKind } from './kind';
@@ -22,4 +22,6 @@ export type NpcData = Readonly<{
   inventory: InventoryCounts;
   /** Начальное значение каждой потребности. Потребности начинают падать с момента, когда NPC создан */
   needs: NeedValues;
+  /** Сила каждой зависимости. 0 — зависимости нет */
+  addictions: Addictions;
 }>;

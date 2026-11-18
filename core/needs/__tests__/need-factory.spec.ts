@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createMockedNeedsValidator, DEFAULT_RECORD, DEFAULT_NEED_DEPS } from '../dev';
 import { Need } from '../src';
+import { Alcoholism } from '../src/alcoholism';
 import { NeedFactory } from '../src/need-factory';
 import { Satiety } from '../src/satiety';
 
@@ -11,6 +12,17 @@ describe('NeedFactory', () => {
       const factory = new NeedFactory(DEFAULT_NEED_DEPS);
 
       expect(factory.create(Need.Satiety, DEFAULT_RECORD)).toBeInstanceOf(Satiety);
+    });
+
+    it('Для алкогольной зависимости возвращает экземпляр Alcoholism', () => {
+      const factory = new NeedFactory(DEFAULT_NEED_DEPS);
+
+      expect(
+        factory.create(Need.Alcoholism, {
+          ...DEFAULT_RECORD,
+          strength: 50,
+        })
+      ).toBeInstanceOf(Alcoholism);
     });
 
     it('Создаёт потребность из переданной записи', () => {

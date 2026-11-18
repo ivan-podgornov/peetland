@@ -1,0 +1,1 @@
+{"id":"819d230e50480b9671ac284b43f1edd6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/validator.spec.ts#NeedsValidator #validateStrength Если сила 50 в пределах от 0 до 100, не выбрасывает ошибку","name":"Если сила 50 в пределах от 0 до 100, не выбрасывает ошибку","status":"passed","testResultsByEnv":{"default":"f2547818cbafacfdf8189fe31660c173"}}

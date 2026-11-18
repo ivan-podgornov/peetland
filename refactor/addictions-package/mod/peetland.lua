@@ -6334,18 +6334,18 @@ do
 end
 return ____exports
  end,
-["core.addictions.src.activity"] = function(...) 
+["core.addictions.src.consumption"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Виды занятий, от которых меняются зависимости
-____exports.ActivityType = ____exports.ActivityType or ({})
-____exports.ActivityType.Drink = "drink"
+--- Виды употребления, которые снимают тягу
+____exports.ConsumptionType = ____exports.ConsumptionType or ({})
+____exports.ConsumptionType.Drink = "drink"
 return ____exports
  end,
 ["core.addictions.src.addiction"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Зависимость NPC: значение, которое падает со временем тем быстрее, чем сильнее зависимость
+--- Зависимость NPC: тяга, которая растёт со временем тем быстрее, чем сильнее зависимость
 ____exports.Addiction = ____exports.Addiction or ({})
 ____exports.Addiction.Alcoholism = "alcoholism"
 return ____exports
@@ -6355,7 +6355,7 @@ return ____exports
 local ____exports = {}
 --- Насколько NPC тянет к зависимости
 ____exports.AddictionStatus = ____exports.AddictionStatus or ({})
-____exports.AddictionStatus.Urgent = "urgent"
+____exports.AddictionStatus.Craving = "craving"
 ____exports.AddictionStatus.Moderate = "moderate"
 ____exports.AddictionStatus.Calm = "calm"
 return ____exports
@@ -6382,12 +6382,12 @@ local AddictionsValidator = ____exports.AddictionsValidator
 AddictionsValidator.name = "AddictionsValidator"
 function AddictionsValidator.prototype.____constructor(self)
 end
-function AddictionsValidator.prototype.validateValue(self, value, min, max)
-    if not __TS__NumberIsFinite(value) or value < min or value > max then
+function AddictionsValidator.prototype.validateCraving(self, craving, min, max)
+    if not __TS__NumberIsFinite(craving) or craving < min or craving > max then
         error(
             __TS__New(
                 RangeError,
-                (((("Зависимость должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(value)
+                (((("Тяга должна быть от " .. tostring(min)) .. " до ") .. tostring(max)) .. ", получено ") .. tostring(craving)
             ),
             0
         )
@@ -6417,9 +6417,9 @@ local ____timings = require("toolkit.timings.src.index")
 local TimeSpan = ____timings.TimeSpan
 local ____status = require("core.addictions.src.status")
 local AddictionStatus = ____status.AddictionStatus
---- Общая логика зависимостей: рост тяги, статус, проверка значения и силы, пределы и изменение от
--- занятий. Значение — насколько NPC не тянет: падает со скоростью, пропорциональной силе, а при силе
--- 0 не падает. Подкласс задаёт скорость при максимальной силе опциями, а вклад занятий — в getGain
+--- Общая логика зависимостей: рост тяги, статус, проверка тяги и силы, пределы и снятие тяги
+-- употреблением. Тяга растёт со скоростью, пропорциональной силе, а при силе 0 не растёт. Подкласс
+-- задаёт скорость при максимальной силе опциями, а сколько тяги снимает употребление — в getRelief
 ____exports.BaseAddiction = __TS__Class()
 local BaseAddiction = ____exports.BaseAddiction
 BaseAddiction.name = "BaseAddiction"
@@ -6427,14 +6427,14 @@ function BaseAddiction.prototype.____constructor(self, record, options, deps)
     self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
     local validator = ____deps_0.validator
-    validator:validateValue(record.value, ____exports.BaseAddiction.MIN_VALUE, ____exports.BaseAddiction.MAX_VALUE)
+    validator:validateCraving(record.craving, ____exports.BaseAddiction.MIN_CRAVING, ____exports.BaseAddiction.MAX_CRAVING)
     validator:validateStrength(record.strength, ____exports.BaseAddiction.MIN_STRENGTH, ____exports.BaseAddiction.MAX_STRENGTH)
     self.options = options
     self.current = record
 end
 function BaseAddiction.prototype.get(self, time)
     local ____self_current_1 = self.current
-    local value = ____self_current_1.value
+    local craving = ____self_current_1.craving
     local since = ____self_current_1.since
     local strength = ____self_current_1.strength
     local ____self_options_2 = self.options
@@ -6446,33 +6446,33 @@ function BaseAddiction.prototype.get(self, time)
             time:getState()
         )
     )
-    local drop = (____exports.BaseAddiction.MAX_VALUE - ____exports.BaseAddiction.URGENT_BELOW) * strength * elapsed / (cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH)
-    return math.max(____exports.BaseAddiction.MIN_VALUE, value - drop)
+    local growth = (____exports.BaseAddiction.CRAVING_ABOVE - ____exports.BaseAddiction.MIN_CRAVING) * strength * elapsed / (cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH)
+    return math.min(____exports.BaseAddiction.MAX_CRAVING, craving + growth)
 end
 function BaseAddiction.prototype.getStatus(self, time)
-    local value = self:get(time)
-    if value < ____exports.BaseAddiction.URGENT_BELOW then
-        return AddictionStatus.Urgent
+    local craving = self:get(time)
+    if craving > ____exports.BaseAddiction.CRAVING_ABOVE then
+        return AddictionStatus.Craving
     end
-    return value > ____exports.BaseAddiction.CALM_ABOVE and AddictionStatus.Calm or AddictionStatus.Moderate
+    return craving < ____exports.BaseAddiction.CALM_BELOW and AddictionStatus.Calm or AddictionStatus.Moderate
 end
 function BaseAddiction.prototype.getState(self)
     return self.current
 end
-function BaseAddiction.prototype.perform(self, activity, time)
+function BaseAddiction.prototype.consume(self, consumption, time)
     self.record = __TS__ObjectAssign(
         {},
         self.current,
         {
-            value = self:get(time) + self:getGain(activity),
+            craving = self:get(time) - self:getRelief(consumption),
             since = time:getState()
         }
     )
 end
-BaseAddiction.MIN_VALUE = 0
-BaseAddiction.MAX_VALUE = 100
-BaseAddiction.URGENT_BELOW = 25
-BaseAddiction.CALM_ABOVE = 60
+BaseAddiction.MIN_CRAVING = 0
+BaseAddiction.MAX_CRAVING = 100
+BaseAddiction.CRAVING_ABOVE = 75
+BaseAddiction.CALM_BELOW = 40
 BaseAddiction.MIN_STRENGTH = 0
 BaseAddiction.MAX_STRENGTH = 100
 __TS__SetDescriptor(
@@ -6486,9 +6486,9 @@ __TS__SetDescriptor(
             self.current = __TS__ObjectAssign(
                 {},
                 record,
-                {value = math.min(
-                    ____exports.BaseAddiction.MAX_VALUE,
-                    math.max(____exports.BaseAddiction.MIN_VALUE, record.value)
+                {craving = math.min(
+                    ____exports.BaseAddiction.MAX_CRAVING,
+                    math.max(____exports.BaseAddiction.MIN_CRAVING, record.craving)
                 )}
             )
         end
@@ -6502,10 +6502,10 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
 local ____exports = {}
-local ____activity = require("core.addictions.src.activity")
-local ActivityType = ____activity.ActivityType
 local ____base_2Daddiction = require("core.addictions.src.base-addiction")
 local BaseAddiction = ____base_2Daddiction.BaseAddiction
+local ____consumption = require("core.addictions.src.consumption")
+local ConsumptionType = ____consumption.ConsumptionType
 --- Алкоголизм: зависимость от пойла
 ____exports.Alcoholism = __TS__Class()
 local Alcoholism = ____exports.Alcoholism
@@ -6514,12 +6514,12 @@ __TS__ClassExtends(Alcoholism, BaseAddiction)
 function Alcoholism.prototype.____constructor(self, record, deps)
     BaseAddiction.prototype.____constructor(self, record, ____exports.Alcoholism.OPTIONS, deps)
 end
-function Alcoholism.prototype.getGain(self, activity)
+function Alcoholism.prototype.getRelief(self, consumption)
     repeat
-        local ____switch4 = activity.type
-        local ____cond4 = ____switch4 == ActivityType.Drink
+        local ____switch4 = consumption.type
+        local ____cond4 = ____switch4 == ConsumptionType.Drink
         if ____cond4 then
-            return BaseAddiction.MAX_VALUE
+            return BaseAddiction.MAX_CRAVING
         end
     until true
 end
@@ -6596,8 +6596,8 @@ end
 function Addictions.prototype.getStatus(self, addiction, time)
     return self.addictions[addiction]:getStatus(time)
 end
-function Addictions.prototype.getGain(self, addiction, activity)
-    return self.addictions[addiction]:getGain(activity)
+function Addictions.prototype.getRelief(self, addiction, consumption)
+    return self.addictions[addiction]:getRelief(consumption)
 end
 function Addictions.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6615,16 +6615,16 @@ function Addictions.prototype.clone(self)
         self.deps
     )
 end
-function Addictions.prototype.perform(self, activity, time)
+function Addictions.prototype.consume(self, consumption, time)
     __TS__ArrayForEach(
         __TS__ObjectValues(Addiction),
-        function(____, addiction) return self.addictions[addiction]:perform(activity, time) end
+        function(____, addiction) return self.addictions[addiction]:consume(consumption, time) end
     )
 end
-Addictions.MIN_VALUE = BaseAddiction.MIN_VALUE
-Addictions.MAX_VALUE = BaseAddiction.MAX_VALUE
-Addictions.URGENT_BELOW = BaseAddiction.URGENT_BELOW
-Addictions.CALM_ABOVE = BaseAddiction.CALM_ABOVE
+Addictions.MIN_CRAVING = BaseAddiction.MIN_CRAVING
+Addictions.MAX_CRAVING = BaseAddiction.MAX_CRAVING
+Addictions.CRAVING_ABOVE = BaseAddiction.CRAVING_ABOVE
+Addictions.CALM_BELOW = BaseAddiction.CALM_BELOW
 Addictions.MIN_STRENGTH = BaseAddiction.MIN_STRENGTH
 Addictions.MAX_STRENGTH = BaseAddiction.MAX_STRENGTH
 return ____exports
@@ -6682,8 +6682,8 @@ return ____exports
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
-    local ____activity = require("core.addictions.src.activity")
-    ____exports.ActivityType = ____activity.ActivityType
+    local ____consumption = require("core.addictions.src.consumption")
+    ____exports.ConsumptionType = ____consumption.ConsumptionType
 end
 do
     local ____addiction = require("core.addictions.src.addiction")
@@ -8518,39 +8518,39 @@ function AddItemTask.prototype.stop(self)
 end
 return ____exports
  end,
-["core.npc-tasks.src.addictions-perform-task"] = function(...) 
+["core.npc-tasks.src.addictions-consume-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
 local ____exports = {}
---- Сообщить зависимостям о занятии, например что NPC выпил. Задача мгновенная
-____exports.AddictionsPerformTask = __TS__Class()
-local AddictionsPerformTask = ____exports.AddictionsPerformTask
-AddictionsPerformTask.name = "AddictionsPerformTask"
-function AddictionsPerformTask.prototype.____constructor(self, options)
-    self.name = "addictions-perform"
+--- Сообщить зависимостям об употреблении, например что NPC выпил. Задача мгновенная
+____exports.AddictionsConsumeTask = __TS__Class()
+local AddictionsConsumeTask = ____exports.AddictionsConsumeTask
+AddictionsConsumeTask.name = "AddictionsConsumeTask"
+function AddictionsConsumeTask.prototype.____constructor(self, options)
+    self.name = "addictions-consume"
     self.options = options
 end
-function AddictionsPerformTask.prototype.canExecute(self)
+function AddictionsConsumeTask.prototype.canExecute(self)
     return true
 end
-function AddictionsPerformTask.prototype.applyEffects(self, state)
+function AddictionsConsumeTask.prototype.applyEffects(self, state)
     local addictions = state.self.addictions:clone()
-    addictions:perform(self.options, state.world.time)
+    addictions:consume(self.options, state.world.time)
     return __TS__ObjectAssign(
         {},
         state,
         {self = __TS__ObjectAssign({}, state.self, {addictions = addictions})}
     )
 end
-function AddictionsPerformTask.prototype.start(self, state, context)
-    context.addictions:perform(self.options, state.world.time)
+function AddictionsConsumeTask.prototype.start(self, state, context)
+    context.addictions:consume(self.options, state.world.time)
     return "success"
 end
-function AddictionsPerformTask.prototype.update(self)
+function AddictionsConsumeTask.prototype.update(self)
     return "failed"
 end
-function AddictionsPerformTask.prototype.stop(self)
+function AddictionsConsumeTask.prototype.stop(self)
 end
 return ____exports
  end,
@@ -8912,8 +8912,8 @@ local ____achieve_2Dangle_2Dtask = require("core.npc-tasks.src.achieve-angle-tas
 local AchieveAngleTask = ____achieve_2Dangle_2Dtask.AchieveAngleTask
 local ____add_2Ditem_2Dtask = require("core.npc-tasks.src.add-item-task")
 local AddItemTask = ____add_2Ditem_2Dtask.AddItemTask
-local ____addictions_2Dperform_2Dtask = require("core.npc-tasks.src.addictions-perform-task")
-local AddictionsPerformTask = ____addictions_2Dperform_2Dtask.AddictionsPerformTask
+local ____addictions_2Dconsume_2Dtask = require("core.npc-tasks.src.addictions-consume-task")
+local AddictionsConsumeTask = ____addictions_2Dconsume_2Dtask.AddictionsConsumeTask
 local ____eat_2Dtask = require("core.npc-tasks.src.eat-task")
 local EatTask = ____eat_2Dtask.EatTask
 local ____go_2Dto_2Dcoords_2Dtask = require("core.npc-tasks.src.go-to-coords-task")
@@ -8957,8 +8957,8 @@ end
 function NpcTaskFactory.prototype.needsPerform(self, options)
     return __TS__New(NeedsPerformTask, options)
 end
-function NpcTaskFactory.prototype.addictionsPerform(self, options)
-    return __TS__New(AddictionsPerformTask, options)
+function NpcTaskFactory.prototype.addictionsConsume(self, options)
+    return __TS__New(AddictionsConsumeTask, options)
 end
 function NpcTaskFactory.prototype.tryLuck(self, options)
     local ____self_deps_0 = self.deps
@@ -10301,7 +10301,7 @@ ____exports.npcs = {{
     psyche = {traits = {[Trait.Conscientiousness] = 100, [Trait.Luck] = 50, [Trait.Optimism] = 50}, feelings = {[Feeling.Shame] = 0}},
     inventory = {[Item.Money] = 80},
     needs = {[Need.Satiety] = 20},
-    addictions = {[Addiction.Alcoholism] = {value = 100, strength = 100}}
+    addictions = {[Addiction.Alcoholism] = {craving = 0, strength = 100}}
 }}
 return ____exports
  end,

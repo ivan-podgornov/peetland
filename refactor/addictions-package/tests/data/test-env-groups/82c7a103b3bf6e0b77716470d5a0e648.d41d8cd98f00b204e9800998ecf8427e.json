@@ -1,1 +1,0 @@
-{"id":"82c7a103b3bf6e0b77716470d5a0e648.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/get.spec.ts#BaseAddiction #get Не опускает значение ниже BaseAddiction.MIN_VALUE","name":"Не опускает значение ниже BaseAddiction.MIN_VALUE","status":"passed","testResultsByEnv":{"default":"0c90297ebde481622ce1978d94e84b3a"}}

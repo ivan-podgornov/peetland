@@ -1,0 +1,1 @@
+{"id":"46a56df63f4a1a8363be0552df0627b8.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/get.spec.ts#BaseAddiction #get Не поднимает тягу выше BaseAddiction.MAX_CRAVING","name":"Не поднимает тягу выше BaseAddiction.MAX_CRAVING","status":"passed","testResultsByEnv":{"default":"0dda243d5d8dc6192a4ea5150ddf95f9"}}

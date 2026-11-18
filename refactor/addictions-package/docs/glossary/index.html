@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/refactor/addictions-package/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/refactor/addictions-package/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/refactor/addictions-package/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/refactor/addictions-package/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/refactor/addictions-package/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/refactor/addictions-package/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/refactor/addictions-package/docs/assets/js/runtime~main.6b78b5ed.js" defer="defer"></script>
+<script src="/peetland/refactor/addictions-package/docs/assets/js/runtime~main.e8e42613.js" defer="defer"></script>
 <script src="/peetland/refactor/addictions-package/docs/assets/js/main.6af388b9.js" defer="defer"></script>
 </head>
 <body>
@@ -65,8 +65,9 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <li class=""><strong>Зависимость</strong> (<code>Addiction</code>, <a class="" href="/peetland/refactor/addictions-package/docs/core/addictions/CONTRIBUTING/"><code>@peetland/addictions</code></a>) — то, без
 чего NPC жить не хочет, например алкоголизм. Похожа на потребность, но у неё есть сила: чем она
 больше, тем быстрее растёт тяга. Зависимость с силой 0 — это отсутствие зависимости.</li>
-<li class=""><strong>Тяга</strong> (<code>AddictionStatus.Urgent</code>) — зависимость, ставшая срочной: NPC тянет употребить.
-Снимается употреблением и, в отличие от срочной потребности, план не прерывает.</li>
+<li class=""><strong>Тяга</strong> — насколько NPC тянет к зависимости: растёт со временем тем быстрее, чем больше сила, и
+снимается употреблением. Когда тяга выше порога (<code>AddictionStatus.Craving</code>), NPC тянет употребить,
+но, в отличие от срочной потребности, план это не прерывает.</li>
 <li class=""><strong>Срочная потребность</strong> (<code>NeedStatus.Urgent</code>) — потребность ниже порога срочности.
 Срочные потребности удовлетворяются раньше зависимостей, деятельности и хобби.</li>
 <li class=""><strong>Наблюдатель срочности</strong> (<code>UrgencyWatcher</code>, <a class="" href="/peetland/refactor/addictions-package/docs/core/needs/CONTRIBUTING/"><code>@peetland/needs</code></a>) —

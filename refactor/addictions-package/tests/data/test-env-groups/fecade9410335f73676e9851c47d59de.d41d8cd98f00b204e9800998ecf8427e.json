@@ -1,1 +1,0 @@
-{"id":"fecade9410335f73676e9851c47d59de.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/record.spec.ts#BaseAddiction Сеттер record Не опускает значение ниже BaseAddiction.MIN_VALUE","name":"Не опускает значение ниже BaseAddiction.MIN_VALUE","status":"passed","testResultsByEnv":{"default":"f764124559db9ea688b89aca7e9bb420"}}

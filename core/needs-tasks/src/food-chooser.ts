@@ -75,7 +75,10 @@ export class FoodChooser implements IFoodChooser {
 
   /** Сколько сытости восполнит еда, если съесть её при сытости satiety, без того, что не влезет */
   private nutritionWithoutOvereating(state: NpcState, satiety: number, food: Food): number {
-    const gain = state.self.needs.getGain(Need.Satiety, Activity.Eat, { food });
+    const gain = state.self.needs.getGain(Need.Satiety, {
+      activity: Activity.Eat,
+      details: { food },
+    });
 
     return Math.max(0, Math.min(gain, Needs.MAX_NEED - satiety));
   }

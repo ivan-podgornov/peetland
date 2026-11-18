@@ -24,8 +24,10 @@ describe('NeedsPerformTask', () => {
       task.start(state, context);
 
       expect(needs.perform).toHaveBeenCalledExactlyOnceWith(
-        Activity.Eat,
-        details,
+        {
+          activity: Activity.Eat,
+          details,
+        },
         state.world.time
       );
     });
@@ -56,7 +58,13 @@ describe('NeedsPerformTask', () => {
 
       task.applyEffects(state);
 
-      expect(copy.perform).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details, state.world.time);
+      expect(copy.perform).toHaveBeenCalledExactlyOnceWith(
+        {
+          activity: Activity.Eat,
+          details,
+        },
+        state.world.time
+      );
     });
 
     it('Кладёт в состояние копию потребностей', () => {

@@ -15,9 +15,15 @@ describe('Needs', () => {
       });
       const details: EatDetails = { food: Item.SmilePizza };
 
-      const gain = needs.getGain(Need.Satiety, Activity.Eat, details);
+      const gain = needs.getGain(Need.Satiety, {
+        activity: Activity.Eat,
+        details,
+      });
 
-      expect(need.getGain).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details);
+      expect(need.getGain).toHaveBeenCalledExactlyOnceWith({
+        activity: Activity.Eat,
+        details,
+      });
       expect(gain).toBe(42);
     });
   });

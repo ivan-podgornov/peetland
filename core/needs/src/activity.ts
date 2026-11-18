@@ -15,3 +15,14 @@ export type EatDetails = Readonly<{
 export type ActivityDetails = {
   [Activity.Eat]: EatDetails;
 };
+
+/**
+ * Занятие с его деталями. По полю activity TypeScript сужает тип деталей, поэтому потребностям не
+ * нужно приводить детали к типу своего занятия
+ */
+export type PerformedActivity = {
+  [A in Activity]: Readonly<{
+    activity: A;
+    details: ActivityDetails[A];
+  }>;
+}[Activity];

@@ -4,7 +4,7 @@ export {
   createMockedNeed,
   createMockedNeedFactory,
   DEFAULT_RECORD,
-  DEFAULT_SATIETY_DEPS,
+  DEFAULT_NEED_DEPS,
   TestNeed,
 } from './need';
 export {

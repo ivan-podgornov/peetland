@@ -3,13 +3,14 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_RECORD, TestNeed } from '../../dev';
 import { NeedStatus } from '../../src';
+import { BaseNeed } from '../../src/base-need';
 
 describe('BaseNeed', () => {
   describe('#getStatus', () => {
     it('Если значение ниже порога срочности, возвращает NeedStatus.Urgent', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: TestNeed.OPTIONS.urgentBelow - 1,
+        value: BaseNeed.URGENT_BELOW - 1,
       };
 
       const status = new TestNeed(record).getStatus(new ManualTime(record.since));
@@ -20,7 +21,7 @@ describe('BaseNeed', () => {
     it('Если значение на пороге срочности, возвращает NeedStatus.Moderate', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: TestNeed.OPTIONS.urgentBelow,
+        value: BaseNeed.URGENT_BELOW,
       };
 
       const status = new TestNeed(record).getStatus(new ManualTime(record.since));
@@ -31,7 +32,7 @@ describe('BaseNeed', () => {
     it('Если значение на пороге спокойствия, возвращает NeedStatus.Moderate', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: TestNeed.OPTIONS.calmAbove,
+        value: BaseNeed.CALM_ABOVE,
       };
 
       const status = new TestNeed(record).getStatus(new ManualTime(record.since));
@@ -42,7 +43,7 @@ describe('BaseNeed', () => {
     it('Если значение выше порога спокойствия, возвращает NeedStatus.Calm', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: TestNeed.OPTIONS.calmAbove + 1,
+        value: BaseNeed.CALM_ABOVE + 1,
       };
 
       const status = new TestNeed(record).getStatus(new ManualTime(record.since));
@@ -53,7 +54,7 @@ describe('BaseNeed', () => {
     it('Считает статус по значению на момент переданного времени', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: TestNeed.OPTIONS.urgentBelow,
+        value: BaseNeed.URGENT_BELOW,
       };
 
       // Через час потребность упала ниже порога срочности

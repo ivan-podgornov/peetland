@@ -1,7 +1,7 @@
 import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
-import type { Activity, ActivityDetails } from './activity';
+import type { PerformedActivity } from './activity';
 import type { NeedCategory } from './category';
 import { NeedStatus } from './status';
 import type { NeedRecord } from './types';
@@ -17,34 +17,42 @@ export interface INeed {
   /** Возвращает значение и момент, когда его выставили */
   getState(): NeedRecord;
   /** Возвращает, на сколько занятие изменит значение, без учёта пределов */
-  getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number;
+  getGain(performed: PerformedActivity): number;
   /**
    * Меняет потребность от занятия
    * @param time - момент, когда занятие закончилось
    */
-  perform<A extends Activity>(activity: A, details: ActivityDetails[A], time: IReadonlyTime): void;
+  perform(performed: PerformedActivity, time: IReadonlyTime): void;
 }
 
-/** Чем одна потребность отличается от другой */
+/**
+ * Чем одна потребность отличается от другой, кроме вклада занятий. Пределы значения и пороги
+ * статусов у всех потребностей одни (см. BaseNeed)
+ */
 export type NeedOptions = Readonly<{
   category: NeedCategory;
   /** За сколько игровых минут потребность падает от MAX_NEED до MIN_NEED */
   depletionMinutes: number;
-  /** Ниже этого значения потребность срочная */
-  urgentBelow: number;
-  /** Выше этого значения потребность спокойная */
-  calmAbove: number;
 }>;
 
 export type NeedDeps = {
   validator: INeedsValidator;
 };
 
-/** Общая логика потребностей */
+/**
+ * Общая логика потребностей: падение, статус, проверка значения, пределы и изменение от занятий.
+ * Подкласс задаёт категорию и скорость падения опциями, а вклад занятий — в getGain
+ */
 export abstract class BaseNeed implements INeed {
   static readonly MIN_NEED = 0;
 
   static readonly MAX_NEED = 100;
+
+  /** Ниже этого значения любая потребность срочная */
+  static readonly URGENT_BELOW = 25;
+
+  /** Выше этого значения любая потребность спокойная */
+  static readonly CALM_ABOVE = 60;
 
   readonly category: NeedCategory;
 
@@ -72,27 +80,28 @@ export abstract class BaseNeed implements INeed {
   }
 
   getStatus(time: IReadonlyTime): NeedStatus {
-    const { urgentBelow, calmAbove } = this.options;
     const value = this.get(time);
 
-    if (value < urgentBelow) {
+    if (value < BaseNeed.URGENT_BELOW) {
       return NeedStatus.Urgent;
     }
 
-    return value > calmAbove ? NeedStatus.Calm : NeedStatus.Moderate;
+    return value > BaseNeed.CALM_ABOVE ? NeedStatus.Calm : NeedStatus.Moderate;
   }
 
   getState(): NeedRecord {
     return this.current;
   }
 
-  abstract getGain<A extends Activity>(activity: A, details: ActivityDetails[A]): number;
+  abstract getGain(performed: PerformedActivity): number;
 
-  abstract perform<A extends Activity>(
-    activity: A,
-    details: ActivityDetails[A],
-    time: IReadonlyTime
-  ): void;
+  /** Прибавляет вклад занятия к значению на момент time и отсчитывает падение от time */
+  perform(performed: PerformedActivity, time: IReadonlyTime): void {
+    this.record = {
+      value: this.get(time) + this.getGain(performed),
+      since: time.getState(),
+    };
+  }
 
   protected get record(): NeedRecord {
     return this.current;

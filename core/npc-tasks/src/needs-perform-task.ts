@@ -1,14 +1,9 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
-import type { Activity, ActivityDetails } from '@peetland/needs';
+import type { PerformedActivity } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 /** Занятие, о котором задача сообщает потребностям, и его детали */
-export type NeedsPerformTaskOptions = {
-  [A in Activity]: Readonly<{
-    activity: A;
-    details: ActivityDetails[A];
-  }>;
-}[Activity];
+export type NeedsPerformTaskOptions = PerformedActivity;
 
 /** Сообщить потребностям о занятии, например что NPC поел. Задача мгновенная */
 export class NeedsPerformTask implements PrimitiveTask<NpcState, NpcContext> {
@@ -26,9 +21,8 @@ export class NeedsPerformTask implements PrimitiveTask<NpcState, NpcContext> {
 
   /** Сообщает о занятии копии потребностей на время из состояния */
   applyEffects(state: NpcState): NpcState {
-    const { activity, details } = this.options;
     const needs = state.self.needs.clone();
-    needs.perform(activity, details, state.world.time);
+    needs.perform(this.options, state.world.time);
 
     return {
       ...state,
@@ -41,8 +35,7 @@ export class NeedsPerformTask implements PrimitiveTask<NpcState, NpcContext> {
 
   /** Сообщает о занятии потребностям из контекста и возвращает 'success' */
   start(state: NpcState, context: NpcContext): TaskResult {
-    const { activity, details } = this.options;
-    context.needs.perform(activity, details, state.world.time);
+    context.needs.perform(this.options, state.world.time);
 
     return 'success';
   }

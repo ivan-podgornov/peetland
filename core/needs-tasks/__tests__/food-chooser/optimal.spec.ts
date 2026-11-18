@@ -58,7 +58,7 @@ describe('FoodChooser', () => {
         [Item.RomashkaLoaf]: 0.75 * FOOD_PRICES[Item.RomashkaLoaf],
         [Item.SmilePizza]: 0.75 * FOOD_PRICES[Item.SmilePizza],
       };
-      needs.getGain.mockImplementation((_need, _activity, details) => gains[details.food]);
+      needs.getGain.mockImplementation((_need, performed) => gains[performed.details.food]);
       const chooser = new FoodChooser({ itemClassifier: new ItemClassifier() });
       const state = new NpcStateBuilder()
         .withInventory({
@@ -84,8 +84,9 @@ describe('FoodChooser', () => {
 
       chooser.chooseFromInventory(state, 0);
 
-      expect(needs.getGain).toHaveBeenCalledWith(Need.Satiety, Activity.Eat, {
-        food: Item.RomashkaLoaf,
+      expect(needs.getGain).toHaveBeenCalledWith(Need.Satiety, {
+        activity: Activity.Eat,
+        details: { food: Item.RomashkaLoaf },
       });
     });
   });

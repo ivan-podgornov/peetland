@@ -16,9 +16,21 @@ describe('Needs', () => {
       const details: EatDetails = { food: Item.SmilePizza };
       const time = new ManualTime();
 
-      needs.perform(Activity.Eat, details, time);
+      needs.perform(
+        {
+          activity: Activity.Eat,
+          details,
+        },
+        time
+      );
 
-      expect(need.perform).toHaveBeenCalledExactlyOnceWith(Activity.Eat, details, time);
+      expect(need.perform).toHaveBeenCalledExactlyOnceWith(
+        {
+          activity: Activity.Eat,
+          details,
+        },
+        time
+      );
     });
   });
 });

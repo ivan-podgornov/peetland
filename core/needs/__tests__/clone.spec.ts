@@ -29,7 +29,13 @@ describe('Needs', () => {
       const needs = new Needs(createNeedsState({ [Need.Satiety]: record }), createNeedsDeps());
       const time = new ManualTime(record.since);
 
-      needs.clone().perform(Activity.Eat, { food: Item.SmilePizza }, time);
+      needs.clone().perform(
+        {
+          activity: Activity.Eat,
+          details: { food: Item.SmilePizza },
+        },
+        time
+      );
 
       expect(needs.get(Need.Satiety, time)).toBe(50);
     });
@@ -43,7 +49,13 @@ describe('Needs', () => {
       const copy = needs.clone();
       const time = new ManualTime(record.since);
 
-      needs.perform(Activity.Eat, { food: Item.SmilePizza }, time);
+      needs.perform(
+        {
+          activity: Activity.Eat,
+          details: { food: Item.SmilePizza },
+        },
+        time
+      );
 
       expect(copy.get(Need.Satiety, time)).toBe(50);
     });

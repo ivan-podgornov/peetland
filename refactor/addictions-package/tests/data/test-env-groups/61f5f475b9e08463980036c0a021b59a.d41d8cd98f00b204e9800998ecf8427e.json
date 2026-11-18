@@ -1,1 +1,0 @@
-{"id":"61f5f475b9e08463980036c0a021b59a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isBooze Если предмет не пойло (romashka-loaf), возвращает false","name":"Если предмет не пойло (romashka-loaf), возвращает false","status":"passed","testResultsByEnv":{"default":"2e4c5a063abcd02af8b868e5348142cc"}}

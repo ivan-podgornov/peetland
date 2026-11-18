@@ -5,4 +5,4 @@ export type { IInventoryFactory } from './factory';
 export { Inventory } from './inventory';
 export type { InventoryCounts, IReadonlyInventory } from './inventory';
 export { Item } from './item';
-export type { Food } from './item';
+export type { Booze, Food } from './item';

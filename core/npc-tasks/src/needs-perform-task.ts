@@ -1,9 +1,9 @@
 import type { PrimitiveTask, TaskResult } from '@peetland/htn';
-import type { PerformedActivity } from '@peetland/needs';
+import type { Activity } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 /** Занятие, о котором задача сообщает потребностям, и его детали */
-export type NeedsPerformTaskOptions = PerformedActivity;
+export type NeedsPerformTaskOptions = Activity;
 
 /** Сообщить потребностям о занятии, например что NPC поел. Задача мгновенная */
 export class NeedsPerformTask implements PrimitiveTask<NpcState, NpcContext> {

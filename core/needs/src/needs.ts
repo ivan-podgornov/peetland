@@ -1,6 +1,6 @@
 import type { IReadonlyTime } from '@peetland/timings';
 
-import type { PerformedActivity } from './activity';
+import type { Activity } from './activity';
 import { BaseNeed } from './base-need';
 import type { INeed } from './base-need';
 import { Need } from './need';
@@ -28,7 +28,7 @@ export interface IReadonlyNeeds {
   /** Возвращает статус потребности на момент time */
   getStatus(need: Need, time: IReadonlyTime): NeedStatus;
   /** Возвращает, на сколько занятие изменит потребность, без учёта пределов */
-  getGain(need: Need, performed: PerformedActivity): number;
+  getGain(need: Need, activity: Activity): number;
   /** Возвращает состояние потребностей. Из него конструктор собирает такие же потребности */
   getState(): NeedsState;
   /** Возвращает копию потребностей, в которую можно писать. Исходные потребности копия не меняет */
@@ -40,7 +40,7 @@ export interface INeeds extends IReadonlyNeeds {
    * Меняет потребности от занятия
    * @param time - момент, когда занятие закончилось
    */
-  perform(performed: PerformedActivity, time: IReadonlyTime): void;
+  perform(activity: Activity, time: IReadonlyTime): void;
 }
 
 export type NeedsDeps = {
@@ -84,8 +84,8 @@ export class Needs implements INeeds {
     return this.needs[need].getStatus(time);
   }
 
-  getGain(need: Need, performed: PerformedActivity): number {
-    return this.needs[need].getGain(performed);
+  getGain(need: Need, activity: Activity): number {
+    return this.needs[need].getGain(activity);
   }
 
   getState(): NeedsState {
@@ -98,7 +98,7 @@ export class Needs implements INeeds {
     return new Needs(this.getState(), this.deps);
   }
 
-  perform(performed: PerformedActivity, time: IReadonlyTime): void {
-    Object.values(Need).forEach((need) => this.needs[need].perform(performed, time));
+  perform(activity: Activity, time: IReadonlyTime): void {
+    Object.values(Need).forEach((need) => this.needs[need].perform(activity, time));
   }
 }

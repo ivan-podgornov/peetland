@@ -1,5 +1,5 @@
 import { Item } from '@peetland/inventory';
-import { Activity } from '@peetland/needs';
+import { ActivityType } from '@peetland/needs';
 import { createMockedNeeds } from '@peetland/needs/dev';
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
@@ -17,7 +17,7 @@ describe('NeedsPerformTask', () => {
       const state = NpcStateBuilder.default();
       const details = { food: Item.SmilePizza } as const;
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details,
       });
 
@@ -25,7 +25,7 @@ describe('NeedsPerformTask', () => {
 
       expect(needs.perform).toHaveBeenCalledExactlyOnceWith(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details,
         },
         state.world.time
@@ -34,7 +34,7 @@ describe('NeedsPerformTask', () => {
 
     it("Возвращает 'success'", () => {
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
 
@@ -52,7 +52,7 @@ describe('NeedsPerformTask', () => {
       const state = new NpcStateBuilder().withNeeds(() => needs).build();
       const details = { food: Item.RomashkaLoaf } as const;
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details,
       });
 
@@ -60,7 +60,7 @@ describe('NeedsPerformTask', () => {
 
       expect(copy.perform).toHaveBeenCalledExactlyOnceWith(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details,
         },
         state.world.time
@@ -72,7 +72,7 @@ describe('NeedsPerformTask', () => {
       const needs = createMockedNeeds();
       needs.clone.mockReturnValue(copy);
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
 
@@ -83,7 +83,7 @@ describe('NeedsPerformTask', () => {
 
     it('Не меняет то, что NPC знает о мире', () => {
       const task = new NeedsPerformTask({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
       const state = NpcStateBuilder.default();

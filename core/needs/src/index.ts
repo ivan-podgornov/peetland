@@ -1,5 +1,5 @@
-export { Activity } from './activity';
-export type { ActivityDetails, EatDetails, PerformedActivity } from './activity';
+export { ActivityType } from './activity';
+export type { ActivityDetails, EatDetails, Activity } from './activity';
 export { NeedCategory } from './category';
 export { NeedsFactory } from './factory';
 export type { INeedsFactory, NeedsFactoryDeps } from './factory';

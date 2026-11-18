@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedNeed, createMockedNeedFactory, createNeedsState } from '../dev';
-import { Activity, Needs } from '../src';
+import { ActivityType, Needs } from '../src';
 import type { EatDetails } from '../src';
 
 describe('Needs', () => {
@@ -18,7 +18,7 @@ describe('Needs', () => {
 
       needs.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details,
         },
         time
@@ -26,7 +26,7 @@ describe('Needs', () => {
 
       expect(need.perform).toHaveBeenCalledExactlyOnceWith(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details,
         },
         time

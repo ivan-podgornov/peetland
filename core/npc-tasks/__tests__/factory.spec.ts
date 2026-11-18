@@ -1,6 +1,6 @@
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
-import { Activity } from '@peetland/needs';
+import { ActivityType } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling, Trait } from '@peetland/psyche';
 import { describe, expect, it } from 'vitest';
@@ -150,7 +150,7 @@ describe('NpcTaskFactory', () => {
       const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
 
       const task = factory.needsPerform({
-        activity: Activity.Eat,
+        type: ActivityType.Eat,
         details: { food: Item.SmilePizza },
       });
 

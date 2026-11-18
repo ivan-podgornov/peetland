@@ -1,7 +1,7 @@
 import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
-import type { PerformedActivity } from './activity';
+import type { Activity } from './activity';
 import type { NeedCategory } from './category';
 import { NeedStatus } from './status';
 import type { NeedRecord } from './types';
@@ -17,12 +17,12 @@ export interface INeed {
   /** Возвращает значение и момент, когда его выставили */
   getState(): NeedRecord;
   /** Возвращает, на сколько занятие изменит значение, без учёта пределов */
-  getGain(performed: PerformedActivity): number;
+  getGain(activity: Activity): number;
   /**
    * Меняет потребность от занятия
    * @param time - момент, когда занятие закончилось
    */
-  perform(performed: PerformedActivity, time: IReadonlyTime): void;
+  perform(activity: Activity, time: IReadonlyTime): void;
 }
 
 /**
@@ -93,12 +93,12 @@ export abstract class BaseNeed implements INeed {
     return this.current;
   }
 
-  abstract getGain(performed: PerformedActivity): number;
+  abstract getGain(activity: Activity): number;
 
   /** Прибавляет вклад занятия к значению на момент time и отсчитывает падение от time */
-  perform(performed: PerformedActivity, time: IReadonlyTime): void {
+  perform(activity: Activity, time: IReadonlyTime): void {
     this.record = {
-      value: this.get(time) + this.getGain(performed),
+      value: this.get(time) + this.getGain(activity),
       since: time.getState(),
     };
   }

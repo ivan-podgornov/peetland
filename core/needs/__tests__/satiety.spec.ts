@@ -4,7 +4,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_RECORD, DEFAULT_NEED_DEPS } from '../dev';
-import { Activity, NeedCategory } from '../src';
+import { ActivityType, NeedCategory } from '../src';
 import { Satiety } from '../src/satiety';
 
 describe('Satiety', () => {
@@ -46,7 +46,7 @@ describe('Satiety', () => {
 
       expect(
         satiety.getGain({
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food },
         })
       ).toBe(gain);
@@ -63,7 +63,7 @@ describe('Satiety', () => {
 
       expect(
         satiety.getGain({
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.SmilePizza },
         })
       ).toBe(100);
@@ -90,7 +90,7 @@ describe('Satiety', () => {
 
       need.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food },
         },
         time
@@ -112,7 +112,7 @@ describe('Satiety', () => {
 
       need.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.RomashkaLoaf },
         },
         time
@@ -137,7 +137,7 @@ describe('Satiety', () => {
 
       need.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.RomashkaLoaf },
         },
         new ManualTime(end)
@@ -158,7 +158,7 @@ describe('Satiety', () => {
 
       need.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.SmilePizza },
         },
         time

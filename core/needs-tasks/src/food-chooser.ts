@@ -1,6 +1,6 @@
 import { Item } from '@peetland/inventory';
 import type { Food, IItemClassifier } from '@peetland/inventory';
-import { Activity, Need, Needs } from '@peetland/needs';
+import { ActivityType, Need, Needs } from '@peetland/needs';
 import type { NpcState } from '@peetland/npc';
 
 import { FOOD_PRICES } from './constants';
@@ -76,7 +76,7 @@ export class FoodChooser implements IFoodChooser {
   /** Сколько сытости восполнит еда, если съесть её при сытости satiety, без того, что не влезет */
   private nutritionWithoutOvereating(state: NpcState, satiety: number, food: Food): number {
     const gain = state.self.needs.getGain(Need.Satiety, {
-      activity: Activity.Eat,
+      type: ActivityType.Eat,
       details: { food },
     });
 

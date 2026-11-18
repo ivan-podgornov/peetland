@@ -3,11 +3,11 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_RECORD, TestNeed } from '../../dev';
-import { Activity } from '../../src';
+import { ActivityType } from '../../src';
 import { BaseNeed } from '../../src/base-need';
 
 const EAT = {
-  activity: Activity.Eat,
+  type: ActivityType.Eat,
   details: { food: Item.SmilePizza },
 } as const;
 

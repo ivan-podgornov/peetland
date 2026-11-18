@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createNeedsDeps, createNeedsState, DEFAULT_RECORD } from '../dev';
-import { Activity, Need, Needs } from '../src';
+import { ActivityType, Need, Needs } from '../src';
 
 describe('Needs', () => {
   describe('#clone', () => {
@@ -31,7 +31,7 @@ describe('Needs', () => {
 
       needs.clone().perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.SmilePizza },
         },
         time
@@ -51,7 +51,7 @@ describe('Needs', () => {
 
       needs.perform(
         {
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.SmilePizza },
         },
         time

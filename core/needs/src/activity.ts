@@ -1,7 +1,7 @@
 import type { Food } from '@peetland/inventory';
 
-/** Занятия, от которых меняются потребности */
-export enum Activity {
+/** Виды занятий, от которых меняются потребности */
+export enum ActivityType {
   /** Поел */
   Eat = 'eat',
 }
@@ -11,18 +11,15 @@ export type EatDetails = Readonly<{
   food: Food;
 }>;
 
-/** Детали каждого занятия */
+/** Детали каждого вида занятий */
 export type ActivityDetails = {
-  [Activity.Eat]: EatDetails;
+  [ActivityType.Eat]: EatDetails;
 };
 
-/**
- * Занятие с его деталями. По полю activity TypeScript сужает тип деталей, поэтому потребностям не
- * нужно приводить детали к типу своего занятия
- */
-export type PerformedActivity = {
-  [A in Activity]: Readonly<{
-    activity: A;
-    details: ActivityDetails[A];
+/** Занятие, от которого меняются потребности: его вид и детали */
+export type Activity = {
+  [T in ActivityType]: Readonly<{
+    type: T;
+    details: ActivityDetails[T];
   }>;
-}[Activity];
+}[ActivityType];

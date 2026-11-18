@@ -1,7 +1,7 @@
 import { applyPlanEffects, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import type { Food } from '@peetland/inventory';
-import { Activity, Need } from '@peetland/needs';
+import { ActivityType, Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -48,7 +48,7 @@ describe('EatTask', () => {
         createEatTask({ food: Item.RomashkaLoaf }, createNpcTaskFactory({ needsPerform }));
 
         expect(needsPerform).toHaveBeenCalledExactlyOnceWith({
-          activity: Activity.Eat,
+          type: ActivityType.Eat,
           details: { food: Item.RomashkaLoaf },
         });
       });

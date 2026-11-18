@@ -8573,69 +8573,122 @@ do
 end
 return ____exports
  end,
-["core.needs-tasks.src.food-chooser"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
-local __TS__ArraySlice = ____lualib.__TS__ArraySlice
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
-local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
+["core.needs-tasks.src.constants"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
-local ____needs = require("core.needs.src.index")
-local Activity = ____needs.Activity
-local Need = ____needs.Need
-local Needs = ____needs.Needs
-____exports.FoodChooser = __TS__Class()
-local FoodChooser = ____exports.FoodChooser
-FoodChooser.name = "FoodChooser"
-function FoodChooser.prototype.____constructor(self)
-end
-function FoodChooser.prototype.choose(self, state, foods)
-    local satiety = state.self.needs:get(Need.Satiety, state.world.time)
-    local filling = __TS__ArrayFilter(
-        foods,
-        function(____, food) return satiety + self:gain(state, food) >= Needs.MAX_NEED end
-    )
-    local ____temp_0 = #filling > 0 and filling or foods
-    local first = ____temp_0[1]
-    local rest = __TS__ArraySlice(____temp_0, 1)
-    if first == nil then
-        error(
-            __TS__New(Error, "Не из чего выбрать еду"),
-            0
-        )
-    end
-    return __TS__ArrayReduce(
-        rest,
-        function(____, best, food)
-            local gain = self:gain(state, food)
-            local bestGain = self:gain(state, best)
-            local ____temp_1
-            if #filling > 0 then
-                ____temp_1 = gain < bestGain
-            else
-                ____temp_1 = gain > bestGain
-            end
-            local better = ____temp_1
-            return better and food or best
-        end,
-        first
-    )
-end
-function FoodChooser.prototype.gain(self, state, food)
-    return state.self.needs:getGain(Need.Satiety, Activity.Eat, {food = food})
-end
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+--- Цена еды в магазине, в долларах
+____exports.FOOD_PRICES = {[Item.RomashkaLoaf] = 80, [Item.SmilePizza] = 120}
+--- Сытость, при которой NPC съест еду, купленную про запас: ниже неё голод загорается. Должна
+-- совпадать с порогом срочности сытости из
+-- 
+-- @peetland /needs
+____exports.EATING_SATIETY = 25
 return ____exports
  end,
 ["core.needs-tasks.src.types"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+return ____exports
+ end,
+["core.needs-tasks.src.buy-food-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____constants = require("core.needs-tasks.src.constants")
+local FOOD_PRICES = ____constants.FOOD_PRICES
+--- Купить еду: дойти до магазина, повернуться к прилавку и купить одну штуку по цене из FOOD_PRICES
+____exports.BuyFoodTask = __TS__Class()
+local BuyFoodTask = ____exports.BuyFoodTask
+BuyFoodTask.name = "BuyFoodTask"
+function BuyFoodTask.prototype.____constructor(self, options, deps)
+    self.name = "buy-food"
+    local ____options_0 = options
+    local food = ____options_0.food
+    local shop = ____options_0.shop
+    local ____deps_1 = deps
+    local npcTaskFactory = ____deps_1.npcTaskFactory
+    self.methods = {{
+        name = "go-to-shop",
+        preconditions = function() return true end,
+        tasks = {
+            npcTaskFactory:goToCoords({coords = shop.position, completeRadius = ____exports.BuyFoodTask.SHOP_COMPLETE_RADIUS}),
+            npcTaskFactory:achieveAngle({angle = shop.angle, tolerance = ____exports.BuyFoodTask.SHOP_FACING_TOLERANCE}),
+            npcTaskFactory:purchase({item = food, count = 1, price = FOOD_PRICES[food]})
+        }
+    }}
+end
+BuyFoodTask.SHOP_COMPLETE_RADIUS = 0.5
+BuyFoodTask.SHOP_FACING_TOLERANCE = 15
+return ____exports
+ end,
+["core.needs-tasks.src.food-chooser"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__ArraySlice = ____lualib.__TS__ArraySlice
+local __TS__ArrayReduce = ____lualib.__TS__ArrayReduce
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+local ____needs = require("core.needs.src.index")
+local Activity = ____needs.Activity
+local Need = ____needs.Need
+local Needs = ____needs.Needs
+local ____constants = require("core.needs-tasks.src.constants")
+local FOOD_PRICES = ____constants.FOOD_PRICES
+____exports.FoodChooser = __TS__Class()
+local FoodChooser = ____exports.FoodChooser
+FoodChooser.name = "FoodChooser"
+function FoodChooser.prototype.____constructor(self, deps)
+    self.itemClassifier = deps.itemClassifier
+end
+function FoodChooser.prototype.chooseFromInventory(self, state, satiety)
+    local items = __TS__ObjectKeys(state.self.inventory:getAll())
+    local foods = __TS__ArrayFilter(
+        items,
+        function(____, item) return self.itemClassifier:isFood(item) end
+    )
+    return self:chooseOptimal(state, satiety, foods)
+end
+function FoodChooser.prototype.chooseToBuy(self, state, satiety)
+    local money = state.self.inventory:get(Item.Money)
+    local foods = __TS__ArrayFilter(
+        ____exports.FoodChooser.SHOP_FOOD,
+        function(____, food) return FOOD_PRICES[food] <= money end
+    )
+    return self:chooseOptimal(state, satiety, foods)
+end
+function FoodChooser.prototype.chooseOptimal(self, state, satiety, foods)
+    local ____foods_0 = foods
+    local first = ____foods_0[1]
+    local rest = __TS__ArraySlice(____foods_0, 1)
+    if first == nil then
+        return nil
+    end
+    return __TS__ArrayReduce(
+        rest,
+        function(____, best, food)
+            local nutrition = self:nutritionWithoutOvereating(state, satiety, food)
+            local bestNutrition = self:nutritionWithoutOvereating(state, satiety, best)
+            local perDollar = nutrition / FOOD_PRICES[food]
+            local bestPerDollar = bestNutrition / FOOD_PRICES[best]
+            local better = perDollar > bestPerDollar or perDollar == bestPerDollar and nutrition > bestNutrition
+            return better and food or best
+        end,
+        first
+    )
+end
+function FoodChooser.prototype.nutritionWithoutOvereating(self, state, satiety, food)
+    local gain = state.self.needs:getGain(Need.Satiety, Activity.Eat, {food = food})
+    return math.max(
+        0,
+        math.min(gain, Needs.MAX_NEED - satiety)
+    )
+end
+FoodChooser.SHOP_FOOD = __TS__ObjectKeys(FOOD_PRICES)
 return ____exports
  end,
 ["core.needs-tasks.src.needs-task"] = function(...) 
@@ -8645,10 +8698,10 @@ local ____exports = {}
 local ____needs = require("core.needs.src.index")
 local Need = ____needs.Need
 local NeedStatus = ____needs.NeedStatus
---- Удовлетворить срочные потребности. Методы — жизненные потребности в порядке приоритета: если
--- срочных несколько, первой удовлетворяется та, что выше. Метод подходит, если его потребность
--- срочная. Если удовлетворить её нечем, планировщик переходит к следующей срочной, а если срочных
--- нет, задачу не спланировать
+--- Удовлетворить потребности. Методы в порядке приоритета: сначала срочные потребности — метод
+-- подходит, если его потребность срочная, — а затем запасы на будущее: обзавестись жратвой, если
+-- сытость не спокойная. Если удовлетворить потребность нечем, планировщик переходит к следующему
+-- методу, а если не подходит ни один, задачу не спланировать
 ____exports.NeedsTask = __TS__Class()
 local NeedsTask = ____exports.NeedsTask
 NeedsTask.name = "NeedsTask"
@@ -8656,28 +8709,24 @@ function NeedsTask.prototype.____constructor(self, deps)
     self.name = "needs"
     local ____deps_0 = deps
     local needsTaskFactory = ____deps_0.needsTaskFactory
-    self.methods = {{
-        name = "satisfy-hunger",
-        preconditions = function(____, state) return state.self.needs:getStatus(Need.Satiety, state.world.time) == NeedStatus.Urgent end,
-        tasks = {needsTaskFactory:satisfyHunger()}
-    }}
+    self.methods = {
+        {
+            name = "satisfy-hunger",
+            preconditions = function(____, state) return state.self.needs:getStatus(Need.Satiety, state.world.time) == NeedStatus.Urgent end,
+            tasks = {needsTaskFactory:satisfyHunger()}
+        },
+        {
+            name = "stock-food",
+            preconditions = function(____, state) return state.self.needs:getStatus(Need.Satiety, state.world.time) ~= NeedStatus.Calm end,
+            tasks = {needsTaskFactory:stockFood()}
+        }
+    }
 end
-return ____exports
- end,
-["core.needs-tasks.src.constants"] = function(...) 
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Item = ____inventory.Item
---- Цена еды в магазине, в долларах
-____exports.FOOD_PRICES = {[Item.RomashkaLoaf] = 80, [Item.SmilePizza] = 120}
 return ____exports
  end,
 ["core.needs-tasks.src.satisfy-hunger-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
 local ReferenceError = ____lualib.ReferenceError
@@ -8686,14 +8735,12 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Item = ____inventory.Item
+local ____needs = require("core.needs.src.index")
+local Need = ____needs.Need
 local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
-local ____constants = require("core.needs-tasks.src.constants")
-local FOOD_PRICES = ____constants.FOOD_PRICES
---- Утолить голод. Если еда есть, NPC съедает ту, что лучше всего подходит. Если еды нет, покупает её в
--- ближайшем магазине и съедает. Что лучше подходит, решает IFoodChooser
+--- Утолить голод. Если еда есть, NPC съедает оптимальную. Если еды нет, покупает её в ближайшем
+-- магазине и съедает. Что оптимально, решает IFoodChooser по текущей сытости
 ____exports.SatisfyHungerTask = __TS__Class()
 local SatisfyHungerTask = ____exports.SatisfyHungerTask
 SatisfyHungerTask.name = "SatisfyHungerTask"
@@ -8703,7 +8750,7 @@ function SatisfyHungerTask.prototype.____constructor(self, deps)
     self.methods = {
         {
             name = "eat-from-inventory",
-            preconditions = function(____, state) return #self:foodInInventory(state) > 0 end,
+            preconditions = function(____, state) return self:foodFromInventory(state) ~= nil end,
             tasks = function(state) return self:eatFromInventory(state) end
         },
         {
@@ -8713,57 +8760,64 @@ function SatisfyHungerTask.prototype.____constructor(self, deps)
         }
     }
 end
-function SatisfyHungerTask.prototype.foodInInventory(self, state)
+function SatisfyHungerTask.prototype.foodFromInventory(self, state)
     local ____self_deps_0 = self.deps
-    local itemClassifier = ____self_deps_0.itemClassifier
-    local items = __TS__ObjectKeys(state.self.inventory:getAll())
-    return __TS__ArrayFilter(
-        items,
-        function(____, item) return itemClassifier:isFood(item) end
+    local foodChooser = ____self_deps_0.foodChooser
+    return foodChooser:chooseFromInventory(
+        state,
+        self:satiety(state)
     )
 end
-function SatisfyHungerTask.prototype.affordableFood(self, state)
-    local money = state.self.inventory:get(Item.Money)
-    return __TS__ArrayFilter(
-        ____exports.SatisfyHungerTask.SHOP_FOOD,
-        function(____, food) return FOOD_PRICES[food] <= money end
+function SatisfyHungerTask.prototype.foodToBuy(self, state)
+    local ____self_deps_1 = self.deps
+    local foodChooser = ____self_deps_1.foodChooser
+    return foodChooser:chooseToBuy(
+        state,
+        self:satiety(state)
     )
+end
+function SatisfyHungerTask.prototype.satiety(self, state)
+    return state.self.needs:get(Need.Satiety, state.world.time)
 end
 function SatisfyHungerTask.prototype.canBuy(self, state)
-    local ____self_deps_1 = self.deps
-    local places = ____self_deps_1.places
-    return #self:affordableFood(state) > 0 and #places:ofType(PlaceType.Shop) > 0 and #places:ofType(PlaceType.HomelessCamp) > 0
+    local ____self_deps_2 = self.deps
+    local places = ____self_deps_2.places
+    return self:foodToBuy(state) ~= nil and #places:ofType(PlaceType.Shop) > 0 and #places:ofType(PlaceType.HomelessCamp) > 0
 end
 function SatisfyHungerTask.prototype.eatFromInventory(self, state)
-    local ____self_deps_2 = self.deps
-    local npcTaskFactory = ____self_deps_2.npcTaskFactory
-    local foodChooser = ____self_deps_2.foodChooser
-    return {npcTaskFactory:eat({food = foodChooser:choose(
-        state,
-        self:foodInInventory(state)
-    )})}
-end
-function SatisfyHungerTask.prototype.buyFood(self, state)
     local ____self_deps_3 = self.deps
     local npcTaskFactory = ____self_deps_3.npcTaskFactory
-    local foodChooser = ____self_deps_3.foodChooser
-    local food = foodChooser:choose(
-        state,
-        self:affordableFood(state)
-    )
+    local food = self:foodFromInventory(state)
+    if food == nil then
+        error(
+            __TS__New(Error, "Еды в инвентаре нет"),
+            0
+        )
+    end
+    return {npcTaskFactory:eat({food = food})}
+end
+function SatisfyHungerTask.prototype.buyFood(self, state)
+    local ____self_deps_4 = self.deps
+    local npcTaskFactory = ____self_deps_4.npcTaskFactory
+    local needsTaskFactory = ____self_deps_4.needsTaskFactory
+    local food = self:foodToBuy(state)
+    if food == nil then
+        error(
+            __TS__New(Error, "Денег на еду нет"),
+            0
+        )
+    end
     local shop = self:findNearest(state.self.actor.position, PlaceType.Shop)
     local camp = self:findNearest(shop.position, PlaceType.HomelessCamp)
     return {
-        npcTaskFactory:goToCoords({coords = shop.position, completeRadius = ____exports.SatisfyHungerTask.SHOP_COMPLETE_RADIUS}),
-        npcTaskFactory:achieveAngle({angle = shop.angle, tolerance = ____exports.SatisfyHungerTask.SHOP_FACING_TOLERANCE}),
-        npcTaskFactory:purchase({item = food, count = 1, price = FOOD_PRICES[food]}),
+        needsTaskFactory:buyFood({food = food, shop = shop}),
         npcTaskFactory:goToCoords({coords = camp.position, completeRadius = ____exports.SatisfyHungerTask.CAMP_COMPLETE_RADIUS}),
         npcTaskFactory:eat({food = food})
     }
 end
 function SatisfyHungerTask.prototype.findNearest(self, position, ____type)
-    local ____self_deps_4 = self.deps
-    local places = ____self_deps_4.places
+    local ____self_deps_5 = self.deps
+    local places = ____self_deps_5.places
     local place = places:findNearest(position, ____type)
     if not place then
         error(
@@ -8773,10 +8827,59 @@ function SatisfyHungerTask.prototype.findNearest(self, position, ____type)
     end
     return place
 end
-SatisfyHungerTask.SHOP_COMPLETE_RADIUS = 0.5
-SatisfyHungerTask.SHOP_FACING_TOLERANCE = 15
 SatisfyHungerTask.CAMP_COMPLETE_RADIUS = 0.5
-SatisfyHungerTask.SHOP_FOOD = __TS__ObjectKeys(FOOD_PRICES)
+return ____exports
+ end,
+["core.needs-tasks.src.stock-food-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____places = require("core.places.src.index")
+local PlaceType = ____places.PlaceType
+local ____constants = require("core.needs-tasks.src.constants")
+local EATING_SATIETY = ____constants.EATING_SATIETY
+--- Обзавестись жратвой: если еды нет, купить её про запас в ближайшем магазине и не есть сразу. Что
+-- купить, IFoodChooser выбирает на сытость, при которой NPC её съест (EATING_SATIETY)
+____exports.StockFoodTask = __TS__Class()
+local StockFoodTask = ____exports.StockFoodTask
+StockFoodTask.name = "StockFoodTask"
+function StockFoodTask.prototype.____constructor(self, deps)
+    self.name = "stock-food"
+    self.deps = deps
+    self.methods = {{
+        name = "buy-food",
+        preconditions = function(____, state) return self:canStock(state) end,
+        tasks = function(state) return self:buyFood(state) end
+    }}
+end
+function StockFoodTask.prototype.canStock(self, state)
+    local ____self_deps_0 = self.deps
+    local places = ____self_deps_0.places
+    local foodChooser = ____self_deps_0.foodChooser
+    return foodChooser:chooseFromInventory(state, EATING_SATIETY) == nil and foodChooser:chooseToBuy(state, EATING_SATIETY) ~= nil and #places:ofType(PlaceType.Shop) > 0
+end
+function StockFoodTask.prototype.buyFood(self, state)
+    local ____self_deps_1 = self.deps
+    local needsTaskFactory = ____self_deps_1.needsTaskFactory
+    local places = ____self_deps_1.places
+    local foodChooser = ____self_deps_1.foodChooser
+    local food = foodChooser:chooseToBuy(state, EATING_SATIETY)
+    local shop = places:findNearest(state.self.actor.position, PlaceType.Shop)
+    if food == nil or not shop then
+        error(
+            __TS__New(Error, "Купить еду не на что или негде"),
+            0
+        )
+    end
+    return {needsTaskFactory:buyFood({food = food, shop = shop})}
+end
 return ____exports
  end,
 ["core.needs-tasks.src.factory"] = function(...) 
@@ -8788,12 +8891,16 @@ local ____inventory = require("core.inventory.src.index")
 local ItemClassifier = ____inventory.ItemClassifier
 local ____npc_2Dtasks = require("core.npc-tasks.src.index")
 local NpcTaskFactory = ____npc_2Dtasks.NpcTaskFactory
+local ____buy_2Dfood_2Dtask = require("core.needs-tasks.src.buy-food-task")
+local BuyFoodTask = ____buy_2Dfood_2Dtask.BuyFoodTask
 local ____food_2Dchooser = require("core.needs-tasks.src.food-chooser")
 local FoodChooser = ____food_2Dchooser.FoodChooser
 local ____needs_2Dtask = require("core.needs-tasks.src.needs-task")
 local NeedsTask = ____needs_2Dtask.NeedsTask
 local ____satisfy_2Dhunger_2Dtask = require("core.needs-tasks.src.satisfy-hunger-task")
 local SatisfyHungerTask = ____satisfy_2Dhunger_2Dtask.SatisfyHungerTask
+local ____stock_2Dfood_2Dtask = require("core.needs-tasks.src.stock-food-task")
+local StockFoodTask = ____stock_2Dfood_2Dtask.StockFoodTask
 --- Создаёт задачи удовлетворения потребностей. На каждый вызов задача новая
 ____exports.NeedsTaskFactory = __TS__Class()
 local NeedsTaskFactory = ____exports.NeedsTaskFactory
@@ -8814,11 +8921,10 @@ function NeedsTaskFactory.prototype.____constructor(self, deps)
     end
     local foodChooser = ____deps_0.foodChooser
     if foodChooser == nil then
-        foodChooser = __TS__New(FoodChooser)
+        foodChooser = __TS__New(FoodChooser, {itemClassifier = itemClassifier})
     end
     self.places = places
     self.npcTaskFactory = npcTaskFactory
-    self.itemClassifier = itemClassifier
     self.foodChooser = foodChooser
 end
 function NeedsTaskFactory.prototype.satisfyNeeds(self)
@@ -8827,9 +8933,17 @@ end
 function NeedsTaskFactory.prototype.satisfyHunger(self)
     local places = self.places
     local npcTaskFactory = self.npcTaskFactory
-    local itemClassifier = self.itemClassifier
     local foodChooser = self.foodChooser
-    return __TS__New(SatisfyHungerTask, {npcTaskFactory = npcTaskFactory, places = places, itemClassifier = itemClassifier, foodChooser = foodChooser})
+    return __TS__New(SatisfyHungerTask, {npcTaskFactory = npcTaskFactory, needsTaskFactory = self, places = places, foodChooser = foodChooser})
+end
+function NeedsTaskFactory.prototype.stockFood(self)
+    local places = self.places
+    local foodChooser = self.foodChooser
+    return __TS__New(StockFoodTask, {needsTaskFactory = self, places = places, foodChooser = foodChooser})
+end
+function NeedsTaskFactory.prototype.buyFood(self, options)
+    local npcTaskFactory = self.npcTaskFactory
+    return __TS__New(BuyFoodTask, options, {npcTaskFactory = npcTaskFactory})
 end
 return ____exports
  end,

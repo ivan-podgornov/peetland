@@ -1,13 +1,14 @@
 export { ActivityType } from './activity';
-export type { ActivityDetails, EatDetails, Activity } from './activity';
+export type { Activity, ActivityDetails, DrinkDetails, EatDetails } from './activity';
 export { NeedCategory } from './category';
 export { NeedsFactory } from './factory';
 export type { INeedsFactory, NeedsFactoryDeps } from './factory';
 export { Need } from './need';
+export type { Addiction } from './need';
 export { Needs } from './needs';
 export type { INeeds, IReadonlyNeeds, NeedsDeps } from './needs';
 export { NeedStatus } from './status';
-export type { NeedRecord, NeedsState, NeedValues } from './types';
+export type { AddictionRecord, Addictions, NeedRecord, NeedsState, NeedValues } from './types';
 export { UrgencyWatcher, UrgencyWatcherFactory } from './urgency-watcher';
 export type { IUrgencyWatcher, IUrgencyWatcherFactory } from './urgency-watcher';
 export { NeedsValidator } from './validator';

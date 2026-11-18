@@ -19,7 +19,10 @@ describe('Needs', () => {
         needFactory: createMockedNeedFactory(createMockedNeed(record)),
       });
 
-      expect(needs.getState()).toStrictEqual({ [Need.Satiety]: record });
+      expect(needs.getState()).toStrictEqual({
+        [Need.Satiety]: record,
+        [Need.Alcoholism]: record,
+      });
     });
   });
 });

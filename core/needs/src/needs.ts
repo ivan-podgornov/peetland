@@ -1,8 +1,10 @@
 import type { IReadonlyTime } from '@peetland/timings';
 
 import type { Activity } from './activity';
+import { BaseAddiction } from './base-addiction';
 import { BaseNeed } from './base-need';
 import type { INeed } from './base-need';
+import type { NeedCategory } from './category';
 import { Need } from './need';
 import type { INeedFactory } from './need-factory';
 import type { NeedStatus } from './status';
@@ -25,6 +27,8 @@ export interface IReadonlyNeeds {
    * @param time - время, на момент которого нужны значения
    */
   getAll(time: IReadonlyTime): NeedValues;
+  /** Возвращает категорию потребности */
+  getCategory(need: Need): NeedCategory;
   /** Возвращает статус потребности на момент time */
   getStatus(need: Need, time: IReadonlyTime): NeedStatus;
   /** Возвращает, на сколько занятие изменит потребность, без учёта пределов */
@@ -57,6 +61,10 @@ export class Needs implements INeeds {
 
   static readonly CALM_ABOVE = BaseNeed.CALM_ABOVE;
 
+  static readonly MIN_STRENGTH = BaseAddiction.MIN_STRENGTH;
+
+  static readonly MAX_STRENGTH = BaseAddiction.MAX_STRENGTH;
+
   private readonly deps: NeedsDeps;
   private readonly needs: Readonly<Record<Need, INeed>>;
 
@@ -78,6 +86,10 @@ export class Needs implements INeeds {
     return Object.fromEntries(
       Object.values(Need).map((need) => [need, this.get(need, time)])
     ) as NeedValues;
+  }
+
+  getCategory(need: Need): NeedCategory {
+    return this.needs[need].category;
   }
 
   getStatus(need: Need, time: IReadonlyTime): NeedStatus {

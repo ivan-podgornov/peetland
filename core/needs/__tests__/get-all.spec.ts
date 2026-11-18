@@ -28,7 +28,10 @@ describe('Needs', () => {
 
       const values = needs.getAll(time);
 
-      expect(values).toStrictEqual({ [Need.Satiety]: needs.get(Need.Satiety, time) });
+      expect(values).toStrictEqual({
+        [Need.Satiety]: needs.get(Need.Satiety, time),
+        [Need.Alcoholism]: needs.get(Need.Alcoholism, time),
+      });
     });
   });
 });

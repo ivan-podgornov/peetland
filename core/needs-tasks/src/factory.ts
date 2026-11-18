@@ -9,11 +9,13 @@ import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
+import { BuyFoodTask } from './buy-food-task';
 import { FoodChooser } from './food-chooser';
 import type { IFoodChooser } from './food-chooser';
 import { NeedsTask } from './needs-task';
 import { SatisfyHungerTask } from './satisfy-hunger-task';
-import type { INeedsTaskFactory } from './types';
+import { StockFoodTask } from './stock-food-task';
+import type { BuyFoodTaskOptions, INeedsTaskFactory } from './types';
 
 export type NeedsTaskFactoryDeps = {
   geometry: IGeometry;
@@ -23,9 +25,12 @@ export type NeedsTaskFactoryDeps = {
   timer: ITimer;
   /** Фабрика задач NPC, которую получают задачи. По умолчанию — NpcTaskFactory */
   npcTaskFactory?: INpcTaskFactory;
-  /** Классификатор предметов. По умолчанию — ItemClassifier */
+  /** Классификатор предметов, которым выбор еды по умолчанию ищет еду. По умолчанию — ItemClassifier */
   itemClassifier?: IItemClassifier;
-  /** Выбирает, что съесть. По умолчанию — FoodChooser */
+  /**
+   * Выбирает оптимальную еду с учётом цены, сытости, при которой NPC её съест, и питательности. По
+   * умолчанию — FoodChooser
+   */
   foodChooser?: IFoodChooser;
 };
 
@@ -33,7 +38,6 @@ export type NeedsTaskFactoryDeps = {
 export class NeedsTaskFactory implements INeedsTaskFactory {
   private readonly places: IPlaces;
   private readonly npcTaskFactory: INpcTaskFactory;
-  private readonly itemClassifier: IItemClassifier;
   private readonly foodChooser: IFoodChooser;
 
   constructor(deps: NeedsTaskFactoryDeps) {
@@ -48,12 +52,11 @@ export class NeedsTaskFactory implements INeedsTaskFactory {
         timer,
       }),
       itemClassifier = new ItemClassifier(),
-      foodChooser = new FoodChooser(),
+      foodChooser = new FoodChooser({ itemClassifier }),
     } = deps;
 
     this.places = places;
     this.npcTaskFactory = npcTaskFactory;
-    this.itemClassifier = itemClassifier;
     this.foodChooser = foodChooser;
   }
 
@@ -62,13 +65,29 @@ export class NeedsTaskFactory implements INeedsTaskFactory {
   }
 
   satisfyHunger(): Task<NpcState, NpcContext> {
-    const { places, npcTaskFactory, itemClassifier, foodChooser } = this;
+    const { places, npcTaskFactory, foodChooser } = this;
 
     return new SatisfyHungerTask({
       npcTaskFactory,
+      needsTaskFactory: this,
       places,
-      itemClassifier,
       foodChooser,
     });
+  }
+
+  stockFood(): Task<NpcState, NpcContext> {
+    const { places, foodChooser } = this;
+
+    return new StockFoodTask({
+      needsTaskFactory: this,
+      places,
+      foodChooser,
+    });
+  }
+
+  buyFood(options: BuyFoodTaskOptions): Task<NpcState, NpcContext> {
+    const { npcTaskFactory } = this;
+
+    return new BuyFoodTask(options, { npcTaskFactory });
   }
 }

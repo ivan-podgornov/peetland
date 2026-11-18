@@ -8,97 +8,60 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
   createMockedFoodChooser,
+  createMockedNeedsTaskFactory,
   createSatisfyHungerTask,
   TEST_CAMP,
   TEST_SHOP,
 } from '../../../dev';
-import { FOOD_PRICES } from '../../../src/constants';
 
 describe('SatisfyHungerTask', () => {
   describe('Метод buy-food', () => {
     describe('Задачи', () => {
-      it('Планирует дойти до магазина, повернуться к прилавку, купить еду, дойти до бомжарни и съесть', () => {
+      it('Планирует купить еду, дойти до бомжарни и съесть', () => {
         const task = createSatisfyHungerTask({
-          npcTaskFactory: createNpcTaskFactory({
-            purchase: () => createStubTask('purchase'),
-            eat: () => createStubTask('eat'),
-          }),
+          npcTaskFactory: createNpcTaskFactory({ eat: () => createStubTask('eat') }),
+          foodChooser: createMockedFoodChooser({ toBuy: Item.SmilePizza }),
         });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: 1000 })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
           new PlanStructureBuilder()
             .compound('satisfy-hunger', 'buy-food', (buy) =>
-              buy
-                .primitive('go-to-coords')
-                .primitive('achieve-angle')
-                .primitive('purchase')
-                .primitive('go-to-coords')
-                .primitive('eat')
+              buy.primitive('buy-food').primitive('go-to-coords').primitive('eat')
             )
             .build()
         );
       });
 
-      it('Идёт к ближайшему магазину и поворачивается к прилавку', () => {
-        const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
-        const achieveAngle = vi.fn(() => createStubNpcTask('achieve-angle'));
-        const task = createSatisfyHungerTask({
-          npcTaskFactory: createNpcTaskFactory({
-            goToCoords,
-            achieveAngle,
-          }),
-        });
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: 1000 })
-          .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
-          .build();
-
-        planSteps(task, state);
-
-        expect(goToCoords).toHaveBeenNthCalledWith(1, {
-          coords: TEST_SHOP.position,
-          completeRadius: 0.5,
-        });
-        expect(achieveAngle).toHaveBeenCalledExactlyOnceWith({
-          angle: TEST_SHOP.angle,
-          tolerance: 15,
-        });
-      });
-
-      it('Выбирает, что купить, из еды, на которую хватает денег', () => {
-        const foodChooser = createMockedFoodChooser(Item.RomashkaLoaf);
+      it('Выбирает, что купить, на текущую сытость', () => {
+        const foodChooser = createMockedFoodChooser({ toBuy: Item.SmilePizza });
         const task = createSatisfyHungerTask({ foodChooser });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] - 1 })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
 
-        expect(foodChooser.choose).toHaveBeenCalledExactlyOnceWith(state, [Item.RomashkaLoaf]);
+        expect(foodChooser.chooseToBuy).toHaveBeenCalledWith(state, 10);
       });
 
-      it('Покупает одну штуку выбранной еды по её цене', () => {
-        const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
+      it('Покупает выбранную еду в ближайшем магазине', () => {
+        const needsTaskFactory = createMockedNeedsTaskFactory();
         const task = createSatisfyHungerTask({
-          npcTaskFactory: createNpcTaskFactory({ purchase }),
-          foodChooser: createMockedFoodChooser(Item.SmilePizza),
+          needsTaskFactory,
+          foodChooser: createMockedFoodChooser({ toBuy: Item.SmilePizza }),
         });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: 1000 })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
 
-        expect(purchase).toHaveBeenCalledExactlyOnceWith({
-          item: Item.SmilePizza,
-          count: 1,
-          price: FOOD_PRICES[Item.SmilePizza],
+        expect(needsTaskFactory.buyFood).toHaveBeenCalledExactlyOnceWith({
+          food: Item.SmilePizza,
+          shop: TEST_SHOP,
         });
       });
 
@@ -110,15 +73,15 @@ describe('SatisfyHungerTask', () => {
             goToCoords,
             eat,
           }),
+          foodChooser: createMockedFoodChooser({ toBuy: Item.SmilePizza }),
         });
         const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: FOOD_PRICES[Item.SmilePizza] })
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
           .build();
 
         planSteps(task, state);
 
-        expect(goToCoords).toHaveBeenLastCalledWith({
+        expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
           coords: TEST_CAMP.position,
           completeRadius: 0.5,
         });

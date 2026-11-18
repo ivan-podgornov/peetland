@@ -14,7 +14,7 @@ function createStateWithSatiety(satiety: number) {
 }
 
 describe('NeedsTask', () => {
-  it('Создаёт задачу утолить голод фабрикой needsTaskFactory', () => {
+  it('Создаёт SatisfyHungerTask фабрикой needsTaskFactory', () => {
     const needsTaskFactory = createMockedNeedsTaskFactory();
 
     new NeedsTask({ needsTaskFactory });
@@ -22,8 +22,16 @@ describe('NeedsTask', () => {
     expect(needsTaskFactory.satisfyHunger).toHaveBeenCalledOnce();
   });
 
+  it('Создаёт StockFoodTask фабрикой needsTaskFactory', () => {
+    const needsTaskFactory = createMockedNeedsTaskFactory();
+
+    new NeedsTask({ needsTaskFactory });
+
+    expect(needsTaskFactory.stockFood).toHaveBeenCalledOnce();
+  });
+
   describe('Метод satisfy-hunger', () => {
-    it('Если голод срочный, планирует утолить голод', () => {
+    it('Если голод срочный, планирует SatisfyHungerTask', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
@@ -36,19 +44,50 @@ describe('NeedsTask', () => {
       );
     });
 
-    it('Если голод не срочный, план не составляется', () => {
+    it('Если голод срочный, а SatisfyHungerTask не спланировать, планирует StockFoodTask', () => {
+      const task = new NeedsTask({
+        needsTaskFactory: createMockedNeedsTaskFactory({
+          satisfyHunger: () => createStubTask('satisfy-hunger', false),
+        }),
+      });
+      const state = createStateWithSatiety(0);
+
+      expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('needs', 'stock-food', (needs) => needs.primitive('stock-food'))
+          .build()
+      );
+    });
+  });
+
+  describe('Метод stock-food', () => {
+    it('Если сытость умеренная, планирует StockFoodTask', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory(),
       });
-      const state = createStateWithSatiety(100);
+      const state = createStateWithSatiety(40);
+
+      expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
+        new PlanStructureBuilder()
+          .compound('needs', 'stock-food', (needs) => needs.primitive('stock-food'))
+          .build()
+      );
+    });
+
+    it('Если сытость спокойная, план не составляется', () => {
+      const task = new NeedsTask({
+        needsTaskFactory: createMockedNeedsTaskFactory(),
+      });
+      const state = createStateWithSatiety(70);
 
       expect(planSteps(task, state)).toBeNull();
     });
 
-    it('Если утолить голод нечем, план не составляется', () => {
+    it('Если ни SatisfyHungerTask, ни StockFoodTask не спланировать, план не составляется', () => {
       const task = new NeedsTask({
         needsTaskFactory: createMockedNeedsTaskFactory({
           satisfyHunger: () => createStubTask('satisfy-hunger', false),
+          stockFood: () => createStubTask('stock-food', false),
         }),
       });
       const state = createStateWithSatiety(0);

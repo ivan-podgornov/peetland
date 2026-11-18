@@ -6189,7 +6189,11 @@ end
 function ItemClassifier.prototype.isFood(self, item)
     return __TS__ArrayIncludes(____exports.ItemClassifier.FOOD, item)
 end
+function ItemClassifier.prototype.isBooze(self, item)
+    return __TS__ArrayIncludes(____exports.ItemClassifier.BOOZE, item)
+end
 ItemClassifier.FOOD = {Item.RomashkaLoaf, Item.SmilePizza}
+ItemClassifier.BOOZE = {Item.Booze}
 return ____exports
  end,
 ["core.inventory.src.inventory"] = function(...) 

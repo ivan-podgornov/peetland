@@ -1,0 +1,1 @@
+{"id":"30b7736dc51e2cf6d5df3f2fc1fe5f1e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/perform.spec.ts#BaseAddiction #perform Не поднимает значение выше BaseAddiction.MAX_VALUE","name":"Не поднимает значение выше BaseAddiction.MAX_VALUE","status":"passed","testResultsByEnv":{"default":"bae8e789f71efb5d9c63149629bc7a27"}}

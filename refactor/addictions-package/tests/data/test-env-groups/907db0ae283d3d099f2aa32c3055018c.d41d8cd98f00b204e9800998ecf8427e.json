@@ -1,0 +1,1 @@
+{"id":"907db0ae283d3d099f2aa32c3055018c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/addictions/__tests__/base-addiction/record.spec.ts#BaseAddiction Сеттер record Не поднимает значение выше BaseAddiction.MAX_VALUE","name":"Не поднимает значение выше BaseAddiction.MAX_VALUE","status":"passed","testResultsByEnv":{"default":"d01674880c0408dff95fce8ae6b4924d"}}

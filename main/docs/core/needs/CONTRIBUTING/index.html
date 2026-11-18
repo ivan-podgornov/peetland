@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.0e981fdc.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.c023ff9c.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.54f7c512.js" defer="defer"></script>
 </head>
 <body>
@@ -21,22 +21,24 @@
 (<code>NeedCategory</code>). Она решает, какой слой корневой задачи NPC удовлетворяет потребность: жизненные
 (<code>Vital</code>) — слой потребностей, зависимости (<code>Addiction</code>) — слой зависимостей.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="классы-потребностей">Классы потребностей<a href="#классы-потребностей" class="hash-link" aria-label="Прямая ссылка на Классы потребностей" title="Прямая ссылка на Классы потребностей" translate="no">​</a></h2>
-<p>Общая логика лежит в абстрактном классе <code>BaseNeed</code>: падение, статус, проверка значения и пределы.
-Чем потребность отличается, подкласс передаёт в конструктор <code>BaseNeed</code> опциями (<code>NeedOptions</code>):
-категорию, за сколько минут она падает до нуля и пороги. Как потребность меняется от занятий,
-подкласс описывает сам в <code>perform</code>, а новое значение выставляет через сеттер <code>record</code>, который
-держит значение в пределах. Например, сытость (<code>Satiety</code>) жизненная, падает до нуля за игровые
+<p>Общая логика лежит в абстрактном классе <code>BaseNeed</code>: падение, статус, проверка значения, пределы и
+изменение от занятий (<code>perform</code>). Пределы значения и пороги статусов у всех потребностей одни и
+лежат в <code>BaseNeed</code>. Потребности отличаются только категорией, скоростью падения и вкладом занятий.
+Категорию и за сколько минут потребность падает до нуля, подкласс передаёт в конструктор
+<code>BaseNeed</code> опциями (<code>NeedOptions</code>), а сколько даёт каждое занятие, описывает сам в <code>getGain</code>.
+<code>perform</code> прибавляет этот вклад через сеттер <code>record</code>, который держит значение в пределах.
+Например, сытость (<code>Satiety</code>) жизненная, падает до нуля за игровые
 сутки, а сколько её восполняет еда, лежит в <code>Satiety.FOOD_SATIETY</code>.</p>
 <p><code>Needs</code> — коллекция потребностей: раздаёт им вызовы и собирает их состояние. Потребности из
 состояния собирает фабрика потребностей (<code>NeedFactory</code>), которую <code>Needs</code> получает в зависимостях.
 Новая потребность — новый подкласс <code>BaseNeed</code> и новая ветка в <code>NeedFactory</code>. Классы потребностей и
 фабрика — детали реализации и из пакета не экспортируются.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="статус">Статус<a href="#статус" class="hash-link" aria-label="Прямая ссылка на Статус" title="Прямая ссылка на Статус" translate="no">​</a></h2>
-<p>У потребности два порога, и от них зависит её статус (<code>NeedStatus</code>). Ниже нижнего (<code>urgentBelow</code>)
-потребность срочная (<code>Urgent</code>): NPC бросает дела и удовлетворяет её. Выше верхнего (<code>calmAbove</code>)
-она спокойная (<code>Calm</code>). Между порогами она <code>Moderate</code>: уже не срочная, но ещё не спокойная. Так
+<p>У потребностей два общих порога, и от них зависит статус (<code>NeedStatus</code>). Ниже нижнего
+(<code>Needs.URGENT_BELOW</code>, 25) потребность срочная (<code>Urgent</code>): NPC бросает дела и удовлетворяет её. Выше
+верхнего (<code>Needs.CALM_ABOVE</code>, 60) она спокойная (<code>Calm</code>). Между порогами она <code>Moderate</code>: уже не срочная, но ещё не спокойная. Так
 значение, которое скачет около нижнего порога, не поднимает тревогу снова (см. наблюдатель
-срочности). У сытости пороги 25 и 60: срочно становится за 6 часов до голода.</p>
+срочности). Когда потребность станет срочной, зависит от скорости: сытость — за 6 часов до голода.</p>
 <p><code>getStatus(need, time)</code> у <code>Needs</code> возвращает статус потребности на момент времени.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="наблюдатель-срочности">Наблюдатель срочности<a href="#наблюдатель-срочности" class="hash-link" aria-label="Прямая ссылка на Наблюдатель срочности" title="Прямая ссылка на Наблюдатель срочности" translate="no">​</a></h2>
 <p><code>UrgencyWatcher</code> следит, когда потребности становятся срочными. <code>check(needs, time)</code> возвращает,
@@ -58,15 +60,16 @@
 раньше момента, когда значение выставили, например время перевели назад, значение не растёт.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="занятия">Занятия<a href="#занятия" class="hash-link" aria-label="Прямая ссылка на Занятия" title="Прямая ссылка на Занятия" translate="no">​</a></h2>
 <p>Потребности меняются от занятий (<code>Activity</code>), как психика от поступков: задача сообщает, чем NPC
-занимался, а потребности сами решают, какие из них и на сколько от этого меняются. Пока занятие
-одно — поесть (<code>Eat</code>).</p>
-<p><code>getGain(need, activity, details)</code> возвращает, на сколько занятие изменит потребность, без учёта
+занимался, а потребности сами решают, какие из них и на сколько от этого меняются. Занятие —
+объект <code>{ type, details }</code>: вид занятия (<code>ActivityType</code>) и его детали. Пока вид занятий один —
+поесть (<code>Eat</code>).</p>
+<p><code>getGain(need, activity)</code> возвращает, на сколько занятие изменит потребность, без учёта
 пределов: например, сколько сытости даст еда. По нему задачи выбирают, чем удовлетворить
 потребность. Подкласс <code>BaseNeed</code> описывает вклад занятий в <code>getGain</code>, а <code>perform</code> пользуется им же.</p>
-<p><code>perform(activity, details, time)</code> сообщает о занятии каждой потребности. Потребность, которую
+<p><code>perform(activity, time)</code> сообщает о занятии каждой потребности. Потребность, которую
 занятие меняет, прибавляет его вклад к значению на момент <code>time</code> и отсчитывает падение от <code>time</code>, а
 остальные не меняются.</p>
-<p>У каждого занятия есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
+<p>У каждого вида занятий есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
 деталей зависит вклад. В деталях еды (<code>EatDetails</code>) лежит, что съели (<code>Food</code> из
 <code>@peetland/inventory</code>), а сколько от этого восполнится сытости, решает <code>Satiety</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="время-при-чтении-и-записи">Время при чтении и записи<a href="#время-при-чтении-и-записи" class="hash-link" aria-label="Прямая ссылка на Время при чтении и записи" title="Прямая ссылка на Время при чтении и записи" translate="no">​</a></h2>
@@ -100,8 +103,8 @@
 <li class="">зависимости потребностей (<code>createNeedsDeps</code>) с валидатором, который пропускает любые значения
 (<code>createMockedNeedsValidator</code>), и настоящей фабрикой потребностей;</li>
 <li class="">мок потребности (<code>createMockedNeed</code>) и мок фабрики потребностей (<code>createMockedNeedFactory</code>);</li>
-<li class="">потребность для тестов общей логики <code>BaseNeed</code> (<code>TestNeed</code>), запись потребности (<code>DEFAULT_RECORD</code>)
-и зависимости потребности с настоящим валидатором (<code>DEFAULT_SATIETY_DEPS</code>);</li>
+<li class="">потребность для тестов общей логики <code>BaseNeed</code> (<code>TestNeed</code>), которой любое занятие прибавляет <code>TestNeed.GAIN</code>, запись потребности (<code>DEFAULT_RECORD</code>)
+и зависимости потребности с настоящим валидатором (<code>DEFAULT_NEED_DEPS</code>);</li>
 <li class="">значения и состояние потребностей (<code>createNeedValues</code>, <code>createNeedsState</code>), в которых всё, что не
 передано, удовлетворено полностью;</li>
 <li class="">мок потребностей (<code>createMockedNeeds</code>), у которого копия из <code>clone()</code> — новый такой же мок;</li>

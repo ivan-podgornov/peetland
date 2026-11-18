@@ -6337,9 +6337,9 @@ return ____exports
 ["core.needs.src.activity"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Занятия, от которых меняются потребности
-____exports.Activity = ____exports.Activity or ({})
-____exports.Activity.Eat = "eat"
+--- Виды занятий, от которых меняются потребности
+____exports.ActivityType = ____exports.ActivityType or ({})
+____exports.ActivityType.Eat = "eat"
 return ____exports
  end,
 ["core.needs.src.category"] = function(...) 
@@ -6414,7 +6414,8 @@ local ____timings = require("toolkit.timings.src.index")
 local TimeSpan = ____timings.TimeSpan
 local ____status = require("core.needs.src.status")
 local NeedStatus = ____status.NeedStatus
---- Общая логика потребностей
+--- Общая логика потребностей: падение, статус, проверка значения, пределы и изменение от занятий.
+-- Подкласс задаёт категорию и скорость падения опциями, а вклад занятий — в getGain
 ____exports.BaseNeed = __TS__Class()
 local BaseNeed = ____exports.BaseNeed
 BaseNeed.name = "BaseNeed"
@@ -6444,20 +6445,25 @@ function BaseNeed.prototype.get(self, time)
     return math.max(____exports.BaseNeed.MIN_NEED, value - rate * elapsed)
 end
 function BaseNeed.prototype.getStatus(self, time)
-    local ____self_options_3 = self.options
-    local urgentBelow = ____self_options_3.urgentBelow
-    local calmAbove = ____self_options_3.calmAbove
     local value = self:get(time)
-    if value < urgentBelow then
+    if value < ____exports.BaseNeed.URGENT_BELOW then
         return NeedStatus.Urgent
     end
-    return value > calmAbove and NeedStatus.Calm or NeedStatus.Moderate
+    return value > ____exports.BaseNeed.CALM_ABOVE and NeedStatus.Calm or NeedStatus.Moderate
 end
 function BaseNeed.prototype.getState(self)
     return self.current
 end
+function BaseNeed.prototype.perform(self, activity, time)
+    self.record = {
+        value = self:get(time) + self:getGain(activity),
+        since = time:getState()
+    }
+end
 BaseNeed.MIN_NEED = 0
 BaseNeed.MAX_NEED = 100
+BaseNeed.URGENT_BELOW = 25
+BaseNeed.CALM_ABOVE = 60
 __TS__SetDescriptor(
     BaseNeed.prototype,
     "record",
@@ -6487,7 +6493,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____activity = require("core.needs.src.activity")
-local Activity = ____activity.Activity
+local ActivityType = ____activity.ActivityType
 local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
 local ____category = require("core.needs.src.category")
@@ -6500,23 +6506,17 @@ __TS__ClassExtends(Satiety, BaseNeed)
 function Satiety.prototype.____constructor(self, record, deps)
     BaseNeed.prototype.____constructor(self, record, ____exports.Satiety.OPTIONS, deps)
 end
-function Satiety.prototype.getGain(self, activity, details)
+function Satiety.prototype.getGain(self, activity)
     repeat
-        local ____switch4 = activity
-        local ____cond4 = ____switch4 == Activity.Eat
+        local ____switch4 = activity.type
+        local ____cond4 = ____switch4 == ActivityType.Eat
         if ____cond4 then
-            return ____exports.Satiety.FOOD_SATIETY[details.food]
+            return ____exports.Satiety.FOOD_SATIETY[activity.details.food]
         end
     until true
     return 0
 end
-function Satiety.prototype.perform(self, activity, details, time)
-    self.record = {
-        value = self:get(time) + self:getGain(activity, details),
-        since = time:getState()
-    }
-end
-Satiety.OPTIONS = {category = NeedCategory.Vital, depletionMinutes = 24 * 60, urgentBelow = 25, calmAbove = 60}
+Satiety.OPTIONS = {category = NeedCategory.Vital, depletionMinutes = 24 * 60}
 Satiety.FOOD_SATIETY = {[Item.RomashkaLoaf] = 60, [Item.SmilePizza] = 100}
 return ____exports
  end,
@@ -6590,8 +6590,8 @@ end
 function Needs.prototype.getStatus(self, need, time)
     return self.needs[need]:getStatus(time)
 end
-function Needs.prototype.getGain(self, need, activity, details)
-    return self.needs[need]:getGain(activity, details)
+function Needs.prototype.getGain(self, need, activity)
+    return self.needs[need]:getGain(activity)
 end
 function Needs.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6609,14 +6609,16 @@ function Needs.prototype.clone(self)
         self.deps
     )
 end
-function Needs.prototype.perform(self, activity, details, time)
+function Needs.prototype.perform(self, activity, time)
     __TS__ArrayForEach(
         __TS__ObjectValues(Need),
-        function(____, need) return self.needs[need]:perform(activity, details, time) end
+        function(____, need) return self.needs[need]:perform(activity, time) end
     )
 end
 Needs.MIN_NEED = BaseNeed.MIN_NEED
 Needs.MAX_NEED = BaseNeed.MAX_NEED
+Needs.URGENT_BELOW = BaseNeed.URGENT_BELOW
+Needs.CALM_ABOVE = BaseNeed.CALM_ABOVE
 return ____exports
  end,
 ["core.needs.src.factory"] = function(...) 
@@ -6721,7 +6723,7 @@ return ____exports
 local ____exports = {}
 do
     local ____activity = require("core.needs.src.activity")
-    ____exports.Activity = ____activity.Activity
+    ____exports.ActivityType = ____activity.ActivityType
 end
 do
     local ____category = require("core.needs.src.category")
@@ -8161,11 +8163,8 @@ function NeedsPerformTask.prototype.canExecute(self)
     return true
 end
 function NeedsPerformTask.prototype.applyEffects(self, state)
-    local ____self_options_0 = self.options
-    local activity = ____self_options_0.activity
-    local details = ____self_options_0.details
     local needs = state.self.needs:clone()
-    needs:perform(activity, details, state.world.time)
+    needs:perform(self.options, state.world.time)
     return __TS__ObjectAssign(
         {},
         state,
@@ -8173,10 +8172,7 @@ function NeedsPerformTask.prototype.applyEffects(self, state)
     )
 end
 function NeedsPerformTask.prototype.start(self, state, context)
-    local ____self_options_1 = self.options
-    local activity = ____self_options_1.activity
-    local details = ____self_options_1.details
-    context.needs:perform(activity, details, state.world.time)
+    context.needs:perform(self.options, state.world.time)
     return "success"
 end
 function NeedsPerformTask.prototype.update(self)
@@ -8402,7 +8398,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____needs = require("core.needs.src.index")
-local Activity = ____needs.Activity
+local ActivityType = ____needs.ActivityType
 --- Съесть еду из инвентаря там, где NPC стоит. Съесть — транзакция: если NPC начал есть, он доест,
 -- еда пропадёт из инвентаря, а потребности узнают, что он поел
 ____exports.EatTask = __TS__Class()
@@ -8421,7 +8417,7 @@ function EatTask.prototype.____constructor(self, options, deps)
         tasks = {
             npcTaskFactory:playAnimation({animation = ____exports.EatTask.ANIMATIONS[food]}),
             npcTaskFactory:removeItem({item = food, count = 1}),
-            npcTaskFactory:needsPerform({activity = Activity.Eat, details = {food = food}})
+            npcTaskFactory:needsPerform({type = ActivityType.Eat, details = {food = food}})
         }
     }}
 end
@@ -8584,11 +8580,6 @@ local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 --- Цена еды в магазине, в долларах
 ____exports.FOOD_PRICES = {[Item.RomashkaLoaf] = 80, [Item.SmilePizza] = 120}
---- Сытость, при которой NPC съест еду, купленную про запас: ниже неё голод загорается. Должна
--- совпадать с порогом срочности сытости из
--- 
--- @peetland /needs
-____exports.EATING_SATIETY = 25
 return ____exports
  end,
 ["core.needs-tasks.src.types"] = function(...) 
@@ -8638,7 +8629,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____needs = require("core.needs.src.index")
-local Activity = ____needs.Activity
+local ActivityType = ____needs.ActivityType
 local Need = ____needs.Need
 local Needs = ____needs.Needs
 local ____constants = require("core.needs-tasks.src.constants")
@@ -8686,7 +8677,7 @@ function FoodChooser.prototype.chooseOptimal(self, state, satiety, foods)
     )
 end
 function FoodChooser.prototype.nutritionWithoutOvereating(self, state, satiety, food)
-    local gain = state.self.needs:getGain(Need.Satiety, Activity.Eat, {food = food})
+    local gain = state.self.needs:getGain(Need.Satiety, {type = ActivityType.Eat, details = {food = food}})
     return math.max(
         0,
         math.min(gain, Needs.MAX_NEED - satiety)
@@ -8845,12 +8836,12 @@ local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____needs = require("core.needs.src.index")
+local Needs = ____needs.Needs
 local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
-local ____constants = require("core.needs-tasks.src.constants")
-local EATING_SATIETY = ____constants.EATING_SATIETY
 --- Обзавестись жратвой: если еды нет, купить её про запас в ближайшем магазине и не есть сразу. Что
--- купить, IFoodChooser выбирает на сытость, при которой NPC её съест (EATING_SATIETY)
+-- купить, IFoodChooser выбирает на сытость, при которой NPC её съест (Needs.URGENT_BELOW: ниже него голод загорается)
 ____exports.StockFoodTask = __TS__Class()
 local StockFoodTask = ____exports.StockFoodTask
 StockFoodTask.name = "StockFoodTask"
@@ -8867,14 +8858,14 @@ function StockFoodTask.prototype.canStock(self, state)
     local ____self_deps_0 = self.deps
     local places = ____self_deps_0.places
     local foodChooser = ____self_deps_0.foodChooser
-    return foodChooser:chooseFromInventory(state, EATING_SATIETY) == nil and foodChooser:chooseToBuy(state, EATING_SATIETY) ~= nil and #places:ofType(PlaceType.Shop) > 0
+    return foodChooser:chooseFromInventory(state, Needs.URGENT_BELOW) == nil and foodChooser:chooseToBuy(state, Needs.URGENT_BELOW) ~= nil and #places:ofType(PlaceType.Shop) > 0
 end
 function StockFoodTask.prototype.buyFood(self, state)
     local ____self_deps_1 = self.deps
     local needsTaskFactory = ____self_deps_1.needsTaskFactory
     local places = ____self_deps_1.places
     local foodChooser = ____self_deps_1.foodChooser
-    local food = foodChooser:chooseToBuy(state, EATING_SATIETY)
+    local food = foodChooser:chooseToBuy(state, Needs.URGENT_BELOW)
     local shop = places:findNearest(state.self.actor.position, PlaceType.Shop)
     if food == nil or not shop then
         error(

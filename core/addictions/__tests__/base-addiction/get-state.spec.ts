@@ -4,10 +4,10 @@ import { DEFAULT_RECORD, TestAddiction } from '../../dev';
 
 describe('BaseAddiction', () => {
   describe('#getState', () => {
-    it('Возвращает выставленное значение и момент, когда его выставили', () => {
+    it('Возвращает выставленные тягу, силу и момент, когда тягу выставили', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: 80,
+        craving: 80,
       };
 
       expect(new TestAddiction(record).getState()).toStrictEqual(record);

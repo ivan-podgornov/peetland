@@ -1,14 +1,14 @@
-import { ActivityType } from '@peetland/addictions';
+import { ConsumptionType } from '@peetland/addictions';
 import { createMockedAddictions } from '@peetland/addictions/dev';
 import { Item } from '@peetland/inventory';
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
-import { AddictionsPerformTask } from '../src/addictions-perform-task';
+import { AddictionsConsumeTask } from '../src/addictions-consume-task';
 
-describe('AddictionsPerformTask', () => {
+describe('AddictionsConsumeTask', () => {
   describe('#start', () => {
-    it('Сообщает о занятии зависимостям из контекста на время из состояния', () => {
+    it('Сообщает об употреблении зависимостям из контекста на время из состояния', () => {
       const addictions = createMockedAddictions();
       const context = {
         ...createNpcContext(),
@@ -16,16 +16,16 @@ describe('AddictionsPerformTask', () => {
       };
       const state = NpcStateBuilder.default();
       const details = { booze: Item.Booze } as const;
-      const task = new AddictionsPerformTask({
-        type: ActivityType.Drink,
+      const task = new AddictionsConsumeTask({
+        type: ConsumptionType.Drink,
         details,
       });
 
       task.start(state, context);
 
-      expect(addictions.perform).toHaveBeenCalledExactlyOnceWith(
+      expect(addictions.consume).toHaveBeenCalledExactlyOnceWith(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details,
         },
         state.world.time
@@ -33,8 +33,8 @@ describe('AddictionsPerformTask', () => {
     });
 
     it("Возвращает 'success'", () => {
-      const task = new AddictionsPerformTask({
-        type: ActivityType.Drink,
+      const task = new AddictionsConsumeTask({
+        type: ConsumptionType.Drink,
         details: { booze: Item.Booze },
       });
 
@@ -45,22 +45,22 @@ describe('AddictionsPerformTask', () => {
   });
 
   describe('#applyEffects', () => {
-    it('Сообщает о занятии копии зависимостей из состояния на время из состояния', () => {
+    it('Сообщает об употреблении копии зависимостей из состояния на время из состояния', () => {
       const copy = createMockedAddictions();
       const addictions = createMockedAddictions();
       addictions.clone.mockReturnValue(copy);
       const state = new NpcStateBuilder().withAddictions(() => addictions).build();
       const details = { booze: Item.Booze } as const;
-      const task = new AddictionsPerformTask({
-        type: ActivityType.Drink,
+      const task = new AddictionsConsumeTask({
+        type: ConsumptionType.Drink,
         details,
       });
 
       task.applyEffects(state);
 
-      expect(copy.perform).toHaveBeenCalledExactlyOnceWith(
+      expect(copy.consume).toHaveBeenCalledExactlyOnceWith(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details,
         },
         state.world.time
@@ -71,8 +71,8 @@ describe('AddictionsPerformTask', () => {
       const copy = createMockedAddictions();
       const addictions = createMockedAddictions();
       addictions.clone.mockReturnValue(copy);
-      const task = new AddictionsPerformTask({
-        type: ActivityType.Drink,
+      const task = new AddictionsConsumeTask({
+        type: ConsumptionType.Drink,
         details: { booze: Item.Booze },
       });
 
@@ -84,8 +84,8 @@ describe('AddictionsPerformTask', () => {
     });
 
     it('Не меняет то, что NPC знает о мире', () => {
-      const task = new AddictionsPerformTask({
-        type: ActivityType.Drink,
+      const task = new AddictionsConsumeTask({
+        type: ConsumptionType.Drink,
         details: { booze: Item.Booze },
       });
       const state = NpcStateBuilder.default();

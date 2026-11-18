@@ -11,7 +11,7 @@ export {
   createAddictionsData,
   createAddictionsDeps,
   createAddictionsState,
-  createAddictionValues,
+  createAddictionCravings,
   createMockedAddictions,
   createMockedAddictionsValidator,
 } from './addictions';

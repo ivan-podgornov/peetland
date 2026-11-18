@@ -6,7 +6,7 @@ import { Addiction, Addictions } from '../src';
 
 describe('Addictions', () => {
   describe('#get', () => {
-    it('Возвращает значение, которое зависимость посчитала на момент переданного времени', () => {
+    it('Возвращает тягу, которую зависимость посчитала на момент переданного времени', () => {
       const addiction = createMockedAddiction();
       addiction.get.mockReturnValue(42);
       const addictions = new Addictions(createAddictionsState(), {

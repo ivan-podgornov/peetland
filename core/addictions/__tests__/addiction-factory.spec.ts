@@ -24,7 +24,7 @@ describe('AddictionFactory', () => {
 
       new AddictionFactory({ validator }).create(Addiction.Alcoholism, DEFAULT_RECORD);
 
-      expect(validator.validateValue).toHaveBeenCalled();
+      expect(validator.validateCraving).toHaveBeenCalled();
     });
   });
 });

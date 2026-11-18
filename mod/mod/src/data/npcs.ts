@@ -35,10 +35,10 @@ export const npcs: NpcData[] = [
     needs: {
       [Need.Satiety]: 20,
     },
-    // Алкаш: зависимость от пойла максимальная, но сейчас выпить не тянет
+    // Алкаш: зависимость от пойла максимальная, но только что выпил, и тяги нет
     addictions: {
       [Addiction.Alcoholism]: {
-        value: 100,
+        craving: 0,
         strength: 100,
       },
     },

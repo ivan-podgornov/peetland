@@ -76,7 +76,7 @@ const state = new NpcStateBuilder()
   .withPsyche((psyche) => psyche.withTrait(Trait.Luck, 80).withFeeling(Feeling.Shame, 30).build())
   .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
   .withAddictions((addictions) =>
-    addictions.withStrength(Addiction.Alcoholism, 100).withValue(Addiction.Alcoholism, 20).build()
+    addictions.withStrength(Addiction.Alcoholism, 100).withCraving(Addiction.Alcoholism, 80).build()
   )
   .withTime({ day: 1, hours: 20, minutes: 0 })
   .build();

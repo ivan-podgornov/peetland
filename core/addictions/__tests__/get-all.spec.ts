@@ -7,11 +7,11 @@ import { BaseAddiction } from '../src/base-addiction';
 
 describe('Addictions', () => {
   describe('#getAll', () => {
-    it('Возвращает значение каждой зависимости на момент переданного времени', () => {
+    it('Возвращает тягу каждой зависимости на момент переданного времени', () => {
       const addictions = new Addictions(
         createAddictionsState({
           [Addiction.Alcoholism]: {
-            value: 80,
+            craving: 80,
             strength: BaseAddiction.MAX_STRENGTH,
             since: {
               day: 1,

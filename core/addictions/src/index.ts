@@ -1,5 +1,5 @@
-export { ActivityType } from './activity';
-export type { Activity, ActivityDetails, DrinkDetails } from './activity';
+export { ConsumptionType } from './consumption';
+export type { Consumption, ConsumptionDetails, DrinkDetails } from './consumption';
 export { Addiction } from './addiction';
 export { Addictions } from './addictions';
 export type { AddictionsDeps, IAddictions, IReadonlyAddictions } from './addictions';
@@ -11,7 +11,7 @@ export type {
   AddictionRecord,
   AddictionsData,
   AddictionsState,
-  AddictionValues,
+  AddictionCravings,
 } from './types';
 export { AddictionsValidator } from './validator';
 export type { IAddictionsValidator } from './validator';

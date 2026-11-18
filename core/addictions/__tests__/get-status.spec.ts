@@ -8,7 +8,7 @@ describe('Addictions', () => {
   describe('#getStatus', () => {
     it('Возвращает статус, который зависимость посчитала на момент переданного времени', () => {
       const addiction = createMockedAddiction();
-      addiction.getStatus.mockReturnValue(AddictionStatus.Urgent);
+      addiction.getStatus.mockReturnValue(AddictionStatus.Craving);
       const addictions = new Addictions(createAddictionsState(), {
         addictionFactory: createMockedAddictionFactory(addiction),
       });
@@ -17,7 +17,7 @@ describe('Addictions', () => {
       const status = addictions.getStatus(Addiction.Alcoholism, time);
 
       expect(addiction.getStatus).toHaveBeenCalledExactlyOnceWith(time);
-      expect(status).toBe(AddictionStatus.Urgent);
+      expect(status).toBe(AddictionStatus.Craving);
     });
   });
 });

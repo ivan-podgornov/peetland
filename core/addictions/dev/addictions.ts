@@ -6,21 +6,21 @@ import type {
   AddictionsData,
   AddictionsDeps,
   AddictionsState,
-  AddictionValues,
+  AddictionCravings,
   IAddictions,
   IAddictionsValidator,
 } from '../src';
 import { AddictionFactory } from '../src/addiction-factory';
 
-/** Создаёт валидатор, который пропускает любые значения и силу */
+/** Создаёт валидатор, который пропускает любые тягу и силу */
 export function createMockedAddictionsValidator(): Mocked<IAddictionsValidator> {
   return {
-    validateValue: vi.fn(),
+    validateCraving: vi.fn(),
     validateStrength: vi.fn(),
   };
 }
 
-/** Создаёт зависимости коллекции с настоящей фабрикой, валидатор которой пропускает любые значения */
+/** Создаёт зависимости коллекции с настоящей фабрикой, валидатор которой пропускает любые тягу и силу */
 export function createAddictionsDeps(deps: Partial<AddictionsDeps> = {}): AddictionsDeps {
   return {
     addictionFactory: new AddictionFactory({ validator: createMockedAddictionsValidator() }),
@@ -28,22 +28,24 @@ export function createAddictionsDeps(deps: Partial<AddictionsDeps> = {}): Addict
   };
 }
 
-/** Создаёт значения зависимостей. Зависимостей, которые не переданы, совсем не тянет */
-export function createAddictionValues(values: Partial<AddictionValues> = {}): AddictionValues {
+/** Создаёт тягу зависимостей. У зависимостей, которые не переданы, тяги нет */
+export function createAddictionCravings(
+  values: Partial<AddictionCravings> = {}
+): AddictionCravings {
   return {
-    [Addiction.Alcoholism]: Addictions.MAX_VALUE,
+    [Addiction.Alcoholism]: Addictions.MIN_CRAVING,
     ...values,
   };
 }
 
 /**
  * Создаёт начальные данные зависимостей. Зависимостей, которые не переданы, нет: их сила —
- * Addictions.MIN_STRENGTH, и совсем не тянет
+ * Addictions.MIN_STRENGTH, и тяги нет
  */
 export function createAddictionsData(data: Partial<AddictionsData> = {}): AddictionsData {
   return {
     [Addiction.Alcoholism]: {
-      value: Addictions.MAX_VALUE,
+      craving: Addictions.MIN_CRAVING,
       strength: Addictions.MIN_STRENGTH,
     },
     ...data,
@@ -52,12 +54,12 @@ export function createAddictionsData(data: Partial<AddictionsData> = {}): Addict
 
 /**
  * Создаёт состояние зависимостей. Зависимостей, которые не переданы, нет, и с полуночи первого дня
- * совсем не тянет
+ * тяги нет
  */
 export function createAddictionsState(state: Partial<AddictionsState> = {}): AddictionsState {
   return {
     [Addiction.Alcoholism]: {
-      value: Addictions.MAX_VALUE,
+      craving: Addictions.MIN_CRAVING,
       strength: Addictions.MIN_STRENGTH,
       since: {
         day: 1,
@@ -72,12 +74,12 @@ export function createAddictionsState(state: Partial<AddictionsState> = {}): Add
 /** Создаёт мок зависимостей. Копия из clone() — новый такой же мок */
 export function createMockedAddictions(): Mocked<IAddictions> {
   return {
-    get: vi.fn(() => Addictions.MAX_VALUE),
-    getAll: vi.fn(() => createAddictionValues()),
+    get: vi.fn(() => Addictions.MIN_CRAVING),
+    getAll: vi.fn(() => createAddictionCravings()),
     getStatus: vi.fn(() => AddictionStatus.Calm),
     getState: vi.fn(() => createAddictionsState()),
-    getGain: vi.fn(() => 0),
+    getRelief: vi.fn(() => 0),
     clone: vi.fn(() => createMockedAddictions()),
-    perform: vi.fn(),
+    consume: vi.fn(),
   };
 }

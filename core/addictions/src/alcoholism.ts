@@ -1,7 +1,7 @@
-import { ActivityType } from './activity';
-import type { Activity } from './activity';
 import { BaseAddiction } from './base-addiction';
 import type { AddictionDeps, AddictionOptions } from './base-addiction';
+import { ConsumptionType } from './consumption';
+import type { Consumption } from './consumption';
 import type { AddictionRecord } from './types';
 
 /** Алкоголизм: зависимость от пойла */
@@ -13,10 +13,10 @@ export class Alcoholism extends BaseAddiction {
     super(record, Alcoholism.OPTIONS, deps);
   }
 
-  getGain(activity: Activity): number {
-    switch (activity.type) {
-      case ActivityType.Drink:
-        return BaseAddiction.MAX_VALUE;
+  getRelief(consumption: Consumption): number {
+    switch (consumption.type) {
+      case ConsumptionType.Drink:
+        return BaseAddiction.MAX_CRAVING;
     }
   }
 }

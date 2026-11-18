@@ -1,36 +1,36 @@
 import { TimeSpan } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
-import type { Activity } from './activity';
+import type { Consumption } from './consumption';
 import { AddictionStatus } from './status';
 import type { AddictionRecord } from './types';
 import type { IAddictionsValidator } from './validator';
 
 /** Зависимость NPC */
 export interface IAddiction {
-  /** Возвращает значение на момент time */
+  /** Возвращает тягу на момент time */
   get(time: IReadonlyTime): number;
   /** Возвращает статус на момент time */
   getStatus(time: IReadonlyTime): AddictionStatus;
-  /** Возвращает значение, момент, когда его выставили, и силу */
+  /** Возвращает тягу, момент, когда её выставили, и силу */
   getState(): AddictionRecord;
-  /** Возвращает, на сколько занятие изменит значение, без учёта пределов */
-  getGain(activity: Activity): number;
+  /** Возвращает, на сколько употребление снимет тягу, без учёта пределов */
+  getRelief(consumption: Consumption): number;
   /**
-   * Меняет зависимость от занятия
-   * @param time - момент, когда занятие закончилось
+   * Снимает тягу от употребления
+   * @param time - момент, когда NPC закончил употреблять
    */
-  perform(activity: Activity, time: IReadonlyTime): void;
+  consume(consumption: Consumption, time: IReadonlyTime): void;
 }
 
 /**
- * Чем одна зависимость отличается от другой, кроме вклада занятий. Пределы значения и силы и
- * пороги статусов у всех зависимостей одни (см. BaseAddiction)
+ * Чем одна зависимость отличается от другой, кроме того, как её снимает употребление. Пределы тяги и
+ * силы и пороги статусов у всех зависимостей одни (см. BaseAddiction)
  */
 export type AddictionOptions = Readonly<{
   /**
-   * Через сколько игровых минут после употребления тянет при максимальной силе: за это время
-   * значение падает от MAX_VALUE до порога срочности
+   * Через сколько игровых минут после того, как тяга снята, снова тянет при максимальной силе: за
+   * это время тяга растёт от MIN_CRAVING до CRAVING_ABOVE
    */
   cravingMinutes: number;
 }>;
@@ -40,20 +40,20 @@ export type AddictionDeps = {
 };
 
 /**
- * Общая логика зависимостей: рост тяги, статус, проверка значения и силы, пределы и изменение от
- * занятий. Значение — насколько NPC не тянет: падает со скоростью, пропорциональной силе, а при силе
- * 0 не падает. Подкласс задаёт скорость при максимальной силе опциями, а вклад занятий — в getGain
+ * Общая логика зависимостей: рост тяги, статус, проверка тяги и силы, пределы и снятие тяги
+ * употреблением. Тяга растёт со скоростью, пропорциональной силе, а при силе 0 не растёт. Подкласс
+ * задаёт скорость при максимальной силе опциями, а сколько тяги снимает употребление — в getRelief
  */
 export abstract class BaseAddiction implements IAddiction {
-  static readonly MIN_VALUE = 0;
+  static readonly MIN_CRAVING = 0;
 
-  static readonly MAX_VALUE = 100;
+  static readonly MAX_CRAVING = 100;
 
-  /** Ниже этого значения тянет */
-  static readonly URGENT_BELOW = 25;
+  /** Выше этой тяги тянет */
+  static readonly CRAVING_ABOVE = 75;
 
-  /** Выше этого значения не тянет совсем */
-  static readonly CALM_ABOVE = 60;
+  /** Ниже этой тяги NPC спокоен */
+  static readonly CALM_BELOW = 40;
 
   static readonly MIN_STRENGTH = 0;
 
@@ -63,11 +63,11 @@ export abstract class BaseAddiction implements IAddiction {
   private readonly timeSpan = new TimeSpan();
   private current: AddictionRecord;
 
-  /** @throws ошибку валидатора, если значение или сила не прошли проверку */
+  /** @throws ошибку валидатора, если тяга или сила не прошли проверку */
   constructor(record: AddictionRecord, options: AddictionOptions, deps: AddictionDeps) {
     const { validator } = deps;
 
-    validator.validateValue(record.value, BaseAddiction.MIN_VALUE, BaseAddiction.MAX_VALUE);
+    validator.validateCraving(record.craving, BaseAddiction.MIN_CRAVING, BaseAddiction.MAX_CRAVING);
     validator.validateStrength(
       record.strength,
       BaseAddiction.MIN_STRENGTH,
@@ -78,39 +78,39 @@ export abstract class BaseAddiction implements IAddiction {
   }
 
   get(time: IReadonlyTime): number {
-    const { value, since, strength } = this.current;
+    const { craving, since, strength } = this.current;
     const { cravingMinutes } = this.options;
     const elapsed = Math.max(0, this.timeSpan.elapsedMinutes(since, time.getState()));
-    // При максимальной силе за cravingMinutes значение падает от MAX_VALUE до порога срочности, а
-    // при меньшей силе — пропорционально медленнее. Сначала умножаем, чтобы не копить погрешность
-    const drop =
-      ((BaseAddiction.MAX_VALUE - BaseAddiction.URGENT_BELOW) * strength * elapsed) /
+    // При максимальной силе за cravingMinutes тяга растёт от MIN_CRAVING до CRAVING_ABOVE, а при
+    // меньшей силе — пропорционально медленнее. Сначала умножаем, чтобы не копить погрешность
+    const growth =
+      ((BaseAddiction.CRAVING_ABOVE - BaseAddiction.MIN_CRAVING) * strength * elapsed) /
       (cravingMinutes * BaseAddiction.MAX_STRENGTH);
 
-    return Math.max(BaseAddiction.MIN_VALUE, value - drop);
+    return Math.min(BaseAddiction.MAX_CRAVING, craving + growth);
   }
 
   getStatus(time: IReadonlyTime): AddictionStatus {
-    const value = this.get(time);
+    const craving = this.get(time);
 
-    if (value < BaseAddiction.URGENT_BELOW) {
-      return AddictionStatus.Urgent;
+    if (craving > BaseAddiction.CRAVING_ABOVE) {
+      return AddictionStatus.Craving;
     }
 
-    return value > BaseAddiction.CALM_ABOVE ? AddictionStatus.Calm : AddictionStatus.Moderate;
+    return craving < BaseAddiction.CALM_BELOW ? AddictionStatus.Calm : AddictionStatus.Moderate;
   }
 
   getState(): AddictionRecord {
     return this.current;
   }
 
-  abstract getGain(activity: Activity): number;
+  abstract getRelief(consumption: Consumption): number;
 
-  /** Прибавляет вклад занятия к значению на момент time и отсчитывает рост тяги от time */
-  perform(activity: Activity, time: IReadonlyTime): void {
+  /** Снимает с тяги на момент time то, что снимает употребление, и отсчитывает рост тяги от time */
+  consume(consumption: Consumption, time: IReadonlyTime): void {
     this.record = {
       ...this.current,
-      value: this.get(time) + this.getGain(activity),
+      craving: this.get(time) - this.getRelief(consumption),
       since: time.getState(),
     };
   }
@@ -119,11 +119,14 @@ export abstract class BaseAddiction implements IAddiction {
     return this.current;
   }
 
-  /** Держит значение в пределах от MIN_VALUE до MAX_VALUE */
+  /** Держит тягу в пределах от MIN_CRAVING до MAX_CRAVING */
   protected set record(record: AddictionRecord) {
     this.current = {
       ...record,
-      value: Math.min(BaseAddiction.MAX_VALUE, Math.max(BaseAddiction.MIN_VALUE, record.value)),
+      craving: Math.min(
+        BaseAddiction.MAX_CRAVING,
+        Math.max(BaseAddiction.MIN_CRAVING, record.craving)
+      ),
     };
   }
 }

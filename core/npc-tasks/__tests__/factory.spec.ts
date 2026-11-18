@@ -1,4 +1,4 @@
-import { ActivityType as AddictionActivityType } from '@peetland/addictions';
+import { ConsumptionType } from '@peetland/addictions';
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import { ActivityType } from '@peetland/needs';
@@ -10,7 +10,7 @@ import { createNpcTaskFactoryDeps } from '../dev';
 import { NpcTaskFactory } from '../src';
 import { AchieveAngleTask } from '../src/achieve-angle-task';
 import { AddItemTask } from '../src/add-item-task';
-import { AddictionsPerformTask } from '../src/addictions-perform-task';
+import { AddictionsConsumeTask } from '../src/addictions-consume-task';
 import { EatTask } from '../src/eat-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
 import { NeedsPerformTask } from '../src/needs-perform-task';
@@ -160,16 +160,16 @@ describe('NpcTaskFactory', () => {
     });
   });
 
-  describe('#addictionsPerform', () => {
-    it('Возвращает AddictionsPerformTask', () => {
+  describe('#addictionsConsume', () => {
+    it('Возвращает AddictionsConsumeTask', () => {
       const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
 
-      const task = factory.addictionsPerform({
-        type: AddictionActivityType.Drink,
+      const task = factory.addictionsConsume({
+        type: ConsumptionType.Drink,
         details: { booze: Item.Booze },
       });
 
-      expect(task).toBeInstanceOf(AddictionsPerformTask);
+      expect(task).toBeInstanceOf(AddictionsConsumeTask);
     });
   });
 

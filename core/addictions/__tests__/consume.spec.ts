@@ -3,12 +3,12 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedAddiction, createMockedAddictionFactory, createAddictionsState } from '../dev';
-import { ActivityType, Addictions } from '../src';
+import { ConsumptionType, Addictions } from '../src';
 import type { DrinkDetails } from '../src';
 
 describe('Addictions', () => {
-  describe('#perform', () => {
-    it('Передаёт зависимости занятие, детали и время', () => {
+  describe('#consume', () => {
+    it('Передаёт каждой зависимости употребление и время', () => {
       const addiction = createMockedAddiction();
       const addictions = new Addictions(createAddictionsState(), {
         addictionFactory: createMockedAddictionFactory(addiction),
@@ -16,17 +16,17 @@ describe('Addictions', () => {
       const details: DrinkDetails = { booze: Item.Booze };
       const time = new ManualTime();
 
-      addictions.perform(
+      addictions.consume(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details,
         },
         time
       );
 
-      expect(addiction.perform).toHaveBeenCalledExactlyOnceWith(
+      expect(addiction.consume).toHaveBeenCalledExactlyOnceWith(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details,
         },
         time

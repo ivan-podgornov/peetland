@@ -6,38 +6,38 @@ import { BaseAddiction } from '../../src/base-addiction';
 
 describe('BaseAddiction', () => {
   describe('#get', () => {
-    it('Если время не прошло, возвращает выставленное значение', () => {
+    it('Если время не прошло, возвращает выставленную тягу', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: 80,
+        craving: 20,
       };
 
-      const value = new TestAddiction(record).get(new ManualTime(record.since));
+      const craving = new TestAddiction(record).get(new ManualTime(record.since));
 
-      expect(value).toBe(80);
+      expect(craving).toBe(20);
     });
 
-    it('Возвращает выставленное значение минус скорость падения, умноженную на минуты от момента, когда его выставили, до переданного времени', () => {
+    it('Возвращает выставленную тягу плюс скорость роста, умноженную на минуты от момента, когда её выставили, до переданного времени', () => {
       const since = {
         day: 1,
         hours: 10,
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        value: 80,
-        strength: BaseAddiction.MAX_STRENGTH,
+        ...DEFAULT_RECORD,
+        craving: 20,
         since,
       });
 
-      // Зависимость падает на 100 за сутки, а прошла четверть суток: она упала на 25
-      const value = addiction.get(
+      // При максимальной силе тяга растёт на 100 за сутки, а прошла четверть суток: она выросла на 25
+      const craving = addiction.get(
         new ManualTime({
           ...since,
           hours: since.hours + 6,
         })
       );
 
-      expect(value).toBeCloseTo(55);
+      expect(craving).toBeCloseTo(45);
     });
 
     it('Считает прошедшее время через полночь', () => {
@@ -47,13 +47,13 @@ describe('BaseAddiction', () => {
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        value: 80,
-        strength: BaseAddiction.MAX_STRENGTH,
+        ...DEFAULT_RECORD,
+        craving: 20,
         since,
       });
 
-      // Прошло 6 часов, четверть суток: зависимость упала на 25
-      const value = addiction.get(
+      // Прошло 6 часов, четверть суток: тяга выросла на 25
+      const craving = addiction.get(
         new ManualTime({
           day: since.day + 1,
           hours: 3,
@@ -61,51 +61,45 @@ describe('BaseAddiction', () => {
         })
       );
 
-      expect(value).toBeCloseTo(55);
+      expect(craving).toBeCloseTo(45);
     });
 
-    it('Не опускает значение ниже BaseAddiction.MIN_VALUE', () => {
-      const since = {
-        day: 1,
-        hours: 10,
-        minutes: 0,
-      };
+    it('Не поднимает тягу выше BaseAddiction.MAX_CRAVING', () => {
       const addiction = new TestAddiction({
-        value: 10,
-        strength: BaseAddiction.MAX_STRENGTH,
-        since,
+        ...DEFAULT_RECORD,
+        craving: 90,
       });
 
-      const value = addiction.get(
+      const craving = addiction.get(
         new ManualTime({
-          ...since,
-          day: since.day + 1,
+          ...DEFAULT_RECORD.since,
+          day: DEFAULT_RECORD.since.day + 1,
         })
       );
 
-      expect(value).toBe(BaseAddiction.MIN_VALUE);
+      expect(craving).toBe(BaseAddiction.MAX_CRAVING);
     });
 
-    it('Если время раньше момента, когда выставили значение, возвращает выставленное значение', () => {
+    it('Если время раньше момента, когда выставили тягу, возвращает выставленную тягу', () => {
       const since = {
         day: 2,
         hours: 10,
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        value: 80,
-        strength: BaseAddiction.MAX_STRENGTH,
+        ...DEFAULT_RECORD,
+        craving: 20,
         since,
       });
 
-      const value = addiction.get(
+      const craving = addiction.get(
         new ManualTime({
           ...since,
           day: since.day - 1,
         })
       );
 
-      expect(value).toBe(80);
+      expect(craving).toBe(20);
     });
   });
 });

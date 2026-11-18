@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createAddictionsDeps, createAddictionsState, DEFAULT_RECORD } from '../dev';
-import { ActivityType, Addiction, Addictions } from '../src';
+import { ConsumptionType, Addiction, Addictions } from '../src';
 
 describe('Addictions', () => {
   describe('#clone', () => {
@@ -12,7 +12,7 @@ describe('Addictions', () => {
         createAddictionsState({
           [Addiction.Alcoholism]: {
             ...DEFAULT_RECORD,
-            value: 80,
+            craving: 80,
           },
         }),
         createAddictionsDeps()
@@ -21,10 +21,10 @@ describe('Addictions', () => {
       expect(addictions.clone().getState()).toStrictEqual(addictions.getState());
     });
 
-    it('Занятие в копии не меняет исходные зависимости', () => {
+    it('Употребление в копии не меняет исходные зависимости', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: 50,
+        craving: 50,
       };
       const addictions = new Addictions(
         createAddictionsState({ [Addiction.Alcoholism]: record }),
@@ -32,9 +32,9 @@ describe('Addictions', () => {
       );
       const time = new ManualTime(record.since);
 
-      addictions.clone().perform(
+      addictions.clone().consume(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details: { booze: Item.Booze },
         },
         time
@@ -43,10 +43,10 @@ describe('Addictions', () => {
       expect(addictions.get(Addiction.Alcoholism, time)).toBe(50);
     });
 
-    it('Занятие в исходных потребностях не меняет копию', () => {
+    it('Употребление в исходных зависимостях не меняет копию', () => {
       const record = {
         ...DEFAULT_RECORD,
-        value: 50,
+        craving: 50,
       };
       const addictions = new Addictions(
         createAddictionsState({ [Addiction.Alcoholism]: record }),
@@ -55,9 +55,9 @@ describe('Addictions', () => {
       const copy = addictions.clone();
       const time = new ManualTime(record.since);
 
-      addictions.perform(
+      addictions.consume(
         {
-          type: ActivityType.Drink,
+          type: ConsumptionType.Drink,
           details: { booze: Item.Booze },
         },
         time

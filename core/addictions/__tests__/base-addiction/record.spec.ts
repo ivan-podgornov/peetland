@@ -8,7 +8,7 @@ describe('BaseAddiction', () => {
     it('Выставляет запись', () => {
       const addiction = new TestAddiction(DEFAULT_RECORD);
       const record = {
-        value: 40,
+        craving: 40,
         strength: BaseAddiction.MAX_STRENGTH,
         since: {
           ...DEFAULT_RECORD.since,
@@ -21,26 +21,26 @@ describe('BaseAddiction', () => {
       expect(addiction.getState()).toStrictEqual(record);
     });
 
-    it('Не поднимает значение выше BaseAddiction.MAX_VALUE', () => {
+    it('Не поднимает тягу выше BaseAddiction.MAX_CRAVING', () => {
       const addiction = new TestAddiction(DEFAULT_RECORD);
 
       addiction.setRecord({
         ...DEFAULT_RECORD,
-        value: BaseAddiction.MAX_VALUE + 1,
+        craving: BaseAddiction.MAX_CRAVING + 1,
       });
 
-      expect(addiction.getState().value).toBe(BaseAddiction.MAX_VALUE);
+      expect(addiction.getState().craving).toBe(BaseAddiction.MAX_CRAVING);
     });
 
-    it('Не опускает значение ниже BaseAddiction.MIN_VALUE', () => {
+    it('Не опускает тягу ниже BaseAddiction.MIN_CRAVING', () => {
       const addiction = new TestAddiction(DEFAULT_RECORD);
 
       addiction.setRecord({
         ...DEFAULT_RECORD,
-        value: BaseAddiction.MIN_VALUE - 1,
+        craving: BaseAddiction.MIN_CRAVING - 1,
       });
 
-      expect(addiction.getState().value).toBe(BaseAddiction.MIN_VALUE);
+      expect(addiction.getState().craving).toBe(BaseAddiction.MIN_CRAVING);
     });
   });
 });

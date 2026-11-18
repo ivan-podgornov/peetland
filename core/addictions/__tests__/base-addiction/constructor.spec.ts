@@ -5,21 +5,21 @@ import { BaseAddiction } from '../../src/base-addiction';
 
 describe('BaseAddiction', () => {
   describe('#constructor', () => {
-    it('Валидирует значение в пределах зависимости', () => {
+    it('Валидирует тягу в пределах тяги', () => {
       const validator = createMockedAddictionsValidator();
 
       new TestAddiction(
         {
           ...DEFAULT_RECORD,
-          value: 40,
+          craving: 40,
         },
         { validator }
       );
 
-      expect(validator.validateValue).toHaveBeenCalledExactlyOnceWith(
+      expect(validator.validateCraving).toHaveBeenCalledExactlyOnceWith(
         40,
-        BaseAddiction.MIN_VALUE,
-        BaseAddiction.MAX_VALUE
+        BaseAddiction.MIN_CRAVING,
+        BaseAddiction.MAX_CRAVING
       );
     });
 
@@ -44,7 +44,7 @@ describe('BaseAddiction', () => {
     it('Если валидатор выбросил ошибку, выбрасывает ту же ошибку', () => {
       const error = new RangeError();
       const validator = createMockedAddictionsValidator();
-      validator.validateValue.mockThrow(error);
+      validator.validateCraving.mockThrow(error);
       function create() {
         return new TestAddiction(DEFAULT_RECORD, { validator });
       }

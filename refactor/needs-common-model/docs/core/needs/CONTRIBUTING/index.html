@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/refactor/needs-common-model/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/refactor/needs-common-model/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/refactor/needs-common-model/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/refactor/needs-common-model/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/refactor/needs-common-model/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/refactor/needs-common-model/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/refactor/needs-common-model/docs/assets/js/runtime~main.aac0e3f6.js" defer="defer"></script>
+<script src="/peetland/refactor/needs-common-model/docs/assets/js/runtime~main.5327b172.js" defer="defer"></script>
 <script src="/peetland/refactor/needs-common-model/docs/assets/js/main.c8ff1f8c.js" defer="defer"></script>
 </head>
 <body>
@@ -60,18 +60,16 @@
 раньше момента, когда значение выставили, например время перевели назад, значение не растёт.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="занятия">Занятия<a href="#занятия" class="hash-link" aria-label="Прямая ссылка на Занятия" title="Прямая ссылка на Занятия" translate="no">​</a></h2>
 <p>Потребности меняются от занятий (<code>Activity</code>), как психика от поступков: задача сообщает, чем NPC
-занимался, а потребности сами решают, какие из них и на сколько от этого меняются. Пока занятие
-одно — поесть (<code>Eat</code>).</p>
-<p>Занятие с деталями передаётся одним объектом (<code>PerformedActivity</code>): <code>{ activity, details }</code>. По
-полю <code>activity</code> TypeScript сам сужает тип деталей, поэтому потребности не приводят детали к типу
-своего занятия.</p>
-<p><code>getGain(need, performed)</code> возвращает, на сколько занятие изменит потребность, без учёта
+занимался, а потребности сами решают, какие из них и на сколько от этого меняются. Занятие —
+объект <code>{ type, details }</code>: вид занятия (<code>ActivityType</code>) и его детали. Пока вид занятий один —
+поесть (<code>Eat</code>).</p>
+<p><code>getGain(need, activity)</code> возвращает, на сколько занятие изменит потребность, без учёта
 пределов: например, сколько сытости даст еда. По нему задачи выбирают, чем удовлетворить
 потребность. Подкласс <code>BaseNeed</code> описывает вклад занятий в <code>getGain</code>, а <code>perform</code> пользуется им же.</p>
-<p><code>perform(performed, time)</code> сообщает о занятии каждой потребности. Потребность, которую
+<p><code>perform(activity, time)</code> сообщает о занятии каждой потребности. Потребность, которую
 занятие меняет, прибавляет его вклад к значению на момент <code>time</code> и отсчитывает падение от <code>time</code>, а
 остальные не меняются.</p>
-<p>У каждого занятия есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
+<p>У каждого вида занятий есть детали (<code>ActivityDetails</code>): для еды — что съели, для сна — сколько спал. От
 деталей зависит вклад. В деталях еды (<code>EatDetails</code>) лежит, что съели (<code>Food</code> из
 <code>@peetland/inventory</code>), а сколько от этого восполнится сытости, решает <code>Satiety</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="время-при-чтении-и-записи">Время при чтении и записи<a href="#время-при-чтении-и-записи" class="hash-link" aria-label="Прямая ссылка на Время при чтении и записи" title="Прямая ссылка на Время при чтении и записи" translate="no">​</a></h2>

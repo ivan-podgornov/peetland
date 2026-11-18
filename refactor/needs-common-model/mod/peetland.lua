@@ -6337,9 +6337,9 @@ return ____exports
 ["core.needs.src.activity"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Занятия, от которых меняются потребности
-____exports.Activity = ____exports.Activity or ({})
-____exports.Activity.Eat = "eat"
+--- Виды занятий, от которых меняются потребности
+____exports.ActivityType = ____exports.ActivityType or ({})
+____exports.ActivityType.Eat = "eat"
 return ____exports
  end,
 ["core.needs.src.category"] = function(...) 
@@ -6454,9 +6454,9 @@ end
 function BaseNeed.prototype.getState(self)
     return self.current
 end
-function BaseNeed.prototype.perform(self, performed, time)
+function BaseNeed.prototype.perform(self, activity, time)
     self.record = {
-        value = self:get(time) + self:getGain(performed),
+        value = self:get(time) + self:getGain(activity),
         since = time:getState()
     }
 end
@@ -6493,7 +6493,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____activity = require("core.needs.src.activity")
-local Activity = ____activity.Activity
+local ActivityType = ____activity.ActivityType
 local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
 local ____category = require("core.needs.src.category")
@@ -6506,12 +6506,12 @@ __TS__ClassExtends(Satiety, BaseNeed)
 function Satiety.prototype.____constructor(self, record, deps)
     BaseNeed.prototype.____constructor(self, record, ____exports.Satiety.OPTIONS, deps)
 end
-function Satiety.prototype.getGain(self, performed)
+function Satiety.prototype.getGain(self, activity)
     repeat
-        local ____switch4 = performed.activity
-        local ____cond4 = ____switch4 == Activity.Eat
+        local ____switch4 = activity.type
+        local ____cond4 = ____switch4 == ActivityType.Eat
         if ____cond4 then
-            return ____exports.Satiety.FOOD_SATIETY[performed.details.food]
+            return ____exports.Satiety.FOOD_SATIETY[activity.details.food]
         end
     until true
     return 0
@@ -6590,8 +6590,8 @@ end
 function Needs.prototype.getStatus(self, need, time)
     return self.needs[need]:getStatus(time)
 end
-function Needs.prototype.getGain(self, need, performed)
-    return self.needs[need]:getGain(performed)
+function Needs.prototype.getGain(self, need, activity)
+    return self.needs[need]:getGain(activity)
 end
 function Needs.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6609,10 +6609,10 @@ function Needs.prototype.clone(self)
         self.deps
     )
 end
-function Needs.prototype.perform(self, performed, time)
+function Needs.prototype.perform(self, activity, time)
     __TS__ArrayForEach(
         __TS__ObjectValues(Need),
-        function(____, need) return self.needs[need]:perform(performed, time) end
+        function(____, need) return self.needs[need]:perform(activity, time) end
     )
 end
 Needs.MIN_NEED = BaseNeed.MIN_NEED
@@ -6723,7 +6723,7 @@ return ____exports
 local ____exports = {}
 do
     local ____activity = require("core.needs.src.activity")
-    ____exports.Activity = ____activity.Activity
+    ____exports.ActivityType = ____activity.ActivityType
 end
 do
     local ____category = require("core.needs.src.category")
@@ -8398,7 +8398,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____needs = require("core.needs.src.index")
-local Activity = ____needs.Activity
+local ActivityType = ____needs.ActivityType
 --- Съесть еду из инвентаря там, где NPC стоит. Съесть — транзакция: если NPC начал есть, он доест,
 -- еда пропадёт из инвентаря, а потребности узнают, что он поел
 ____exports.EatTask = __TS__Class()
@@ -8417,7 +8417,7 @@ function EatTask.prototype.____constructor(self, options, deps)
         tasks = {
             npcTaskFactory:playAnimation({animation = ____exports.EatTask.ANIMATIONS[food]}),
             npcTaskFactory:removeItem({item = food, count = 1}),
-            npcTaskFactory:needsPerform({activity = Activity.Eat, details = {food = food}})
+            npcTaskFactory:needsPerform({type = ActivityType.Eat, details = {food = food}})
         }
     }}
 end
@@ -8629,7 +8629,7 @@ local ____exports = {}
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____needs = require("core.needs.src.index")
-local Activity = ____needs.Activity
+local ActivityType = ____needs.ActivityType
 local Need = ____needs.Need
 local Needs = ____needs.Needs
 local ____constants = require("core.needs-tasks.src.constants")
@@ -8677,7 +8677,7 @@ function FoodChooser.prototype.chooseOptimal(self, state, satiety, foods)
     )
 end
 function FoodChooser.prototype.nutritionWithoutOvereating(self, state, satiety, food)
-    local gain = state.self.needs:getGain(Need.Satiety, {activity = Activity.Eat, details = {food = food}})
+    local gain = state.self.needs:getGain(Need.Satiety, {type = ActivityType.Eat, details = {food = food}})
     return math.max(
         0,
         math.min(gain, Needs.MAX_NEED - satiety)

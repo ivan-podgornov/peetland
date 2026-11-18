@@ -5,13 +5,11 @@ import { ActivityType } from './activity';
 import type { Activity } from './activity';
 import { BaseNeed } from './base-need';
 import type { NeedDeps, NeedOptions } from './base-need';
-import { NeedCategory } from './category';
 import type { NeedRecord } from './types';
 
 /** Сытость */
 export class Satiety extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
-    category: NeedCategory.Vital,
     depletionMinutes: 24 * 60,
   };
 

@@ -1,3 +1,5 @@
+import type { IAddictions } from '@peetland/addictions';
+import { AddictionsBuilder } from '@peetland/addictions/dev';
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
@@ -17,10 +19,14 @@ type PsycheBuild = (builder: PsycheBuilder) => IPsyche;
 /** Собирает потребности из переданного билдера потребностей */
 type NeedsBuild = (builder: NeedsBuilder) => INeeds;
 
+/** Собирает зависимости из переданного билдера зависимостей */
+type AddictionsBuild = (builder: AddictionsBuilder) => IAddictions;
+
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC —
  * бомж, стоит в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder
- * по умолчанию, потребности удовлетворены полностью, а в мире полночь первого дня. Каждый вызов
+ * по умолчанию, потребности удовлетворены полностью, зависимостей нет, а в мире полночь первого
+ * дня. Каждый вызов
  * build возвращает новое состояние
  *
  * @example
@@ -41,6 +47,7 @@ export class NpcStateBuilder {
   private inventory: InventoryCounts = {};
   private psyche: PsycheBuild = (builder) => builder.build();
   private needs: NeedsBuild = (builder) => builder.build();
+  private addictions: AddictionsBuild = (builder) => builder.build();
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -104,6 +111,16 @@ export class NpcStateBuilder {
     return this;
   }
 
+  /**
+   * Задаёт зависимости: функция получает новый билдер зависимостей, значения которого выставлены на
+   * время из состояния, и возвращает зависимости, которые лягут в состояние. Функция вызывается на
+   * каждый build, поэтому каждое состояние получает свои зависимости
+   */
+  withAddictions(addictions: AddictionsBuild): this {
+    this.addictions = addictions;
+    return this;
+  }
+
   /** Задаёт время суток в мире: в состояние ляжет ManualTime с этим временем */
   withTime(time: TimeState): this {
     this.time = time;
@@ -124,6 +141,7 @@ export class NpcStateBuilder {
         inventory: new Inventory(this.inventory),
         psyche: this.psyche(new PsycheBuilder()),
         needs: this.needs(new NeedsBuilder().withTime(this.time)),
+        addictions: this.addictions(new AddictionsBuilder().withTime(this.time)),
       },
       world: {
         time,

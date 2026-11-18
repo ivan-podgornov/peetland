@@ -1,3 +1,5 @@
+import { Addictions } from '@peetland/addictions';
+import { createMockedAddictionsFactory } from '@peetland/addictions/dev';
 import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
@@ -81,6 +83,15 @@ describe('NpcFactory', () => {
       expect(needsFactory.create).toHaveBeenCalledOnce();
     });
 
+    it('NPC создаёт зависимости фабрикой addictionsFactory из зависимостей', () => {
+      const addictionsFactory = createMockedAddictionsFactory();
+      const factory = new NpcFactory(createRequiredDeps({ addictionsFactory }));
+
+      factory.create(createNpcData());
+
+      expect(addictionsFactory.create).toHaveBeenCalledOnce();
+    });
+
     it('Если inventoryFactory не передана, NPC получает экземпляр Inventory', () => {
       const factory = new NpcFactory(createRequiredDeps());
 
@@ -134,6 +145,14 @@ describe('NpcFactory', () => {
       const npc = factory.create(createNpcData());
 
       expect(npc.needs).toBeInstanceOf(Needs);
+    });
+
+    it('Если addictionsFactory не передана, NPC получает экземпляр Addictions', () => {
+      const factory = new NpcFactory(createRequiredDeps());
+
+      const npc = factory.create(createNpcData());
+
+      expect(npc.addictions).toBeInstanceOf(Addictions);
     });
   });
 });

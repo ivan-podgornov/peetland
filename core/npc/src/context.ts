@@ -1,3 +1,4 @@
+import type { IAddictions } from '@peetland/addictions';
 import type { IActor } from '@peetland/game';
 import type { Inventory } from '@peetland/inventory';
 import type { INeeds } from '@peetland/needs';
@@ -14,4 +15,6 @@ export type NpcContext = Readonly<{
   psyche: IPsyche;
   /** Потребности, которым задачи сообщают о занятиях NPC */
   needs: INeeds;
+  /** Зависимости, которым задачи сообщают о занятиях NPC */
+  addictions: IAddictions;
 }>;

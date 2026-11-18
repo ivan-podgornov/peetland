@@ -1,3 +1,4 @@
+import { AddictionsFactory } from '@peetland/addictions';
 import { HTNFactory } from '@peetland/htn';
 import { InventoryFactory } from '@peetland/inventory';
 import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
@@ -25,7 +26,12 @@ export type NpcFactoryDeps = Pick<
   Partial<
     Pick<
       NpcDeps,
-      'htnFactory' | 'inventoryFactory' | 'psycheFactory' | 'needsFactory' | 'urgencyWatcherFactory'
+      | 'htnFactory'
+      | 'inventoryFactory'
+      | 'psycheFactory'
+      | 'needsFactory'
+      | 'addictionsFactory'
+      | 'urgencyWatcherFactory'
     >
   >;
 
@@ -43,6 +49,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory = new InventoryFactory(),
       psycheFactory = new PsycheFactory(),
       needsFactory = new NeedsFactory(),
+      addictionsFactory = new AddictionsFactory(),
       urgencyWatcherFactory = new UrgencyWatcherFactory(),
     } = deps;
 
@@ -53,6 +60,7 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory,
       psycheFactory,
       needsFactory,
+      addictionsFactory,
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,

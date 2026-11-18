@@ -9,6 +9,7 @@
     "./dev": "./dev/index.ts"
   },
   "dependencies": {
+    "@peetland/addictions": "0.0.0",
     "@peetland/events": "0.0.0",
     "@peetland/game": "0.0.0",
     "@peetland/geometry": "0.0.0",

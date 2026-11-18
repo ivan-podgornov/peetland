@@ -1,3 +1,4 @@
+import type { AddictionsData } from '@peetland/addictions';
 import type { Vector3 } from '@peetland/geometry';
 import type { InventoryCounts } from '@peetland/inventory';
 import type { NeedValues } from '@peetland/needs';
@@ -22,4 +23,6 @@ export type NpcData = Readonly<{
   inventory: InventoryCounts;
   /** Начальное значение каждой потребности. Потребности начинают падать с момента, когда NPC создан */
   needs: NeedValues;
+  /** Начальные значение и сила каждой зависимости. Тяга начинает расти с момента, когда NPC создан */
+  addictions: AddictionsData;
 }>;

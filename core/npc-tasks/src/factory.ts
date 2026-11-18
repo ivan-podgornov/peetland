@@ -9,6 +9,8 @@ import type { ITimer } from '@peetland/timings';
 import { AchieveAngleTask } from './achieve-angle-task';
 import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
+import { AddictionsPerformTask } from './addictions-perform-task';
+import type { AddictionsPerformTaskOptions } from './addictions-perform-task';
 import { EatTask } from './eat-task';
 import { GoToCoordsTask } from './go-to-coords-task';
 import { NeedsPerformTask } from './needs-perform-task';
@@ -68,6 +70,10 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   needsPerform(options: NeedsPerformTaskOptions): NpcPrimitiveTask {
     return new NeedsPerformTask(options);
+  }
+
+  addictionsPerform(options: AddictionsPerformTaskOptions): NpcPrimitiveTask {
+    return new AddictionsPerformTask(options);
   }
 
   tryLuck(options: TryLuckTaskOptions): NpcPrimitiveTask {

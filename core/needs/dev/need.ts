@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { NeedCategory, NeedStatus, NeedsValidator } from '../src';
+import { NeedStatus, NeedsValidator } from '../src';
 import type { NeedRecord } from '../src';
 import { BaseNeed } from '../src/base-need';
 import type { INeed, NeedDeps, NeedOptions } from '../src/base-need';
@@ -26,7 +26,6 @@ export const DEFAULT_NEED_DEPS: NeedDeps = { validator: new NeedsValidator() };
  */
 export class TestNeed extends BaseNeed {
   static readonly OPTIONS: NeedOptions = {
-    category: NeedCategory.Vital,
     depletionMinutes: 24 * 60,
   };
 
@@ -50,7 +49,6 @@ export class TestNeed extends BaseNeed {
 /** Создаёт мок потребности со статусом NeedStatus.Moderate */
 export function createMockedNeed(record: NeedRecord = DEFAULT_RECORD): Mocked<INeed> {
   return {
-    category: NeedCategory.Vital,
     get: vi.fn<INeed['get']>(() => 0),
     getStatus: vi.fn<INeed['getStatus']>(() => NeedStatus.Moderate),
     getState: vi.fn(() => record),

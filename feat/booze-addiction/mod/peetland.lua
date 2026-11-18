@@ -6358,7 +6358,7 @@ local ____exports = {}
 --- Потребность NPC: значение, которое само падает со временем и восполняется занятиями
 ____exports.Need = ____exports.Need or ({})
 ____exports.Need.Satiety = "satiety"
-____exports.Need.Booze = "booze"
+____exports.Need.Alcoholism = "alcoholism"
 return ____exports
  end,
 ["core.needs.src.status"] = function(...) 
@@ -6469,6 +6469,12 @@ end
 function BaseNeed.prototype.getState(self)
     return self.current
 end
+function BaseNeed.prototype.perform(self, performed, time)
+    self.record = {
+        value = self:get(time) + self:getGain(performed),
+        since = time:getState()
+    }
+end
 BaseNeed.MIN_NEED = 0
 BaseNeed.MAX_NEED = 100
 __TS__SetDescriptor(
@@ -6492,7 +6498,7 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
-["core.needs.src.booze"] = function(...) 
+["core.needs.src.alcoholism"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ClassExtends = ____lualib.__TS__ClassExtends
@@ -6504,33 +6510,33 @@ local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
 local ____category = require("core.needs.src.category")
 local NeedCategory = ____category.NeedCategory
---- Зависимость от пойла. Значение — насколько NPC не тянет выпить: падает тем быстрее, чем сильнее
+--- Алкоголизм: зависимость от пойла. Значение — насколько NPC не тянет выпить: падает тем быстрее, чем сильнее
 -- зависимость, а когда NPC выпил, восполняется полностью. Срочная — значит, тянет. При силе 0
 -- зависимости нет, и значение не падает
-____exports.Booze = __TS__Class()
-local Booze = ____exports.Booze
-Booze.name = "Booze"
-__TS__ClassExtends(Booze, BaseNeed)
-function Booze.prototype.____constructor(self, record, deps)
+____exports.Alcoholism = __TS__Class()
+local Alcoholism = ____exports.Alcoholism
+Alcoholism.name = "Alcoholism"
+__TS__ClassExtends(Alcoholism, BaseNeed)
+function Alcoholism.prototype.____constructor(self, record, deps)
     BaseNeed.prototype.____constructor(
         self,
         record,
-        ____exports.Booze:options(record.strength),
+        ____exports.Alcoholism:options(record.strength),
         deps
     )
-    deps.validator:validateStrength(record.strength, ____exports.Booze.MIN_STRENGTH, ____exports.Booze.MAX_STRENGTH)
+    deps.validator:validateStrength(record.strength, ____exports.Alcoholism.MIN_STRENGTH, ____exports.Alcoholism.MAX_STRENGTH)
     self.strength = record.strength
 end
-function Booze.prototype.getState(self)
+function Alcoholism.prototype.getState(self)
     return __TS__ObjectAssign(
         {},
         BaseNeed.prototype.getState(self),
         {strength = self.strength}
     )
 end
-function Booze.prototype.getGain(self, activity)
+function Alcoholism.prototype.getGain(self, performed)
     repeat
-        local ____switch5 = activity
+        local ____switch5 = performed.activity
         local ____cond5 = ____switch5 == Activity.Drink
         if ____cond5 then
             return BaseNeed.MAX_NEED
@@ -6538,21 +6544,15 @@ function Booze.prototype.getGain(self, activity)
     until true
     return 0
 end
-function Booze.prototype.perform(self, activity, _details, time)
-    self.record = {
-        value = self:get(time) + self:getGain(activity),
-        since = time:getState()
-    }
+function Alcoholism.options(self, strength)
+    local fullDepletionAtMax = ____exports.Alcoholism.MAX_STRENGTH_CRAVING_MINUTES * BaseNeed.MAX_NEED / (BaseNeed.MAX_NEED - ____exports.Alcoholism.URGENT_BELOW)
+    return {category = NeedCategory.Addiction, depletionMinutes = strength > 0 and fullDepletionAtMax * ____exports.Alcoholism.MAX_STRENGTH / strength or math.huge, urgentBelow = ____exports.Alcoholism.URGENT_BELOW, calmAbove = ____exports.Alcoholism.CALM_ABOVE}
 end
-function Booze.options(self, strength)
-    local fullDepletionAtMax = ____exports.Booze.MAX_STRENGTH_CRAVING_MINUTES * BaseNeed.MAX_NEED / (BaseNeed.MAX_NEED - ____exports.Booze.URGENT_BELOW)
-    return {category = NeedCategory.Addiction, depletionMinutes = strength > 0 and fullDepletionAtMax * ____exports.Booze.MAX_STRENGTH / strength or math.huge, urgentBelow = ____exports.Booze.URGENT_BELOW, calmAbove = ____exports.Booze.CALM_ABOVE}
-end
-Booze.MIN_STRENGTH = 0
-Booze.MAX_STRENGTH = 100
-Booze.URGENT_BELOW = 25
-Booze.CALM_ABOVE = 60
-Booze.MAX_STRENGTH_CRAVING_MINUTES = 24 * 60
+Alcoholism.MIN_STRENGTH = 0
+Alcoholism.MAX_STRENGTH = 100
+Alcoholism.URGENT_BELOW = 25
+Alcoholism.CALM_ABOVE = 60
+Alcoholism.MAX_STRENGTH_CRAVING_MINUTES = 24 * 60
 return ____exports
  end,
 ["core.needs.src.satiety"] = function(...) 
@@ -6576,21 +6576,15 @@ __TS__ClassExtends(Satiety, BaseNeed)
 function Satiety.prototype.____constructor(self, record, deps)
     BaseNeed.prototype.____constructor(self, record, ____exports.Satiety.OPTIONS, deps)
 end
-function Satiety.prototype.getGain(self, activity, details)
+function Satiety.prototype.getGain(self, performed)
     repeat
-        local ____switch4 = activity
+        local ____switch4 = performed.activity
         local ____cond4 = ____switch4 == Activity.Eat
         if ____cond4 then
-            return ____exports.Satiety.FOOD_SATIETY[details.food]
+            return ____exports.Satiety.FOOD_SATIETY[performed.details.food]
         end
     until true
     return 0
-end
-function Satiety.prototype.perform(self, activity, details, time)
-    self.record = {
-        value = self:get(time) + self:getGain(activity, details),
-        since = time:getState()
-    }
 end
 Satiety.OPTIONS = {category = NeedCategory.Vital, depletionMinutes = 24 * 60, urgentBelow = 25, calmAbove = 60}
 Satiety.FOOD_SATIETY = {[Item.RomashkaLoaf] = 60, [Item.SmilePizza] = 100}
@@ -6601,8 +6595,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____booze = require("core.needs.src.booze")
-local Booze = ____booze.Booze
+local ____alcoholism = require("core.needs.src.alcoholism")
+local Alcoholism = ____alcoholism.Alcoholism
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 local ____satiety = require("core.needs.src.satiety")
@@ -6620,9 +6614,9 @@ function NeedFactory.prototype.create(self, need, record)
         if ____cond4 then
             return __TS__New(Satiety, record, self.deps)
         end
-        ____cond4 = ____cond4 or ____switch4 == Need.Booze
+        ____cond4 = ____cond4 or ____switch4 == Need.Alcoholism
         if ____cond4 then
-            return __TS__New(Booze, record, self.deps)
+            return __TS__New(Alcoholism, record, self.deps)
         end
     until true
 end
@@ -6637,10 +6631,10 @@ local __TS__ObjectFromEntries = ____lualib.__TS__ObjectFromEntries
 local __TS__New = ____lualib.__TS__New
 local __TS__ArrayForEach = ____lualib.__TS__ArrayForEach
 local ____exports = {}
+local ____alcoholism = require("core.needs.src.alcoholism")
+local Alcoholism = ____alcoholism.Alcoholism
 local ____base_2Dneed = require("core.needs.src.base-need")
 local BaseNeed = ____base_2Dneed.BaseNeed
-local ____booze = require("core.needs.src.booze")
-local Booze = ____booze.Booze
 local ____need = require("core.needs.src.need")
 local Need = ____need.Need
 --- Потребности NPC
@@ -6677,8 +6671,8 @@ end
 function Needs.prototype.getStatus(self, need, time)
     return self.needs[need]:getStatus(time)
 end
-function Needs.prototype.getGain(self, need, activity, details)
-    return self.needs[need]:getGain(activity, details)
+function Needs.prototype.getGain(self, need, performed)
+    return self.needs[need]:getGain(performed)
 end
 function Needs.prototype.getState(self)
     return __TS__ObjectFromEntries(__TS__ArrayMap(
@@ -6696,16 +6690,16 @@ function Needs.prototype.clone(self)
         self.deps
     )
 end
-function Needs.prototype.perform(self, activity, details, time)
+function Needs.prototype.perform(self, performed, time)
     __TS__ArrayForEach(
         __TS__ObjectValues(Need),
-        function(____, need) return self.needs[need]:perform(activity, details, time) end
+        function(____, need) return self.needs[need]:perform(performed, time) end
     )
 end
 Needs.MIN_NEED = BaseNeed.MIN_NEED
 Needs.MAX_NEED = BaseNeed.MAX_NEED
-Needs.MIN_STRENGTH = Booze.MIN_STRENGTH
-Needs.MAX_STRENGTH = Booze.MAX_STRENGTH
+Needs.MIN_STRENGTH = Alcoholism.MIN_STRENGTH
+Needs.MAX_STRENGTH = Alcoholism.MAX_STRENGTH
 return ____exports
  end,
 ["core.needs.src.factory"] = function(...) 
@@ -6740,9 +6734,9 @@ function NeedsFactory.prototype.____constructor(self, deps)
     end
     self.deps = {needFactory = needFactory}
 end
-function NeedsFactory.prototype.create(self, values, strengths, time)
+function NeedsFactory.prototype.create(self, values, addictions, time)
     local since = time:getState()
-    local state = {[Need.Satiety] = {value = values[Need.Satiety], since = since}, [Need.Booze] = {value = values[Need.Booze], since = since, strength = strengths[Need.Booze]}}
+    local state = {[Need.Satiety] = {value = values[Need.Satiety], since = since}, [Need.Alcoholism] = {value = values[Need.Alcoholism], since = since, strength = addictions[Need.Alcoholism]}}
     return __TS__New(Needs, state, self.deps)
 end
 return ____exports
@@ -8251,11 +8245,8 @@ function NeedsPerformTask.prototype.canExecute(self)
     return true
 end
 function NeedsPerformTask.prototype.applyEffects(self, state)
-    local ____self_options_0 = self.options
-    local activity = ____self_options_0.activity
-    local details = ____self_options_0.details
     local needs = state.self.needs:clone()
-    needs:perform(activity, details, state.world.time)
+    needs:perform(self.options, state.world.time)
     return __TS__ObjectAssign(
         {},
         state,
@@ -8263,10 +8254,7 @@ function NeedsPerformTask.prototype.applyEffects(self, state)
     )
 end
 function NeedsPerformTask.prototype.start(self, state, context)
-    local ____self_options_1 = self.options
-    local activity = ____self_options_1.activity
-    local details = ____self_options_1.details
-    context.needs:perform(activity, details, state.world.time)
+    context.needs:perform(self.options, state.world.time)
     return "success"
 end
 function NeedsPerformTask.prototype.update(self)
@@ -8776,7 +8764,7 @@ function FoodChooser.prototype.chooseOptimal(self, state, satiety, foods)
     )
 end
 function FoodChooser.prototype.nutritionWithoutOvereating(self, state, satiety, food)
-    local gain = state.self.needs:getGain(Need.Satiety, Activity.Eat, {food = food})
+    local gain = state.self.needs:getGain(Need.Satiety, {activity = Activity.Eat, details = {food = food}})
     return math.max(
         0,
         math.min(gain, Needs.MAX_NEED - satiety)
@@ -9984,8 +9972,8 @@ ____exports.npcs = {{
     spawnAngle = 242,
     psyche = {traits = {[Trait.Conscientiousness] = 100, [Trait.Luck] = 50, [Trait.Optimism] = 50}, feelings = {[Feeling.Shame] = 0}},
     inventory = {[Item.Money] = 80},
-    needs = {[Need.Satiety] = 20, [Need.Booze] = 20},
-    addictions = {[Need.Booze] = 100}
+    needs = {[Need.Satiety] = 20, [Need.Alcoholism] = 100},
+    addictions = {[Need.Alcoholism] = 100}
 }}
 return ____exports
  end,

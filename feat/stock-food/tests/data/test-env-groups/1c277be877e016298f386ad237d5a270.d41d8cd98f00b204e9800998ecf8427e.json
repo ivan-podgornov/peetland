@@ -1,0 +1,1 @@
+{"id":"1c277be877e016298f386ad237d5a270.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs-tasks/__tests__/stock-food-task/preconditions.spec.ts#StockFoodTask Метод buy-food Предусловия Если еда уже есть, план не составляется","name":"Если еда уже есть, план не составляется","status":"passed","testResultsByEnv":{"default":"7c70d98ab6f1d8bb5b4256bb32dd2b77"}}

@@ -6,38 +6,38 @@ import { BaseAddiction } from '../../src/base-addiction';
 
 describe('BaseAddiction', () => {
   describe('#get', () => {
-    it('Если время не прошло, возвращает выставленную тягу', () => {
+    it('Если время не прошло, возвращает выставленную удовлетворённость', () => {
       const record = {
         ...DEFAULT_RECORD,
-        craving: 20,
+        satisfaction: 80,
       };
 
-      const craving = new TestAddiction(record).get(new ManualTime(record.since));
+      const value = new TestAddiction(record).get(new ManualTime(record.since));
 
-      expect(craving).toBe(20);
+      expect(value).toBe(80);
     });
 
-    it('Возвращает выставленную тягу плюс скорость роста, умноженную на минуты от момента, когда её выставили, до переданного времени', () => {
+    it('Возвращает выставленную удовлетворённость минус скорость падения, умноженную на минуты от момента, когда её выставили, до переданного времени', () => {
       const since = {
         day: 1,
         hours: 10,
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        ...DEFAULT_RECORD,
-        craving: 20,
+        satisfaction: 80,
+        strength: BaseAddiction.MAX_STRENGTH,
         since,
       });
 
-      // При максимальной силе тяга растёт на 100 за сутки, а прошла четверть суток: она выросла на 25
-      const craving = addiction.get(
+      // При максимальной силе удовлетворённость падает на 100 за сутки, а прошла четверть суток: она упала на 25
+      const value = addiction.get(
         new ManualTime({
           ...since,
           hours: since.hours + 6,
         })
       );
 
-      expect(craving).toBeCloseTo(45);
+      expect(value).toBeCloseTo(55);
     });
 
     it('Считает прошедшее время через полночь', () => {
@@ -47,13 +47,13 @@ describe('BaseAddiction', () => {
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        ...DEFAULT_RECORD,
-        craving: 20,
+        satisfaction: 80,
+        strength: BaseAddiction.MAX_STRENGTH,
         since,
       });
 
-      // Прошло 6 часов, четверть суток: тяга выросла на 25
-      const craving = addiction.get(
+      // Прошло 6 часов, четверть суток: удовлетворённость упала на 25
+      const value = addiction.get(
         new ManualTime({
           day: since.day + 1,
           hours: 3,
@@ -61,45 +61,51 @@ describe('BaseAddiction', () => {
         })
       );
 
-      expect(craving).toBeCloseTo(45);
+      expect(value).toBeCloseTo(55);
     });
 
-    it('Не поднимает тягу выше BaseAddiction.MAX_CRAVING', () => {
+    it('Не опускает удовлетворённость ниже BaseAddiction.MIN_SATISFACTION', () => {
+      const since = {
+        day: 1,
+        hours: 10,
+        minutes: 0,
+      };
       const addiction = new TestAddiction({
-        ...DEFAULT_RECORD,
-        craving: 90,
+        satisfaction: 10,
+        strength: BaseAddiction.MAX_STRENGTH,
+        since,
       });
 
-      const craving = addiction.get(
+      const value = addiction.get(
         new ManualTime({
-          ...DEFAULT_RECORD.since,
-          day: DEFAULT_RECORD.since.day + 1,
+          ...since,
+          day: since.day + 1,
         })
       );
 
-      expect(craving).toBe(BaseAddiction.MAX_CRAVING);
+      expect(value).toBe(BaseAddiction.MIN_SATISFACTION);
     });
 
-    it('Если время раньше момента, когда выставили тягу, возвращает выставленную тягу', () => {
+    it('Если время раньше момента, когда выставили удовлетворённость, возвращает выставленную удовлетворённость', () => {
       const since = {
         day: 2,
         hours: 10,
         minutes: 0,
       };
       const addiction = new TestAddiction({
-        ...DEFAULT_RECORD,
-        craving: 20,
+        satisfaction: 80,
+        strength: BaseAddiction.MAX_STRENGTH,
         since,
       });
 
-      const craving = addiction.get(
+      const value = addiction.get(
         new ManualTime({
           ...since,
           day: since.day - 1,
         })
       );
 
-      expect(craving).toBe(20);
+      expect(value).toBe(80);
     });
   });
 });

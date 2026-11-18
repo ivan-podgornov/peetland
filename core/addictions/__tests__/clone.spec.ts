@@ -12,7 +12,7 @@ describe('Addictions', () => {
         createAddictionsState({
           [Addiction.Alcoholism]: {
             ...DEFAULT_RECORD,
-            craving: 80,
+            satisfaction: 80,
           },
         }),
         createAddictionsDeps()
@@ -24,7 +24,7 @@ describe('Addictions', () => {
     it('Употребление в копии не меняет исходные зависимости', () => {
       const record = {
         ...DEFAULT_RECORD,
-        craving: 50,
+        satisfaction: 50,
       };
       const addictions = new Addictions(
         createAddictionsState({ [Addiction.Alcoholism]: record }),
@@ -46,7 +46,7 @@ describe('Addictions', () => {
     it('Употребление в исходных зависимостях не меняет копию', () => {
       const record = {
         ...DEFAULT_RECORD,
-        craving: 50,
+        satisfaction: 50,
       };
       const addictions = new Addictions(
         createAddictionsState({ [Addiction.Alcoholism]: record }),

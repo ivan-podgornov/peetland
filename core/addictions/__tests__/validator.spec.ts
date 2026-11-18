@@ -3,27 +3,30 @@ import { describe, expect, it } from 'vitest';
 import { AddictionsValidator } from '../src';
 
 describe('AddictionsValidator', () => {
-  describe('#validateCraving', () => {
+  describe('#validateSatisfaction', () => {
     it.each([-1, 101, Number.NaN, Number.POSITIVE_INFINITY])(
-      'Если тяга %s вне пределов от 0 до 100, выбрасывает RangeError',
+      'Если удовлетворённость %s вне пределов от 0 до 100, выбрасывает RangeError',
       (value) => {
         const validator = new AddictionsValidator();
         function validate() {
-          validator.validateCraving(value, 0, 100);
+          validator.validateSatisfaction(value, 0, 100);
         }
 
         expect(validate).toThrow(RangeError);
       }
     );
 
-    it.each([0, 50, 100])('Если тяга %s в пределах от 0 до 100, не выбрасывает ошибку', (value) => {
-      const validator = new AddictionsValidator();
-      function validate() {
-        validator.validateCraving(value, 0, 100);
-      }
+    it.each([0, 50, 100])(
+      'Если удовлетворённость %s в пределах от 0 до 100, не выбрасывает ошибку',
+      (value) => {
+        const validator = new AddictionsValidator();
+        function validate() {
+          validator.validateSatisfaction(value, 0, 100);
+        }
 
-      expect(validate).not.toThrow();
-    });
+        expect(validate).not.toThrow();
+      }
+    );
   });
 
   describe('#validateStrength', () => {

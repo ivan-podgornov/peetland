@@ -13,10 +13,10 @@ export class Alcoholism extends BaseAddiction {
     super(record, Alcoholism.OPTIONS, deps);
   }
 
-  getRelief(consumption: Consumption): number {
+  getGain(consumption: Consumption): number {
     switch (consumption.type) {
       case ConsumptionType.Drink:
-        return BaseAddiction.MAX_CRAVING;
+        return BaseAddiction.MAX_SATISFACTION;
     }
   }
 }

@@ -6,21 +6,21 @@ import { ConsumptionType, Addiction, Addictions } from '../src';
 import type { DrinkDetails } from '../src';
 
 describe('Addictions', () => {
-  describe('#getRelief', () => {
-    it('Возвращает, на сколько употребление снимет тягу, по ответу самой зависимости', () => {
+  describe('#getGain', () => {
+    it('Возвращает, на сколько употребление поднимет удовлетворённость, по ответу самой зависимости', () => {
       const addiction = createMockedAddiction();
-      addiction.getRelief.mockReturnValue(42);
+      addiction.getGain.mockReturnValue(42);
       const addictions = new Addictions(createAddictionsState(), {
         addictionFactory: createMockedAddictionFactory(addiction),
       });
       const details: DrinkDetails = { booze: Item.Booze };
 
-      const gain = addictions.getRelief(Addiction.Alcoholism, {
+      const gain = addictions.getGain(Addiction.Alcoholism, {
         type: ConsumptionType.Drink,
         details,
       });
 
-      expect(addiction.getRelief).toHaveBeenCalledExactlyOnceWith({
+      expect(addiction.getGain).toHaveBeenCalledExactlyOnceWith({
         type: ConsumptionType.Drink,
         details,
       });

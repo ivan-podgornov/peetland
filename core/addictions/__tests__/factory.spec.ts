@@ -17,7 +17,7 @@ describe('AddictionsFactory', () => {
       expect(factory.create(createAddictionsData(), new ManualTime())).toBeInstanceOf(Addictions);
     });
 
-    it('Выставляет начальные тягу и силу на момент переданного времени', () => {
+    it('Выставляет начальные удовлетворённость и силу на момент переданного времени', () => {
       const factory = new AddictionsFactory(createAddictionsDeps());
       const since = {
         day: 2,
@@ -28,7 +28,7 @@ describe('AddictionsFactory', () => {
       const addictions = factory.create(
         createAddictionsData({
           [Addiction.Alcoholism]: {
-            craving: 30,
+            satisfaction: 30,
             strength: 70,
           },
         }),
@@ -37,20 +37,20 @@ describe('AddictionsFactory', () => {
 
       expect(addictions.getState()).toStrictEqual({
         [Addiction.Alcoholism]: {
-          craving: 30,
+          satisfaction: 30,
           strength: 70,
           since,
         },
       });
     });
 
-    it('Если валидатор не передан, проверяет тягу AddictionsValidator', () => {
+    it('Если валидатор не передан, проверяет удовлетворённость AddictionsValidator', () => {
       const factory = new AddictionsFactory();
       function create() {
         return factory.create(
           createAddictionsData({
             [Addiction.Alcoholism]: {
-              craving: -1,
+              satisfaction: -1,
               strength: 0,
             },
           }),
@@ -67,7 +67,7 @@ describe('AddictionsFactory', () => {
         return factory.create(
           createAddictionsData({
             [Addiction.Alcoholism]: {
-              craving: 100,
+              satisfaction: 100,
               strength: 101,
             },
           }),
@@ -86,12 +86,12 @@ describe('AddictionsFactory', () => {
       expect(addictionFactory.create).toHaveBeenCalledTimes(Object.values(Addiction).length);
     });
 
-    it('Проверяет тягу переданным валидатором', () => {
+    it('Проверяет удовлетворённость переданным валидатором', () => {
       const validator = createMockedAddictionsValidator();
 
       new AddictionsFactory({ validator }).create(createAddictionsData(), new ManualTime());
 
-      expect(validator.validateCraving).toHaveBeenCalled();
+      expect(validator.validateSatisfaction).toHaveBeenCalled();
     });
   });
 });

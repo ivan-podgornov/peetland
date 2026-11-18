@@ -10,8 +10,9 @@ import type { IAddictionsValidator } from './validator';
 
 export interface IAddictionsFactory {
   /**
-   * Создаёт зависимости с начальными тягой и силой. Тяга растёт с момента time (см. Addictions)
-   * @param data - начальные тяга и сила каждой зависимости
+   * Создаёт зависимости с начальными удовлетворённостью и силой, которые падают с момента time (см.
+   * Addictions)
+   * @param data - начальные удовлетворённость и сила каждой зависимости
    * @param time - время, с которого растёт тяга
    */
   create(data: AddictionsData, time: IReadonlyTime): IAddictions;

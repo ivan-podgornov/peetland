@@ -6,7 +6,7 @@ import { BaseAddiction } from './base-addiction';
 import type { IAddiction } from './base-addiction';
 import type { Consumption } from './consumption';
 import type { AddictionStatus } from './status';
-import type { AddictionsState, AddictionCravings } from './types';
+import type { AddictionsState, AddictionSatisfactions } from './types';
 
 /**
  * Зависимости только на чтение. Так зависимости лежат в состоянии NPC: планирование читает их, а
@@ -15,20 +15,20 @@ import type { AddictionsState, AddictionCravings } from './types';
  */
 export interface IReadonlyAddictions {
   /**
-   * Возвращает тягу зависимости на момент time
+   * Возвращает удовлетворённость зависимости на момент time
    * @param addiction - зависимость
-   * @param time - время, на момент которого нужна тяга, обычно время из того же состояния
+   * @param time - время, на момент которого нужна удовлетворённость, обычно время из того же состояния
    */
   get(addiction: Addiction, time: IReadonlyTime): number;
   /**
-   * Возвращает тягу каждой зависимости на момент time
-   * @param time - время, на момент которого нужна тяга
+   * Возвращает удовлетворённость каждой зависимости на момент time
+   * @param time - время, на момент которого нужна удовлетворённость
    */
-  getAll(time: IReadonlyTime): AddictionCravings;
+  getAll(time: IReadonlyTime): AddictionSatisfactions;
   /** Возвращает статус зависимости на момент time */
   getStatus(addiction: Addiction, time: IReadonlyTime): AddictionStatus;
-  /** Возвращает, на сколько употребление снимет тягу зависимости, без учёта пределов */
-  getRelief(addiction: Addiction, consumption: Consumption): number;
+  /** Возвращает, на сколько употребление поднимет удовлетворённость, без учёта пределов */
+  getGain(addiction: Addiction, consumption: Consumption): number;
   /** Возвращает состояние зависимостей. Из него конструктор собирает такие же зависимости */
   getState(): AddictionsState;
   /** Возвращает копию зависимостей, в которую можно писать. Исходные зависимости копия не меняет */
@@ -37,7 +37,7 @@ export interface IReadonlyAddictions {
 
 export interface IAddictions extends IReadonlyAddictions {
   /**
-   * Снимает тягу от употребления
+   * Меняет зависимости от употребления
    * @param time - момент, когда NPC закончил употреблять
    */
   consume(consumption: Consumption, time: IReadonlyTime): void;
@@ -49,13 +49,13 @@ export type AddictionsDeps = {
 
 /** Зависимости NPC */
 export class Addictions implements IAddictions {
-  static readonly MIN_CRAVING = BaseAddiction.MIN_CRAVING;
+  static readonly MIN_SATISFACTION = BaseAddiction.MIN_SATISFACTION;
 
-  static readonly MAX_CRAVING = BaseAddiction.MAX_CRAVING;
+  static readonly MAX_SATISFACTION = BaseAddiction.MAX_SATISFACTION;
 
-  static readonly CRAVING_ABOVE = BaseAddiction.CRAVING_ABOVE;
+  static readonly CRAVING_BELOW = BaseAddiction.CRAVING_BELOW;
 
-  static readonly CALM_BELOW = BaseAddiction.CALM_BELOW;
+  static readonly CALM_ABOVE = BaseAddiction.CALM_ABOVE;
 
   static readonly MIN_STRENGTH = BaseAddiction.MIN_STRENGTH;
 
@@ -64,7 +64,7 @@ export class Addictions implements IAddictions {
   private readonly deps: AddictionsDeps;
   private readonly addictions: Readonly<Record<Addiction, IAddiction>>;
 
-  /** @throws ошибку фабрики, например если тяга вне пределов */
+  /** @throws ошибку фабрики, например если удовлетворённость вне пределов */
   constructor(state: AddictionsState, deps: AddictionsDeps) {
     const { addictionFactory } = deps;
 
@@ -81,18 +81,18 @@ export class Addictions implements IAddictions {
     return this.addictions[addiction].get(time);
   }
 
-  getAll(time: IReadonlyTime): AddictionCravings {
+  getAll(time: IReadonlyTime): AddictionSatisfactions {
     return Object.fromEntries(
       Object.values(Addiction).map((addiction) => [addiction, this.get(addiction, time)])
-    ) as AddictionCravings;
+    ) as AddictionSatisfactions;
   }
 
   getStatus(addiction: Addiction, time: IReadonlyTime): AddictionStatus {
     return this.addictions[addiction].getStatus(time);
   }
 
-  getRelief(addiction: Addiction, consumption: Consumption): number {
-    return this.addictions[addiction].getRelief(consumption);
+  getGain(addiction: Addiction, consumption: Consumption): number {
+    return this.addictions[addiction].getGain(consumption);
   }
 
   getState(): AddictionsState {

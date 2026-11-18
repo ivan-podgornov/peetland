@@ -1,12 +1,12 @@
-/** Проверяет тягу и силу зависимостей (см. Addictions) */
+/** Проверяет удовлетворённость и силу зависимостей (см. Addictions) */
 export interface IAddictionsValidator {
   /**
-   * Выбрасывает RangeError, если craving не конечное число от min до max
-   * @param craving - тяга
-   * @param min - минимальная тяга
-   * @param max - максимальная тяга
+   * Выбрасывает RangeError, если satisfaction не конечное число от min до max
+   * @param satisfaction - удовлетворённость зависимости
+   * @param min - минимальная удовлетворённость
+   * @param max - максимальная удовлетворённость
    */
-  validateCraving(craving: number, min: number, max: number): void;
+  validateSatisfaction(satisfaction: number, min: number, max: number): void;
   /**
    * Выбрасывает RangeError, если strength не конечное число от min до max
    * @param strength - сила зависимости
@@ -17,9 +17,11 @@ export interface IAddictionsValidator {
 }
 
 export class AddictionsValidator implements IAddictionsValidator {
-  validateCraving(craving: number, min: number, max: number): void {
-    if (!Number.isFinite(craving) || craving < min || craving > max) {
-      throw new RangeError(`Тяга должна быть от ${min} до ${max}, получено ${craving}`);
+  validateSatisfaction(satisfaction: number, min: number, max: number): void {
+    if (!Number.isFinite(satisfaction) || satisfaction < min || satisfaction > max) {
+      throw new RangeError(
+        `Удовлетворённость зависимости должна быть от ${min} до ${max}, получено ${satisfaction}`
+      );
     }
   }
 

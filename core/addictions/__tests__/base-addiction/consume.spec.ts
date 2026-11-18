@@ -13,12 +13,12 @@ const DRINK = {
 
 describe('BaseAddiction', () => {
   describe('#consume', () => {
-    it('Снимает то, что вернул getRelief, с тяги на момент, когда NPC закончил употреблять', () => {
+    it('Прибавляет вклад употребления из getGain к удовлетворённости на момент, когда NPC закончил употреблять', () => {
       const addiction = new TestAddiction({
         ...DEFAULT_RECORD,
-        craving: 50,
+        satisfaction: 50,
       });
-      // За 6 часов из суток тяга выросла на 25
+      // За 6 часов из суток удовлетворённость падает на 25
       const time = new ManualTime({
         ...DEFAULT_RECORD.since,
         hours: DEFAULT_RECORD.since.hours + 6,
@@ -26,10 +26,10 @@ describe('BaseAddiction', () => {
 
       addiction.consume(DRINK, time);
 
-      expect(addiction.get(time)).toBeCloseTo(50 + 25 - TestAddiction.RELIEF);
+      expect(addiction.get(time)).toBeCloseTo(50 - 25 + TestAddiction.GAIN);
     });
 
-    it('Отсчитывает рост тяги от момента, когда NPC закончил употреблять', () => {
+    it('Отсчитывает падение от момента, когда NPC закончил употреблять', () => {
       const addiction = new TestAddiction(DEFAULT_RECORD);
       const end = {
         ...DEFAULT_RECORD.since,
@@ -41,13 +41,13 @@ describe('BaseAddiction', () => {
       expect(addiction.getState().since).toStrictEqual(end);
     });
 
-    it('Не опускает тягу ниже BaseAddiction.MIN_CRAVING', () => {
+    it('Не поднимает удовлетворённость выше BaseAddiction.MAX_SATISFACTION', () => {
       const addiction = new TestAddiction(DEFAULT_RECORD);
       const time = new ManualTime(DEFAULT_RECORD.since);
 
       addiction.consume(DRINK, time);
 
-      expect(addiction.get(time)).toBe(BaseAddiction.MIN_CRAVING);
+      expect(addiction.get(time)).toBe(BaseAddiction.MAX_SATISFACTION);
     });
 
     it('Не меняет силу зависимости', () => {

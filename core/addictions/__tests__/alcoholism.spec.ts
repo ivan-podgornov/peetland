@@ -3,7 +3,7 @@ import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_ADDICTION_DEPS, DEFAULT_RECORD } from '../dev';
-import { AddictionStatus, ConsumptionType } from '../src';
+import { ConsumptionType, AddictionStatus } from '../src';
 import { Alcoholism } from '../src/alcoholism';
 
 const DRINK = {
@@ -37,9 +37,9 @@ describe('Alcoholism', () => {
     ).toBe(AddictionStatus.Craving);
   });
 
-  it('Выпивка снимает тягу полностью: getRelief возвращает MAX_CRAVING', () => {
+  it('Выпивка снимает тягу полностью: getGain возвращает MAX_SATISFACTION', () => {
     const alcoholism = new Alcoholism(DEFAULT_RECORD, DEFAULT_ADDICTION_DEPS);
 
-    expect(alcoholism.getRelief(DRINK)).toBe(Alcoholism.MAX_CRAVING);
+    expect(alcoholism.getGain(DRINK)).toBe(Alcoholism.MAX_SATISFACTION);
   });
 });

@@ -26,7 +26,7 @@ describe('Npc', () => {
       const data = createNpcData({
         addictions: createAddictionsData({
           [Addiction.Alcoholism]: {
-            craving: 30,
+            satisfaction: 70,
             strength: 40,
           },
         }),

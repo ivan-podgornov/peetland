@@ -9,7 +9,7 @@ describe('Addictions', () => {
       const addictionFactory = createMockedAddictionFactory();
       const record = {
         ...DEFAULT_RECORD,
-        craving: 40,
+        satisfaction: 40,
       };
 
       new Addictions(createAddictionsState({ [Addiction.Alcoholism]: record }), {

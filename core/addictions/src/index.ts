@@ -11,7 +11,7 @@ export type {
   AddictionRecord,
   AddictionsData,
   AddictionsState,
-  AddictionCravings,
+  AddictionSatisfactions,
 } from './types';
 export { AddictionsValidator } from './validator';
 export type { IAddictionsValidator } from './validator';

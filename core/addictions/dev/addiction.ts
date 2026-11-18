@@ -7,9 +7,9 @@ import type { IAddictionFactory } from '../src/addiction-factory';
 import { BaseAddiction } from '../src/base-addiction';
 import type { AddictionDeps, AddictionOptions, IAddiction } from '../src/base-addiction';
 
-/** Запись зависимости максимальной силы: в полночь первого дня тяги нет */
+/** Запись зависимости максимальной силы: с полуночи первого дня совсем не тянет */
 export const DEFAULT_RECORD: AddictionRecord = {
-  craving: BaseAddiction.MIN_CRAVING,
+  satisfaction: BaseAddiction.MAX_SATISFACTION,
   strength: BaseAddiction.MAX_STRENGTH,
   since: {
     day: 1,
@@ -22,25 +22,25 @@ export const DEFAULT_RECORD: AddictionRecord = {
 export const DEFAULT_ADDICTION_DEPS: AddictionDeps = { validator: new AddictionsValidator() };
 
 /**
- * Зависимость для тестов общей логики BaseAddiction. При максимальной силе тяга растёт от нуля до
- * MAX_CRAVING за сутки, а любое употребление снимает TestAddiction.RELIEF. setRecord выставляет
+ * Зависимость для тестов общей логики BaseAddiction. При максимальной силе удовлетворённость падает от
+ * MAX_SATISFACTION до нуля за сутки, а любое употребление прибавляет ей TestAddiction.GAIN. setRecord выставляет
  * переданную запись через сеттер BaseAddiction
  */
 export class TestAddiction extends BaseAddiction {
   static readonly OPTIONS: AddictionOptions = {
-    // До порога тяги (75) — три четверти суток, значит, до максимума — сутки
+    // До порога срочности — три четверти суток, значит, до нуля — сутки
     cravingMinutes: 18 * 60,
   };
 
-  /** Сколько тяги снимает любое употребление */
-  static readonly RELIEF = 10;
+  /** Сколько прибавляет любое употребление */
+  static readonly GAIN = 10;
 
   constructor(record: AddictionRecord, deps: AddictionDeps = DEFAULT_ADDICTION_DEPS) {
     super(record, TestAddiction.OPTIONS, deps);
   }
 
-  getRelief(): number {
-    return TestAddiction.RELIEF;
+  getGain(): number {
+    return TestAddiction.GAIN;
   }
 
   /** Выставляет запись через сеттер BaseAddiction */
@@ -57,7 +57,7 @@ export function createMockedAddiction(
     get: vi.fn<IAddiction['get']>(() => 0),
     getStatus: vi.fn<IAddiction['getStatus']>(() => AddictionStatus.Moderate),
     getState: vi.fn(() => record),
-    getRelief: vi.fn<IAddiction['getRelief']>(() => 0),
+    getGain: vi.fn<IAddiction['getGain']>(() => 0),
     consume: vi.fn(),
   };
 }

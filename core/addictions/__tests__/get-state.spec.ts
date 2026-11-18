@@ -13,7 +13,7 @@ describe('Addictions', () => {
     it('Возвращает состояние каждой зависимости', () => {
       const record = {
         ...DEFAULT_RECORD,
-        craving: 80,
+        satisfaction: 80,
       };
       const addictions = new Addictions(createAddictionsState(), {
         addictionFactory: createMockedAddictionFactory(createMockedAddiction(record)),

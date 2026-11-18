@@ -8,12 +8,12 @@ import { createAddictionsData } from './addictions';
 
 /**
  * Собирает зависимости по шагам. То, что не задано, заполняется незначимыми значениями: зависимостей
- * нет, и с полуночи первого дня тяги нет. Каждый вызов build возвращает новые зависимости
+ * нет, и с полуночи первого дня совсем не тянет. Каждый вызов build возвращает новые зависимости
  *
  * @example
  * const addictions = new AddictionsBuilder()
  *   .withStrength(Addiction.Alcoholism, 100)
- *   .withCraving(Addiction.Alcoholism, 80)
+ *   .withSatisfaction(Addiction.Alcoholism, 10)
  *   .build();
  */
 export class AddictionsBuilder {
@@ -24,13 +24,13 @@ export class AddictionsBuilder {
     minutes: 0,
   };
 
-  /** Задаёт тягу зависимости */
-  withCraving(addiction: Addiction, craving: number): this {
+  /** Задаёт удовлетворённость зависимости */
+  withSatisfaction(addiction: Addiction, satisfaction: number): this {
     this.data = {
       ...this.data,
       [addiction]: {
         ...this.data[addiction],
-        craving,
+        satisfaction,
       },
     };
     return this;

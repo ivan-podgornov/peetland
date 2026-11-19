@@ -24,6 +24,7 @@
       "@peetland/gta-sa": ["../gta-sa/src/index.ts"],
       "@peetland/moonloader": ["../moonloader/src/index.ts"],
       "vkeys": ["../moonloader/src/vkeys.ts"],
+      "memory": ["../moonloader/src/memory.ts"],
       "@peetland/events": ["../../toolkit/events/src/index.ts"],
       "@peetland/gauge": ["../../toolkit/gauge/src/index.ts"],
       "@peetland/geometry": ["../../toolkit/geometry/src/index.ts"],
@@ -38,7 +39,7 @@
     "luaBundleEntry": "./src/main.ts",
     "luaTarget": "JIT",
     "noImplicitSelf": true,
-    "noResolvePaths": ["vkeys"]
+    "noResolvePaths": ["vkeys", "memory"]
   },
   "include": ["./_G.d.ts", "./src/**/*.ts"]
 }

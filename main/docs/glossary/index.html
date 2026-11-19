@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/main/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.2cb647ce.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.02351454.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.74479c43.js" defer="defer"></script>
 </head>
 <body>
@@ -23,7 +23,7 @@ NPC создаёт NPC.</li>
 создаёт NPC.</li>
 <li class=""><strong>Место</strong> (<code>PlaceData</code>, <a class="" href="/peetland/main/docs/core/places/CONTRIBUTING/"><code>@peetland/places</code></a>) — точка мира, которой NPC
 пользуется: где встать и куда повернуться. Тип места (<code>PlaceType</code>) — бомжарня, магазин, приёмка,
-мусорка или место для клянчанья.</li>
+мусорка или место для попрошайничества.</li>
 <li class=""><strong>Знание о мире</strong> (<code>INpcWorldKnowledge</code>, <a class="" href="/peetland/main/docs/core/npc/CONTRIBUTING/"><code>@peetland/npc</code></a>) — то, что NPC
 знает о мире, например, который час. Одно на всех NPC.</li>
 <li class=""><strong>Игра</strong> (<code>IGame</code>, <a class="" href="/peetland/main/docs/core/game/CONTRIBUTING/"><code>@peetland/game</code></a>) — интерфейсы игры, которые реализует
@@ -91,7 +91,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <li class=""><strong>Чувство</strong> (<code>Feeling</code>) — значение от 0 до 100, которое меняется от поступков. Пока чувство одно —
 стыд.</li>
 <li class=""><strong>Поступок</strong> (<code>Deed</code>) — то, что персонаж сделал и на что реагирует психика: нашёл бутылку или
-клянчил.</li>
+попрошайничал.</li>
 <li class=""><strong>Шанс</strong> (<code>IPsyche.adjustChance</code>) — вероятность, что персонажу повезёт. Психика поправляет её по
 удачливости.</li>
 </ul>
@@ -138,7 +138,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="бомж-алкаш">Бомж-алкаш<a href="#бомж-алкаш" class="hash-link" aria-label="Прямая ссылка на Бомж-алкаш" title="Прямая ссылка на Бомж-алкаш" translate="no">​</a></h2>
 <ul>
 <li class=""><strong>Бомж</strong> (<code>NpcKind.Homeless</code>, <a class="" href="/peetland/main/docs/core/homeless/CONTRIBUTING/"><code>@peetland/homeless</code></a>) — пока
-единственный тип NPC. Его деятельность — перебиваться: сдать бутылки, клянчить или собирать
+единственный тип NPC. Его деятельность — перебиваться: сдать бутылки, попрошайничать или собирать
 бутылки. Пьёт бомж-алкаш, когда тянет: это слой зависимостей.</li>
 <li class=""><strong>Бомжарня</strong> (<code>PlaceType.HomelessCamp</code>) — лагерь бездомных, где живут бомжи.</li>
 <li class=""><strong>Место для распития</strong> (<code>PlaceType.DrinkingSpot</code>) — где NPC пьёт пойло, когда тянет. У бомжарни
@@ -147,7 +147,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 распития, а пустая бутылка остаётся.</li>
 <li class=""><strong>Приёмка</strong> (<code>PlaceType.BottleCollection</code>) — пункт приёма бутылок, где бомж сдаёт их за деньги.</li>
 <li class=""><strong>Мусорка</strong> (<code>PlaceType.TrashBin</code>) — где бомж ищет бутылки. Находка уменьшает стыд.</li>
-<li class=""><strong>Клянчить</strong> (<code>BegTask</code>) — просить деньги на месте для клянчанья (<code>PlaceType.BeggingSpot</code>), пока
+<li class=""><strong>Попрошайничать</strong> (<code>BegTask</code>) — просить деньги на месте для попрошайничества (<code>PlaceType.BeggingSpot</code>), пока
 стыд ниже порога. От совестливости зависит, как быстро растёт стыд.</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="разработка">Разработка<a href="#разработка" class="hash-link" aria-label="Прямая ссылка на Разработка" title="Прямая ссылка на Разработка" translate="no">​</a></h2>

@@ -7306,7 +7306,7 @@ return ____exports
 ["core.psyche.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- На сколько растёт стыд за одну попытку клянчить при средней совестливости
+--- На сколько растёт стыд за одну попытку попрошайничать при средней совестливости
 ____exports.BEGGING_SHAME = 0.1
 --- На сколько падает стыд за одну найденную бутылку при средней совестливости
 ____exports.BOTTLE_FOUND_SHAME_RELIEF = 2
@@ -7331,7 +7331,7 @@ local ____deed = require("core.psyche.src.deed")
 local Deed = ____deed.Deed
 local ____feeling = require("core.psyche.src.feeling")
 local Feeling = ____feeling.Feeling
---- Совестливость. Чем она выше, тем быстрее растёт стыд, когда NPC клянчит, и тем медленнее падает,
+--- Совестливость. Чем она выше, тем быстрее растёт стыд, когда NPC попрошайничает, и тем медленнее падает,
 -- когда NPC сам находит бутылки. При средней совестливости стыд меняется на BEGGING_SHAME и
 -- BOTTLE_FOUND_SHAME_RELIEF, а на краях — вдвое медленнее или в полтора раза быстрее
 ____exports.Conscientiousness = __TS__Class()
@@ -9100,10 +9100,7 @@ return ____exports
 ["core.addictions-tasks.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Цена бутылки пойла в магазине, в долларах. Должна совпадать с BOOZE_PRICE из
--- 
--- @peetland /homeless,
--- пока цены не сообщает магазин (#260)
+--- Цена бутылки пойла в магазине, в долларах, пока цены не сообщает магазин (#260)
 ____exports.BOOZE_PRICE = 100
 return ____exports
  end,
@@ -9717,7 +9714,7 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
 --- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
--- получается — клянчить, а иначе — собирать бутылки
+-- получается — попрошайничать, а иначе — собирать бутылки
 ____exports.HomelessActivityTask = __TS__Class()
 local HomelessActivityTask = ____exports.HomelessActivityTask
 HomelessActivityTask.name = "HomelessActivityTask"
@@ -9748,11 +9745,6 @@ return ____exports
 ["core.homeless.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Цена бутылки пойла, в долларах. Должна совпадать с BOOZE_PRICE из
--- 
--- @peetland /addictions-tasks, пока
--- цены не сообщает магазин (#260)
-____exports.BOOZE_PRICE = 100
 --- Сколько платят за одну пустую бутылку, в долларах
 ____exports.BOTTLE_PRICE = 10
 --- Со сколькими бутылками бомж идёт их сдавать: столько с собой таскать уже тяжело
@@ -9763,16 +9755,17 @@ ____exports.BOTTLE_FIND_CHANCE = 1 / 60
 ____exports.MAX_BOTTLES_PER_VISIT = 5
 --- Сколько бутылок NPC может унести
 ____exports.MAX_BOTTLES = 15
---- Шанс выклянчить деньги за одну попытку, раз в секунду (см. TryLuckTask)
+--- Шанс получить подачку за одну попытку, раз в секунду (см. TryLuckTask)
 ____exports.BEGGING_CHANCE = 1 / 40
---- Сколько долларов NPC получает, когда удалось выклянчить
+--- Сколько долларов NPC получает в одной подачке
 ____exports.BEGGING_REWARD = 10
---- Стыд, при котором NPC перестаёт клянчить. Подобран вместе с приростом стыда за попытку (см.
+--- Сколько подачек NPC получает за один заход, если стыд не остановит его раньше
+____exports.MAX_BEGGING_REWARDS_PER_VISIT = 10
+--- Стыд, при котором NPC перестаёт попрошайничать. Подобран вместе с приростом стыда за попытку (см.
 -- BEGGING_SHAME в
 -- 
 -- @peetland /psyche): при средней совестливости и нулевом стартовом стыде порог
--- достигается примерно за 600 попыток. Чтобы с пустыми карманами наклянчить на пойло, в среднем
--- нужно 400 попыток, поэтому одной сессии клянчанья хватает на пойло примерно в 93% случаев
+-- достигается примерно за 600 попыток, а на одну подачку в среднем уходит 40 попыток
 ____exports.BEGGING_SHAME_LIMIT = 60
 return ____exports
  end,
@@ -9800,18 +9793,9 @@ local ____constants = require("core.homeless.src.constants")
 local BEGGING_CHANCE = ____constants.BEGGING_CHANCE
 local BEGGING_REWARD = ____constants.BEGGING_REWARD
 local BEGGING_SHAME_LIMIT = ____constants.BEGGING_SHAME_LIMIT
-local BOOZE_PRICE = ____constants.BOOZE_PRICE
-local BOTTLE_PRICE = ____constants.BOTTLE_PRICE
---- Клянчить: один заход к ближайшему месту для клянчанья. NPC сидит с анимацией и раз в секунду с
--- шансом BEGGING_CHANCE получает BEGGING_REWARD, пока не наклянчит столько, сколько ему не хватает
--- на пойло вместе с деньгами и бутылками, которые у него есть. Каждая попытка, удачная или нет, —
--- поступок Deed.Begging, от которого растёт стыд. Когда стыд достигает BEGGING_SHAME_LIMIT, NPC
--- перестаёт клянчить.
--- 
--- Клянчить NPC идёт, только если это окупится: по предсказанию, он успеет наклянчить на пойло до
--- того, как стыд достигнет порога. Стыд предсказывается так, будто на каждую удачу уходит столько
--- попыток, сколько NPC ожидает при шансе BEGGING_CHANCE: оптимист рассчитывает на меньшее число
--- попыток, пессимист — на большее
+local MAX_BEGGING_REWARDS_PER_VISIT = ____constants.MAX_BEGGING_REWARDS_PER_VISIT
+--- Попрошайничать у ближайшего места для попрошайничества, пока не станет стыдно, но не больше
+-- MAX_BEGGING_REWARDS_PER_VISIT подачек за заход
 ____exports.BegTask = __TS__Class()
 local BegTask = ____exports.BegTask
 BegTask.name = "BegTask"
@@ -9826,8 +9810,7 @@ function BegTask.prototype.____constructor(self, deps)
     }}
 end
 function BegTask.prototype.canBeg(self, state)
-    local rewards = self:countNeededRewards(state)
-    return rewards > 0 and self:countRewardsBeforeShame(state.self.psyche, rewards) == rewards and #self.places:ofType(PlaceType.BeggingSpot) > 0
+    return self:countRewards(state.self.psyche) > 0 and #self.places:ofType(PlaceType.BeggingSpot) > 0
 end
 function BegTask.prototype.begAtNearestSpot(self, state)
     local ____self_deps_0 = self.deps
@@ -9835,7 +9818,7 @@ function BegTask.prototype.begAtNearestSpot(self, state)
     local spot = self.places:findNearest(state.self.actor.position, PlaceType.BeggingSpot)
     if not spot then
         error(
-            __TS__New(Error, "Не из чего выбрать место для клянчанья"),
+            __TS__New(Error, "Не из чего выбрать место для попрошайничества"),
             0
         )
     end
@@ -9845,7 +9828,7 @@ function BegTask.prototype.begAtNearestSpot(self, state)
     }
     do
         local index = 0
-        while index < self:countNeededRewards(state) do
+        while index < self:countRewards(state.self.psyche) do
             __TS__ArrayPush(
                 tasks,
                 npcTaskFactory:parallel({
@@ -9872,19 +9855,10 @@ function BegTask.prototype.begAtNearestSpot(self, state)
     end
     return tasks
 end
-function BegTask.prototype.countNeededRewards(self, state)
-    local money = state.self.inventory:get(Item.Money)
-    local bottles = state.self.inventory:get(Item.Bottles)
-    local shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE
-    return math.max(
-        0,
-        math.ceil(shortfall / BEGGING_REWARD)
-    )
-end
-function BegTask.prototype.countRewardsBeforeShame(self, psyche, limit)
+function BegTask.prototype.countRewards(self, psyche)
     local rewards = 0
-    local current = psyche
-    while rewards < limit and not self:isAshamed(current) do
+    local current = self:predictReward(psyche)
+    while rewards < MAX_BEGGING_REWARDS_PER_VISIT and not self:isAshamed(current) do
         rewards = rewards + 1
         current = self:predictReward(current)
     end

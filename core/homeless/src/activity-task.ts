@@ -30,21 +30,21 @@ export class HomelessActivityTask implements CompoundTask<NpcState, NpcContext> 
       },
       {
         name: 'beg',
-        preconditions: (state) => !hasEnoughMoney(state),
+        preconditions: (state) => !this.hasEnoughMoney(state),
         tasks: [homelessTaskFactory.beg()],
       },
       {
         name: 'collect-bottles',
-        preconditions: (state) => !hasEnoughMoney(state),
+        preconditions: (state) => !this.hasEnoughMoney(state),
         tasks: [homelessTaskFactory.collectBottles()],
       },
     ];
   }
-}
 
-/** Хватает ли бомжу денег: деньги вместе с выручкой за бутылки не меньше ENOUGH_MONEY */
-function hasEnoughMoney(state: NpcState): boolean {
-  const { inventory } = state.self;
+  /** Хватает ли бомжу денег: деньги вместе с выручкой за бутылки не меньше ENOUGH_MONEY */
+  private hasEnoughMoney(state: NpcState): boolean {
+    const { inventory } = state.self;
 
-  return inventory.get(Item.Money) + inventory.get(Item.Bottles) * BOTTLE_PRICE >= ENOUGH_MONEY;
+    return inventory.get(Item.Money) + inventory.get(Item.Bottles) * BOTTLE_PRICE >= ENOUGH_MONEY;
+  }
 }

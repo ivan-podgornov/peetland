@@ -14,7 +14,7 @@ export type SatisfyHungerTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Фабрика, которой задача создаёт задачу купить еду */
   needsTaskFactory: INeedsTaskFactory;
-  /** Места мира. Еда покупается в магазинах, а съедается в бомжарне */
+  /** Места мира. Еда покупается в магазинах, а съедается в местах для трапезы */
   places: IPlaces;
   /** Выбирает, что съесть или купить */
   foodChooser: IFoodChooser;
@@ -25,8 +25,8 @@ export type SatisfyHungerTaskDeps = {
  * магазине и съедает. Что оптимально, решает IFoodChooser по текущей сытости
  */
 export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
-  /** На каком расстоянии от бомжарни можно считать, что NPC до неё дошёл, в метрах */
-  private static readonly CAMP_COMPLETE_RADIUS = 0.5;
+  /** На каком расстоянии от места для трапезы можно считать, что NPC до него дошёл, в метрах */
+  private static readonly SPOT_COMPLETE_RADIUS = 0.5;
 
   readonly name = 'satisfy-hunger';
 
@@ -66,14 +66,14 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
     return state.self.needs.get(Need.Satiety, state.world.time);
   }
 
-  /** Купить еду можно, если на неё хватает денег, есть магазин и есть бомжарня, где её съесть */
+  /** Купить еду можно, если на неё хватает денег, есть магазин и есть место для трапезы */
   private canBuy(state: NpcState): boolean {
     const { places } = this.deps;
 
     return (
       this.foodToBuy(state) !== null &&
       places.ofType(PlaceType.Shop).length > 0 &&
-      places.ofType(PlaceType.HomelessCamp).length > 0
+      places.ofType(PlaceType.MealSpot).length > 0
     );
   }
 
@@ -97,9 +97,7 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
     }
 
     const shop = this.findNearest(state.self.actor.position, PlaceType.Shop);
-    // Есть у дверей магазина не дело, поэтому NPC идёт есть в бомжарню. Когда появится поиск пути,
-    // будет есть где-нибудь рядом с магазином
-    const camp = this.findNearest(shop.position, PlaceType.HomelessCamp);
+    const spot = this.findNearest(shop.position, PlaceType.MealSpot);
 
     return [
       needsTaskFactory.buyFood({
@@ -107,8 +105,8 @@ export class SatisfyHungerTask implements CompoundTask<NpcState, NpcContext> {
         shop,
       }),
       npcTaskFactory.goToCoords({
-        coords: camp.position,
-        completeRadius: SatisfyHungerTask.CAMP_COMPLETE_RADIUS,
+        coords: spot.position,
+        completeRadius: SatisfyHungerTask.SPOT_COMPLETE_RADIUS,
       }),
       npcTaskFactory.eat({ food }),
     ];

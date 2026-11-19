@@ -7,12 +7,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createSatisfyAlcoholismTask } from '../../dev';
 
-/** Место для распития TEST_SPOT стоит в (10, 0, 0) */
+/** Место для трапезы TEST_MEAL_SPOT стоит в (10, 0, 0) */
 const IN_SPOT = [10, 1, 0] as const;
 
 describe('SatisfyAlcoholismTask', () => {
   describe('Метод drink-here', () => {
-    it('Если пойло есть и NPC в месте для распития, планирует выпить там же', () => {
+    it('Если пойло есть и NPC в месте для трапезы, планирует выпить там же', () => {
       const task = createSatisfyAlcoholismTask({
         npcTaskFactory: createNpcTaskFactory({ drink: () => createStubTask('drink') }),
       });

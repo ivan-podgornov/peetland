@@ -4,7 +4,7 @@ import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
-import { TEST_CAMP, TEST_SHOP } from '@peetland/places/dev';
+import { TEST_MEAL_SPOT, TEST_SHOP } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -16,7 +16,7 @@ import {
 describe('SatisfyHungerTask', () => {
   describe('Метод buy-food', () => {
     describe('Задачи', () => {
-      it('Планирует купить еду, дойти до бомжарни и съесть', () => {
+      it('Планирует купить еду, дойти до места для трапезы и съесть', () => {
         const task = createSatisfyHungerTask({
           npcTaskFactory: createNpcTaskFactory({ eat: () => createStubTask('eat') }),
           foodChooser: createMockedFoodChooser({ toBuy: Item.SmilePizza }),
@@ -64,7 +64,7 @@ describe('SatisfyHungerTask', () => {
         });
       });
 
-      it('Съедает купленное в бомжарне, ближайшей к магазину', () => {
+      it('Съедает купленное в месте для трапезы, ближайшем к магазину', () => {
         const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
         const eat = vi.fn(() => createStubTask<NpcState, NpcContext>('eat'));
         const task = createSatisfyHungerTask({
@@ -81,7 +81,7 @@ describe('SatisfyHungerTask', () => {
         planSteps(task, state);
 
         expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-          coords: TEST_CAMP.position,
+          coords: TEST_MEAL_SPOT.position,
           completeRadius: 0.5,
         });
         expect(eat).toHaveBeenCalledExactlyOnceWith({ food: Item.SmilePizza });

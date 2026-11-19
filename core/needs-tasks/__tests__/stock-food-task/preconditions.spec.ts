@@ -1,7 +1,7 @@
 import { planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { TEST_CAMP, TEST_SHOP, createPlaces } from '@peetland/places/dev';
+import { TEST_MEAL_SPOT, TEST_SHOP, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedFoodChooser, createStockFoodTask } from '../../dev';
@@ -45,13 +45,13 @@ describe('StockFoodTask', () => {
       it('Если магазинов нет, план не составляется', () => {
         const task = createStockFoodTask({
           foodChooser: createMockedFoodChooser({ toBuy: Item.RomashkaLoaf }),
-          places: createPlaces([TEST_CAMP]),
+          places: createPlaces([TEST_MEAL_SPOT]),
         });
 
         expect(planSteps(task, NpcStateBuilder.default())).toBeNull();
       });
 
-      it('Если бомжарен нет, план составляется: есть сразу не нужно', () => {
+      it('Если мест для трапезы нет, план составляется: есть сразу не нужно', () => {
         const task = createStockFoodTask({
           foodChooser: createMockedFoodChooser({ toBuy: Item.RomashkaLoaf }),
           places: createPlaces([TEST_SHOP]),

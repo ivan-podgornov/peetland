@@ -13,15 +13,48 @@ export const places: PlaceData[] = [
     type: PlaceType.HomelessCamp,
   },
   {
-    // Пьют там же, где живут: у входа в бомжарню
-    id: 'montgomery-homeless-camp-drinking-spot',
+    // Справа от входа в магазин liquor deli
+    id: 'montgomery-liquor-deli-meal-spot',
     position: {
-      x: 1271.41,
-      y: 181.76,
-      z: 19.44,
+      x: 1347.21,
+      y: 209.7,
+      z: 19.55,
     },
-    angle: 242,
-    type: PlaceType.DrinkingSpot,
+    angle: 334,
+    type: PlaceType.MealSpot,
+  },
+  {
+    // Справа от входа в пиццерию
+    id: 'montgomery-pizzeria-meal-spot',
+    position: {
+      x: 1359.6,
+      y: 234.53,
+      z: 19.57,
+    },
+    angle: 70,
+    type: PlaceType.MealSpot,
+  },
+  {
+    // Рядом с киоском hannibal liquor
+    id: 'montgomery-hannibal-liquor-kiosk-meal-spot',
+    position: {
+      x: 1319.72,
+      y: 344.74,
+      z: 19.55,
+    },
+    angle: 287,
+    type: PlaceType.MealSpot,
+  },
+  {
+    // Рядом с заправкой
+    id: 'montgomery-gas-station-meal-spot',
+    position: {
+      x: 1375.72,
+      y: 468.03,
+      z: 20.2,
+    },
+    angle: 159,
+    type: PlaceType.MealSpot,
   },
   {
     id: 'montgomery-hannibal-liquor-kiosk',

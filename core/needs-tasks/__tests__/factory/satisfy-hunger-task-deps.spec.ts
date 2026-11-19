@@ -4,7 +4,7 @@ import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createMockedPlaces, createPlacesWithShopAndCamp } from '@peetland/places/dev';
+import { createMockedPlaces, createPlacesWithShopAndMealSpot } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedFoodChooser, createNeedsTaskFactoryDeps } from '../../dev';
@@ -56,7 +56,7 @@ describe('NeedsTaskFactory', () => {
       const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
       const factory = new NeedsTaskFactory(
         createNeedsTaskFactoryDeps({
-          places: createPlacesWithShopAndCamp(),
+          places: createPlacesWithShopAndMealSpot(),
           npcTaskFactory: createNpcTaskFactory({
             purchase,
             eat: () => createStubTask('eat'),

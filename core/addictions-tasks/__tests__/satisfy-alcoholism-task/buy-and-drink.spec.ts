@@ -2,7 +2,7 @@ import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peet
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
-import { TEST_SHOP, TEST_SPOT, createPlaces } from '@peetland/places/dev';
+import { TEST_SHOP, TEST_MEAL_SPOT, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createMockedAddictionsTaskFactory, createSatisfyAlcoholismTask } from '../../dev';
@@ -15,7 +15,7 @@ function createStateWithMoney(money = BOOZE_PRICE) {
 
 describe('SatisfyAlcoholismTask', () => {
   describe('Метод buy-and-drink', () => {
-    it('Если пойла нет, а денег хватает, планирует купить пойло, дойти до места для распития и выпить', () => {
+    it('Если пойла нет, а денег хватает, планирует купить пойло, дойти до места для трапезы и выпить', () => {
       const task = createSatisfyAlcoholismTask({
         npcTaskFactory: createNpcTaskFactory({ drink: () => createStubTask('drink') }),
       });
@@ -38,7 +38,7 @@ describe('SatisfyAlcoholismTask', () => {
       expect(addictionsTaskFactory.buyBooze).toHaveBeenCalledExactlyOnceWith({ shop: TEST_SHOP });
     });
 
-    it('Пьёт в месте для распития, ближайшем к магазину', () => {
+    it('Пьёт в месте для трапезы, ближайшем к магазину', () => {
       const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
       const task = createSatisfyAlcoholismTask({
         npcTaskFactory: createNpcTaskFactory({ goToCoords }),
@@ -47,7 +47,7 @@ describe('SatisfyAlcoholismTask', () => {
       planSteps(task, createStateWithMoney());
 
       expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-        coords: TEST_SPOT.position,
+        coords: TEST_MEAL_SPOT.position,
         completeRadius: 0.5,
       });
     });
@@ -59,7 +59,7 @@ describe('SatisfyAlcoholismTask', () => {
     });
 
     it('Если магазинов нет, план не составляется', () => {
-      const task = createSatisfyAlcoholismTask({ places: createPlaces([TEST_SPOT]) });
+      const task = createSatisfyAlcoholismTask({ places: createPlaces([TEST_MEAL_SPOT]) });
 
       expect(planSteps(task, createStateWithMoney())).toBeNull();
     });

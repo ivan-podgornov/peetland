@@ -135,7 +135,7 @@ describe('RootTaskFactory', () => {
 
       planSteps(factory.create(NpcKind.Homeless), state);
 
-      expect(places.ofType).toHaveBeenCalledWith(PlaceType.DrinkingSpot);
+      expect(places.ofType).toHaveBeenCalledWith(PlaceType.MealSpot);
     });
   });
 });

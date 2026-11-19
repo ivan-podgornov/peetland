@@ -14,23 +14,23 @@ export type SatisfyAlcoholismTaskDeps = {
   npcTaskFactory: INpcTaskFactory;
   /** Фабрика, которой задача создаёт задачу купить пойло */
   addictionsTaskFactory: IAddictionsTaskFactory;
-  /** Места мира. Пойло покупается в магазинах, а пьётся в местах для распития */
+  /** Места мира. Пойло покупается в магазинах, а пьётся в местах для трапезы */
   places: IPlaces;
   /** Определяет, какие предметы в инвентаре — пойло */
   itemClassifier: IItemClassifier;
 };
 
 /**
- * Удовлетворить алкоголизм: выпить пойло в месте для распития. Методы в порядке приоритета: если
- * пойло есть и NPC в месте для распития, выпить там же; если пойло есть, дойти до ближайшего места
- * для распития и выпить; если пойла нет, а денег хватает, купить его в ближайшем магазине, дойти до
- * места для распития, ближайшего к магазину, и выпить
+ * Удовлетворить алкоголизм: выпить пойло в месте для трапезы. Методы в порядке приоритета: если
+ * пойло есть и NPC в месте для трапезы, выпить там же; если пойло есть, дойти до ближайшего места
+ * для трапезы и выпить; если пойла нет, а денег хватает, купить его в ближайшем магазине, дойти до
+ * места для трапезы, ближайшего к магазину, и выпить
  */
 export class SatisfyAlcoholismTask implements CompoundTask<NpcState, NpcContext> {
-  /** На каком расстоянии от места для распития NPC считается в нём, в метрах */
+  /** На каком расстоянии от места для трапезы NPC считается в нём, в метрах */
   static readonly SPOT_RADIUS = 3;
 
-  /** На каком расстоянии от места для распития можно считать, что NPC до него дошёл, в метрах */
+  /** На каком расстоянии от места для трапезы можно считать, что NPC до него дошёл, в метрах */
   private static readonly SPOT_COMPLETE_RADIUS = 0.5;
 
   readonly name = 'satisfy-alcoholism';
@@ -81,13 +81,13 @@ export class SatisfyAlcoholismTask implements CompoundTask<NpcState, NpcContext>
     return booze;
   }
 
-  /** Находится ли NPC в радиусе SPOT_RADIUS от какого-нибудь места для распития */
+  /** Находится ли NPC в радиусе SPOT_RADIUS от какого-нибудь места для трапезы */
   private isInSpot(state: NpcState): boolean {
     const { places } = this.deps;
 
     return places.isNear(
       state.self.actor.position,
-      PlaceType.DrinkingSpot,
+      PlaceType.MealSpot,
       SatisfyAlcoholismTask.SPOT_RADIUS
     );
   }
@@ -95,7 +95,7 @@ export class SatisfyAlcoholismTask implements CompoundTask<NpcState, NpcContext>
   private hasSpots(): boolean {
     const { places } = this.deps;
 
-    return places.ofType(PlaceType.DrinkingSpot).length > 0;
+    return places.ofType(PlaceType.MealSpot).length > 0;
   }
 
   /** Купить пойло можно, если на него хватает денег, есть магазин и есть место, где его выпить */
@@ -126,10 +126,10 @@ export class SatisfyAlcoholismTask implements CompoundTask<NpcState, NpcContext>
     return npcTaskFactory.drink({ booze });
   }
 
-  /** Создаёт задачу дойти до места для распития, ближайшего к position */
+  /** Создаёт задачу дойти до места для трапезы, ближайшего к position */
   private goToNearestSpot(position: Vector3): Task<NpcState, NpcContext> {
     const { npcTaskFactory } = this.deps;
-    const spot = this.findNearest(position, PlaceType.DrinkingSpot);
+    const spot = this.findNearest(position, PlaceType.MealSpot);
 
     return npcTaskFactory.goToCoords({
       coords: spot.position,

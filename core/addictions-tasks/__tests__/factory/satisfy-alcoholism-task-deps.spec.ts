@@ -3,7 +3,7 @@ import { Item, ItemClassifier } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createMockedPlaces, createPlacesWithShopAndSpot } from '@peetland/places/dev';
+import { createMockedPlaces, createPlacesWithShopAndMealSpot } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createAddictionsTaskFactoryDeps } from '../../dev';
@@ -16,7 +16,7 @@ describe('AddictionsTaskFactory', () => {
       const drink = vi.fn(() => createStubTask<NpcState, NpcContext>('drink'));
       const factory = new AddictionsTaskFactory(
         createAddictionsTaskFactoryDeps({
-          places: createPlacesWithShopAndSpot(),
+          places: createPlacesWithShopAndMealSpot(),
           npcTaskFactory: createNpcTaskFactory({ drink }),
         })
       );
@@ -54,7 +54,7 @@ describe('AddictionsTaskFactory', () => {
       const purchase = vi.fn(() => createStubTask<NpcState, NpcContext>('purchase'));
       const factory = new AddictionsTaskFactory(
         createAddictionsTaskFactoryDeps({
-          places: createPlacesWithShopAndSpot(),
+          places: createPlacesWithShopAndMealSpot(),
           npcTaskFactory: createNpcTaskFactory({
             purchase,
             drink: () => createStubTask('drink'),

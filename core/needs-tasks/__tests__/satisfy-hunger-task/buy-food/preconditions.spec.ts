@@ -3,7 +3,7 @@ import { Item } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { TEST_CAMP, TEST_SHOP, createPlaces } from '@peetland/places/dev';
+import { TEST_MEAL_SPOT, TEST_SHOP, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedFoodChooser, createSatisfyHungerTask } from '../../../dev';
@@ -37,7 +37,7 @@ describe('SatisfyHungerTask', () => {
       it('Если магазинов нет, план не составляется', () => {
         const task = createSatisfyHungerTask({
           foodChooser: createMockedFoodChooser({ toBuy: Item.RomashkaLoaf }),
-          places: createPlaces([TEST_CAMP]),
+          places: createPlaces([TEST_MEAL_SPOT]),
         });
         const state = new NpcStateBuilder()
           .withNeeds((needs) => needs.withValue(Need.Satiety, 10).build())
@@ -46,7 +46,7 @@ describe('SatisfyHungerTask', () => {
         expect(planSteps(task, state)).toBeNull();
       });
 
-      it('Если бомжарен нет, план не составляется: есть негде', () => {
+      it('Если мест для трапезы нет, план не составляется: есть негде', () => {
         const task = createSatisfyHungerTask({
           foodChooser: createMockedFoodChooser({ toBuy: Item.RomashkaLoaf }),
           places: createPlaces([TEST_SHOP]),

@@ -2,7 +2,7 @@ import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peet
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
-import { TEST_SHOP, TEST_SPOT, createPlaces } from '@peetland/places/dev';
+import { TEST_SHOP, TEST_MEAL_SPOT, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSatisfyAlcoholismTask } from '../../dev';
@@ -17,7 +17,7 @@ function createFactory(overrides = {}) {
 
 describe('SatisfyAlcoholismTask', () => {
   describe('Метод go-and-drink', () => {
-    it('Если пойло есть, а NPC не в месте для распития, планирует дойти до него и выпить', () => {
+    it('Если пойло есть, а NPC не в месте для трапезы, планирует дойти до него и выпить', () => {
       const task = createSatisfyAlcoholismTask({ npcTaskFactory: createFactory() });
       const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
@@ -30,7 +30,7 @@ describe('SatisfyAlcoholismTask', () => {
       );
     });
 
-    it('Идёт к месту для распития, ближайшему к NPC', () => {
+    it('Идёт к месту для трапезы, ближайшему к NPC', () => {
       const goToCoords = vi.fn(() => createStubNpcTask('go-to-coords'));
       const task = createSatisfyAlcoholismTask({ npcTaskFactory: createFactory({ goToCoords }) });
       const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
@@ -38,12 +38,12 @@ describe('SatisfyAlcoholismTask', () => {
       planSteps(task, state);
 
       expect(goToCoords).toHaveBeenCalledExactlyOnceWith({
-        coords: TEST_SPOT.position,
+        coords: TEST_MEAL_SPOT.position,
         completeRadius: 0.5,
       });
     });
 
-    it('Если мест для распития нет, план не составляется', () => {
+    it('Если мест для трапезы нет, план не составляется', () => {
       const task = createSatisfyAlcoholismTask({
         npcTaskFactory: createFactory(),
         places: createPlaces([TEST_SHOP]),

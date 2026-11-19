@@ -9743,17 +9743,11 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
-local hasEnoughMoney
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____constants = require("core.homeless.src.constants")
 local BOTTLE_PRICE = ____constants.BOTTLE_PRICE
 local ENOUGH_MONEY = ____constants.ENOUGH_MONEY
-function hasEnoughMoney(state)
-    local ____state_self_1 = state.self
-    local inventory = ____state_self_1.inventory
-    return inventory:get(Item.Money) + inventory:get(Item.Bottles) * BOTTLE_PRICE >= ENOUGH_MONEY
-end
 --- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
 -- получается — попрошайничать, а иначе — собирать бутылки. Если денег хватает, бомж только сдаёт
 -- бутылки
@@ -9772,15 +9766,20 @@ function HomelessActivityTask.prototype.____constructor(self, deps)
         },
         {
             name = "beg",
-            preconditions = function(____, state) return not hasEnoughMoney(state) end,
+            preconditions = function(____, state) return not self:hasEnoughMoney(state) end,
             tasks = {homelessTaskFactory:beg()}
         },
         {
             name = "collect-bottles",
-            preconditions = function(____, state) return not hasEnoughMoney(state) end,
+            preconditions = function(____, state) return not self:hasEnoughMoney(state) end,
             tasks = {homelessTaskFactory:collectBottles()}
         }
     }
+end
+function HomelessActivityTask.prototype.hasEnoughMoney(self, state)
+    local ____state_self_1 = state.self
+    local inventory = ____state_self_1.inventory
+    return inventory:get(Item.Money) + inventory:get(Item.Bottles) * BOTTLE_PRICE >= ENOUGH_MONEY
 end
 return ____exports
  end,

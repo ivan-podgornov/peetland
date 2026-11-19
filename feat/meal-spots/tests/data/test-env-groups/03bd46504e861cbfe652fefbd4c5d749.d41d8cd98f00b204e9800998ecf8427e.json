@@ -1,1 +1,0 @@
-{"id":"03bd46504e861cbfe652fefbd4c5d749.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/gauge/__tests__/get.spec.ts#Gauge #get Если depletion.amount — 0, значение не падает","name":"Если depletion.amount — 0, значение не падает","status":"passed","testResultsByEnv":{"default":"70cce8363b7614413a555fb40d79df4d"}}

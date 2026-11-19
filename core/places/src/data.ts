@@ -6,6 +6,7 @@ export enum PlaceType {
   BottleCollection = 'bottle-collection',
   TrashBin = 'trash-bin',
   BeggingSpot = 'begging-spot',
+  DrinkingSpot = 'drinking-spot',
 }
 
 /** Данные места, которые хранятся в репозитории */

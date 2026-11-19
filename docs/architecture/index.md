@@ -89,7 +89,10 @@ flowchart TD
     world --> homeless
     world --> places
     world --> needstasks[needs-tasks]
+    world --> addictionstasks[addictions-tasks]
     needstasks --> npc
+    addictionstasks --> npctasks
+    addictionstasks --> places
     homeless --> npctasks[npc-tasks]
     homeless --> places
     npctasks --> npc
@@ -184,7 +187,7 @@ flowchart TD
 - перечисления и типы данных.
 
 Детали реализации не экспортируются: классы, которые пакет создаёт внутри, их опции и зависимости,
-константы. Например, `homeless` экспортирует `HomelessActivityTaskFactory`, но не `DrinkTask`. Тесты и
+константы. Например, `homeless` экспортирует `HomelessActivityTaskFactory`, но не `BegTask`. Тесты и
 `dev` импортируют детали реализации своего пакета напрямую из файлов, например
 `../src/drink-task`.
 

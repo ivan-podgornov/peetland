@@ -9,6 +9,7 @@
     "paths": {
       "@peetland/actor-command": ["../../core/actor-command/src/index.ts"],
       "@peetland/addictions": ["../../core/addictions/src/index.ts"],
+      "@peetland/addictions-tasks": ["../../core/addictions-tasks/src/index.ts"],
       "@peetland/animation-manager": ["../../core/animation-manager/src/index.ts"],
       "@peetland/game": ["../../core/game/src/index.ts"],
       "@peetland/homeless": ["../../core/homeless/src/index.ts"],

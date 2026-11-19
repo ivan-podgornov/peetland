@@ -1,10 +1,10 @@
 import { planSteps } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createPlaces } from '@peetland/places/dev';
+import { TEST_CAMP, TEST_SHOP, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedFoodChooser, createStockFoodTask, TEST_CAMP, TEST_SHOP } from '../../dev';
+import { createMockedFoodChooser, createStockFoodTask } from '../../dev';
 
 describe('StockFoodTask', () => {
   describe('Метод buy-food', () => {

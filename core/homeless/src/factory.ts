@@ -5,9 +5,7 @@ import type { IPlaces } from '@peetland/places';
 import type { IRandom } from '@peetland/random';
 
 import { BegTask } from './beg-task';
-import { BuyBoozeTask } from './buy-booze-task';
 import { CollectBottlesTask } from './collect-bottles-task';
-import { DrinkTask } from './drink-task';
 import { SellBottlesTask } from './sell-bottles-task';
 import type { IHomelessTaskFactory } from './types';
 
@@ -26,24 +24,6 @@ export class HomelessTaskFactory implements IHomelessTaskFactory {
 
   constructor(deps: HomelessTaskFactoryDeps) {
     this.deps = deps;
-  }
-
-  buyBooze(): NpcTask {
-    const { npcTaskFactory, places } = this.deps;
-
-    return new BuyBoozeTask({
-      npcTaskFactory,
-      places,
-    });
-  }
-
-  drink(): NpcTask {
-    const { npcTaskFactory, places } = this.deps;
-
-    return new DrinkTask({
-      npcTaskFactory,
-      places,
-    });
   }
 
   sellBottles(): NpcTask {

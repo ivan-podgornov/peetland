@@ -1,7 +1,8 @@
 import { Item } from '@peetland/inventory';
+import { TEST_SHOP } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createNeedsTaskFactoryDeps, TEST_SHOP } from '../../dev';
+import { createNeedsTaskFactoryDeps } from '../../dev';
 import { NeedsTask, NeedsTaskFactory } from '../../src';
 import type { BuyFoodTaskOptions } from '../../src';
 import { BuyFoodTask } from '../../src/buy-food-task';

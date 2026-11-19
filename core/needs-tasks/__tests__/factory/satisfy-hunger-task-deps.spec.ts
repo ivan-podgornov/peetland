@@ -4,14 +4,10 @@ import { Need } from '@peetland/needs';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createMockedPlaces } from '@peetland/places/dev';
+import { createMockedPlaces, createPlacesWithShopAndCamp } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  createMockedFoodChooser,
-  createNeedsTaskFactoryDeps,
-  createPlacesWithShopAndCamp,
-} from '../../dev';
+import { createMockedFoodChooser, createNeedsTaskFactoryDeps } from '../../dev';
 import { NeedsTaskFactory } from '../../src';
 
 describe('NeedsTaskFactory', () => {

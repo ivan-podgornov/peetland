@@ -9,14 +9,11 @@ export type HomelessActivityTaskDeps = {
 };
 
 /**
- * Деятельность бомжа: напиться. Методы перечислены по приоритету: бухать, а если не получается —
- * купить пойло, а если и это не получается — сдать бутылки, а если и это не получается — клянчить, а
- * иначе — собирать бутылки. Когда что получается, решают предусловия самих задач: бухать можно,
- * если есть пойло, купить — если хватает денег, сдать — если за бутылки хватит на пойло, клянчить —
- * если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
+ * Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
+ * получается — клянчить, а иначе — собирать бутылки
  */
 export class HomelessActivityTask implements CompoundTask<NpcState, NpcContext> {
-  readonly name = 'get-drunk';
+  readonly name = 'scrape-by';
 
   readonly methods: Method<NpcState, NpcContext>[];
 
@@ -24,16 +21,6 @@ export class HomelessActivityTask implements CompoundTask<NpcState, NpcContext> 
     const { homelessTaskFactory } = deps;
 
     this.methods = [
-      {
-        name: 'drink',
-        preconditions: () => true,
-        tasks: [homelessTaskFactory.drink()],
-      },
-      {
-        name: 'buy-booze',
-        preconditions: () => true,
-        tasks: [homelessTaskFactory.buyBooze()],
-      },
       {
         name: 'sell-bottles',
         preconditions: () => true,

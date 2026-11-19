@@ -1,5 +1,4 @@
 import { plan, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import type { PlayAnimationTaskOptions } from '@peetland/npc-tasks';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
@@ -7,17 +6,26 @@ import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createBegTask, createPlacesWithBeggingSpot } from '../../../dev';
-import { BEGGING_REWARD, BOOZE_PRICE } from '../../../src/constants';
+import {
+  createBeggingOptimism,
+  createBegTask,
+  createPlacesWithBeggingSpot,
+  withBeggingTraits,
+} from '../../../dev';
+
+/** Состояние NPC, который, по ожиданию, успеет получить ровно одну подачку: после неё стыд 30, а после второй — 60 */
+function createStateForOneReward() {
+  return new NpcStateBuilder()
+    .withPsyche((psyche) => withBeggingTraits(psyche, 1, createBeggingOptimism(30)).build())
+    .build();
+}
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {
     describe('Задачи', () => {
-      it('Планирует дойти до места, повернуться и клянчить', () => {
+      it('Планирует дойти до места, повернуться и попрошайничать', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD })
-          .build();
+        const state = createStateForOneReward();
 
         expect(planTree(planSteps(task, state) ?? [])).toStrictEqual(
           new PlanStructureBuilder()
@@ -32,7 +40,7 @@ describe('BegTask', () => {
         );
       });
 
-      it('Ищет место для клянчанья, ближайшее к NPC', () => {
+      it('Ищет место для попрошайничества, ближайшее к NPC', () => {
         const places = createPlacesWithBeggingSpot();
         const state = new NpcStateBuilder().withPosition(1, 2, 3).build();
 
@@ -94,7 +102,7 @@ describe('BegTask', () => {
         });
       });
 
-      it('Пока клянчит, сидит с анимацией beg-sitting', () => {
+      it('Пока попрошайничает, сидит с анимацией beg-sitting', () => {
         const playAnimation = vi.fn((options: PlayAnimationTaskOptions) =>
           createNpcTaskFactory().playAnimation(options)
         );

@@ -4,62 +4,50 @@ import { NpcStateBuilder } from '@peetland/npc/dev';
 import { describe, expect, it } from 'vitest';
 
 import {
+  createBeggingOptimism,
   createBegTask,
   createPlacesWithBeggingSpot,
   createTaskFactoryWithTryLuckSpy,
+  withBeggingTraits,
 } from '../../../dev';
-import { BEGGING_REWARD, BOOZE_PRICE, BOTTLE_PRICE } from '../../../src/constants';
+import { BEGGING_REWARD, MAX_BEGGING_REWARDS_PER_VISIT } from '../../../src/constants';
+
+/** Состояние NPC, у которого каждая попытка добавляет shame стыда, а до подачки он ждёт attempts */
+function createState(shame: number, attempts: number) {
+  return new NpcStateBuilder()
+    .withPsyche((psyche) =>
+      withBeggingTraits(psyche, shame, createBeggingOptimism(attempts)).build()
+    )
+    .withEmptyInventory()
+    .build();
+}
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {
     describe('Задачи', () => {
-      it('Если ни денег, ни бутылок нет, пытает удачу столько раз, сколько удач нужно на всё пойло', () => {
+      it('Пытает удачу столько раз, сколько подачек, по ожиданию психики, успеет получить до BEGGING_SHAME_LIMIT', () => {
         const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
 
-        plan(
-          createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory),
-          new NpcStateBuilder().withEmptyInventory().build()
-        );
+        // 30 попыток на подачку по 0.5 стыда: после подачек стыд 15, 30, 45, а после четвёртой — 60
+        plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), createState(0.5, 30));
 
-        expect(tryLuck).toHaveBeenCalledTimes(BOOZE_PRICE / BEGGING_REWARD);
+        expect(tryLuck).toHaveBeenCalledTimes(3);
       });
 
-      it('Пытает удачу столько раз, сколько удач не хватает на пойло вместе с деньгами и выручкой за бутылки', () => {
+      it('Если стыд не растёт, пытает удачу MAX_BEGGING_REWARDS_PER_VISIT раз', () => {
         const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-        const state = new NpcStateBuilder()
-          .withInventory({
-            [Item.Money]: 3 * BEGGING_REWARD,
-            [Item.Bottles]: 2,
-          })
-          .build();
 
-        plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), state);
+        plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), createState(0, 30));
 
-        expect(tryLuck).toHaveBeenCalledTimes(
-          (BOOZE_PRICE - 3 * BEGGING_REWARD - 2 * BOTTLE_PRICE) / BEGGING_REWARD
-        );
+        expect(tryLuck).toHaveBeenCalledTimes(MAX_BEGGING_REWARDS_PER_VISIT);
       });
 
-      it('Если не хватает не кратно BEGGING_REWARD, пытает удачу с запасом до целой удачи', () => {
-        const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD - 1 })
-          .build();
-
-        plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), state);
-
-        expect(tryLuck).toHaveBeenCalledTimes(2);
-      });
-
-      it('За каждую удачу получает BEGGING_REWARD', () => {
+      it('За каждую подачку получает BEGGING_REWARD', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
-        const state = new NpcStateBuilder()
-          .withInventory({ [Item.Money]: BOOZE_PRICE - 2 * BEGGING_REWARD })
-          .build();
 
-        const after = applyPlanEffects(task, state);
+        const after = applyPlanEffects(task, createState(0.5, 30));
 
-        expect(after.self.inventory.getAll()).toStrictEqual({ [Item.Money]: BOOZE_PRICE });
+        expect(after.self.inventory.getAll()).toStrictEqual({ [Item.Money]: 3 * BEGGING_REWARD });
       });
     });
   });

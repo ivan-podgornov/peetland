@@ -10,7 +10,7 @@ export type HomelessActivityTaskDeps = {
 
 /**
  * Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
- * получается — клянчить, а иначе — собирать бутылки
+ * получается — попрошайничать, а иначе — собирать бутылки
  */
 export class HomelessActivityTask implements CompoundTask<NpcState, NpcContext> {
   readonly name = 'scrape-by';

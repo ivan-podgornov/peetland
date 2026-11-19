@@ -11,33 +11,24 @@ import {
   BEGGING_CHANCE,
   BEGGING_REWARD,
   BEGGING_SHAME_LIMIT,
-  BOOZE_PRICE,
-  BOTTLE_PRICE,
+  MAX_BEGGING_REWARDS_PER_VISIT,
 } from './constants';
 
 export type BegTaskDeps = {
-  /** Места мира. Клянчат в местах типа PlaceType.BeggingSpot */
+  /** Места мира. Попрошайничают в местах типа PlaceType.BeggingSpot */
   places: IPlaces;
   npcTaskFactory: INpcTaskFactory;
 };
 
 /**
- * Клянчить: один заход к ближайшему месту для клянчанья. NPC сидит с анимацией и раз в секунду с
- * шансом BEGGING_CHANCE получает BEGGING_REWARD, пока не наклянчит столько, сколько ему не хватает
- * на пойло вместе с деньгами и бутылками, которые у него есть. Каждая попытка, удачная или нет, —
- * поступок Deed.Begging, от которого растёт стыд. Когда стыд достигает BEGGING_SHAME_LIMIT, NPC
- * перестаёт клянчить.
- *
- * Клянчить NPC идёт, только если это окупится: по предсказанию, он успеет наклянчить на пойло до
- * того, как стыд достигнет порога. Стыд предсказывается так, будто на каждую удачу уходит столько
- * попыток, сколько NPC ожидает при шансе BEGGING_CHANCE: оптимист рассчитывает на меньшее число
- * попыток, пессимист — на большее
+ * Попрошайничать у ближайшего места для попрошайничества, пока не станет стыдно, но не больше
+ * MAX_BEGGING_REWARDS_PER_VISIT подачек за заход
  */
 export class BegTask implements CompoundTask<NpcState, NpcContext> {
-  /** На каком расстоянии от места для клянчанья можно считать, что NPC до него дошёл, в метрах */
+  /** На каком расстоянии от места для попрошайничества можно считать, что NPC до него дошёл, в метрах */
   private static readonly SPOT_COMPLETE_RADIUS = 0.5;
 
-  /** Насколько NPC может быть отвёрнут от нужного направления, чтобы клянчить, в градусах */
+  /** Насколько NPC может быть отвёрнут от нужного направления, чтобы попрошайничать, в градусах */
   private static readonly SPOT_FACING_TOLERANCE = 15;
 
   readonly name = 'beg';
@@ -60,26 +51,23 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   /**
-   * Клянчить стоит, если на пойло не хватает, до порога стыда NPC успеет наклянчить, сколько не
-   * хватает, и есть место для клянчанья
+   * Попрошайничать стоит, если до порога стыда NPC успеет получить хотя бы одну подачку и есть место
+   * для попрошайничества
    */
   private canBeg(state: NpcState): boolean {
-    const rewards = this.countNeededRewards(state);
-
     return (
-      rewards > 0 &&
-      this.countRewardsBeforeShame(state.self.psyche, rewards) === rewards &&
+      this.countRewards(state.self.psyche) > 0 &&
       this.places.ofType(PlaceType.BeggingSpot).length > 0
     );
   }
 
-  /** Собирает задачи захода к ближайшему месту для клянчанья */
+  /** Собирает задачи захода к ближайшему месту для попрошайничества */
   private begAtNearestSpot(state: NpcState): Task<NpcState, NpcContext>[] {
     const { npcTaskFactory } = this.deps;
     const spot = this.places.findNearest(state.self.actor.position, PlaceType.BeggingSpot);
 
     if (!spot) {
-      throw new Error('Не из чего выбрать место для клянчанья');
+      throw new Error('Не из чего выбрать место для попрошайничества');
     }
 
     const tasks: Task<NpcState, NpcContext>[] = [
@@ -93,7 +81,7 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
       }),
     ];
 
-    for (let index = 0; index < this.countNeededRewards(state); index++) {
+    for (let index = 0; index < this.countRewards(state.self.psyche); index++) {
       tasks.push(
         npcTaskFactory.parallel({
           main: npcTaskFactory.tryLuck({
@@ -121,26 +109,15 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   /**
-   * Сколько удач нужно, чтобы вместе с деньгами и выручкой за бутылки хватило на пойло. Если уже
-   * хватает, возвращает 0
+   * Сколько подачек, но не больше MAX_BEGGING_REWARDS_PER_VISIT, NPC, по предсказанию, успеет
+   * получить до порога стыда: подачка успевает, если после попыток, которые NPC на неё ожидает, стыд
+   * ещё ниже порога
    */
-  private countNeededRewards(state: NpcState): number {
-    const money = state.self.inventory.get(Item.Money);
-    const bottles = state.self.inventory.get(Item.Bottles);
-    const shortfall = BOOZE_PRICE - money - bottles * BOTTLE_PRICE;
-
-    return Math.max(0, Math.ceil(shortfall / BEGGING_REWARD));
-  }
-
-  /**
-   * Сколько удач, но не больше limit, успеет случиться, пока стыд, по предсказанию, не достиг
-   * порога: удача случается, если перед ней стыд ещё ниже порога
-   */
-  private countRewardsBeforeShame(psyche: IReadonlyPsyche, limit: number): number {
+  private countRewards(psyche: IReadonlyPsyche): number {
     let rewards = 0;
-    let current = psyche;
+    let current = this.predictReward(psyche);
 
-    while (rewards < limit && !this.isAshamed(current)) {
+    while (rewards < MAX_BEGGING_REWARDS_PER_VISIT && !this.isAshamed(current)) {
       rewards++;
       current = this.predictReward(current);
     }
@@ -149,8 +126,8 @@ export class BegTask implements CompoundTask<NpcState, NpcContext> {
   }
 
   /**
-   * Предсказывает психику после одной удачи: клянчил столько раз, сколько NPC ожидает до удачи.
-   * Возвращает копию психики, а переданную не меняет
+   * Предсказывает психику после одной подачки: попрошайничал столько раз, сколько NPC ожидает до
+   * подачки. Возвращает копию психики, а переданную не меняет
    */
   private predictReward(current: IReadonlyPsyche): IPsyche {
     const psyche = current.clone();

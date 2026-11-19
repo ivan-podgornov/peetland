@@ -41,11 +41,11 @@ describe('HomelessActivityTask', () => {
       expect(planActivity()).toStrictEqual(activityPlan('sell-bottles'));
     });
 
-    it('Если сдать бутылки нельзя, планирует клянчить', () => {
+    it('Если сдать бутылки нельзя, планирует попрошайничать', () => {
       expect(planActivity(['sell-bottles'])).toStrictEqual(activityPlan('beg'));
     });
 
-    it('Если и клянчить нельзя, планирует собирать бутылки', () => {
+    it('Если и попрошайничать нельзя, планирует собирать бутылки', () => {
       expect(planActivity(['sell-bottles', 'beg'])).toStrictEqual(activityPlan('collect-bottles'));
     });
 

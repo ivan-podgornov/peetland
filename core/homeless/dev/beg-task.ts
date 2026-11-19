@@ -21,7 +21,7 @@ import { BEGGING_CHANCE } from '../src/constants';
 
 /**
  * Создаёт оптимизм, который при шансе BEGGING_CHANCE ожидает attempts попыток до удачи. Если его
- * спросят о другом шансе, выбрасывает Error: клянчанье должно ожидать попыток только при своём шансе
+ * спросят о другом шансе, выбрасывает Error: попрошайничество должно ожидать попыток только при своём шансе
  */
 export function createBeggingOptimism(attempts: number): Mocked<IOptimism> {
   const optimism = createMockedOptimism();
@@ -37,7 +37,7 @@ export function createBeggingOptimism(attempts: number): Mocked<IOptimism> {
 }
 
 /**
- * Настраивает билдер психики так, чтобы каждая попытка клянчить меняла стыд на shame, а сколько
+ * Настраивает билдер психики так, чтобы каждая попытка попрошайничать меняла стыд на shame, а сколько
  * попыток NPC ожидает до удачи, решал переданный оптимизм. По умолчанию NPC ожидает как реалист:
  * 1 / шанс. Возвращает тот же билдер
  */
@@ -54,7 +54,7 @@ export function withBeggingTraits(
     .withTraitFactory(Trait.Optimism, createMockedTraitFactory(optimism));
 }
 
-/** Создаёт задачу клянчанья с настоящей фабрикой примитивов, если другая не передана */
+/** Создаёт задачу попрошайничества с настоящей фабрикой примитивов, если другая не передана */
 export function createBegTask(
   places: IPlaces,
   npcTaskFactory: INpcTaskFactory = createNpcTaskFactory()
@@ -65,7 +65,7 @@ export function createBegTask(
   });
 }
 
-/** Создаёт мок мест, в которых ближайшее место для клянчанья — переданное */
+/** Создаёт мок мест, в которых ближайшее место для попрошайничества — переданное */
 export function createPlacesWithBeggingSpot(
   spot: PlaceData = createPlace({ type: PlaceType.BeggingSpot })
 ) {

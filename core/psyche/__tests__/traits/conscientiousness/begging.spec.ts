@@ -6,7 +6,7 @@ import { Conscientiousness } from '../../../src/traits';
 
 describe('Conscientiousness', () => {
   describe('#react', () => {
-    describe('При клянчанье', () => {
+    describe('При попрошайничестве', () => {
       it('Если совестливость средняя, увеличивает стыд на BEGGING_SHAME', () => {
         const conscientiousness = new Conscientiousness(50);
 

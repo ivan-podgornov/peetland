@@ -8840,6 +8840,40 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
+["core.npc-tasks.src.drink-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____addictions = require("core.addictions.src.index")
+local ConsumptionType = ____addictions.ConsumptionType
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+--- Выпить пойло из инвентаря там, где NPC стоит. Выпить — транзакция: если NPC начал пить, он допьёт,
+-- пойло пропадёт из инвентаря, у NPC останется пустая бутылка, а зависимости узнают, что он выпил
+____exports.DrinkTask = __TS__Class()
+local DrinkTask = ____exports.DrinkTask
+DrinkTask.name = "DrinkTask"
+function DrinkTask.prototype.____constructor(self, options, deps)
+    self.name = "drink"
+    self.transaction = true
+    local ____options_0 = options
+    local booze = ____options_0.booze
+    local ____deps_1 = deps
+    local npcTaskFactory = ____deps_1.npcTaskFactory
+    self.methods = {{
+        name = "drink-booze",
+        preconditions = function(____, state) return state.self.inventory:has(booze) end,
+        tasks = {
+            npcTaskFactory:playAnimation({animation = "drink-standing-1", duration = ____exports.DrinkTask.DURATION}),
+            npcTaskFactory:removeItem({item = booze, count = 1}),
+            npcTaskFactory:addItem({item = Item.Bottles, count = 1}),
+            npcTaskFactory:addictionsConsume({type = ConsumptionType.Drink, details = {booze = booze}})
+        }
+    }}
+end
+DrinkTask.DURATION = 10000
+return ____exports
+ end,
 ["core.npc-tasks.src.eat-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8955,6 +8989,8 @@ local ____add_2Ditem_2Dtask = require("core.npc-tasks.src.add-item-task")
 local AddItemTask = ____add_2Ditem_2Dtask.AddItemTask
 local ____addictions_2Dconsume_2Dtask = require("core.npc-tasks.src.addictions-consume-task")
 local AddictionsConsumeTask = ____addictions_2Dconsume_2Dtask.AddictionsConsumeTask
+local ____drink_2Dtask = require("core.npc-tasks.src.drink-task")
+local DrinkTask = ____drink_2Dtask.DrinkTask
 local ____eat_2Dtask = require("core.npc-tasks.src.eat-task")
 local EatTask = ____eat_2Dtask.EatTask
 local ____go_2Dto_2Dcoords_2Dtask = require("core.npc-tasks.src.go-to-coords-task")
@@ -9015,6 +9051,9 @@ function NpcTaskFactory.prototype.purchase(self, options)
 end
 function NpcTaskFactory.prototype.eat(self, options)
     return __TS__New(EatTask, options, {npcTaskFactory = self})
+end
+function NpcTaskFactory.prototype.drink(self, options)
+    return __TS__New(DrinkTask, options, {npcTaskFactory = self})
 end
 return ____exports
  end,
@@ -9762,17 +9801,15 @@ return ____exports
 ["core.homeless.src.drink-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
 local Error = ____lualib.Error
 local RangeError = ____lualib.RangeError
 local ReferenceError = ____lualib.ReferenceError
 local SyntaxError = ____lualib.SyntaxError
 local TypeError = ____lualib.TypeError
 local URIError = ____lualib.URIError
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local hasBooze
-local ____htn = require("toolkit.htn.src.index")
-local TransactionTask = ____htn.TransactionTask
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
@@ -9781,7 +9818,8 @@ function hasBooze(state)
     return state.self.inventory:get(Item.Booze) > 0
 end
 --- Бухать: выпить бутылку пойла в бомжарне, если пойло есть. Если NPC не в бомжарне, сначала он
--- идёт к ближайшей. Когда NPC допил, пойло отнимается, а пустая бутылка остаётся в инвентаре
+-- идёт к ближайшей. Пьёт задачей «выпить» из фабрики примитивов: пойло отнимается, пустая бутылка
+-- остаётся в инвентаре, а зависимости узнают, что NPC выпил
 ____exports.DrinkTask = __TS__Class()
 local DrinkTask = ____exports.DrinkTask
 DrinkTask.name = "DrinkTask"
@@ -9789,15 +9827,7 @@ function DrinkTask.prototype.____constructor(self, deps)
     self.name = "drink"
     local ____deps_0 = deps
     local npcTaskFactory = ____deps_0.npcTaskFactory
-    local drink = __TS__New(
-        TransactionTask,
-        "drink-booze",
-        {
-            npcTaskFactory:playAnimation({animation = "drink-standing-1", duration = ____exports.DrinkTask.DURATION}),
-            npcTaskFactory:removeItem({item = Item.Booze, count = 1}),
-            npcTaskFactory:addItem({item = Item.Bottles, count = 1})
-        }
-    )
+    local drink = npcTaskFactory:drink({booze = Item.Booze})
     self.places = deps.places
     self.deps = deps
     self.methods = {
@@ -9831,7 +9861,6 @@ function DrinkTask.prototype.goToNearestCamp(self, state)
     end
     return npcTaskFactory:goToCoords({coords = camp.position, completeRadius = ____exports.DrinkTask.CAMP_COMPLETE_RADIUS})
 end
-DrinkTask.DURATION = 10000
 DrinkTask.CAMP_RADIUS = 3
 DrinkTask.CAMP_COMPLETE_RADIUS = 0.5
 return ____exports

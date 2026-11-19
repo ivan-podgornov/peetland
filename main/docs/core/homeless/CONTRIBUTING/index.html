@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/homeless | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/homeless | Peetland"><meta data-rh="true" name="description" content="Задачи бомжа и его деятельность. Как бомж живёт с точки зрения игрока, описано в"><meta data-rh="true" property="og:description" content="Задачи бомжа и его деятельность. Как бомж живёт с точки зрения игрока, описано в"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/homeless","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.e036222f.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.8fc01294.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.3be1d854.js" defer="defer"></script>
 </head>
 <body>
@@ -26,8 +26,9 @@
 <li class=""><strong>Купить пойло</strong> (<code>BuyBoozeTask</code>) — если денег хватает, дойти до ближайшего магазина,
 повернуться к прилавку и купить бутылку пойла за <code>BOOZE_PRICE</code> (см. покупку в
 <code>@peetland/npc-tasks</code>).</li>
-<li class=""><strong>Бухать</strong> (<code>DrinkTask</code>) — дойти до бомжарни, если NPC не в ней, и выпить бутылку пойла. Пустая
-бутылка остаётся в инвентаре.</li>
+<li class=""><strong>Бухать</strong> (<code>DrinkTask</code>) — дойти до бомжарни, если NPC не в ней, и выпить бутылку пойла задачей
+«выпить» из <code>@peetland/npc-tasks</code>. Пустая бутылка остаётся в инвентаре, а зависимости узнают, что
+NPC выпил.</li>
 <li class=""><strong>Сдать бутылки</strong> (<code>SellBottlesTask</code>) — дойти до ближайшей приёмки и сдать бутылки по
 <code>BOTTLE_PRICE</code>, если бутылки есть и с выручкой за них хватит на пойло.</li>
 <li class=""><strong>Собрать бутылки</strong> (<code>CollectBottlesTask</code>) — дойти до случайной мусорки и искать в ней бутылки.

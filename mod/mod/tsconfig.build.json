@@ -24,6 +24,7 @@
       "@peetland/moonloader": ["../moonloader/src/index.ts"],
       "vkeys": ["../moonloader/src/vkeys.ts"],
       "@peetland/events": ["../../toolkit/events/src/index.ts"],
+      "@peetland/gauge": ["../../toolkit/gauge/src/index.ts"],
       "@peetland/geometry": ["../../toolkit/geometry/src/index.ts"],
       "@peetland/htn": ["../../toolkit/htn/src/index.ts"],
       "@peetland/random": ["../../toolkit/random/src/index.ts"],

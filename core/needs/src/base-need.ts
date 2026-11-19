@@ -1,4 +1,4 @@
-import { TimeSpan } from '@peetland/timings';
+import { Gauge, GaugeLevel } from '@peetland/gauge';
 import type { IReadonlyTime } from '@peetland/timings';
 
 import type { Activity } from './activity';
@@ -37,8 +37,9 @@ export type NeedDeps = {
 };
 
 /**
- * Общая логика потребностей: падение, статус, проверка значения, пределы и изменение от занятий.
- * Подкласс задаёт скорость падения опциями, а вклад занятий — в getGain
+ * Общая логика потребностей: статус, проверка значения и изменение от занятий. Падение и пределы
+ * считает шкала (Gauge из @peetland/gauge). Подкласс задаёт скорость падения опциями, а вклад
+ * занятий — в getGain
  */
 export abstract class BaseNeed implements INeed {
   static readonly MIN_NEED = 0;
@@ -51,61 +52,48 @@ export abstract class BaseNeed implements INeed {
   /** Выше этого значения любая потребность спокойная */
   static readonly CALM_ABOVE = 60;
 
-  private readonly options: NeedOptions;
-  private readonly timeSpan = new TimeSpan();
-  private current: NeedRecord;
+  /** Статус потребности на каждом уровне шкалы */
+  private static readonly STATUSES: Readonly<Record<GaugeLevel, NeedStatus>> = {
+    [GaugeLevel.Low]: NeedStatus.Urgent,
+    [GaugeLevel.Middle]: NeedStatus.Moderate,
+    [GaugeLevel.High]: NeedStatus.Calm,
+  };
+
+  private readonly gauge: Gauge;
 
   /** @throws ошибку валидатора, если значение не прошло проверку */
   constructor(record: NeedRecord, options: NeedOptions, deps: NeedDeps) {
     const { validator } = deps;
 
     validator.validateValue(record.value, BaseNeed.MIN_NEED, BaseNeed.MAX_NEED);
-    this.options = options;
-    this.current = record;
+    this.gauge = new Gauge(record, {
+      min: BaseNeed.MIN_NEED,
+      max: BaseNeed.MAX_NEED,
+      depletion: {
+        amount: BaseNeed.MAX_NEED,
+        minutes: options.depletionMinutes,
+      },
+      lowBelow: BaseNeed.URGENT_BELOW,
+      highAbove: BaseNeed.CALM_ABOVE,
+    });
   }
 
   get(time: IReadonlyTime): number {
-    const { value, since } = this.current;
-    const { depletionMinutes } = this.options;
-    const elapsed = Math.max(0, this.timeSpan.elapsedMinutes(since, time.getState()));
-    const rate = BaseNeed.MAX_NEED / depletionMinutes;
-
-    return Math.max(BaseNeed.MIN_NEED, value - rate * elapsed);
+    return this.gauge.get(time);
   }
 
   getStatus(time: IReadonlyTime): NeedStatus {
-    const value = this.get(time);
-
-    if (value < BaseNeed.URGENT_BELOW) {
-      return NeedStatus.Urgent;
-    }
-
-    return value > BaseNeed.CALM_ABOVE ? NeedStatus.Calm : NeedStatus.Moderate;
+    return BaseNeed.STATUSES[this.gauge.getLevel(time)];
   }
 
   getState(): NeedRecord {
-    return this.current;
+    return this.gauge.getState();
   }
 
   abstract getGain(activity: Activity): number;
 
   /** Прибавляет вклад занятия к значению на момент time и отсчитывает падение от time */
   perform(activity: Activity, time: IReadonlyTime): void {
-    this.record = {
-      value: this.get(time) + this.getGain(activity),
-      since: time.getState(),
-    };
-  }
-
-  protected get record(): NeedRecord {
-    return this.current;
-  }
-
-  /** Держит значение в пределах от MIN_NEED до MAX_NEED */
-  protected set record(record: NeedRecord) {
-    this.current = {
-      value: Math.min(BaseNeed.MAX_NEED, Math.max(BaseNeed.MIN_NEED, record.value)),
-      since: record.since,
-    };
+    this.gauge.add(this.getGain(activity), time);
   }
 }

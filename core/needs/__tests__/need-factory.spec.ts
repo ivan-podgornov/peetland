@@ -16,7 +16,7 @@ describe('NeedFactory', () => {
     it('Создаёт потребность из переданной записи', () => {
       const factory = new NeedFactory(DEFAULT_NEED_DEPS);
 
-      expect(factory.create(Need.Satiety, DEFAULT_RECORD).getState()).toBe(DEFAULT_RECORD);
+      expect(factory.create(Need.Satiety, DEFAULT_RECORD).getState()).toStrictEqual(DEFAULT_RECORD);
     });
 
     it('Передаёт потребности валидатор', () => {

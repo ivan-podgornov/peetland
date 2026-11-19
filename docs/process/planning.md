@@ -31,7 +31,7 @@ Issue заводится только через шаблон: фича, баг,
 | --------------- | ------------------------------------------------------------------------------------------------------------ |
 | `area: htn`     | `htn`                                                                                                        |
 | `area: events`  | `events`                                                                                                     |
-| `area: toolkit` | остальные пакеты toolkit: `geometry`, `logger`, `random`, `repository`, `timings`                            |
+| `area: toolkit` | остальные пакеты toolkit: `gauge`, `geometry`, `logger`, `random`, `repository`, `timings`                   |
 | `area: game`    | `game`                                                                                                       |
 | `area: world`   | `world`, `places`                                                                                            |
 | `area: npc`     | `npc`, `npc-tasks`, `psyche`, `homeless`, `inventory`, `actor-command`, `animation-manager`, `virtual-actor` |

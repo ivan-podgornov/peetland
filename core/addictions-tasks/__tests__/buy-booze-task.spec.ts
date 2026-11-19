@@ -3,9 +3,9 @@ import { Item } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
+import { TEST_SHOP } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { TEST_SHOP } from '../dev';
 import { BuyBoozeTask } from '../src/buy-booze-task';
 import { BOOZE_PRICE } from '../src/constants';
 

@@ -3,10 +3,10 @@ import { Item, ItemClassifier } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createMockedPlaces } from '@peetland/places/dev';
+import { createMockedPlaces, createPlacesWithShopAndSpot } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createAddictionsTaskFactoryDeps, createPlacesWithShopAndSpot } from '../../dev';
+import { createAddictionsTaskFactoryDeps } from '../../dev';
 import { AddictionsTaskFactory } from '../../src';
 import { BOOZE_PRICE } from '../../src/constants';
 

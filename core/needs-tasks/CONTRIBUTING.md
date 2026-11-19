@@ -58,8 +58,8 @@
   всегда можно выполнить. Его же по умолчанию получают задачи из `createSatisfyHungerTask` и
   `createStockFoodTask`;
 - зависимости фабрики (`createNeedsTaskFactoryDeps`), в которых мест нет;
-- задачу утолить голод (`createSatisfyHungerTask`), задачу обзавестись жратвой
-  (`createStockFoodTask`) и места с магазином `TEST_SHOP` и бомжарней
-  `TEST_CAMP` (`createPlacesWithShopAndCamp`);
+- задачу утолить голод (`createSatisfyHungerTask`) и задачу обзавестись жратвой
+  (`createStockFoodTask`). Места для них — в `@peetland/places/dev`: если места не переданы, в мире
+  есть магазин `TEST_SHOP` и бомжарня `TEST_CAMP` (`createPlacesWithShopAndCamp`);
 - мок выбора еды (`createMockedFoodChooser`), который всегда выбирает переданную еду из инвентаря и
   для покупки, а если её не передали, — не выбирает ничего.

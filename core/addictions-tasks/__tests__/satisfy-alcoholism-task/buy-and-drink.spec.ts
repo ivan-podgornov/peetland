@@ -2,15 +2,10 @@ import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peet
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
-import { createPlaces } from '@peetland/places/dev';
+import { TEST_SHOP, TEST_SPOT, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  createMockedAddictionsTaskFactory,
-  createSatisfyAlcoholismTask,
-  TEST_SHOP,
-  TEST_SPOT,
-} from '../../dev';
+import { createMockedAddictionsTaskFactory, createSatisfyAlcoholismTask } from '../../dev';
 import { BOOZE_PRICE } from '../../src/constants';
 
 /** Состояние NPC, у которого пойла нет, а денег ровно на него */

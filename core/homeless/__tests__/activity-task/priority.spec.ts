@@ -31,7 +31,7 @@ function planActivity(unavailable: HomelessTaskName[] = []) {
 /** Структура плана деятельности, в которой выбран метод с задачей name */
 function activityPlan(name: HomelessTaskName) {
   return new PlanStructureBuilder()
-    .compound('earn-for-booze', name, (method) => method.primitive(name))
+    .compound('scrape-by', name, (method) => method.primitive(name))
     .build();
 }
 

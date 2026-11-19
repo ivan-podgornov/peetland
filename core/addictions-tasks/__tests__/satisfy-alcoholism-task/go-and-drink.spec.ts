@@ -2,10 +2,10 @@ import { createStubTask, planSteps, PlanStructureBuilder, planTree } from '@peet
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
-import { createPlaces } from '@peetland/places/dev';
+import { TEST_SHOP, TEST_SPOT, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSatisfyAlcoholismTask, TEST_SHOP, TEST_SPOT } from '../../dev';
+import { createSatisfyAlcoholismTask } from '../../dev';
 
 /** Фабрика примитивов, в которой выпить — заглушка */
 function createFactory(overrides = {}) {

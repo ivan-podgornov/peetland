@@ -2,13 +2,13 @@ import { planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { Needs } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
+import { TEST_SHOP } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
 import {
   createMockedFoodChooser,
   createMockedNeedsTaskFactory,
   createStockFoodTask,
-  TEST_SHOP,
 } from '../../dev';
 
 describe('StockFoodTask', () => {

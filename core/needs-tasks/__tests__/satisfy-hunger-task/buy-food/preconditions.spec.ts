@@ -3,15 +3,10 @@ import { Item } from '@peetland/inventory';
 import { Need } from '@peetland/needs';
 import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createPlaces } from '@peetland/places/dev';
+import { TEST_CAMP, TEST_SHOP, createPlaces } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
-import {
-  createMockedFoodChooser,
-  createSatisfyHungerTask,
-  TEST_CAMP,
-  TEST_SHOP,
-} from '../../../dev';
+import { createMockedFoodChooser, createSatisfyHungerTask } from '../../../dev';
 
 describe('SatisfyHungerTask', () => {
   describe('Метод buy-food', () => {

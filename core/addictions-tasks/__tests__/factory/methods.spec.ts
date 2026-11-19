@@ -1,6 +1,7 @@
+import { TEST_SHOP } from '@peetland/places/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createAddictionsTaskFactoryDeps, TEST_SHOP } from '../../dev';
+import { createAddictionsTaskFactoryDeps } from '../../dev';
 import { AddictionsTask, AddictionsTaskFactory } from '../../src';
 import { BuyBoozeTask } from '../../src/buy-booze-task';
 import { SatisfyAlcoholismTask } from '../../src/satisfy-alcoholism-task';

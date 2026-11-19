@@ -13,5 +13,8 @@
 
 ## Для тестов
 
-Точка входа `@peetland/places/dev` даёт данные места (`createPlace`) и мок запросов к местам
-(`createMockedPlaces`).
+Точка входа `@peetland/places/dev` даёт данные места (`createPlace`), настоящие запросы к
+переданным местам (`createPlaces`), мок запросов к местам (`createMockedPlaces`) и места для тестов
+задач: магазин `TEST_SHOP` в начале координат, бомжарню `TEST_CAMP` и место для распития
+`TEST_SPOT` в 10 метрах от него, а также места с магазином и бомжарней
+(`createPlacesWithShopAndCamp`) и с магазином и местом для распития (`createPlacesWithShopAndSpot`).

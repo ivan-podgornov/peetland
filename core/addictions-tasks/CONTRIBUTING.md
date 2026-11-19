@@ -53,5 +53,6 @@
   которые всегда можно выполнить. Его же по умолчанию получает задача из
   `createSatisfyAlcoholismTask`;
 - зависимости фабрики (`createAddictionsTaskFactoryDeps`), в которых мест нет;
-- задачу удовлетворить алкоголизм (`createSatisfyAlcoholismTask`) и места с магазином `TEST_SHOP` и
-  местом для распития `TEST_SPOT` (`createPlacesWithShopAndSpot`).
+- задачу удовлетворить алкоголизм (`createSatisfyAlcoholismTask`). Места для неё — в
+  `@peetland/places/dev`: если места не переданы, в мире есть магазин `TEST_SHOP` и место для
+  распития `TEST_SPOT` (`createPlacesWithShopAndSpot`).

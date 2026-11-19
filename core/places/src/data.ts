@@ -6,7 +6,6 @@ export enum PlaceType {
   BottleCollection = 'bottle-collection',
   TrashBin = 'trash-bin',
   BeggingSpot = 'begging-spot',
-  /** Место для распития: где NPC пьёт пойло */
   DrinkingSpot = 'drinking-spot',
 }
 

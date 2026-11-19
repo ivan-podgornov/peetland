@@ -9716,15 +9716,13 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
---- Деятельность бомжа: добывать на пойло. Бухает бомж не здесь, а в слое зависимостей, когда тянет.
--- Методы перечислены по приоритету: сдать бутылки, а если не получается — клянчить, а иначе —
--- собирать бутылки. Когда что получается, решают предусловия самих задач: сдать — если за бутылки
--- хватит на пойло, клянчить — если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
+--- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
+-- получается — клянчить, а иначе — собирать бутылки
 ____exports.HomelessActivityTask = __TS__Class()
 local HomelessActivityTask = ____exports.HomelessActivityTask
 HomelessActivityTask.name = "HomelessActivityTask"
 function HomelessActivityTask.prototype.____constructor(self, deps)
-    self.name = "earn-for-booze"
+    self.name = "scrape-by"
     local ____deps_0 = deps
     local homelessTaskFactory = ____deps_0.homelessTaskFactory
     self.methods = {

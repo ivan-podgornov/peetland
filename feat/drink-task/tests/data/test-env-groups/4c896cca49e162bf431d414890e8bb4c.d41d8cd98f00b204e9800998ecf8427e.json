@@ -1,0 +1,1 @@
+{"id":"4c896cca49e162bf431d414890e8bb4c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs-tasks/__tests__/food-chooser/choose-from-inventory.spec.ts#FoodChooser #chooseFromInventory Если еды в инвентаре нет, возвращает null","name":"Если еды в инвентаре нет, возвращает null","status":"passed","testResultsByEnv":{"default":"b745bcbc6bef1ca302827c710de92380"}}

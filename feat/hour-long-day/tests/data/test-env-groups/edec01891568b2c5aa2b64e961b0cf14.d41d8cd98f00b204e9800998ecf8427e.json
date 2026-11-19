@@ -1,0 +1,1 @@
+{"id":"edec01891568b2c5aa2b64e961b0cf14.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isBooze Если предмет не пойло (smile-pizza), возвращает false","name":"Если предмет не пойло (smile-pizza), возвращает false","status":"passed","testResultsByEnv":{"default":"88a4cec874f2c7682123af00dfbac0fb"}}

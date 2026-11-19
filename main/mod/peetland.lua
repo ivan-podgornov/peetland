@@ -8264,7 +8264,7 @@ ____exports.PlaceType.Shop = "shop"
 ____exports.PlaceType.BottleCollection = "bottle-collection"
 ____exports.PlaceType.TrashBin = "trash-bin"
 ____exports.PlaceType.BeggingSpot = "begging-spot"
-____exports.PlaceType.DrinkingSpot = "drinking-spot"
+____exports.PlaceType.MealSpot = "meal-spot"
 return ____exports
  end,
 ["core.places.src.places"] = function(...) 
@@ -9155,10 +9155,10 @@ local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
 local ____constants = require("core.addictions-tasks.src.constants")
 local BOOZE_PRICE = ____constants.BOOZE_PRICE
---- Удовлетворить алкоголизм: выпить пойло в месте для распития. Методы в порядке приоритета: если
--- пойло есть и NPC в месте для распития, выпить там же; если пойло есть, дойти до ближайшего места
--- для распития и выпить; если пойла нет, а денег хватает, купить его в ближайшем магазине, дойти до
--- места для распития, ближайшего к магазину, и выпить
+--- Удовлетворить алкоголизм: выпить пойло в месте для трапезы. Методы в порядке приоритета: если
+-- пойло есть и NPC в месте для трапезы, выпить там же; если пойло есть, дойти до ближайшего места
+-- для трапезы и выпить; если пойла нет, а денег хватает, купить его в ближайшем магазине, дойти до
+-- места для трапезы, ближайшего к магазину, и выпить
 ____exports.SatisfyAlcoholismTask = __TS__Class()
 local SatisfyAlcoholismTask = ____exports.SatisfyAlcoholismTask
 SatisfyAlcoholismTask.name = "SatisfyAlcoholismTask"
@@ -9208,12 +9208,12 @@ end
 function SatisfyAlcoholismTask.prototype.isInSpot(self, state)
     local ____self_deps_1 = self.deps
     local places = ____self_deps_1.places
-    return places:isNear(state.self.actor.position, PlaceType.DrinkingSpot, ____exports.SatisfyAlcoholismTask.SPOT_RADIUS)
+    return places:isNear(state.self.actor.position, PlaceType.MealSpot, ____exports.SatisfyAlcoholismTask.SPOT_RADIUS)
 end
 function SatisfyAlcoholismTask.prototype.hasSpots(self)
     local ____self_deps_2 = self.deps
     local places = ____self_deps_2.places
-    return #places:ofType(PlaceType.DrinkingSpot) > 0
+    return #places:ofType(PlaceType.MealSpot) > 0
 end
 function SatisfyAlcoholismTask.prototype.canBuy(self, state)
     local ____self_deps_3 = self.deps
@@ -9238,7 +9238,7 @@ end
 function SatisfyAlcoholismTask.prototype.goToNearestSpot(self, position)
     local ____self_deps_6 = self.deps
     local npcTaskFactory = ____self_deps_6.npcTaskFactory
-    local spot = self:findNearest(position, PlaceType.DrinkingSpot)
+    local spot = self:findNearest(position, PlaceType.MealSpot)
     return npcTaskFactory:goToCoords({coords = spot.position, completeRadius = ____exports.SatisfyAlcoholismTask.SPOT_COMPLETE_RADIUS})
 end
 function SatisfyAlcoholismTask.prototype.findNearest(self, position, ____type)
@@ -9526,7 +9526,7 @@ end
 function SatisfyHungerTask.prototype.canBuy(self, state)
     local ____self_deps_2 = self.deps
     local places = ____self_deps_2.places
-    return self:foodToBuy(state) ~= nil and #places:ofType(PlaceType.Shop) > 0 and #places:ofType(PlaceType.HomelessCamp) > 0
+    return self:foodToBuy(state) ~= nil and #places:ofType(PlaceType.Shop) > 0 and #places:ofType(PlaceType.MealSpot) > 0
 end
 function SatisfyHungerTask.prototype.eatFromInventory(self, state)
     local ____self_deps_3 = self.deps
@@ -9552,10 +9552,10 @@ function SatisfyHungerTask.prototype.buyFood(self, state)
         )
     end
     local shop = self:findNearest(state.self.actor.position, PlaceType.Shop)
-    local camp = self:findNearest(shop.position, PlaceType.HomelessCamp)
+    local spot = self:findNearest(shop.position, PlaceType.MealSpot)
     return {
         needsTaskFactory:buyFood({food = food, shop = shop}),
-        npcTaskFactory:goToCoords({coords = camp.position, completeRadius = ____exports.SatisfyHungerTask.CAMP_COMPLETE_RADIUS}),
+        npcTaskFactory:goToCoords({coords = spot.position, completeRadius = ____exports.SatisfyHungerTask.SPOT_COMPLETE_RADIUS}),
         npcTaskFactory:eat({food = food})
     }
 end
@@ -9571,7 +9571,7 @@ function SatisfyHungerTask.prototype.findNearest(self, position, ____type)
     end
     return place
 end
-SatisfyHungerTask.CAMP_COMPLETE_RADIUS = 0.5
+SatisfyHungerTask.SPOT_COMPLETE_RADIUS = 0.5
 return ____exports
  end,
 ["core.needs-tasks.src.stock-food-task"] = function(...) 
@@ -10447,7 +10447,10 @@ local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
 ____exports.places = {
     {id = "montgomery-homeless-camp", position = {x = 1271.41, y = 181.76, z = 19.44}, angle = 242, type = PlaceType.HomelessCamp},
-    {id = "montgomery-homeless-camp-drinking-spot", position = {x = 1271.41, y = 181.76, z = 19.44}, angle = 242, type = PlaceType.DrinkingSpot},
+    {id = "montgomery-liquor-deli-meal-spot", position = {x = 1347.21, y = 209.7, z = 19.55}, angle = 334, type = PlaceType.MealSpot},
+    {id = "montgomery-pizzeria-meal-spot", position = {x = 1359.6, y = 234.53, z = 19.57}, angle = 70, type = PlaceType.MealSpot},
+    {id = "montgomery-hannibal-liquor-kiosk-meal-spot", position = {x = 1319.72, y = 344.74, z = 19.55}, angle = 287, type = PlaceType.MealSpot},
+    {id = "montgomery-gas-station-meal-spot", position = {x = 1375.72, y = 468.03, z = 20.2}, angle = 159, type = PlaceType.MealSpot},
     {id = "montgomery-hannibal-liquor-kiosk", position = {x = 1321.81, y = 352.54, z = 19.55}, angle = 67, type = PlaceType.Shop},
     {id = "montgomery-liquor-deli", position = {x = 1359.61, y = 205.1, z = 19.75}, angle = 157, type = PlaceType.Shop},
     {id = "montgomery-hannibal-liquor-kiosk-backdoor", position = {x = 1311.13, y = 351.59, z = 19.55}, angle = 336, type = PlaceType.BottleCollection},

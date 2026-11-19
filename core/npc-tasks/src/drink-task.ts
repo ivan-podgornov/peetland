@@ -1,8 +1,6 @@
 import { ConsumptionType } from '@peetland/addictions';
-import type { AnimationId } from '@peetland/game';
 import type { CompoundTask, Method } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
-import type { Booze } from '@peetland/inventory';
 import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { DrinkTaskOptions, INpcTaskFactory } from './types';
@@ -13,22 +11,11 @@ export type DrinkTaskDeps = {
 
 /**
  * Выпить пойло из инвентаря там, где NPC стоит. Выпить — транзакция: если NPC начал пить, он допьёт,
- * пойло пропадёт из инвентаря, у NPC останется то, во что оно было налито, а зависимости узнают, что
- * он выпил
+ * пойло пропадёт из инвентаря, у NPC останется пустая бутылка, а зависимости узнают, что он выпил
  */
 export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
   /** Сколько NPC пьёт одну бутылку пойла, в миллисекундах */
   static readonly DURATION = 10000;
-
-  /** Какой анимацией NPC пьёт каждое пойло */
-  private static readonly ANIMATIONS: Readonly<Record<Booze, AnimationId>> = {
-    [Item.Booze]: 'drink-standing-1',
-  };
-
-  /** Что остаётся у NPC, когда он выпил каждое пойло */
-  private static readonly LEFTOVERS: Readonly<Record<Booze, Item>> = {
-    [Item.Booze]: Item.Bottles,
-  };
 
   readonly name = 'drink';
 
@@ -46,7 +33,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
         preconditions: (state) => state.self.inventory.has(booze),
         tasks: [
           npcTaskFactory.playAnimation({
-            animation: DrinkTask.ANIMATIONS[booze],
+            animation: 'drink-standing-1',
             duration: DrinkTask.DURATION,
           }),
           npcTaskFactory.removeItem({
@@ -54,7 +41,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
             count: 1,
           }),
           npcTaskFactory.addItem({
-            item: DrinkTask.LEFTOVERS[booze],
+            item: Item.Bottles,
             count: 1,
           }),
           npcTaskFactory.addictionsConsume({

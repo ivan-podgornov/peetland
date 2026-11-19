@@ -44,6 +44,7 @@ Peetland — учебный мод для GTA San Andreas, в котором NPC
 - [Планирование](./docs/process/planning.md) — issue, лейблы, связи между issue и sub-issues.
 - [Коммиты и ветки](./docs/process/commits.md) — как называть коммиты, ветки и пулл реквесты.
 - [Тестирование](./docs/process/testing.md) — принципы, по которым пишутся тесты.
+- [Комментарии в коде](./docs/process/comments.md) — что пишется в TSDoc и комментариях, а что нет.
 - [Ревью](./docs/process/review.md) — что проверяет ревьюер и как отвечать на комментарии.
 - [Документация](./docs/process/docs.md), [CI и сборки](./docs/process/ci.md),
   [Проверка в игре](./docs/process/in-game.md).

@@ -6350,6 +6350,102 @@ ____exports.Addiction = ____exports.Addiction or ({})
 ____exports.Addiction.Alcoholism = "alcoholism"
 return ____exports
  end,
+["toolkit.gauge.src.level"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- Уровень шкалы относительно двух её порогов (см. GaugeOptions)
+____exports.GaugeLevel = ____exports.GaugeLevel or ({})
+____exports.GaugeLevel.Low = "low"
+____exports.GaugeLevel.Middle = "middle"
+____exports.GaugeLevel.High = "high"
+return ____exports
+ end,
+["toolkit.gauge.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["toolkit.gauge.src.gauge"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____timings = require("toolkit.timings.src.index")
+local TimeSpan = ____timings.TimeSpan
+local ____level = require("toolkit.gauge.src.level")
+local GaugeLevel = ____level.GaugeLevel
+--- Шкала: значение в пределах, которое само падает со временем. Никто не убавляет его по тикам:
+-- шкала хранит значение и момент, когда его выставили, а текущее считает при чтении
+____exports.Gauge = __TS__Class()
+local Gauge = ____exports.Gauge
+Gauge.name = "Gauge"
+function Gauge.prototype.____constructor(self, state, options)
+    self.timeSpan = __TS__New(TimeSpan)
+    self.options = options
+    self.state = {
+        value = self:clamp(state.value),
+        since = state.since
+    }
+end
+function Gauge.prototype.get(self, time)
+    local ____self_state_0 = self.state
+    local value = ____self_state_0.value
+    local since = ____self_state_0.since
+    local ____self_options_depletion_1 = self.options.depletion
+    local amount = ____self_options_depletion_1.amount
+    local minutes = ____self_options_depletion_1.minutes
+    local elapsed = math.max(
+        0,
+        self.timeSpan:elapsedMinutes(
+            since,
+            time:getState()
+        )
+    )
+    return self:clamp(value - amount * elapsed / minutes)
+end
+function Gauge.prototype.getLevel(self, time)
+    local ____self_options_2 = self.options
+    local lowBelow = ____self_options_2.lowBelow
+    local highAbove = ____self_options_2.highAbove
+    local value = self:get(time)
+    if value < lowBelow then
+        return GaugeLevel.Low
+    end
+    return value > highAbove and GaugeLevel.High or GaugeLevel.Middle
+end
+function Gauge.prototype.getState(self)
+    return self.state
+end
+function Gauge.prototype.add(self, amount, time)
+    self.state = {
+        value = self:clamp(self:get(time) + amount),
+        since = time:getState()
+    }
+end
+function Gauge.prototype.clamp(self, value)
+    local ____self_options_3 = self.options
+    local min = ____self_options_3.min
+    local max = ____self_options_3.max
+    return math.min(
+        max,
+        math.max(min, value)
+    )
+end
+return ____exports
+ end,
+["toolkit.gauge.src.index"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____gauge = require("toolkit.gauge.src.gauge")
+    ____exports.Gauge = ____gauge.Gauge
+end
+do
+    local ____level = require("toolkit.gauge.src.level")
+    ____exports.GaugeLevel = ____level.GaugeLevel
+end
+return ____exports
+ end,
 ["core.addictions.src.status"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -6410,64 +6506,55 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____timings = require("toolkit.timings.src.index")
-local TimeSpan = ____timings.TimeSpan
+local ____gauge = require("toolkit.gauge.src.index")
+local Gauge = ____gauge.Gauge
+local GaugeLevel = ____gauge.GaugeLevel
 local ____status = require("core.addictions.src.status")
 local AddictionStatus = ____status.AddictionStatus
---- Общая логика зависимостей: падение удовлетворённости, статус, проверка удовлетворённости и силы,
--- пределы и изменение от употребления. Удовлетворённость падает со скоростью, пропорциональной силе,
--- а при силе 0 не падает. Подкласс задаёт скорость при максимальной силе опциями, а вклад
--- употребления — в getGain
+--- Общая логика зависимостей: скорость падения от силы, статус, проверка удовлетворённости и силы и
+-- изменение от употребления. Падение и пределы считает шкала (Gauge из
+-- 
+-- @peetland /gauge).
+-- Удовлетворённость падает со скоростью, пропорциональной силе, а при силе 0 не падает. Подкласс
+-- задаёт скорость при максимальной силе опциями, а вклад употребления — в getGain
 ____exports.BaseAddiction = __TS__Class()
 local BaseAddiction = ____exports.BaseAddiction
 BaseAddiction.name = "BaseAddiction"
 function BaseAddiction.prototype.____constructor(self, record, options, deps)
-    self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
     local validator = ____deps_0.validator
-    validator:validateSatisfaction(record.satisfaction, ____exports.BaseAddiction.MIN_SATISFACTION, ____exports.BaseAddiction.MAX_SATISFACTION)
-    validator:validateStrength(record.strength, ____exports.BaseAddiction.MIN_STRENGTH, ____exports.BaseAddiction.MAX_STRENGTH)
-    self.options = options
-    self.current = record
+    local ____record_1 = record
+    local satisfaction = ____record_1.satisfaction
+    local since = ____record_1.since
+    local strength = ____record_1.strength
+    validator:validateSatisfaction(satisfaction, ____exports.BaseAddiction.MIN_SATISFACTION, ____exports.BaseAddiction.MAX_SATISFACTION)
+    validator:validateStrength(strength, ____exports.BaseAddiction.MIN_STRENGTH, ____exports.BaseAddiction.MAX_STRENGTH)
+    self.strength = strength
+    self.gauge = __TS__New(Gauge, {value = satisfaction, since = since}, {
+        min = ____exports.BaseAddiction.MIN_SATISFACTION,
+        max = ____exports.BaseAddiction.MAX_SATISFACTION,
+        depletion = {amount = (____exports.BaseAddiction.MAX_SATISFACTION - ____exports.BaseAddiction.CRAVING_BELOW) * strength, minutes = options.cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH},
+        lowBelow = ____exports.BaseAddiction.CRAVING_BELOW,
+        highAbove = ____exports.BaseAddiction.CALM_ABOVE
+    })
 end
 function BaseAddiction.prototype.get(self, time)
-    local ____self_current_1 = self.current
-    local satisfaction = ____self_current_1.satisfaction
-    local since = ____self_current_1.since
-    local strength = ____self_current_1.strength
-    local ____self_options_2 = self.options
-    local cravingMinutes = ____self_options_2.cravingMinutes
-    local elapsed = math.max(
-        0,
-        self.timeSpan:elapsedMinutes(
-            since,
-            time:getState()
-        )
-    )
-    local drop = (____exports.BaseAddiction.MAX_SATISFACTION - ____exports.BaseAddiction.CRAVING_BELOW) * strength * elapsed / (cravingMinutes * ____exports.BaseAddiction.MAX_STRENGTH)
-    return math.max(____exports.BaseAddiction.MIN_SATISFACTION, satisfaction - drop)
+    return self.gauge:get(time)
 end
 function BaseAddiction.prototype.getStatus(self, time)
-    local satisfaction = self:get(time)
-    if satisfaction < ____exports.BaseAddiction.CRAVING_BELOW then
-        return AddictionStatus.Craving
-    end
-    return satisfaction > ____exports.BaseAddiction.CALM_ABOVE and AddictionStatus.Calm or AddictionStatus.Moderate
+    return ____exports.BaseAddiction.STATUSES[self.gauge:getLevel(time)]
 end
 function BaseAddiction.prototype.getState(self)
-    return self.current
+    local ____temp_2 = self.gauge:getState()
+    local value = ____temp_2.value
+    local since = ____temp_2.since
+    return {satisfaction = value, since = since, strength = self.strength}
 end
 function BaseAddiction.prototype.consume(self, consumption, time)
-    self.record = __TS__ObjectAssign(
-        {},
-        self.current,
-        {
-            satisfaction = self:get(time) + self:getGain(consumption),
-            since = time:getState()
-        }
+    self.gauge:add(
+        self:getGain(consumption),
+        time
     )
 end
 BaseAddiction.MIN_SATISFACTION = 0
@@ -6476,26 +6563,7 @@ BaseAddiction.CRAVING_BELOW = 25
 BaseAddiction.CALM_ABOVE = 60
 BaseAddiction.MIN_STRENGTH = 0
 BaseAddiction.MAX_STRENGTH = 100
-__TS__SetDescriptor(
-    BaseAddiction.prototype,
-    "record",
-    {
-        get = function(self)
-            return self.current
-        end,
-        set = function(self, record)
-            self.current = __TS__ObjectAssign(
-                {},
-                record,
-                {satisfaction = math.min(
-                    ____exports.BaseAddiction.MAX_SATISFACTION,
-                    math.max(____exports.BaseAddiction.MIN_SATISFACTION, record.satisfaction)
-                )}
-            )
-        end
-    },
-    true
-)
+BaseAddiction.STATUSES = {[GaugeLevel.Low] = AddictionStatus.Craving, [GaugeLevel.Middle] = AddictionStatus.Moderate, [GaugeLevel.High] = AddictionStatus.Calm}
 return ____exports
  end,
 ["core.addictions.src.alcoholism"] = function(...) 
@@ -6773,80 +6841,52 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
-local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
-local ____timings = require("toolkit.timings.src.index")
-local TimeSpan = ____timings.TimeSpan
+local ____gauge = require("toolkit.gauge.src.index")
+local Gauge = ____gauge.Gauge
+local GaugeLevel = ____gauge.GaugeLevel
 local ____status = require("core.needs.src.status")
 local NeedStatus = ____status.NeedStatus
---- Общая логика потребностей: падение, статус, проверка значения, пределы и изменение от занятий.
--- Подкласс задаёт скорость падения опциями, а вклад занятий — в getGain
+--- Общая логика потребностей: статус, проверка значения и изменение от занятий. Падение и пределы
+-- считает шкала (Gauge из
+-- 
+-- @peetland /gauge). Подкласс задаёт скорость падения опциями, а вклад
+-- занятий — в getGain
 ____exports.BaseNeed = __TS__Class()
 local BaseNeed = ____exports.BaseNeed
 BaseNeed.name = "BaseNeed"
 function BaseNeed.prototype.____constructor(self, record, options, deps)
-    self.timeSpan = __TS__New(TimeSpan)
     local ____deps_0 = deps
     local validator = ____deps_0.validator
     validator:validateValue(record.value, ____exports.BaseNeed.MIN_NEED, ____exports.BaseNeed.MAX_NEED)
-    self.options = options
-    self.current = record
+    self.gauge = __TS__New(Gauge, record, {
+        min = ____exports.BaseNeed.MIN_NEED,
+        max = ____exports.BaseNeed.MAX_NEED,
+        depletion = {amount = ____exports.BaseNeed.MAX_NEED, minutes = options.depletionMinutes},
+        lowBelow = ____exports.BaseNeed.URGENT_BELOW,
+        highAbove = ____exports.BaseNeed.CALM_ABOVE
+    })
 end
 function BaseNeed.prototype.get(self, time)
-    local ____self_current_1 = self.current
-    local value = ____self_current_1.value
-    local since = ____self_current_1.since
-    local ____self_options_2 = self.options
-    local depletionMinutes = ____self_options_2.depletionMinutes
-    local elapsed = math.max(
-        0,
-        self.timeSpan:elapsedMinutes(
-            since,
-            time:getState()
-        )
-    )
-    local rate = ____exports.BaseNeed.MAX_NEED / depletionMinutes
-    return math.max(____exports.BaseNeed.MIN_NEED, value - rate * elapsed)
+    return self.gauge:get(time)
 end
 function BaseNeed.prototype.getStatus(self, time)
-    local value = self:get(time)
-    if value < ____exports.BaseNeed.URGENT_BELOW then
-        return NeedStatus.Urgent
-    end
-    return value > ____exports.BaseNeed.CALM_ABOVE and NeedStatus.Calm or NeedStatus.Moderate
+    return ____exports.BaseNeed.STATUSES[self.gauge:getLevel(time)]
 end
 function BaseNeed.prototype.getState(self)
-    return self.current
+    return self.gauge:getState()
 end
 function BaseNeed.prototype.perform(self, activity, time)
-    self.record = {
-        value = self:get(time) + self:getGain(activity),
-        since = time:getState()
-    }
+    self.gauge:add(
+        self:getGain(activity),
+        time
+    )
 end
 BaseNeed.MIN_NEED = 0
 BaseNeed.MAX_NEED = 100
 BaseNeed.URGENT_BELOW = 25
 BaseNeed.CALM_ABOVE = 60
-__TS__SetDescriptor(
-    BaseNeed.prototype,
-    "record",
-    {
-        get = function(self)
-            return self.current
-        end,
-        set = function(self, record)
-            self.current = {
-                value = math.min(
-                    ____exports.BaseNeed.MAX_NEED,
-                    math.max(____exports.BaseNeed.MIN_NEED, record.value)
-                ),
-                since = record.since
-            }
-        end
-    },
-    true
-)
+BaseNeed.STATUSES = {[GaugeLevel.Low] = NeedStatus.Urgent, [GaugeLevel.Middle] = NeedStatus.Moderate, [GaugeLevel.High] = NeedStatus.Calm}
 return ____exports
  end,
 ["core.needs.src.satiety"] = function(...) 

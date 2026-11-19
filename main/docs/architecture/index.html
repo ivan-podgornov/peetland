@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Архитектура | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Архитектура | Peetland"><meta data-rh="true" name="description" content="Чистота архитектуры"><meta data-rh="true" property="og:description" content="Чистота архитектуры"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/architecture/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Архитектура","item":"https://ivan-podgornov.github.io/peetland/main/docs/architecture/"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.f94ba6c4.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.70ff060d.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.e036222f.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.3be1d854.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -61,7 +61,8 @@ core и toolkit. Если обход платформы требует меня�
 <p>Слой более нижнего уровня не должен знать о слоях выше.</p>
 <h3 class="anchor anchorTargetStickyNavbar_tleR" id="пакеты-и-зависимости">Пакеты и зависимости<a href="#пакеты-и-зависимости" class="hash-link" aria-label="Прямая ссылка на Пакеты и зависимости" title="Прямая ссылка на Пакеты и зависимости" translate="no">​</a></h3>
 <p>Стрелка ведёт от пакета к пакету, от которого он зависит. Пакеты toolkit не зависят от других
-слоёв, а внутри toolkit от другого пакета зависят только таймеры: им нужны события.</p>
+слоёв, а внутри toolkit от других пакетов зависят только таймеры, которым нужны события, и шкала,
+которой нужно игровое время.</p>
 <!-- -->
 <p>На схеме показаны не все связи: прямые зависимости, которые уже следуют из других стрелок, опущены.
 Например, <code>world</code> зависит и от <code>npc</code>, и от <code>psyche</code>, а <code>homeless</code> — от <code>npc</code> и <code>psyche</code>.</p>

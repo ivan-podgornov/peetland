@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.f94ba6c4.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.70ff060d.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.e036222f.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.3be1d854.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -20,12 +20,14 @@
 выставили, сама падает со временем и сама меняется от занятий. Зависимости — не потребности: они
 живут в своём пакете <code>@peetland/addictions</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="классы-потребностей">Классы потребностей<a href="#классы-потребностей" class="hash-link" aria-label="Прямая ссылка на Классы потребностей" title="Прямая ссылка на Классы потребностей" translate="no">​</a></h2>
-<p>Общая логика лежит в абстрактном классе <code>BaseNeed</code>: падение, статус, проверка значения, пределы и
-изменение от занятий (<code>perform</code>). Пределы значения и пороги статусов у всех потребностей одни и
-лежат в <code>BaseNeed</code>. Потребности отличаются только скоростью падения и вкладом занятий. За сколько
+<p>Общая логика лежит в абстрактном классе <code>BaseNeed</code>: статус, проверка значения и изменение от
+занятий (<code>perform</code>). Падение и пределы считает шкала (<code>Gauge</code> из <code>@peetland/gauge</code>), которую
+потребность держит внутри: так та же механика работает и у зависимостей, а потребности о них не
+знают. Пределы значения и пороги статусов у всех потребностей одни и лежат в <code>BaseNeed</code>, а уровни
+шкалы <code>BaseNeed</code> переводит в статусы. Потребности отличаются только скоростью падения и вкладом занятий. За сколько
 минут потребность падает до нуля, подкласс передаёт в конструктор
 <code>BaseNeed</code> опциями (<code>NeedOptions</code>), а сколько даёт каждое занятие, описывает сам в <code>getGain</code>.
-<code>perform</code> прибавляет этот вклад через сеттер <code>record</code>, который держит значение в пределах.
+<code>perform</code> прибавляет этот вклад к шкале, а шкала держит значение в пределах.
 Например, сытость (<code>Satiety</code>) жизненная, падает до нуля за игровые
 сутки, а сколько её восполняет еда, лежит в <code>Satiety.FOOD_SATIETY</code>.</p>
 <p><code>Needs</code> — коллекция потребностей: раздаёт им вызовы и собирает их состояние. Потребности из
@@ -52,10 +54,9 @@
 <p>Все потребности есть у всех NPC, поэтому начальные значения (<code>NeedValues</code>) и состояние
 (<code>NeedsState</code>) — полные мапы по <code>Need</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="ленивое-падение">Ленивое падение<a href="#ленивое-падение" class="hash-link" aria-label="Прямая ссылка на Ленивое падение" title="Прямая ссылка на Ленивое падение" translate="no">​</a></h2>
-<p>Никто не убавляет потребности по тикам. Потребность хранит значение и момент игрового времени,
-когда его выставили, а текущее значение считает при чтении: значение − скорость падения × прошло
-минут (<code>TimeSpan</code> из <code>@peetland/timings</code>). Значение не падает ниже нуля, а если переданное время
-раньше момента, когда значение выставили, например время перевели назад, значение не растёт.</p>
+<p>Никто не убавляет потребности по тикам: шкала хранит значение и момент игрового времени, когда его
+выставили, а текущее значение считает при чтении (см. CONTRIBUTING <code>@peetland/gauge</code>).
+Потребность падает от <code>MAX_NEED</code> до <code>MIN_NEED</code> за <code>depletionMinutes</code>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="занятия">Занятия<a href="#занятия" class="hash-link" aria-label="Прямая ссылка на Занятия" title="Прямая ссылка на Занятия" translate="no">​</a></h2>
 <p>Потребности меняются от занятий (<code>Activity</code>), как психика от поступков: задача сообщает, чем NPC
 занимался, а потребности сами решают, какие из них и на сколько от этого меняются. Занятие —

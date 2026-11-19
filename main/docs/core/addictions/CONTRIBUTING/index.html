@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/addictions | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/addictions | Peetland"><meta data-rh="true" name="description" content="Зависимости NPC: удовлетворённость, которая падает со временем тем быстрее, чем сильнее зависимость,"><meta data-rh="true" property="og:description" content="Зависимости NPC: удовлетворённость, которая падает со временем тем быстрее, чем сильнее зависимость,"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/addictions","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.f94ba6c4.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.70ff060d.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.e036222f.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.3be1d854.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -18,7 +18,8 @@
 <p>Зависимости устроены так же, как потребности (<code>@peetland/needs</code>): удовлетворённость лениво падает по
 игровому времени, статусы считаются по тем же порогам, а употребление её восполняет. Но меняются они по своим причинам:
 у зависимости есть сила, а тяга не прерывает план. Поэтому зависимости — отдельный пакет, который не
-зависит от <code>needs</code>, а общая механика в нём повторена, а не унаследована.</p>
+зависит от <code>needs</code>. Общая механика — падение, пределы и уровни — вынесена в шкалу
+(<code>@peetland/gauge</code>), которой пользуются оба пакета.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="удовлетворённость-и-сила">Удовлетворённость и сила<a href="#удовлетворённость-и-сила" class="hash-link" aria-label="Прямая ссылка на Удовлетворённость и сила" title="Прямая ссылка на Удовлетворённость и сила" translate="no">​</a></h2>
 <p>Зависимости перечислены в enum <code>Addiction</code>, пока одна — алкоголизм (<code>Alcoholism</code>). Удовлетворённость
 зависимости — насколько NPC не тянет, от <code>Addictions.MIN_SATISFACTION</code> (0) до
@@ -27,8 +28,9 @@
 Зависимости есть у всех NPC: насколько NPC зависим, решает не наличие зависимости, а её сила, и
 зависимость с силой 0 — это отсутствие зависимости.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="классы-зависимостей">Классы зависимостей<a href="#классы-зависимостей" class="hash-link" aria-label="Прямая ссылка на Классы зависимостей" title="Прямая ссылка на Классы зависимостей" translate="no">​</a></h2>
-<p>Общая логика лежит в абстрактном классе <code>BaseAddiction</code>: падение удовлетворённости, статус, проверка
-удовлетворённости и силы, пределы и изменение от употребления (<code>consume</code>). Пределы и пороги у всех зависимостей одни.
+<p>Общая логика лежит в абстрактном классе <code>BaseAddiction</code>: скорость падения от силы, статус, проверка
+удовлетворённости и силы и изменение от употребления (<code>consume</code>). Падение и пределы считает шкала
+(<code>Gauge</code> из <code>@peetland/gauge</code>), которую зависимость держит внутри, — та же, что у потребностей. Пределы и пороги у всех зависимостей одни.
 Зависимости отличаются только скоростью и вкладом употребления. Скорость подкласс передаёт в конструктор
 <code>BaseAddiction</code> опциями (<code>AddictionOptions</code>): через сколько минут после употребления тянет при
 максимальной силе (<code>cravingMinutes</code>). Сколько даёт каждое употребление, подкласс описывает
@@ -39,9 +41,9 @@
 зависимостях. Новая зависимость — новый подкласс <code>BaseAddiction</code> и новая ветка в <code>AddictionFactory</code>.
 Классы зависимостей и фабрика — детали реализации и из пакета не экспортируются.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="падение-удовлетворённости">Падение удовлетворённости<a href="#падение-удовлетворённости" class="hash-link" aria-label="Прямая ссылка на Падение удовлетворённости" title="Прямая ссылка на Падение удовлетворённости" translate="no">​</a></h2>
-<p>Никто не убавляет зависимости по тикам. Зависимость хранит удовлетворённость, силу и момент игрового
-времени, когда удовлетворённость выставили, а текущую считает при чтении. Скорость падения
-пропорциональна силе: при максимальной силе за <code>cravingMinutes</code> удовлетворённость падает от
+<p>Никто не убавляет зависимости по тикам: шкала хранит удовлетворённость и момент игрового времени,
+когда её выставили, а текущую считает при чтении (см. CONTRIBUTING <code>@peetland/gauge</code>).
+Скорость падения зависимость считает из силы и передаёт шкале. Она пропорциональна силе: при максимальной силе за <code>cravingMinutes</code> удовлетворённость падает от
 <code>MAX_SATISFACTION</code> до порога тяги, при вдвое меньшей силе — вдвое медленнее, а при силе 0 не падает.
 Удовлетворённость не падает ниже нуля, а если переданное время раньше момента, когда её выставили,
 не растёт.</p>

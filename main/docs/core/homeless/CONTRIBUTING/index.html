@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/homeless | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/homeless | Peetland"><meta data-rh="true" name="description" content="Задачи бомжа и его деятельность. Как бомж живёт с точки зрения игрока, описано в"><meta data-rh="true" property="og:description" content="Задачи бомжа и его деятельность. Как бомж живёт с точки зрения игрока, описано в"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/homeless","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/homeless/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.d0f2f319.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.2cb647ce.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.74479c43.js" defer="defer"></script>
 </head>
 <body>
@@ -23,11 +23,12 @@
 <p>Фабрика <code>HomelessActivityTaskFactory</code> реализует <code>IActivityTaskFactory</code> из <code>@peetland/npc</code>: так мир
 собирает корневую задачу бомжа, а NPC ничего не знает о задачах.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="задачи">Задачи<a href="#задачи" class="hash-link" aria-label="Прямая ссылка на Задачи" title="Прямая ссылка на Задачи" translate="no">​</a></h2>
-<p>Цену пойла <code>BOOZE_PRICE</code> задачи бомжа берут из своих констант. Она повторяет цену из
-<code>@peetland/addictions-tasks</code>, пока цены не сообщает магазин (#260).</p>
+<p>Цену пойла <code>BOOZE_PRICE</code>, по которой бомж решает, идти ли клянчить, он берёт из своих констант. Она
+повторяет цену из <code>@peetland/addictions-tasks</code>, пока цены не сообщает магазин (#260).</p>
 <ul>
 <li class=""><strong>Сдать бутылки</strong> (<code>SellBottlesTask</code>) — дойти до ближайшей приёмки и сдать бутылки по
-<code>BOTTLE_PRICE</code>, если бутылки есть и с выручкой за них хватит на пойло.</li>
+<code>BOTTLE_PRICE</code>, когда их накопилось не меньше <code>BOTTLES_TO_SELL</code>: столько с собой таскать уже
+тяжело.</li>
 <li class=""><strong>Собрать бутылки</strong> (<code>CollectBottlesTask</code>) — дойти до случайной мусорки и искать в ней бутылки.
 Находка уменьшает стыд.</li>
 <li class=""><strong>Клянчить</strong> (<code>BegTask</code>) — дойти до ближайшего места для клянчанья и просить деньги, пока стыд ниже

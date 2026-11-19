@@ -9755,6 +9755,8 @@ local ____exports = {}
 ____exports.BOOZE_PRICE = 100
 --- Сколько платят за одну пустую бутылку, в долларах
 ____exports.BOTTLE_PRICE = 10
+--- Со сколькими бутылками бомж идёт их сдавать: столько с собой таскать уже тяжело
+____exports.BOTTLES_TO_SELL = 10
 --- Шанс найти бутылку за одну попытку, раз в секунду (см. TryLuckTask)
 ____exports.BOTTLE_FIND_CHANCE = 1 / 60
 --- Сколько бутылок NPC ищет в мусорке за один заход
@@ -10009,11 +10011,11 @@ local Item = ____inventory.Item
 local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
 local ____constants = require("core.homeless.src.constants")
-local BOOZE_PRICE = ____constants.BOOZE_PRICE
 local BOTTLE_PRICE = ____constants.BOTTLE_PRICE
+local BOTTLES_TO_SELL = ____constants.BOTTLES_TO_SELL
 --- Сдать бутылки в ближайшей приёмке: все бутылки, по BOTTLE_PRICE за штуку. Приёмка и количество
--- бутылок определяются при планировании, один раз на весь план. Сдавать идёт, только если есть
--- что сдать и после сдачи денег хватит на пойло
+-- бутылок определяются при планировании, один раз на весь план. Сдавать идёт, когда бутылок
+-- накопилось не меньше BOTTLES_TO_SELL
 ____exports.SellBottlesTask = __TS__Class()
 local SellBottlesTask = ____exports.SellBottlesTask
 SellBottlesTask.name = "SellBottlesTask"
@@ -10028,9 +10030,7 @@ function SellBottlesTask.prototype.____constructor(self, deps)
     }}
 end
 function SellBottlesTask.prototype.canSell(self, state)
-    local money = state.self.inventory:get(Item.Money)
-    local bottles = self:countBottles(state)
-    return bottles > 0 and money + bottles * BOTTLE_PRICE >= BOOZE_PRICE and #self.places:ofType(PlaceType.BottleCollection) > 0
+    return self:countBottles(state) >= BOTTLES_TO_SELL and #self.places:ofType(PlaceType.BottleCollection) > 0
 end
 function SellBottlesTask.prototype.sellInNearestCollection(self, state)
     local ____self_deps_0 = self.deps

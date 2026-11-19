@@ -11,8 +11,4 @@ export {
   createCollectBottlesTask,
   createPlacesWithTrashBins,
 } from './collect-bottles-task';
-export {
-  createSellBottlesTask,
-  createPlacesWithCollection,
-  BOTTLES_FOR_BOOZE,
-} from './sell-bottles-task';
+export { createSellBottlesTask, createPlacesWithCollection } from './sell-bottles-task';

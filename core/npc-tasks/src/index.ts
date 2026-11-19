@@ -1,6 +1,11 @@
 export { NpcTaskFactory } from './factory';
 export type { NpcTaskFactoryDeps } from './factory';
-export type { EatTaskOptions, INpcTaskFactory, PurchaseTaskOptions } from './types';
+export type {
+  DrinkTaskOptions,
+  EatTaskOptions,
+  INpcTaskFactory,
+  PurchaseTaskOptions,
+} from './types';
 export type { AddItemTaskOptions } from './add-item-task';
 export type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
 export type { NeedsPerformTaskOptions } from './needs-perform-task';

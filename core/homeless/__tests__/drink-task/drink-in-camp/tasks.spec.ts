@@ -1,16 +1,15 @@
 import { applyPlanEffects, planSteps, PlanStructureBuilder, planTree } from '@peetland/htn/dev';
 import { Item } from '@peetland/inventory';
 import { NpcStateBuilder } from '@peetland/npc/dev';
-import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
+import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { buildDrinkBooze, createDrinkTask, createPlacesWithCamp } from '../../../dev';
-import { DrinkTask } from '../../../src/drink-task';
 
 describe('DrinkTask', () => {
   describe('Метод drink-in-camp', () => {
     describe('Задачи', () => {
-      it('Планирует проиграть анимацию питья, отнять пойло и добавить пустую бутылку', () => {
+      it('Планирует выпить пойло', () => {
         const task = createDrinkTask(createPlacesWithCamp(true));
         const state = new NpcStateBuilder().withInventory({ [Item.Booze]: 1 }).build();
 
@@ -19,15 +18,12 @@ describe('DrinkTask', () => {
         );
       });
 
-      it('Пьёт стоя в течение DrinkTask.DURATION', () => {
-        const playAnimation = vi.fn();
+      it('Пьёт пойло задачей «выпить» из фабрики примитивов', () => {
+        const drink = vi.fn(() => createStubNpcTask('drink'));
 
-        createDrinkTask(createPlacesWithCamp(true), createNpcTaskFactory({ playAnimation }));
+        createDrinkTask(createPlacesWithCamp(true), createNpcTaskFactory({ drink }));
 
-        expect(playAnimation).toHaveBeenCalledExactlyOnceWith({
-          animation: 'drink-standing-1',
-          duration: DrinkTask.DURATION,
-        });
+        expect(drink).toHaveBeenCalledExactlyOnceWith({ booze: Item.Booze });
       });
 
       it('По плану отнимает бутылку пойла и добавляет пустую бутылку', () => {

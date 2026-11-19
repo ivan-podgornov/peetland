@@ -46,16 +46,14 @@ describe('HomelessActivityTaskFactory', () => {
     });
 
     it('Если homelessTaskFactory не передана, задачи бомжа получают npcTaskFactory из зависимостей', () => {
-      const playAnimation = vi.fn(() =>
-        createStubPrimitiveTask<NpcState, NpcContext>('play-animation')
-      );
+      const drink = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('drink'));
       const factory = new HomelessActivityTaskFactory(
-        createDeps({ npcTaskFactory: createNpcTaskFactory({ playAnimation }) })
+        createDeps({ npcTaskFactory: createNpcTaskFactory({ drink }) })
       );
 
       factory.create();
 
-      expect(playAnimation).toHaveBeenCalled();
+      expect(drink).toHaveBeenCalled();
     });
   });
 });

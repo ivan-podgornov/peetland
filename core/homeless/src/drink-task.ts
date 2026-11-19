@@ -1,4 +1,3 @@
-import { TransactionTask } from '@peetland/htn';
 import type { CompoundTask, Method, Task } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 
@@ -15,12 +14,10 @@ export type DrinkTaskDeps = {
 
 /**
  * Бухать: выпить бутылку пойла в бомжарне, если пойло есть. Если NPC не в бомжарне, сначала он
- * идёт к ближайшей. Когда NPC допил, пойло отнимается, а пустая бутылка остаётся в инвентаре
+ * идёт к ближайшей. Пьёт задачей «выпить» из фабрики примитивов: пойло отнимается, пустая бутылка
+ * остаётся в инвентаре, а зависимости узнают, что NPC выпил
  */
 export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
-  /** Сколько NPC пьёт одну бутылку пойла, в миллисекундах */
-  static readonly DURATION = 10000;
-
   /** На каком расстоянии от бомжарни NPC считается в бомжарне, в метрах */
   static readonly CAMP_RADIUS = 3;
 
@@ -36,21 +33,7 @@ export class DrinkTask implements CompoundTask<NpcState, NpcContext> {
 
   constructor(deps: DrinkTaskDeps) {
     const { npcTaskFactory } = deps;
-    // Выпить — транзакция: если NPC выпил, пойло кончилось, а пустая бутылка осталась
-    const drink = new TransactionTask<NpcState, NpcContext>('drink-booze', [
-      npcTaskFactory.playAnimation({
-        animation: 'drink-standing-1',
-        duration: DrinkTask.DURATION,
-      }),
-      npcTaskFactory.removeItem({
-        item: Item.Booze,
-        count: 1,
-      }),
-      npcTaskFactory.addItem({
-        item: Item.Bottles,
-        count: 1,
-      }),
-    ]);
+    const drink = npcTaskFactory.drink({ booze: Item.Booze });
 
     this.places = deps.places;
     this.deps = deps;

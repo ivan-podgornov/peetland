@@ -10,12 +10,16 @@ import { vi } from 'vitest';
 import { DrinkTask } from '../src/drink-task';
 
 /**
- * Добавляет в структуру плана транзакцию «выпить»: выпить стоя, отдать пойло и получить пустую
- * бутылку
+ * Добавляет в структуру плана задачу «выпить» из фабрики примитивов: выпить стоя, отдать пойло,
+ * получить пустую бутылку и сообщить зависимостям
  */
 export function buildDrinkBooze(structure: PlanStructureBuilder): PlanStructureBuilder {
-  return structure.transaction('drink-booze', 'drink-booze', (drink) =>
-    drink.primitive('play-animation').primitive('remove-item').primitive('add-item')
+  return structure.transaction('drink', 'drink-booze', (drink) =>
+    drink
+      .primitive('play-animation')
+      .primitive('remove-item')
+      .primitive('add-item')
+      .primitive('addictions-consume')
   );
 }
 

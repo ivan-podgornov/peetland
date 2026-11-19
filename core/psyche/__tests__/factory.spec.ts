@@ -38,7 +38,7 @@ describe('PsycheFactory', () => {
       expect(conscientiousnessFactory.create).toHaveBeenCalledExactlyOnceWith(70);
     });
 
-    it('Если фабрика совестливости не передана, стыд растёт от клянчанья по совестливости', () => {
+    it('Если фабрика совестливости не передана, стыд растёт от попрошайничества по совестливости', () => {
       const factory = new PsycheFactory({
         traitFactories: { [Trait.Luck]: createMockedTraitFactory(createMockedLuck()) },
       });

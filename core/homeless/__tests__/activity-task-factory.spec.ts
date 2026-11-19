@@ -56,7 +56,7 @@ describe('HomelessActivityTaskFactory', () => {
         })
       );
 
-      // Бутылок и денег нет, клянчить негде: бомж идёт собирать бутылки
+      // Бутылок и денег нет, попрошайничать негде: бомж идёт собирать бутылки
       planSteps(factory.create(), NpcStateBuilder.default());
 
       expect(goToCoords).toHaveBeenCalled();

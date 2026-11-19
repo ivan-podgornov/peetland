@@ -11,28 +11,11 @@ import {
   createPlacesWithBeggingSpot,
   withBeggingTraits,
 } from '../../dev';
-import {
-  BEGGING_REWARD,
-  BEGGING_SHAME_LIMIT,
-  BOOZE_PRICE,
-  BOTTLE_PRICE,
-} from '../../src/constants';
+import { BEGGING_SHAME_LIMIT } from '../../src/constants';
 
 describe('BegTask', () => {
   describe('Метод beg-at-nearest-spot', () => {
     describe('Предусловия', () => {
-      it('Если на пойло хватает денег и выручки за бутылки, план не составляется', () => {
-        const task = createBegTask(createPlacesWithBeggingSpot());
-        const state = new NpcStateBuilder()
-          .withInventory({
-            [Item.Money]: BOOZE_PRICE - BOTTLE_PRICE,
-            [Item.Bottles]: 1,
-          })
-          .build();
-
-        expect(planSteps(task, state)).toBeNull();
-      });
-
       it('Если стыд достиг BEGGING_SHAME_LIMIT, план не составляется', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
@@ -42,31 +25,48 @@ describe('BegTask', () => {
         expect(planSteps(task, state)).toBeNull();
       });
 
-      it('Если мест для клянчанья нет, план не составляется', () => {
+      it('Если мест для попрошайничества нет, план не составляется', () => {
         const places = createMockedPlaces({ ofType: vi.fn(() => []) });
 
         expect(planSteps(createBegTask(places), NpcStateBuilder.default())).toBeNull();
       });
 
-      it('Если по ожиданию психики NPC успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, планирует клянчить', () => {
+      it('Не зависит от денег: даже если денег много, планирует попрошайничать', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
-        const state = new NpcStateBuilder()
-          .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(30)).build())
-          .withInventory({ [Item.Money]: BOOZE_PRICE - 4 * BEGGING_REWARD })
-          .build();
+        const state = new NpcStateBuilder().withInventory({ [Item.Money]: 1000 }).build();
 
-        // 30 попыток на удачу по 0.5 стыда: перед четырьмя удачами стыд 0, 15, 30, 45
         expect(planSteps(task, state)).not.toBeNull();
       });
 
-      it('Если по ожиданию психики NPC не успеет наклянчить на пойло до BEGGING_SHAME_LIMIT, план не составляется', () => {
+      it('Если по ожиданию психики NPC успеет получить подачку до BEGGING_SHAME_LIMIT, планирует попрошайничать', () => {
         const task = createBegTask(createPlacesWithBeggingSpot());
         const state = new NpcStateBuilder()
-          .withPsyche((psyche) => withBeggingTraits(psyche, 0.5, createBeggingOptimism(60)).build())
-          .withInventory({ [Item.Money]: BOOZE_PRICE - 3 * BEGGING_REWARD })
+          .withPsyche((psyche) =>
+            withBeggingTraits(
+              psyche.withFeeling(Feeling.Shame, 40),
+              0.5,
+              createBeggingOptimism(30)
+            ).build()
+          )
           .build();
 
-        // 60 попыток на удачу по 0.5 стыда: перед третьей удачей стыд уже 60
+        // 30 попыток на подачку по 0.5 стыда: после неё стыд 55, ещё ниже порога
+        expect(planSteps(task, state)).not.toBeNull();
+      });
+
+      it('Если по ожиданию психики NPC не успеет получить ни одной подачки до BEGGING_SHAME_LIMIT, план не составляется', () => {
+        const task = createBegTask(createPlacesWithBeggingSpot());
+        const state = new NpcStateBuilder()
+          .withPsyche((psyche) =>
+            withBeggingTraits(
+              psyche.withFeeling(Feeling.Shame, 40),
+              0.5,
+              createBeggingOptimism(60)
+            ).build()
+          )
+          .build();
+
+        // 60 попыток на подачку по 0.5 стыда: до неё стыд дорастёт до 70
         expect(planSteps(task, state)).toBeNull();
       });
     });

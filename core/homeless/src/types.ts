@@ -12,6 +12,6 @@ export interface IHomelessTaskFactory {
   sellBottles(): NpcTask;
   /** Собрать бутылки в случайной мусорке (см. CollectBottlesTask) */
   collectBottles(): NpcTask;
-  /** Клянчить у ближайшего места для клянчанья (см. BegTask) */
+  /** Попрошайничать у ближайшего места для попрошайничества (см. BegTask) */
   beg(): NpcTask;
 }

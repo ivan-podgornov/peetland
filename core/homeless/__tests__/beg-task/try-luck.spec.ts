@@ -1,5 +1,4 @@
 import { plan } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
 import { createNpcContext, NpcStateBuilder } from '@peetland/npc/dev';
 import { Deed, Feeling } from '@peetland/psyche';
 import { createMockedPsyche } from '@peetland/psyche/dev';
@@ -12,20 +11,12 @@ import {
   createTaskFactoryWithTryLuckSpy,
   withBeggingTraits,
 } from '../../dev';
-import {
-  BEGGING_CHANCE,
-  BEGGING_REWARD,
-  BEGGING_SHAME_LIMIT,
-  BOOZE_PRICE,
-} from '../../src/constants';
+import { BEGGING_CHANCE, BEGGING_SHAME_LIMIT } from '../../src/constants';
 
-/** Планирует клянчанье на одну удачу и возвращает опции, с которыми задача пытает удачу */
+/** Планирует попрошайничество и возвращает опции, с которыми задача пытает удачу на первую подачку */
 function planTryLuck() {
   const { tryLuck, npcTaskFactory } = createTaskFactoryWithTryLuckSpy();
-  plan(
-    createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory),
-    new NpcStateBuilder().withInventory({ [Item.Money]: BOOZE_PRICE - BEGGING_REWARD }).build()
-  );
+  plan(createBegTask(createPlacesWithBeggingSpot(), npcTaskFactory), NpcStateBuilder.default());
 
   return tryLuck.mock.calls[0]?.[0];
 }
@@ -48,7 +39,7 @@ describe('BegTask', () => {
         expect(psyche.react).toHaveBeenCalledExactlyOnceWith(Deed.Begging);
       });
 
-      it('Если стыд достиг BEGGING_SHAME_LIMIT, останавливает клянчанье', () => {
+      it('Если стыд достиг BEGGING_SHAME_LIMIT, останавливает попрошайничество', () => {
         const state = new NpcStateBuilder()
           .withPsyche((psyche) => psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT).build())
           .build();
@@ -56,7 +47,7 @@ describe('BegTask', () => {
         expect(planTryLuck()?.stopWhen?.(state)).toBe(true);
       });
 
-      it('Если стыд ниже BEGGING_SHAME_LIMIT, не останавливает клянчанье', () => {
+      it('Если стыд ниже BEGGING_SHAME_LIMIT, не останавливает попрошайничество', () => {
         const state = new NpcStateBuilder()
           .withPsyche((psyche) =>
             psyche.withFeeling(Feeling.Shame, BEGGING_SHAME_LIMIT - 1).build()
@@ -66,7 +57,7 @@ describe('BegTask', () => {
         expect(planTryLuck()?.stopWhen?.(state)).toBe(false);
       });
 
-      it('Предсказывает стыд так, будто клянчил столько раз, сколько психика NPC ожидает попыток до удачи при BEGGING_CHANCE', () => {
+      it('Предсказывает стыд так, будто попрошайничал столько раз, сколько психика NPC ожидает попыток до удачи при BEGGING_CHANCE', () => {
         const options = planTryLuck();
 
         const after = options?.applyEffects?.(

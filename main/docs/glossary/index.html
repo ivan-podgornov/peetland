@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Глоссарий | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Глоссарий | Peetland"><meta data-rh="true" name="description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><meta data-rh="true" property="og:description" content="Термины проекта, которые встречаются в коде и обсуждениях. Рядом с термином — имя в коде и пакет."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/glossary/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Глоссарий","item":"https://ivan-podgornov.github.io/peetland/main/docs/glossary"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.8fc01294.js" defer="defer"></script>
-<script src="/peetland/main/docs/assets/js/main.3be1d854.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.d0f2f319.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/main.74479c43.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -74,8 +74,9 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 каждый тик проверяет потребности NPC и сообщает, когда одна из них стала срочной. Тогда NPC мягко
 останавливает текущий план, чтобы заняться потребностью.</li>
 <li class=""><strong>Задача удовлетворения</strong> (<a class="" href="/peetland/main/docs/core/needs-tasks/CONTRIBUTING/"><code>@peetland/needs-tasks</code></a>) — составная
-задача, которая удовлетворяет одну потребность, например «утолить голод». Одинаковая для всех
-типов NPC: способы, доступные не всем, ограничивают предусловия.</li>
+задача, которая удовлетворяет одну потребность, например «утолить голод», или одну зависимость,
+например «удовлетворить алкоголизм» (<a class="" href="/peetland/main/docs/core/addictions-tasks/CONTRIBUTING/"><code>@peetland/addictions-tasks</code></a>).
+Одинаковая для всех типов NPC: способы, доступные не всем, ограничивают предусловия.</li>
 <li class=""><strong>Инвентарь</strong> (<code>Inventory</code>, <a class="" href="/peetland/main/docs/core/inventory/CONTRIBUTING/"><code>@peetland/inventory</code></a>) — сколько у
 персонажа каких предметов. Предметы (<code>Item</code>) — деньги, бутылки, пойло и еда.</li>
 <li class=""><strong>Еда</strong> (<code>Food</code>, <a class="" href="/peetland/main/docs/core/inventory/CONTRIBUTING/"><code>@peetland/inventory</code></a>) — предметы, которые NPC
@@ -127,7 +128,7 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <li class=""><strong>Слой корневой задачи</strong> — часть корневой задачи, которую планировщик пробует, только если в слоях
 выше планировать нечего.</li>
 <li class=""><strong>Деятельность</strong> (<code>IActivityTaskFactory</code>) — слой корневой задачи: то, чем NPC занят по своему
-типу, например у бомжа — напиться. Ограничена своим расписанием, а свободное от неё время занимают
+типу, например у бомжа — перебиваться. Ограничена своим расписанием, а свободное от неё время занимают
 хобби.</li>
 <li class=""><strong>Параллельная задача</strong> (<code>ParallelTask</code>) — выполняет основную задачу и одновременно с ней фоновую,
 например, пытает удачу под анимацию поиска в мусорке.</li>
@@ -137,11 +138,13 @@ GTA San Andreas, в котором работает мод. Мод пишетс�
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="бомж-алкаш">Бомж-алкаш<a href="#бомж-алкаш" class="hash-link" aria-label="Прямая ссылка на Бомж-алкаш" title="Прямая ссылка на Бомж-алкаш" translate="no">​</a></h2>
 <ul>
 <li class=""><strong>Бомж</strong> (<code>NpcKind.Homeless</code>, <a class="" href="/peetland/main/docs/core/homeless/CONTRIBUTING/"><code>@peetland/homeless</code></a>) — пока
-единственный тип NPC. Его деятельность — напиться: бухать, а если не получается — купить пойло,
-сдать бутылки, клянчить или собирать бутылки.</li>
-<li class=""><strong>Бомжарня</strong> (<code>PlaceType.HomelessCamp</code>) — лагерь бездомных, где бомж бухает.</li>
-<li class=""><strong>Пойло</strong> (<code>Item.Booze</code>) — бутылка выпивки. Бомж покупает её в магазине и выпивает в бомжарне, а
-пустая бутылка остаётся у него.</li>
+единственный тип NPC. Его деятельность — перебиваться: сдать бутылки, клянчить или собирать
+бутылки. Пьёт бомж-алкаш, когда тянет: это слой зависимостей.</li>
+<li class=""><strong>Бомжарня</strong> (<code>PlaceType.HomelessCamp</code>) — лагерь бездомных, где живут бомжи.</li>
+<li class=""><strong>Место для распития</strong> (<code>PlaceType.DrinkingSpot</code>) — где NPC пьёт пойло, когда тянет. У бомжарни
+Монтгомери такое есть прямо у входа.</li>
+<li class=""><strong>Пойло</strong> (<code>Item.Booze</code>) — бутылка выпивки. Её покупают в магазине и выпивают в месте для
+распития, а пустая бутылка остаётся.</li>
 <li class=""><strong>Приёмка</strong> (<code>PlaceType.BottleCollection</code>) — пункт приёма бутылок, где бомж сдаёт их за деньги.</li>
 <li class=""><strong>Мусорка</strong> (<code>PlaceType.TrashBin</code>) — где бомж ищет бутылки. Находка уменьшает стыд.</li>
 <li class=""><strong>Клянчить</strong> (<code>BegTask</code>) — просить деньги на месте для клянчанья (<code>PlaceType.BeggingSpot</code>), пока

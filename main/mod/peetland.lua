@@ -8264,6 +8264,7 @@ ____exports.PlaceType.Shop = "shop"
 ____exports.PlaceType.BottleCollection = "bottle-collection"
 ____exports.PlaceType.TrashBin = "trash-bin"
 ____exports.PlaceType.BeggingSpot = "begging-spot"
+____exports.PlaceType.DrinkingSpot = "drinking-spot"
 return ____exports
  end,
 ["core.places.src.places"] = function(...) 
@@ -8414,6 +8415,36 @@ function NpcWorldKnowledge.prototype.getState(self)
     local ____self_deps_0 = self.deps
     local time = ____self_deps_0.time
     return {time = time}
+end
+return ____exports
+ end,
+["core.addictions-tasks.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.addictions-tasks.src.addictions-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____addictions = require("core.addictions.src.index")
+local Addiction = ____addictions.Addiction
+local AddictionStatus = ____addictions.AddictionStatus
+--- Удовлетворить зависимости. Метод подходит, если его зависимость тянет (AddictionStatus.Craving),
+-- и планирует её удовлетворение. Если удовлетворить нечем или ничего не тянет, задачу не
+-- спланировать
+____exports.AddictionsTask = __TS__Class()
+local AddictionsTask = ____exports.AddictionsTask
+AddictionsTask.name = "AddictionsTask"
+function AddictionsTask.prototype.____constructor(self, deps)
+    self.name = "addictions"
+    local ____deps_0 = deps
+    local addictionsTaskFactory = ____deps_0.addictionsTaskFactory
+    self.methods = {{
+        name = "satisfy-alcoholism",
+        preconditions = function(____, state) return state.self.addictions:getStatus(Addiction.Alcoholism, state.world.time) == AddictionStatus.Craving end,
+        tasks = {addictionsTaskFactory:satisfyAlcoholism()}
+    }}
 end
 return ____exports
  end,
@@ -9066,6 +9097,234 @@ do
 end
 return ____exports
  end,
+["core.addictions-tasks.src.constants"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+--- Цена бутылки пойла в магазине, в долларах. Должна совпадать с BOOZE_PRICE из
+-- 
+-- @peetland /homeless,
+-- пока цены не сообщает магазин (#260)
+____exports.BOOZE_PRICE = 100
+return ____exports
+ end,
+["core.addictions-tasks.src.buy-booze-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+local ____constants = require("core.addictions-tasks.src.constants")
+local BOOZE_PRICE = ____constants.BOOZE_PRICE
+--- Купить пойло: дойти до магазина, повернуться к прилавку и купить бутылку за BOOZE_PRICE
+____exports.BuyBoozeTask = __TS__Class()
+local BuyBoozeTask = ____exports.BuyBoozeTask
+BuyBoozeTask.name = "BuyBoozeTask"
+function BuyBoozeTask.prototype.____constructor(self, options, deps)
+    self.name = "buy-booze"
+    local ____options_0 = options
+    local shop = ____options_0.shop
+    local ____deps_1 = deps
+    local npcTaskFactory = ____deps_1.npcTaskFactory
+    self.methods = {{
+        name = "go-to-shop",
+        preconditions = function() return true end,
+        tasks = {
+            npcTaskFactory:goToCoords({coords = shop.position, completeRadius = ____exports.BuyBoozeTask.SHOP_COMPLETE_RADIUS}),
+            npcTaskFactory:achieveAngle({angle = shop.angle, tolerance = ____exports.BuyBoozeTask.SHOP_FACING_TOLERANCE}),
+            npcTaskFactory:purchase({item = Item.Booze, count = 1, price = BOOZE_PRICE})
+        }
+    }}
+end
+BuyBoozeTask.SHOP_COMPLETE_RADIUS = 0.5
+BuyBoozeTask.SHOP_FACING_TOLERANCE = 15
+return ____exports
+ end,
+["core.addictions-tasks.src.satisfy-alcoholism-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectKeys = ____lualib.__TS__ObjectKeys
+local __TS__ArrayFind = ____lualib.__TS__ArrayFind
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+local ____places = require("core.places.src.index")
+local PlaceType = ____places.PlaceType
+local ____constants = require("core.addictions-tasks.src.constants")
+local BOOZE_PRICE = ____constants.BOOZE_PRICE
+--- Удовлетворить алкоголизм: выпить пойло в месте для распития. Методы в порядке приоритета: если
+-- пойло есть и NPC в месте для распития, выпить там же; если пойло есть, дойти до ближайшего места
+-- для распития и выпить; если пойла нет, а денег хватает, купить его в ближайшем магазине, дойти до
+-- места для распития, ближайшего к магазину, и выпить
+____exports.SatisfyAlcoholismTask = __TS__Class()
+local SatisfyAlcoholismTask = ____exports.SatisfyAlcoholismTask
+SatisfyAlcoholismTask.name = "SatisfyAlcoholismTask"
+function SatisfyAlcoholismTask.prototype.____constructor(self, deps)
+    self.name = "satisfy-alcoholism"
+    self.deps = deps
+    self.methods = {
+        {
+            name = "drink-here",
+            preconditions = function(____, state) return self:boozeFromInventory(state) ~= nil and self:isInSpot(state) end,
+            tasks = function(state) return {self:drink(self:requireBooze(state))} end
+        },
+        {
+            name = "go-and-drink",
+            preconditions = function(____, state) return self:boozeFromInventory(state) ~= nil and self:hasSpots() end,
+            tasks = function(state) return {
+                self:goToNearestSpot(state.self.actor.position),
+                self:drink(self:requireBooze(state))
+            } end
+        },
+        {
+            name = "buy-and-drink",
+            preconditions = function(____, state) return self:canBuy(state) end,
+            tasks = function(state) return self:buyAndDrink(state) end
+        }
+    }
+end
+function SatisfyAlcoholismTask.prototype.boozeFromInventory(self, state)
+    local ____self_deps_0 = self.deps
+    local itemClassifier = ____self_deps_0.itemClassifier
+    local items = __TS__ObjectKeys(state.self.inventory:getAll())
+    return __TS__ArrayFind(
+        items,
+        function(____, item) return itemClassifier:isBooze(item) end
+    ) or nil
+end
+function SatisfyAlcoholismTask.prototype.requireBooze(self, state)
+    local booze = self:boozeFromInventory(state)
+    if booze == nil then
+        error(
+            __TS__New(Error, "Пойла в инвентаре нет"),
+            0
+        )
+    end
+    return booze
+end
+function SatisfyAlcoholismTask.prototype.isInSpot(self, state)
+    local ____self_deps_1 = self.deps
+    local places = ____self_deps_1.places
+    return places:isNear(state.self.actor.position, PlaceType.DrinkingSpot, ____exports.SatisfyAlcoholismTask.SPOT_RADIUS)
+end
+function SatisfyAlcoholismTask.prototype.hasSpots(self)
+    local ____self_deps_2 = self.deps
+    local places = ____self_deps_2.places
+    return #places:ofType(PlaceType.DrinkingSpot) > 0
+end
+function SatisfyAlcoholismTask.prototype.canBuy(self, state)
+    local ____self_deps_3 = self.deps
+    local places = ____self_deps_3.places
+    return state.self.inventory:get(Item.Money) >= BOOZE_PRICE and #places:ofType(PlaceType.Shop) > 0 and self:hasSpots()
+end
+function SatisfyAlcoholismTask.prototype.buyAndDrink(self, state)
+    local ____self_deps_4 = self.deps
+    local addictionsTaskFactory = ____self_deps_4.addictionsTaskFactory
+    local shop = self:findNearest(state.self.actor.position, PlaceType.Shop)
+    return {
+        addictionsTaskFactory:buyBooze({shop = shop}),
+        self:goToNearestSpot(shop.position),
+        self:drink(Item.Booze)
+    }
+end
+function SatisfyAlcoholismTask.prototype.drink(self, booze)
+    local ____self_deps_5 = self.deps
+    local npcTaskFactory = ____self_deps_5.npcTaskFactory
+    return npcTaskFactory:drink({booze = booze})
+end
+function SatisfyAlcoholismTask.prototype.goToNearestSpot(self, position)
+    local ____self_deps_6 = self.deps
+    local npcTaskFactory = ____self_deps_6.npcTaskFactory
+    local spot = self:findNearest(position, PlaceType.DrinkingSpot)
+    return npcTaskFactory:goToCoords({coords = spot.position, completeRadius = ____exports.SatisfyAlcoholismTask.SPOT_COMPLETE_RADIUS})
+end
+function SatisfyAlcoholismTask.prototype.findNearest(self, position, ____type)
+    local ____self_deps_7 = self.deps
+    local places = ____self_deps_7.places
+    local place = places:findNearest(position, ____type)
+    if not place then
+        error(
+            __TS__New(Error, "Не из чего выбрать место " .. ____type),
+            0
+        )
+    end
+    return place
+end
+SatisfyAlcoholismTask.SPOT_RADIUS = 3
+SatisfyAlcoholismTask.SPOT_COMPLETE_RADIUS = 0.5
+return ____exports
+ end,
+["core.addictions-tasks.src.factory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local ItemClassifier = ____inventory.ItemClassifier
+local ____npc_2Dtasks = require("core.npc-tasks.src.index")
+local NpcTaskFactory = ____npc_2Dtasks.NpcTaskFactory
+local ____addictions_2Dtask = require("core.addictions-tasks.src.addictions-task")
+local AddictionsTask = ____addictions_2Dtask.AddictionsTask
+local ____buy_2Dbooze_2Dtask = require("core.addictions-tasks.src.buy-booze-task")
+local BuyBoozeTask = ____buy_2Dbooze_2Dtask.BuyBoozeTask
+local ____satisfy_2Dalcoholism_2Dtask = require("core.addictions-tasks.src.satisfy-alcoholism-task")
+local SatisfyAlcoholismTask = ____satisfy_2Dalcoholism_2Dtask.SatisfyAlcoholismTask
+--- Создаёт задачи удовлетворения зависимостей. На каждый вызов задача новая
+____exports.AddictionsTaskFactory = __TS__Class()
+local AddictionsTaskFactory = ____exports.AddictionsTaskFactory
+AddictionsTaskFactory.name = "AddictionsTaskFactory"
+function AddictionsTaskFactory.prototype.____constructor(self, deps)
+    local ____deps_0 = deps
+    local geometry = ____deps_0.geometry
+    local places = ____deps_0.places
+    local random = ____deps_0.random
+    local timer = ____deps_0.timer
+    local npcTaskFactory = ____deps_0.npcTaskFactory
+    if npcTaskFactory == nil then
+        npcTaskFactory = __TS__New(NpcTaskFactory, {geometry = geometry, random = random, timer = timer})
+    end
+    local itemClassifier = ____deps_0.itemClassifier
+    if itemClassifier == nil then
+        itemClassifier = __TS__New(ItemClassifier)
+    end
+    self.places = places
+    self.npcTaskFactory = npcTaskFactory
+    self.itemClassifier = itemClassifier
+end
+function AddictionsTaskFactory.prototype.satisfyAddictions(self)
+    return __TS__New(AddictionsTask, {addictionsTaskFactory = self})
+end
+function AddictionsTaskFactory.prototype.satisfyAlcoholism(self)
+    local places = self.places
+    local npcTaskFactory = self.npcTaskFactory
+    local itemClassifier = self.itemClassifier
+    return __TS__New(SatisfyAlcoholismTask, {npcTaskFactory = npcTaskFactory, addictionsTaskFactory = self, places = places, itemClassifier = itemClassifier})
+end
+function AddictionsTaskFactory.prototype.buyBooze(self, options)
+    local npcTaskFactory = self.npcTaskFactory
+    return __TS__New(BuyBoozeTask, options, {npcTaskFactory = npcTaskFactory})
+end
+return ____exports
+ end,
+["core.addictions-tasks.src.index"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____addictions_2Dtask = require("core.addictions-tasks.src.addictions-task")
+    ____exports.AddictionsTask = ____addictions_2Dtask.AddictionsTask
+end
+do
+    local ____factory = require("core.addictions-tasks.src.factory")
+    ____exports.AddictionsTaskFactory = ____factory.AddictionsTaskFactory
+end
+return ____exports
+ end,
 ["core.needs-tasks.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -9457,29 +9716,16 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local ____exports = {}
---- Деятельность бомжа: напиться. Методы перечислены по приоритету: бухать, а если не получается —
--- купить пойло, а если и это не получается — сдать бутылки, а если и это не получается — клянчить, а
--- иначе — собирать бутылки. Когда что получается, решают предусловия самих задач: бухать можно,
--- если есть пойло, купить — если хватает денег, сдать — если за бутылки хватит на пойло, клянчить —
--- если стыд ниже порога, собирать — если NPC унесёт ещё бутылку
+--- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
+-- получается — клянчить, а иначе — собирать бутылки
 ____exports.HomelessActivityTask = __TS__Class()
 local HomelessActivityTask = ____exports.HomelessActivityTask
 HomelessActivityTask.name = "HomelessActivityTask"
 function HomelessActivityTask.prototype.____constructor(self, deps)
-    self.name = "get-drunk"
+    self.name = "scrape-by"
     local ____deps_0 = deps
     local homelessTaskFactory = ____deps_0.homelessTaskFactory
     self.methods = {
-        {
-            name = "drink",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:drink()}
-        },
-        {
-            name = "buy-booze",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:buyBooze()}
-        },
         {
             name = "sell-bottles",
             preconditions = function() return true end,
@@ -9502,7 +9748,10 @@ return ____exports
 ["core.homeless.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Цена бутылки пойла, в долларах
+--- Цена бутылки пойла, в долларах. Должна совпадать с BOOZE_PRICE из
+-- 
+-- @peetland /addictions-tasks, пока
+-- цены не сообщает магазин (#260)
 ____exports.BOOZE_PRICE = 100
 --- Сколько платят за одну пустую бутылку, в долларах
 ____exports.BOTTLE_PRICE = 10
@@ -9658,62 +9907,6 @@ BegTask.SPOT_COMPLETE_RADIUS = 0.5
 BegTask.SPOT_FACING_TOLERANCE = 15
 return ____exports
  end,
-["core.homeless.src.buy-booze-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local ____inventory = require("core.inventory.src.index")
-local Item = ____inventory.Item
-local ____places = require("core.places.src.index")
-local PlaceType = ____places.PlaceType
-local ____constants = require("core.homeless.src.constants")
-local BOOZE_PRICE = ____constants.BOOZE_PRICE
---- Купить пойло в ближайшем магазине, если на него хватает денег. Магазин выбирается при планировании по позиции NPC, один раз
--- на весь план
-____exports.BuyBoozeTask = __TS__Class()
-local BuyBoozeTask = ____exports.BuyBoozeTask
-BuyBoozeTask.name = "BuyBoozeTask"
-function BuyBoozeTask.prototype.____constructor(self, deps)
-    self.name = "buy-booze"
-    self.places = deps.places
-    self.deps = deps
-    self.methods = {{
-        name = "buy-in-nearest-shop",
-        preconditions = function(____, state) return self:canBuy(state) end,
-        tasks = function(state) return self:buyInNearestShop(state) end
-    }}
-end
-function BuyBoozeTask.prototype.canBuy(self, state)
-    local money = state.self.inventory:get(Item.Money)
-    return money >= BOOZE_PRICE and #self.places:ofType(PlaceType.Shop) > 0
-end
-function BuyBoozeTask.prototype.buyInNearestShop(self, state)
-    local ____self_deps_0 = self.deps
-    local npcTaskFactory = ____self_deps_0.npcTaskFactory
-    local shop = self.places:findNearest(state.self.actor.position, PlaceType.Shop)
-    if not shop then
-        error(
-            __TS__New(Error, "Не из чего выбрать магазин"),
-            0
-        )
-    end
-    return {
-        npcTaskFactory:goToCoords({coords = shop.position, completeRadius = ____exports.BuyBoozeTask.SHOP_COMPLETE_RADIUS}),
-        npcTaskFactory:achieveAngle({angle = shop.angle, tolerance = ____exports.BuyBoozeTask.SHOP_FACING_TOLERANCE}),
-        npcTaskFactory:purchase({item = Item.Booze, count = 1, price = BOOZE_PRICE})
-    }
-end
-BuyBoozeTask.SHOP_COMPLETE_RADIUS = 0.5
-BuyBoozeTask.SHOP_FACING_TOLERANCE = 15
-return ____exports
- end,
 ["core.homeless.src.collect-bottles-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -9798,73 +9991,6 @@ CollectBottlesTask.TRASH_BIN_COMPLETE_RADIUS = 0.5
 CollectBottlesTask.TRASH_BIN_FACING_TOLERANCE = 15
 return ____exports
  end,
-["core.homeless.src.drink-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local Error = ____lualib.Error
-local RangeError = ____lualib.RangeError
-local ReferenceError = ____lualib.ReferenceError
-local SyntaxError = ____lualib.SyntaxError
-local TypeError = ____lualib.TypeError
-local URIError = ____lualib.URIError
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local hasBooze
-local ____inventory = require("core.inventory.src.index")
-local Item = ____inventory.Item
-local ____places = require("core.places.src.index")
-local PlaceType = ____places.PlaceType
-function hasBooze(state)
-    return state.self.inventory:get(Item.Booze) > 0
-end
---- Бухать: выпить бутылку пойла в бомжарне, если пойло есть. Если NPC не в бомжарне, сначала он
--- идёт к ближайшей. Пьёт задачей «выпить» из фабрики примитивов: пойло отнимается, пустая бутылка
--- остаётся в инвентаре, а зависимости узнают, что NPC выпил
-____exports.DrinkTask = __TS__Class()
-local DrinkTask = ____exports.DrinkTask
-DrinkTask.name = "DrinkTask"
-function DrinkTask.prototype.____constructor(self, deps)
-    self.name = "drink"
-    local ____deps_0 = deps
-    local npcTaskFactory = ____deps_0.npcTaskFactory
-    local drink = npcTaskFactory:drink({booze = Item.Booze})
-    self.places = deps.places
-    self.deps = deps
-    self.methods = {
-        {
-            name = "drink-in-camp",
-            preconditions = function(____, state) return hasBooze(state) and self:isInCamp(state) end,
-            tasks = {drink}
-        },
-        {
-            name = "go-to-camp-and-drink",
-            preconditions = function(____, state) return hasBooze(state) and #self.places:ofType(PlaceType.HomelessCamp) > 0 end,
-            tasks = function(state) return {
-                self:goToNearestCamp(state),
-                drink
-            } end
-        }
-    }
-end
-function DrinkTask.prototype.isInCamp(self, state)
-    return self.places:isNear(state.self.actor.position, PlaceType.HomelessCamp, ____exports.DrinkTask.CAMP_RADIUS)
-end
-function DrinkTask.prototype.goToNearestCamp(self, state)
-    local ____self_deps_1 = self.deps
-    local npcTaskFactory = ____self_deps_1.npcTaskFactory
-    local camp = self.places:findNearest(state.self.actor.position, PlaceType.HomelessCamp)
-    if not camp then
-        error(
-            __TS__New(Error, "Не из чего выбрать бомжарню"),
-            0
-        )
-    end
-    return npcTaskFactory:goToCoords({coords = camp.position, completeRadius = ____exports.DrinkTask.CAMP_COMPLETE_RADIUS})
-end
-DrinkTask.CAMP_RADIUS = 3
-DrinkTask.CAMP_COMPLETE_RADIUS = 0.5
-return ____exports
- end,
 ["core.homeless.src.sell-bottles-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -9945,12 +10071,8 @@ local __TS__New = ____lualib.__TS__New
 local ____exports = {}
 local ____beg_2Dtask = require("core.homeless.src.beg-task")
 local BegTask = ____beg_2Dtask.BegTask
-local ____buy_2Dbooze_2Dtask = require("core.homeless.src.buy-booze-task")
-local BuyBoozeTask = ____buy_2Dbooze_2Dtask.BuyBoozeTask
 local ____collect_2Dbottles_2Dtask = require("core.homeless.src.collect-bottles-task")
 local CollectBottlesTask = ____collect_2Dbottles_2Dtask.CollectBottlesTask
-local ____drink_2Dtask = require("core.homeless.src.drink-task")
-local DrinkTask = ____drink_2Dtask.DrinkTask
 local ____sell_2Dbottles_2Dtask = require("core.homeless.src.sell-bottles-task")
 local SellBottlesTask = ____sell_2Dbottles_2Dtask.SellBottlesTask
 ____exports.HomelessTaskFactory = __TS__Class()
@@ -9959,35 +10081,23 @@ HomelessTaskFactory.name = "HomelessTaskFactory"
 function HomelessTaskFactory.prototype.____constructor(self, deps)
     self.deps = deps
 end
-function HomelessTaskFactory.prototype.buyBooze(self)
+function HomelessTaskFactory.prototype.sellBottles(self)
     local ____self_deps_0 = self.deps
     local npcTaskFactory = ____self_deps_0.npcTaskFactory
     local places = ____self_deps_0.places
-    return __TS__New(BuyBoozeTask, {npcTaskFactory = npcTaskFactory, places = places})
-end
-function HomelessTaskFactory.prototype.drink(self)
-    local ____self_deps_1 = self.deps
-    local npcTaskFactory = ____self_deps_1.npcTaskFactory
-    local places = ____self_deps_1.places
-    return __TS__New(DrinkTask, {npcTaskFactory = npcTaskFactory, places = places})
-end
-function HomelessTaskFactory.prototype.sellBottles(self)
-    local ____self_deps_2 = self.deps
-    local npcTaskFactory = ____self_deps_2.npcTaskFactory
-    local places = ____self_deps_2.places
     return __TS__New(SellBottlesTask, {npcTaskFactory = npcTaskFactory, places = places})
 end
 function HomelessTaskFactory.prototype.collectBottles(self)
-    local ____self_deps_3 = self.deps
-    local npcTaskFactory = ____self_deps_3.npcTaskFactory
-    local places = ____self_deps_3.places
-    local random = ____self_deps_3.random
+    local ____self_deps_1 = self.deps
+    local npcTaskFactory = ____self_deps_1.npcTaskFactory
+    local places = ____self_deps_1.places
+    local random = ____self_deps_1.random
     return __TS__New(CollectBottlesTask, {npcTaskFactory = npcTaskFactory, places = places, random = random})
 end
 function HomelessTaskFactory.prototype.beg(self)
-    local ____self_deps_4 = self.deps
-    local npcTaskFactory = ____self_deps_4.npcTaskFactory
-    local places = ____self_deps_4.places
+    local ____self_deps_2 = self.deps
+    local npcTaskFactory = ____self_deps_2.npcTaskFactory
+    local places = ____self_deps_2.places
     return __TS__New(BegTask, {npcTaskFactory = npcTaskFactory, places = places})
 end
 return ____exports
@@ -10085,39 +10195,6 @@ function ActivityTaskFactory.prototype.create(self, kind)
 end
 return ____exports
  end,
-["core.world.src.addictions-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
---- Слой зависимостей корневой задачи NPC: то, без чего NPC жить не хочет. Пока зависимостей нет ни у
--- кого, поэтому методов нет, и планировщик переходит к следующему слою
-____exports.AddictionsTask = __TS__Class()
-local AddictionsTask = ____exports.AddictionsTask
-AddictionsTask.name = "AddictionsTask"
-function AddictionsTask.prototype.____constructor(self)
-    self.name = "addictions"
-    self.methods = {}
-end
-return ____exports
- end,
-["core.world.src.addictions-task-factory"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local ____addictions_2Dtask = require("core.world.src.addictions-task")
-local AddictionsTask = ____addictions_2Dtask.AddictionsTask
---- Создаёт слой зависимостей корневой задачи NPC (см. AddictionsTask)
-____exports.AddictionsTaskFactory = __TS__Class()
-local AddictionsTaskFactory = ____exports.AddictionsTaskFactory
-AddictionsTaskFactory.name = "AddictionsTaskFactory"
-function AddictionsTaskFactory.prototype.____constructor(self)
-end
-function AddictionsTaskFactory.prototype.create(self)
-    return __TS__New(AddictionsTask)
-end
-return ____exports
- end,
 ["core.world.src.hobbies-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -10199,12 +10276,12 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
+local ____addictions_2Dtasks = require("core.addictions-tasks.src.index")
+local AddictionsTaskFactory = ____addictions_2Dtasks.AddictionsTaskFactory
 local ____needs_2Dtasks = require("core.needs-tasks.src.index")
 local NeedsTaskFactory = ____needs_2Dtasks.NeedsTaskFactory
 local ____activity_2Dtask_2Dfactory = require("core.world.src.activity-task-factory")
 local ActivityTaskFactory = ____activity_2Dtask_2Dfactory.ActivityTaskFactory
-local ____addictions_2Dtask_2Dfactory = require("core.world.src.addictions-task-factory")
-local AddictionsTaskFactory = ____addictions_2Dtask_2Dfactory.AddictionsTaskFactory
 local ____hobbies_2Dtask_2Dfactory = require("core.world.src.hobbies-task-factory")
 local HobbiesTaskFactory = ____hobbies_2Dtask_2Dfactory.HobbiesTaskFactory
 local ____root_2Dtask = require("core.world.src.root-task")
@@ -10225,7 +10302,7 @@ function RootTaskFactory.prototype.____constructor(self, deps)
     end
     local addictionsTaskFactory = ____deps_0.addictionsTaskFactory
     if addictionsTaskFactory == nil then
-        addictionsTaskFactory = __TS__New(AddictionsTaskFactory)
+        addictionsTaskFactory = __TS__New(AddictionsTaskFactory, {geometry = geometry, places = places, random = random, timer = timer})
     end
     local activityTaskFactory = ____deps_0.activityTaskFactory
     if activityTaskFactory == nil then
@@ -10249,7 +10326,7 @@ function RootTaskFactory.prototype.create(self, kind)
         RootTask,
         {
             needs = needsTaskFactory:satisfyNeeds(),
-            addictions = addictionsTaskFactory:create(kind),
+            addictions = addictionsTaskFactory:satisfyAddictions(),
             activity = activityTaskFactory:create(kind),
             hobbies = hobbiesTaskFactory:create(kind)
         }
@@ -10382,6 +10459,7 @@ local ____places = require("core.places.src.index")
 local PlaceType = ____places.PlaceType
 ____exports.places = {
     {id = "montgomery-homeless-camp", position = {x = 1271.41, y = 181.76, z = 19.44}, angle = 242, type = PlaceType.HomelessCamp},
+    {id = "montgomery-homeless-camp-drinking-spot", position = {x = 1271.41, y = 181.76, z = 19.44}, angle = 242, type = PlaceType.DrinkingSpot},
     {id = "montgomery-hannibal-liquor-kiosk", position = {x = 1321.81, y = 352.54, z = 19.55}, angle = 67, type = PlaceType.Shop},
     {id = "montgomery-liquor-deli", position = {x = 1359.61, y = 205.1, z = 19.75}, angle = 157, type = PlaceType.Shop},
     {id = "montgomery-hannibal-liquor-kiosk-backdoor", position = {x = 1311.13, y = 351.59, z = 19.55}, angle = 336, type = PlaceType.BottleCollection},

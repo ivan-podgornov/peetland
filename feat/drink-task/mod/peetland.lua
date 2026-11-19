@@ -8849,8 +8849,7 @@ local ConsumptionType = ____addictions.ConsumptionType
 local ____inventory = require("core.inventory.src.index")
 local Item = ____inventory.Item
 --- Выпить пойло из инвентаря там, где NPC стоит. Выпить — транзакция: если NPC начал пить, он допьёт,
--- пойло пропадёт из инвентаря, у NPC останется то, во что оно было налито, а зависимости узнают, что
--- он выпил
+-- пойло пропадёт из инвентаря, у NPC останется пустая бутылка, а зависимости узнают, что он выпил
 ____exports.DrinkTask = __TS__Class()
 local DrinkTask = ____exports.DrinkTask
 DrinkTask.name = "DrinkTask"
@@ -8865,16 +8864,14 @@ function DrinkTask.prototype.____constructor(self, options, deps)
         name = "drink-booze",
         preconditions = function(____, state) return state.self.inventory:has(booze) end,
         tasks = {
-            npcTaskFactory:playAnimation({animation = ____exports.DrinkTask.ANIMATIONS[booze], duration = ____exports.DrinkTask.DURATION}),
+            npcTaskFactory:playAnimation({animation = "drink-standing-1", duration = ____exports.DrinkTask.DURATION}),
             npcTaskFactory:removeItem({item = booze, count = 1}),
-            npcTaskFactory:addItem({item = ____exports.DrinkTask.LEFTOVERS[booze], count = 1}),
+            npcTaskFactory:addItem({item = Item.Bottles, count = 1}),
             npcTaskFactory:addictionsConsume({type = ConsumptionType.Drink, details = {booze = booze}})
         }
     }}
 end
 DrinkTask.DURATION = 10000
-DrinkTask.ANIMATIONS = {[Item.Booze] = "drink-standing-1"}
-DrinkTask.LEFTOVERS = {[Item.Booze] = Item.Bottles}
 return ____exports
  end,
 ["core.npc-tasks.src.eat-task"] = function(...) 

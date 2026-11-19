@@ -10,6 +10,7 @@ import { Timer } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
 import { GTA_ANIMATIONS, GtaActorFactory, GtaAnimationLoader } from './actor';
+import { GtaClock } from './clock';
 
 import { GtaLogger } from './logger';
 import { GtaObjectFactory } from './object';
@@ -56,6 +57,11 @@ export class GtaGame implements IGame {
 
     this.ticks = tickEvents.when('tick');
 
+    // Сутки длятся час, а не 24 минуты: так NPC успевают за сутки и заработать, и отдохнуть
+    new GtaClock({
+      ticks: this.ticks,
+      signal,
+    }).start();
     this.time = new GtaTime({ ticks: this.ticks });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();

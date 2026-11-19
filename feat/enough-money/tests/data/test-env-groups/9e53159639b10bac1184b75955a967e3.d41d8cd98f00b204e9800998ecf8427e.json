@@ -1,0 +1,1 @@
+{"id":"9e53159639b10bac1184b75955a967e3.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isFood Если у предмета нет тега еды (bottles), возвращает false","name":"Если у предмета нет тега еды (bottles), возвращает false","status":"passed","testResultsByEnv":{"default":"f7a368ffa04d3bb64355b659b0047f2d"}}

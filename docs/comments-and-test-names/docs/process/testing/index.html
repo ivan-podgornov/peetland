@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">Тестирование | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process/testing/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Тестирование | Peetland"><meta data-rh="true" name="description" content="Принципы"><meta data-rh="true" property="og:description" content="Принципы"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process/testing/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process/testing/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process/testing/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Процесс","item":"https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process"},{"@type":"ListItem","position":2,"name":"Тестирование","item":"https://ivan-podgornov.github.io/peetland/docs/comments-and-test-names/docs/process/testing"}]}</script><link rel="stylesheet" href="/peetland/docs/comments-and-test-names/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/docs/comments-and-test-names/docs/assets/js/runtime~main.6bd8b6bd.js" defer="defer"></script>
+<script src="/peetland/docs/comments-and-test-names/docs/assets/js/runtime~main.6ad48c8b.js" defer="defer"></script>
 <script src="/peetland/docs/comments-and-test-names/docs/assets/js/main.98ea23c8.js" defer="defer"></script>
 </head>
 <body>
@@ -45,6 +45,10 @@ builder&#x27;ы, — лежат в <code>dev</code> пакета и экспор
 Функция, которая нужна только одному файлу, остаётся в нём.</li>
 </ol>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="названия-тестов">Названия тестов<a href="#названия-тестов" class="hash-link" aria-label="Прямая ссылка на Названия тестов" title="Прямая ссылка на Названия тестов" translate="no">​</a></h2>
+<p>Тесты пишутся так, чтобы по ним одним можно было написать реализацию заново. Если стереть код класса
+и оставить его тесты, по их названиям и проверкам должно быть понятно, что класс делает в каждом
+случае и почему. Если, чтобы это понять, приходится заглядывать в код, тестам не хватает случая или
+название говорит о значении, а не о правиле.</p>
 <p>Название теста — правило предметной области: почему так происходит. По нему читатель, который не
 видит тела теста, понимает, как устроен мир. Значение, которое вернул метод, — только следствие
 правила, а не само правило.</p>

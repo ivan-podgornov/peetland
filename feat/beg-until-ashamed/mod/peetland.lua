@@ -9794,15 +9794,8 @@ local BEGGING_CHANCE = ____constants.BEGGING_CHANCE
 local BEGGING_REWARD = ____constants.BEGGING_REWARD
 local BEGGING_SHAME_LIMIT = ____constants.BEGGING_SHAME_LIMIT
 local MAX_BEGGING_REWARDS_PER_VISIT = ____constants.MAX_BEGGING_REWARDS_PER_VISIT
---- Попрошайничать: один заход к ближайшему месту для попрошайничества. NPC сидит с анимацией и раз в
--- секунду с шансом BEGGING_CHANCE получает подачку BEGGING_REWARD. Каждая попытка, удачная или нет, —
--- поступок Deed.Begging, от которого растёт стыд. Когда стыд достигает BEGGING_SHAME_LIMIT, NPC
--- перестаёт попрошайничать.
--- 
--- За заход NPC планирует столько подачек, сколько, по предсказанию, успеет получить до порога стыда,
--- но не больше MAX_BEGGING_REWARDS_PER_VISIT. Если не ожидает ни одной, не идёт. Стыд предсказывается
--- так, будто на каждую подачку уходит столько попыток, сколько NPC ожидает при шансе BEGGING_CHANCE:
--- оптимист рассчитывает на меньшее число попыток, пессимист — на большее
+--- Попрошайничать у ближайшего места для попрошайничества, пока не станет стыдно, но не больше
+-- MAX_BEGGING_REWARDS_PER_VISIT подачек за заход
 ____exports.BegTask = __TS__Class()
 local BegTask = ____exports.BegTask
 BegTask.name = "BegTask"

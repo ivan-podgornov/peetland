@@ -31,6 +31,7 @@ const sidebars: SidebarsConfig = {
         'process/planning',
         'process/commits',
         'process/testing',
+        'process/comments',
         'process/review',
         'process/docs',
         'process/ci',

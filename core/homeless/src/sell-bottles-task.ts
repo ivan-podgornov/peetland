@@ -7,7 +7,7 @@ import type { INpcTaskFactory } from '@peetland/npc-tasks';
 import { PlaceType } from '@peetland/places';
 import type { IPlaces } from '@peetland/places';
 
-import { BOOZE_PRICE, BOTTLE_PRICE } from './constants';
+import { BOTTLE_PRICE, BOTTLES_TO_SELL } from './constants';
 
 export type SellBottlesTaskDeps = {
   /** Места мира. Бутылки сдаются в местах типа PlaceType.BottleCollection */
@@ -17,8 +17,8 @@ export type SellBottlesTaskDeps = {
 
 /**
  * Сдать бутылки в ближайшей приёмке: все бутылки, по BOTTLE_PRICE за штуку. Приёмка и количество
- * бутылок определяются при планировании, один раз на весь план. Сдавать идёт, только если есть
- * что сдать и после сдачи денег хватит на пойло
+ * бутылок определяются при планировании, один раз на весь план. Сдавать идёт, когда бутылок
+ * накопилось не меньше BOTTLES_TO_SELL
  */
 export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
   /** На каком расстоянии от приёмки можно считать, что NPC до неё дошёл, в метрах */
@@ -46,17 +46,10 @@ export class SellBottlesTask implements CompoundTask<NpcState, NpcContext> {
     ];
   }
 
-  /**
-   * Сдавать бутылки есть смысл, только если они есть и на вырученные деньги вместе с теми, что уже
-   * есть, можно купить пойло. И если есть приёмка, где их сдать
-   */
+  /** Сдавать бутылки есть смысл, если их накопилось не меньше BOTTLES_TO_SELL и есть приёмка */
   private canSell(state: NpcState): boolean {
-    const money = state.self.inventory.get(Item.Money);
-    const bottles = this.countBottles(state);
-
     return (
-      bottles > 0 &&
-      money + bottles * BOTTLE_PRICE >= BOOZE_PRICE &&
+      this.countBottles(state) >= BOTTLES_TO_SELL &&
       this.places.ofType(PlaceType.BottleCollection).length > 0
     );
   }

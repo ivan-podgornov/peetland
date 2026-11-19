@@ -6,7 +6,6 @@ import { createMockedPlaces } from '@peetland/places/dev';
 import { createPlace } from '@peetland/places/dev';
 import { vi } from 'vitest';
 
-import { BOOZE_PRICE, BOTTLE_PRICE } from '../src/constants';
 import { SellBottlesTask } from '../src/sell-bottles-task';
 
 /** Создаёт задачу сдачи бутылок с настоящей фабрикой примитивов, если другая не передана */
@@ -29,6 +28,3 @@ export function createPlacesWithCollection(
     findNearest: vi.fn(() => collection),
   });
 }
-
-/** Сколько бутылок нужно сдать, чтобы хватило на пойло, если денег нет */
-export const BOTTLES_FOR_BOOZE = BOOZE_PRICE / BOTTLE_PRICE;

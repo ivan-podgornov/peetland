@@ -6,11 +6,12 @@ import { PlaceType } from '@peetland/places';
 import { createPlace } from '@peetland/places/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
+import { createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
+import { BOTTLES_TO_SELL } from '../../../src/constants';
 
 /** Создаёт состояние NPC, у которого бутылок хватает на пойло: без них план не составляется */
 function createStateWithBottles() {
-  return new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE }).build();
+  return new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_TO_SELL }).build();
 }
 
 describe('SellBottlesTask', () => {
@@ -40,7 +41,7 @@ describe('SellBottlesTask', () => {
         const places = createPlacesWithCollection();
         const state = new NpcStateBuilder()
           .withPosition(8, 0, 0)
-          .withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE })
+          .withInventory({ [Item.Bottles]: BOTTLES_TO_SELL })
           .build();
 
         plan(createSellBottlesTask(places), state);

@@ -4,7 +4,8 @@ import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory, createStubNpcTask } from '@peetland/npc-tasks/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { BOTTLES_FOR_BOOZE, createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
+import { createPlacesWithCollection, createSellBottlesTask } from '../../../dev';
+import { BOTTLES_TO_SELL } from '../../../src/constants';
 import { BOTTLE_PRICE } from '../../../src/constants';
 
 describe('SellBottlesTask', () => {
@@ -19,7 +20,7 @@ describe('SellBottlesTask', () => {
 
         plan(
           task,
-          new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_FOR_BOOZE }).build()
+          new NpcStateBuilder().withInventory({ [Item.Bottles]: BOTTLES_TO_SELL }).build()
         );
 
         expect(playAnimation).toHaveBeenCalledExactlyOnceWith({ animation: 'item-give' });

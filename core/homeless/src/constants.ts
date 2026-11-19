@@ -12,6 +12,9 @@ export const BOOZE_PRICE = 100;
 /** Сколько платят за одну пустую бутылку, в долларах */
 export const BOTTLE_PRICE = 10;
 
+/** Со сколькими бутылками бомж идёт их сдавать: столько с собой таскать уже тяжело */
+export const BOTTLES_TO_SELL = 10;
+
 /** Шанс найти бутылку за одну попытку, раз в секунду (см. TryLuckTask) */
 export const BOTTLE_FIND_CHANCE = 1 / 60;
 

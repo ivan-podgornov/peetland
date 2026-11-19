@@ -8,10 +8,6 @@ type NpcTask = Task<NpcState, NpcContext>;
  * задач, а примитивы берут у фабрики примитивов (см. INpcTaskFactory)
  */
 export interface IHomelessTaskFactory {
-  /** Купить пойло в ближайшем магазине (см. BuyBoozeTask) */
-  buyBooze(): NpcTask;
-  /** Бухать в бомжарне (см. DrinkTask) */
-  drink(): NpcTask;
   /** Сдать бутылки в ближайшей приёмке (см. SellBottlesTask) */
   sellBottles(): NpcTask;
   /** Собрать бутылки в случайной мусорке (см. CollectBottlesTask) */

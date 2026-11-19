@@ -1,3 +1,5 @@
+import { AddictionsTaskFactory } from '@peetland/addictions-tasks';
+import type { IAddictionsTaskFactory } from '@peetland/addictions-tasks';
 import type { IGeometry } from '@peetland/geometry';
 import { NeedsTaskFactory } from '@peetland/needs-tasks';
 import type { INeedsTaskFactory } from '@peetland/needs-tasks';
@@ -7,7 +9,6 @@ import type { IRandom } from '@peetland/random';
 import type { ITimer } from '@peetland/timings';
 
 import { ActivityTaskFactory } from './activity-task-factory';
-import { AddictionsTaskFactory } from './addictions-task-factory';
 import { HobbiesTaskFactory } from './hobbies-task-factory';
 import { RootTask } from './root-task';
 import type { ILayerTaskFactory } from './types';
@@ -23,8 +24,11 @@ export type RootTaskFactoryDeps = {
    * NeedsTaskFactory
    */
   needsTaskFactory?: INeedsTaskFactory;
-  /** Фабрика слоя зависимостей. По умолчанию — AddictionsTaskFactory */
-  addictionsTaskFactory?: ILayerTaskFactory;
+  /**
+   * Фабрика задач удовлетворения зависимостей, которой создаётся слой зависимостей. По умолчанию —
+   * AddictionsTaskFactory
+   */
+  addictionsTaskFactory?: IAddictionsTaskFactory;
   /** Фабрика слоя деятельности. По умолчанию — ActivityTaskFactory */
   activityTaskFactory?: ILayerTaskFactory;
   /** Фабрика слоя хобби. По умолчанию — HobbiesTaskFactory */
@@ -34,7 +38,7 @@ export type RootTaskFactoryDeps = {
 /** Создаёт корневую задачу NPC (см. RootTask) из слоёв, которые создают фабрики слоёв */
 export class RootTaskFactory implements IRootTaskFactory {
   private readonly needsTaskFactory: INeedsTaskFactory;
-  private readonly addictionsTaskFactory: ILayerTaskFactory;
+  private readonly addictionsTaskFactory: IAddictionsTaskFactory;
   private readonly activityTaskFactory: ILayerTaskFactory;
   private readonly hobbiesTaskFactory: ILayerTaskFactory;
 
@@ -50,7 +54,12 @@ export class RootTaskFactory implements IRootTaskFactory {
         random,
         timer,
       }),
-      addictionsTaskFactory = new AddictionsTaskFactory(),
+      addictionsTaskFactory = new AddictionsTaskFactory({
+        geometry,
+        places,
+        random,
+        timer,
+      }),
       activityTaskFactory = new ActivityTaskFactory({
         geometry,
         places,
@@ -73,7 +82,8 @@ export class RootTaskFactory implements IRootTaskFactory {
     return new RootTask({
       // Задачи удовлетворения потребностей одинаковые для всех типов NPC
       needs: needsTaskFactory.satisfyNeeds(),
-      addictions: addictionsTaskFactory.create(kind),
+      // Задачи удовлетворения зависимостей тоже одинаковые для всех типов NPC
+      addictions: addictionsTaskFactory.satisfyAddictions(),
       activity: activityTaskFactory.create(kind),
       hobbies: hobbiesTaskFactory.create(kind),
     });

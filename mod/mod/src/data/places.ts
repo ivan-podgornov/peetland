@@ -13,6 +13,17 @@ export const places: PlaceData[] = [
     type: PlaceType.HomelessCamp,
   },
   {
+    // Пьют там же, где живут: у входа в бомжарню
+    id: 'montgomery-homeless-camp-drinking-spot',
+    position: {
+      x: 1271.41,
+      y: 181.76,
+      z: 19.44,
+    },
+    angle: 242,
+    type: PlaceType.DrinkingSpot,
+  },
+  {
     id: 'montgomery-hannibal-liquor-kiosk',
     position: {
       x: 1321.81,

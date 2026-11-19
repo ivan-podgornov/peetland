@@ -1,8 +1,10 @@
 import { Geometry } from '@peetland/geometry';
-import { createStubPrimitiveTask, createStubTask } from '@peetland/htn/dev';
+import { createStubPrimitiveTask, createStubTask, planSteps } from '@peetland/htn/dev';
 import type { NpcContext, NpcState } from '@peetland/npc';
+import { NpcStateBuilder } from '@peetland/npc/dev';
 import { createNpcTaskFactory } from '@peetland/npc-tasks/dev';
-import { createMockedPlaces } from '@peetland/places/dev';
+import { PlaceType } from '@peetland/places';
+import { createMockedPlaces, createPlace, createPlaces } from '@peetland/places/dev';
 import { createMockedRandom } from '@peetland/random/dev';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -35,25 +37,29 @@ describe('HomelessActivityTaskFactory', () => {
     });
 
     it('Создаёт задачи бомжа фабрикой homelessTaskFactory из зависимостей', () => {
-      const drink = vi.fn(() => createStubTask<NpcState, NpcContext>('drink'));
+      const sellBottles = vi.fn(() => createStubTask<NpcState, NpcContext>('sell-bottles'));
       const factory = new HomelessActivityTaskFactory(
-        createDeps({ homelessTaskFactory: createHomelessTaskFactory({ drink }) })
+        createDeps({ homelessTaskFactory: createHomelessTaskFactory({ sellBottles }) })
       );
 
       factory.create();
 
-      expect(drink).toHaveBeenCalledExactlyOnceWith();
+      expect(sellBottles).toHaveBeenCalledExactlyOnceWith();
     });
 
     it('Если homelessTaskFactory не передана, задачи бомжа получают npcTaskFactory из зависимостей', () => {
-      const drink = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('drink'));
+      const goToCoords = vi.fn(() => createStubPrimitiveTask<NpcState, NpcContext>('go-to-coords'));
       const factory = new HomelessActivityTaskFactory(
-        createDeps({ npcTaskFactory: createNpcTaskFactory({ drink }) })
+        createDeps({
+          places: createPlaces([createPlace({ type: PlaceType.TrashBin })]),
+          npcTaskFactory: createNpcTaskFactory({ goToCoords }),
+        })
       );
 
-      factory.create();
+      // Бутылок и денег нет, клянчить негде: бомж идёт собирать бутылки
+      planSteps(factory.create(), NpcStateBuilder.default());
 
-      expect(drink).toHaveBeenCalled();
+      expect(goToCoords).toHaveBeenCalled();
     });
   });
 });

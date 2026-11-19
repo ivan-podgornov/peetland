@@ -16,6 +16,7 @@ const sidebars: SidebarsConfig = {
         'psyche/README',
         'needs/README',
         'addictions/README',
+        'addictions-tasks/README',
         'needs-tasks/README',
         'inventory/README',
       ],

@@ -1,3 +1,6 @@
+import { Addiction } from '@peetland/addictions';
+import { AddictionsTask } from '@peetland/addictions-tasks';
+import { createMockedAddictionsTaskFactory } from '@peetland/addictions-tasks/dev';
 import { Geometry } from '@peetland/geometry';
 import { HomelessActivityTask } from '@peetland/homeless';
 import { createStubTask, methodTasks, planSteps } from '@peetland/htn/dev';
@@ -53,13 +56,13 @@ describe('RootTaskFactory', () => {
       expect(needsTaskFactory.satisfyNeeds).toHaveBeenCalledOnce();
     });
 
-    it('Создаёт слой зависимостей фабрикой addictionsTaskFactory с типом NPC', () => {
-      const addictionsTaskFactory = createLayerTaskFactory('addictions');
+    it('Создаёт слой зависимостей фабрикой addictionsTaskFactory', () => {
+      const addictionsTaskFactory = createMockedAddictionsTaskFactory();
       const factory = new RootTaskFactory(createDeps({ addictionsTaskFactory }));
 
       factory.create(NpcKind.Homeless);
 
-      expect(addictionsTaskFactory.create).toHaveBeenCalledExactlyOnceWith(NpcKind.Homeless);
+      expect(addictionsTaskFactory.satisfyAddictions).toHaveBeenCalledOnce();
     });
 
     it('Создаёт слой деятельности фабрикой activityTaskFactory с типом NPC', () => {
@@ -107,6 +110,32 @@ describe('RootTaskFactory', () => {
       planSteps(factory.create(NpcKind.Homeless), state);
 
       expect(places.ofType).toHaveBeenCalledWith(PlaceType.Shop);
+    });
+
+    it('Если addictionsTaskFactory не передана, слой зависимостей — экземпляр AddictionsTask', () => {
+      const factory = new RootTaskFactory(createDeps());
+
+      const task = factory.create(NpcKind.Homeless);
+
+      expect(methodTasks(task, 'addictions')).toStrictEqual([expect.any(AddictionsTask)]);
+    });
+
+    it('Если addictionsTaskFactory не передана, задачи зависимостей получают места из зависимостей', () => {
+      const places = createMockedPlaces();
+      const factory = new RootTaskFactory(createDeps({ places }));
+      const state = new NpcStateBuilder()
+        .withInventory({ [Item.Booze]: 1 })
+        .withAddictions((addictions) =>
+          addictions
+            .withStrength(Addiction.Alcoholism, 100)
+            .withSatisfaction(Addiction.Alcoholism, 0)
+            .build()
+        )
+        .build();
+
+      planSteps(factory.create(NpcKind.Homeless), state);
+
+      expect(places.ofType).toHaveBeenCalledWith(PlaceType.DrinkingSpot);
     });
   });
 });

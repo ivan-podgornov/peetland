@@ -1,1 +1,0 @@
-{"id":"54c567d200084dcd8ea652b2c566d69d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isFood Если у предмета есть тег еды (romashka-loaf), возвращает true","name":"Если у предмета есть тег еды (romashka-loaf), возвращает true","status":"passed","testResultsByEnv":{"default":"e4e7a3e3faa86ec4b0754fdac1fe5e65"}}

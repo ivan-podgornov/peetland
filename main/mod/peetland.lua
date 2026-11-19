@@ -5833,6 +5833,41 @@ do
 end
 return ____exports
  end,
+["gta-sa.src.clock"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____memory = require("memory")
+local setuint32 = ____memory.setuint32
+--- Часы GTA: задают, сколько длится игровая минута. Игра может сбросить длительность, например при
+-- загрузке сохранения, поэтому часы выставляют её на каждом тике
+____exports.GtaClock = __TS__Class()
+local GtaClock = ____exports.GtaClock
+GtaClock.name = "GtaClock"
+function GtaClock.prototype.____constructor(self, deps)
+    self.deps = deps
+end
+function GtaClock.prototype.start(self)
+    local ____self_deps_0 = self.deps
+    local ticks = ____self_deps_0.ticks
+    local signal = ____self_deps_0.signal
+    ticks:subscribe(
+        function() return self:setMsPerGameMinute(____exports.GtaClock.MS_PER_GAME_MINUTE) end,
+        {signal = signal}
+    )
+    signal:addEventListener(
+        "abort",
+        function() return self:setMsPerGameMinute(____exports.GtaClock.DEFAULT_MS_PER_GAME_MINUTE) end
+    )
+end
+function GtaClock.prototype.setMsPerGameMinute(self, ms)
+    setuint32(____exports.GtaClock.MS_PER_GAME_MINUTE_ADDRESS, ms, true)
+end
+GtaClock.MS_PER_GAME_MINUTE_ADDRESS = 11993436
+GtaClock.DEFAULT_MS_PER_GAME_MINUTE = 1000
+GtaClock.MS_PER_GAME_MINUTE = 2500
+return ____exports
+ end,
 ["gta-sa.src.logger"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -5950,6 +5985,8 @@ local ____actor = require("gta-sa.src.actor.index")
 local GTA_ANIMATIONS = ____actor.GTA_ANIMATIONS
 local GtaActorFactory = ____actor.GtaActorFactory
 local GtaAnimationLoader = ____actor.GtaAnimationLoader
+local ____clock = require("gta-sa.src.clock")
+local GtaClock = ____clock.GtaClock
 local ____logger = require("gta-sa.src.logger")
 local GtaLogger = ____logger.GtaLogger
 local ____object = require("gta-sa.src.object.index")
@@ -5986,6 +6023,7 @@ function GtaGame.prototype.____constructor(self, deps)
         {signal = signal}
     )
     self.ticks = tickEvents:when("tick")
+    __TS__New(GtaClock, {ticks = self.ticks, signal = signal}):start()
     self.time = __TS__New(GtaTime, {ticks = self.ticks})
     self.geometry = __TS__New(Geometry)
     self.objectFactory = __TS__New(GtaObjectFactory)

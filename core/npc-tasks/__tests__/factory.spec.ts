@@ -11,6 +11,7 @@ import { NpcTaskFactory } from '../src';
 import { AchieveAngleTask } from '../src/achieve-angle-task';
 import { AddItemTask } from '../src/add-item-task';
 import { AddictionsConsumeTask } from '../src/addictions-consume-task';
+import { DrinkTask } from '../src/drink-task';
 import { EatTask } from '../src/eat-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
 import { NeedsPerformTask } from '../src/needs-perform-task';
@@ -170,6 +171,16 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(AddictionsConsumeTask);
+    });
+  });
+
+  describe('#drink', () => {
+    it('Возвращает DrinkTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.drink({ booze: Item.Booze });
+
+      expect(task).toBeInstanceOf(DrinkTask);
     });
   });
 

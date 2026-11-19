@@ -37,6 +37,7 @@ export function createNpcTaskFactory(factory: Partial<INpcTaskFactory> = {}): IN
     parallel: (options) => real.parallel(options),
     purchase: (options) => real.purchase(options),
     eat: (options) => real.eat(options),
+    drink: (options) => real.drink(options),
     ...factory,
   };
 }

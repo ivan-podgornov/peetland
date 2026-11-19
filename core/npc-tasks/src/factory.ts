@@ -11,6 +11,7 @@ import { AddItemTask } from './add-item-task';
 import type { AddItemTaskOptions } from './add-item-task';
 import { AddictionsConsumeTask } from './addictions-consume-task';
 import type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
+import { DrinkTask } from './drink-task';
 import { EatTask } from './eat-task';
 import { GoToCoordsTask } from './go-to-coords-task';
 import { NeedsPerformTask } from './needs-perform-task';
@@ -25,6 +26,7 @@ import type { RemoveItemTaskOptions } from './remove-item-task';
 import { TryLuckTask } from './try-luck-task';
 import type { TryLuckTaskOptions } from './try-luck-task';
 import type {
+  DrinkTaskOptions,
   EatTaskOptions,
   INpcTaskFactory,
   NpcPrimitiveTask,
@@ -95,5 +97,9 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   eat(options: EatTaskOptions): Task<NpcState, NpcContext> {
     return new EatTask(options, { npcTaskFactory: this });
+  }
+
+  drink(options: DrinkTaskOptions): Task<NpcState, NpcContext> {
+    return new DrinkTask(options, { npcTaskFactory: this });
   }
 }

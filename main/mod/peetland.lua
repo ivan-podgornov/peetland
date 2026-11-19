@@ -9100,7 +9100,7 @@ return ____exports
 ["core.addictions-tasks.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
---- Цена бутылки пойла в магазине, в долларах, пока цены не сообщает магазин (#260)
+--- Цена бутылки пойла в магазине, в долларах
 ____exports.BOOZE_PRICE = 100
 return ____exports
  end,
@@ -9709,39 +9709,6 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["core.homeless.src.activity-task"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__Class = ____lualib.__TS__Class
-local ____exports = {}
---- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
--- получается — попрошайничать, а иначе — собирать бутылки
-____exports.HomelessActivityTask = __TS__Class()
-local HomelessActivityTask = ____exports.HomelessActivityTask
-HomelessActivityTask.name = "HomelessActivityTask"
-function HomelessActivityTask.prototype.____constructor(self, deps)
-    self.name = "scrape-by"
-    local ____deps_0 = deps
-    local homelessTaskFactory = ____deps_0.homelessTaskFactory
-    self.methods = {
-        {
-            name = "sell-bottles",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:sellBottles()}
-        },
-        {
-            name = "beg",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:beg()}
-        },
-        {
-            name = "collect-bottles",
-            preconditions = function() return true end,
-            tasks = {homelessTaskFactory:collectBottles()}
-        }
-    }
-end
-return ____exports
- end,
 ["core.homeless.src.constants"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -9749,6 +9716,9 @@ local ____exports = {}
 ____exports.BOTTLE_PRICE = 10
 --- Со сколькими бутылками бомж идёт их сдавать: столько с собой таскать уже тяжело
 ____exports.BOTTLES_TO_SELL = 10
+--- Сколько долларов бомжу хватает: с таким богатством — деньгами вместе с выручкой за бутылки — он не
+-- попрошайничает и не роется в мусорках
+____exports.ENOUGH_MONEY = 200
 --- Шанс найти бутылку за одну попытку, раз в секунду (см. TryLuckTask)
 ____exports.BOTTLE_FIND_CHANCE = 1 / 60
 --- Сколько бутылок NPC ищет в мусорке за один заход
@@ -9767,6 +9737,50 @@ ____exports.MAX_BEGGING_REWARDS_PER_VISIT = 10
 -- @peetland /psyche): при средней совестливости и нулевом стартовом стыде порог
 -- достигается примерно за 600 попыток, а на одну подачку в среднем уходит 40 попыток
 ____exports.BEGGING_SHAME_LIMIT = 60
+return ____exports
+ end,
+["core.homeless.src.activity-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____inventory = require("core.inventory.src.index")
+local Item = ____inventory.Item
+local ____constants = require("core.homeless.src.constants")
+local BOTTLE_PRICE = ____constants.BOTTLE_PRICE
+local ENOUGH_MONEY = ____constants.ENOUGH_MONEY
+--- Деятельность бомжа: перебиваться. Методы перечислены по приоритету: сдать бутылки, а если не
+-- получается — попрошайничать, а иначе — собирать бутылки. Если денег хватает, бомж только сдаёт
+-- бутылки
+____exports.HomelessActivityTask = __TS__Class()
+local HomelessActivityTask = ____exports.HomelessActivityTask
+HomelessActivityTask.name = "HomelessActivityTask"
+function HomelessActivityTask.prototype.____constructor(self, deps)
+    self.name = "scrape-by"
+    local ____deps_0 = deps
+    local homelessTaskFactory = ____deps_0.homelessTaskFactory
+    self.methods = {
+        {
+            name = "sell-bottles",
+            preconditions = function() return true end,
+            tasks = {homelessTaskFactory:sellBottles()}
+        },
+        {
+            name = "beg",
+            preconditions = function(____, state) return not self:hasEnoughMoney(state) end,
+            tasks = {homelessTaskFactory:beg()}
+        },
+        {
+            name = "collect-bottles",
+            preconditions = function(____, state) return not self:hasEnoughMoney(state) end,
+            tasks = {homelessTaskFactory:collectBottles()}
+        }
+    }
+end
+function HomelessActivityTask.prototype.hasEnoughMoney(self, state)
+    local ____state_self_1 = state.self
+    local inventory = ____state_self_1.inventory
+    return inventory:get(Item.Money) + inventory:get(Item.Bottles) * BOTTLE_PRICE >= ENOUGH_MONEY
+end
 return ____exports
  end,
 ["core.homeless.src.beg-task"] = function(...) 

@@ -1,1 +1,0 @@
-{"id":"7bac297b7e945f940336ebe0bd99d4ef.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/gauge/__tests__/add.spec.ts#Gauge #add Если amount отрицательный, отнимает, но не опускает значение ниже min","name":"Если amount отрицательный, отнимает, но не опускает значение ниже min","status":"passed","testResultsByEnv":{"default":"fe3162a8ddd66a4eb0d8e0f7bb06d1c7"}}

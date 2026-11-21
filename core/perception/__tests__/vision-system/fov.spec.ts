@@ -1,9 +1,11 @@
 import { ActorRegistry } from '@peetland/game';
-import { Geometry } from '@peetland/geometry';
+
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { AlwaysClearLos, HUMAN_FOV_DEG, VisionSystem } from '../../src';
+import { HUMAN_FOV_DEG, VisionSystem } from '../../src';
+
+import { DEFAULT_DEPS } from './helpers';
 
 import { getPointAt } from '@peetland/perception/dev';
 
@@ -16,9 +18,8 @@ describe('VisionSystem', () => {
       registry.register(target);
       registry.register(other);
       const vision = new VisionSystem({
+        ...DEFAULT_DEPS,
         registry,
-        los: new AlwaysClearLos(),
-        geometry: new Geometry(),
       });
 
       const visible = vision.getVisibleActors(target, 10);
@@ -33,9 +34,8 @@ describe('VisionSystem', () => {
       registry.register(target);
       registry.register(other);
       const vision = new VisionSystem({
+        ...DEFAULT_DEPS,
         registry,
-        los: new AlwaysClearLos(),
-        geometry: new Geometry(),
       });
 
       const visible = vision.getVisibleActors(target, 10);
@@ -50,9 +50,8 @@ describe('VisionSystem', () => {
       registry.register(target);
       registry.register(other);
       const vision = new VisionSystem({
+        ...DEFAULT_DEPS,
         registry,
-        los: new AlwaysClearLos(),
-        geometry: new Geometry(),
       });
 
       const visible = vision.getVisibleActors(target, 10);
@@ -67,9 +66,8 @@ describe('VisionSystem', () => {
       registry.register(target);
       registry.register(other);
       const vision = new VisionSystem({
+        ...DEFAULT_DEPS,
         registry,
-        los: new AlwaysClearLos(),
-        geometry: new Geometry(),
       });
 
       const visible = vision.getVisibleActors(target, 10);
@@ -84,9 +82,8 @@ describe('VisionSystem', () => {
       registry.register(target);
       registry.register(other);
       const vision = new VisionSystem({
+        ...DEFAULT_DEPS,
         registry,
-        los: new AlwaysClearLos(),
-        geometry: new Geometry(),
       });
 
       const visible = vision.getVisibleActors(target, 10);

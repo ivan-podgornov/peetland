@@ -48,6 +48,9 @@ const visible = vision.getVisibleActors(actor, 50);
 
 ## Для тестов
 
-`@peetland/perception/dev` даёт `getPointAt(bearing, distance)`: точку на расстоянии `distance`
-от начала координат по направлению `bearing` (0° — север, против часовой стрелки). Удобно
-расставлять акторов вокруг смотрящего.
+`@peetland/perception/dev` даёт:
+
+- `getPointAt(bearing, distance)` — точку на расстоянии `distance` от начала координат по
+  направлению `bearing` (0° — север, против часовой стрелки). Удобно расставлять акторов вокруг
+  смотрящего;
+- `createMockedLos(isClear)` — провайдер прямой видимости, который всегда возвращает `isClear`.

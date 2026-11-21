@@ -205,3 +205,17 @@ class Guard {
 
 const guard = new Guard(new Geometry(), { x: 100, y: 200, z: 10 });
 ```
+
+## Для тестов
+
+`@peetland/geometry/dev` даёт `createMockedGeometry(overrides)`: мок геометрии, у которого все
+проверки попадания возвращают `true`, а любой метод можно переопределить через partial-объект
+`overrides`:
+
+```ts
+import { createMockedGeometry } from '@peetland/geometry/dev';
+
+const geometry = createMockedGeometry({
+  isWithinRadius2d: () => false,
+});
+```

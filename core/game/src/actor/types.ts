@@ -109,3 +109,15 @@ export interface IActorCommand<TValue = unknown> {
    */
   cancel(reason: unknown): void;
 }
+
+/** Общий реестр заспавненных акторов игры */
+export interface IActorRegistry {
+  /** Регистрирует актора. Деспавненного актора не регистрирует */
+  register(actor: IActor): void;
+
+  /** Убирает актора из реестра */
+  remove(actor: IActor): void;
+
+  /** Возвращает всех зарегистрированных акторов */
+  getAll(): IActor[];
+}

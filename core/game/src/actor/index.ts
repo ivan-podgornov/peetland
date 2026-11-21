@@ -8,4 +8,5 @@ export type {
   IActor,
   IActorCommand,
   IActorFactory,
+  IActorRegistry,
 } from './types';

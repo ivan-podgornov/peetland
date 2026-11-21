@@ -2,7 +2,7 @@ import { AnimationManager } from '@peetland/animation-manager';
 import { AbortController, EventTarget } from '@peetland/events';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import { ActorRegistry } from '@peetland/game';
-import type { IActorFactory, IGame } from '@peetland/game';
+import type { GameEvents, IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
 import type { ILogger } from '@peetland/logger';
@@ -53,7 +53,7 @@ export class GtaGame implements IGame {
     const { signal } = this.terminateController;
     // Таймер один на игру, а подписчики тиков подписываются и отписываются через EventTarget. После
     // выгрузки скрипта тики заканчиваются
-    const tickEvents = new EventTarget<{ tick: [] }>();
+    const tickEvents = new EventTarget<GameEvents>();
     timer.interval(TICK_PERIOD).subscribe(() => tickEvents.dispatchEvent('tick'), { signal });
 
     this.ticks = tickEvents.when('tick');

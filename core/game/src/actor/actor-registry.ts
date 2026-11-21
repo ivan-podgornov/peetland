@@ -1,6 +1,6 @@
-import type { IActor } from './types';
+import type { IActor, IActorRegistry } from './types';
 
-export class ActorRegistry {
+export class ActorRegistry implements IActorRegistry {
   private readonly actors: Set<IActor>;
   private readonly removeListeners: Map<IActor, () => void>;
 

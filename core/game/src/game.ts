@@ -5,6 +5,12 @@ import type { IReadonlyTime } from '@peetland/timings';
 import type { IActorFactory } from './actor';
 import type { IObjectFactory } from './object';
 
+/** События игры, например, тик мира */
+export type GameEvents = {
+  /** Тик мира */
+  tick: [];
+};
+
 export interface IGame {
   readonly actorFactory: IActorFactory;
   /** Время суток в игре */

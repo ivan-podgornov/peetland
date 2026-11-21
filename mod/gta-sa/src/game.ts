@@ -1,6 +1,7 @@
 import { AnimationManager } from '@peetland/animation-manager';
 import { AbortController, EventTarget } from '@peetland/events';
 import type { IAbortSignal, Observable } from '@peetland/events';
+import { ActorRegistry } from '@peetland/game';
 import type { IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
@@ -65,7 +66,11 @@ export class GtaGame implements IGame {
     this.time = new GtaTime({ ticks: this.ticks });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
+    // Реестр один на игру: фабрика добавляет в него каждого созданного актора и убирает
+    // деспавненных, а проверка видимости потом ищет в нём кандидатов
+    const actorRegistry = new ActorRegistry();
     this.actorFactory = new GtaActorFactory({
+      actorRegistry,
       animations: new AnimationManager(
         { animations: GTA_ANIMATIONS },
         { loader: new GtaAnimationLoader({ timer }) }

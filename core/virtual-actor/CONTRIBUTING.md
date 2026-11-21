@@ -8,10 +8,12 @@
 ```ts
 import { AnimationManager, InstantAnimationLoader } from '@peetland/animation-manager';
 import { Geometry } from '@peetland/geometry';
+import { ActorRegistry } from '@peetland/game';
 import { Timer } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/virtual-actor';
 
 const factory = new VirtualActorFactory({
+  actorRegistry: new ActorRegistry(),
   animations: new AnimationManager(
     { animations: VIRTUAL_ANIMATIONS },
     { loader: new InstantAnimationLoader() }

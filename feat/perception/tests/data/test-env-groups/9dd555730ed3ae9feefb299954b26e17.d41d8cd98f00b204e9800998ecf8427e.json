@@ -1,0 +1,1 @@
+{"id":"9dd555730ed3ae9feefb299954b26e17.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/perception/__tests__/vision-system/radius.spec.ts#VisionSystem #getVisibleActors — радиус Не возвращает актора за пределами радиуса","name":"Не возвращает актора за пределами радиуса","status":"passed","testResultsByEnv":{"default":"423bd556424d4cd5de469f380e1eb6c6"}}

@@ -3968,6 +3968,17 @@ function Geometry.prototype.normalizeAngle(self, angle)
     local FULL_TURN = ____exports_Geometry_0.FULL_TURN
     return (angle % FULL_TURN + FULL_TURN) % FULL_TURN
 end
+function Geometry.prototype.isPointInSector2d(self, sector, point)
+    if sector.fovDeg >= 360 then
+        return true
+    end
+    local isVertex = point.x == sector.origin.x and point.y == sector.origin.y
+    if isVertex then
+        return true
+    end
+    local angleToPoint = self:getAngleTo(sector.origin, point)
+    return self:isWithinAngle(angleToPoint, sector.angle, sector.fovDeg / 2)
+end
 Geometry.FULL_TURN = 360
 return ____exports
  end,

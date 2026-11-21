@@ -1,0 +1,15 @@
+{
+  "name": "@peetland/virtual-game",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@peetland/animation-manager": "0.0.0",
+    "@peetland/events": "0.0.0",
+    "@peetland/game": "0.0.0",
+    "@peetland/geometry": "0.0.0",
+    "@peetland/timings": "0.0.0",
+    "@peetland/virtual-actor": "0.0.0"
+  }
+}

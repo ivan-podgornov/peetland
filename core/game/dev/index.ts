@@ -1,0 +1,1 @@
+export { createMockedRegistry } from './registry';

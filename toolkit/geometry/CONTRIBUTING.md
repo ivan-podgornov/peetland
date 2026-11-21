@@ -147,10 +147,12 @@ const isFacing = geometry.isWithinAngle(actor.getAngle(), target, 15);
 
 Круговой сектор описывается типом `Sector2d`: вершина `origin`, направление центра `angle` и
 угловой размер `fovDeg`. Углы в той же системе, что и у остальной геометрии: градусы, 0° — север,
-против часовой стрелки. Вхождение точки проверяет функция `isPointInSector2d`:
+против часовой стрелки. Вхождение точки проверяет `isPointInSector2d`:
 
 ```ts
-import { isPointInSector2d, type Sector2d } from '@peetland/geometry';
+import { Geometry, type Sector2d } from '@peetland/geometry';
+
+const geometry = new Geometry();
 
 const sector: Sector2d = {
   origin: { x: 0, y: 0 },
@@ -158,8 +160,8 @@ const sector: Sector2d = {
   fovDeg: 90, // сектор раскрыт на 90°: от 315° до 45°
 };
 
-isPointInSector2d(sector, { x: 0, y: 10 }); // true — точка на севере
-isPointInSector2d(sector, { x: 10, y: 0 }); // false — точка на востоке
+geometry.isPointInSector2d(sector, { x: 0, y: 10 }); // true — точка на севере
+geometry.isPointInSector2d(sector, { x: 10, y: 0 }); // false — точка на востоке
 ```
 
 Границы сектора считаются попавшими в него: точка ровно на крайнем угле — внутри. Точка в вершине
@@ -169,9 +171,8 @@ isPointInSector2d(sector, { x: 10, y: 0 }); // false — точка на вос�
 расстоянием, его комбинируют с `isWithinRadius2d`:
 
 ```ts
-const geometry = new Geometry();
 const inSight =
-  isPointInSector2d(sector, point) && geometry.isWithinRadius2d(point, sector.origin, 50);
+  geometry.isPointInSector2d(sector, point) && geometry.isWithinRadius2d(point, sector.origin, 50);
 ```
 
 ## Точка строкой

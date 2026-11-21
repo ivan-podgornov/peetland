@@ -2,6 +2,16 @@ export type Vector2 = { x: number; y: number };
 
 export type Vector3 = { x: number; y: number; z: number };
 
+/** Круговой сектор на плоскости */
+export type Sector2d = {
+  /** Вершина сектора */
+  origin: Vector2;
+  /** Направление центра сектора в градусах: 0° — север (+Y), угол растёт против часовой стрелки */
+  angle: number;
+  /** Угловой размер сектора в градусах. 360 и больше — всё вокруг */
+  fovDeg: number;
+};
+
 export interface IGeometry {
   /** Возвращает дистанцию между двумя точками в двумерном пространстве */
   getDistance2d(pointA: Vector2, pointB: Vector2): number;
@@ -61,4 +71,12 @@ export interface IGeometry {
    * @param point - точка, которую нужно перевести в строку
    */
   formatPoint(point: Vector3): string;
+
+  /**
+   * Проверяет, что точка находится в круговом секторе, включая его границы. Радиус не
+   * проверяется: точка попадает в сектор на любом расстоянии
+   * @param sector - сектор, вхождение в который проверяем
+   * @param point - точка, которую проверяем
+   */
+  isPointInSector2d(sector: Sector2d, point: Vector2): boolean;
 }

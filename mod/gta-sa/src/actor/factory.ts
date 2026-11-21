@@ -1,9 +1,12 @@
-import type { CreateActorOptions, IActorFactory } from '@peetland/game';
+import type { ActorRegistry, CreateActorOptions, IActorFactory } from '@peetland/game';
 
 import { GtaActor } from './actor';
 import type { ActorDeps } from './actor';
 
-export type ActorFactoryDeps = ActorDeps;
+export type ActorFactoryDeps = ActorDeps & {
+  /** Общий реестр акторов игры */
+  actorRegistry: ActorRegistry;
+};
 
 export class GtaActorFactory implements IActorFactory {
   private readonly deps: ActorFactoryDeps;
@@ -13,6 +16,11 @@ export class GtaActorFactory implements IActorFactory {
   }
 
   create(options: CreateActorOptions): GtaActor {
-    return new GtaActor(options, this.deps);
+    const { actorRegistry } = this.deps;
+    const actor = new GtaActor(options, this.deps);
+
+    actorRegistry.register(actor);
+
+    return actor;
   }
 }

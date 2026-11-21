@@ -3,24 +3,9 @@
 Виртуальный актор — реализация `IActor` из `@peetland/game`, такая же, как `mod/gta-sa`.
 
 `VirtualActorFactory` создаёт акторов, которые работают без игры и хранят всё в памяти. На них
-тестируются задачи, NPC и мир.
-
-```ts
-import { AnimationManager, InstantAnimationLoader } from '@peetland/animation-manager';
-import { Geometry } from '@peetland/geometry';
-import { Timer } from '@peetland/timings';
-import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/virtual-actor';
-
-const factory = new VirtualActorFactory({
-  animations: new AnimationManager(
-    { animations: VIRTUAL_ANIMATIONS },
-    { loader: new InstantAnimationLoader() }
-  ),
-  geometry: new Geometry(),
-  timer: new Timer(),
-});
-const actor = factory.create({ modelId: 230, position: { x: 0, y: 0, z: 0 }, angle: 0 });
-```
+тестируются задачи, NPC и мир. Фабрика получает общий реестр акторов игры в зависимостях
+(`actorRegistry`) и регистрирует в нём каждого созданного актора — про реестр написано в
+[CONTRIBUTING `@peetland/game`](../game/CONTRIBUTING.md).
 
 Команды актора наследуются от `Command` из `@peetland/actor-command`.
 

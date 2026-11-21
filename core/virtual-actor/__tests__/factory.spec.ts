@@ -1,4 +1,5 @@
 import { createAnimationManager } from '@peetland/animation-manager/dev';
+import { ActorRegistry } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,6 +10,7 @@ describe('VirtualActorFactory', () => {
   describe('#create', () => {
     it('Создаёт актора на переданной позиции', () => {
       const factory = new VirtualActorFactory({
+        actorRegistry: new ActorRegistry(),
         animations: createAnimationManager(VIRTUAL_ANIMATIONS),
         geometry: new Geometry(),
         timer: new ManualTimer(),
@@ -33,6 +35,7 @@ describe('VirtualActorFactory', () => {
 
     it('Создаёт актора, повёрнутого на переданный угол', () => {
       const factory = new VirtualActorFactory({
+        actorRegistry: new ActorRegistry(),
         animations: createAnimationManager(VIRTUAL_ANIMATIONS),
         geometry: new Geometry(),
         timer: new ManualTimer(),
@@ -54,6 +57,7 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, который двигается по времени переданного таймера', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory({
+        actorRegistry: new ActorRegistry(),
         animations: createAnimationManager(VIRTUAL_ANIMATIONS),
         geometry: new Geometry(),
         timer,
@@ -87,6 +91,7 @@ describe('VirtualActorFactory', () => {
     it('Создаёт актора, анимации которого длятся по таблице переданного менеджера анимаций', () => {
       const timer = new ManualTimer();
       const factory = new VirtualActorFactory({
+        actorRegistry: new ActorRegistry(),
         animations: createAnimationManager({
           ...VIRTUAL_ANIMATIONS,
           pay: { duration: 3000 },
@@ -109,6 +114,50 @@ describe('VirtualActorFactory', () => {
       timer.advance(3000);
 
       expect(complete).toHaveBeenCalledOnce();
+    });
+
+    it('Регистрирует созданного актора в реестре', () => {
+      const actorRegistry = new ActorRegistry();
+      const factory = new VirtualActorFactory({
+        actorRegistry,
+        animations: createAnimationManager(VIRTUAL_ANIMATIONS),
+        geometry: new Geometry(),
+        timer: new ManualTimer(),
+      });
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      });
+
+      expect(actorRegistry.getAll()).toStrictEqual([actor]);
+    });
+
+    it('Убирает актора из реестра при его деспавне', () => {
+      const actorRegistry = new ActorRegistry();
+      const factory = new VirtualActorFactory({
+        actorRegistry,
+        animations: createAnimationManager(VIRTUAL_ANIMATIONS),
+        geometry: new Geometry(),
+        timer: new ManualTimer(),
+      });
+      const actor = factory.create({
+        modelId: 230,
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        angle: 0,
+      });
+
+      actor.despawn();
+
+      expect(actorRegistry.getAll()).toStrictEqual([]);
     });
   });
 });

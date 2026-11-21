@@ -1,9 +1,12 @@
-import type { CreateActorOptions, IActorFactory } from '@peetland/game';
+import type { ActorRegistry, CreateActorOptions, IActorFactory } from '@peetland/game';
 
 import { VirtualActor } from './actor';
 import type { VirtualActorDeps } from './actor';
 
-export type VirtualActorFactoryDeps = VirtualActorDeps;
+export type VirtualActorFactoryDeps = VirtualActorDeps & {
+  /** Общий реестр акторов игры */
+  actorRegistry: ActorRegistry;
+};
 
 export class VirtualActorFactory implements IActorFactory {
   private readonly deps: VirtualActorFactoryDeps;
@@ -13,6 +16,11 @@ export class VirtualActorFactory implements IActorFactory {
   }
 
   create(options: CreateActorOptions): VirtualActor {
-    return new VirtualActor(options, this.deps);
+    const { actorRegistry } = this.deps;
+    const actor = new VirtualActor(options, this.deps);
+
+    actorRegistry.register(actor);
+
+    return actor;
   }
 }

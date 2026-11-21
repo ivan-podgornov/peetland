@@ -1,0 +1,1 @@
+{"id":"19fbc876c9502fd736491acae0c02fcd.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/game/__tests__/actor-registry.spec.ts#ActorRegistry #register Повторная регистрация не дублирует актора","name":"Повторная регистрация не дублирует актора","status":"passed","testResultsByEnv":{"default":"993c185b36b9a0ada10c7dd95f9d237a"}}

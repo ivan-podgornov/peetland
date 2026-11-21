@@ -1,0 +1,1 @@
+{"id":"ef21982a67e72f606f8d467f485aacb1.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/needs/__tests__/base-need/get-status.spec.ts#BaseNeed #getStatus Если значение выше CALM_ABOVE, возвращает NeedStatus.Calm","name":"Если значение выше CALM_ABOVE, возвращает NeedStatus.Calm","status":"passed","testResultsByEnv":{"default":"bb80d84d55f1f3fbf1678cba132d06e4"}}

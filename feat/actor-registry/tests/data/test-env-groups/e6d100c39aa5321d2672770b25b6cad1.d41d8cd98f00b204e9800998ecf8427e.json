@@ -1,0 +1,1 @@
+{"id":"e6d100c39aa5321d2672770b25b6cad1.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/game/__tests__/actor-registry.spec.ts#ActorRegistry #getAll Возвращает копию: изменение результата не меняет реестр","name":"Возвращает копию: изменение результата не меняет реестр","status":"passed","testResultsByEnv":{"default":"28016518e307546e518439c93ea55ad3"}}

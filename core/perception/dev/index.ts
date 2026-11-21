@@ -1,0 +1,1 @@
+export { getPointAt } from './point';

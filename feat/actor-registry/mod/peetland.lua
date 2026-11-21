@@ -3993,9 +3993,6 @@ local __TS__New = ____lualib.__TS__New
 local Map = ____lualib.Map
 local __TS__Spread = ____lualib.__TS__Spread
 local ____exports = {}
---- Реестр заспавненных акторов игры. Фабрики акторов регистрируют в нём каждого созданного актора,
--- а реестр следит за сигналом деспавна: как только актор деспавнен, он сам исчезает из реестра,
--- поэтому в нём не бывает «призраков» — деспавненных акторов
 ____exports.ActorRegistry = __TS__Class()
 local ActorRegistry = ____exports.ActorRegistry
 ActorRegistry.name = "ActorRegistry"
@@ -4016,7 +4013,7 @@ function ActorRegistry.prototype.register(self, actor)
 end
 function ActorRegistry.prototype.remove(self, actor)
     local removeListener = self.removeListeners:get(actor)
-    if removeListener == nil then
+    if not removeListener then
         return
     end
     actor.signal:removeEventListener("abort", removeListener)

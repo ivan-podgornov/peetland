@@ -4,7 +4,7 @@ import { VirtualActor } from './actor';
 import type { VirtualActorDeps } from './actor';
 
 export type VirtualActorFactoryDeps = VirtualActorDeps & {
-  /** Общий реестр акторов, куда фабрика добавляет каждого созданного актора */
+  /** Общий реестр акторов игры */
   actorRegistry: ActorRegistry;
 };
 

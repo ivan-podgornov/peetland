@@ -66,8 +66,6 @@ export class GtaGame implements IGame {
     this.time = new GtaTime({ ticks: this.ticks });
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
-    // Реестр один на игру: фабрика добавляет в него каждого созданного актора и убирает
-    // деспавненных, а проверка видимости потом ищет в нём кандидатов
     const actorRegistry = new ActorRegistry();
     this.actorFactory = new GtaActorFactory({
       actorRegistry,

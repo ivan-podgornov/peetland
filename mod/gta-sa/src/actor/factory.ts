@@ -4,7 +4,7 @@ import { GtaActor } from './actor';
 import type { ActorDeps } from './actor';
 
 export type ActorFactoryDeps = ActorDeps & {
-  /** Общий реестр акторов, куда фабрика добавляет каждого созданного актора */
+  /** Общий реестр акторов игры */
   actorRegistry: ActorRegistry;
 };
 

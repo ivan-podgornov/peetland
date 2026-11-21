@@ -4474,12 +4474,40 @@ function AnimationManager.prototype.getLoad(self, record)
 end
 return ____exports
  end,
+["core.animation-manager.src.instant-animation-loader"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____events = require("toolkit.events.src.index")
+local Observable = ____events.Observable
+--- Загрузчик, у которого все анимации всегда загружены. Нужен, когда загружать нечего
+____exports.InstantAnimationLoader = __TS__Class()
+local InstantAnimationLoader = ____exports.InstantAnimationLoader
+InstantAnimationLoader.name = "InstantAnimationLoader"
+function InstantAnimationLoader.prototype.____constructor(self)
+end
+function InstantAnimationLoader.prototype.key(self)
+    return "instant"
+end
+function InstantAnimationLoader.prototype.load(self)
+    return __TS__New(
+        Observable,
+        function(subscriber) return subscriber:next() end
+    )
+end
+return ____exports
+ end,
 ["core.animation-manager.src.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
     local ____animation_2Dmanager = require("core.animation-manager.src.animation-manager")
     ____exports.AnimationManager = ____animation_2Dmanager.AnimationManager
+end
+do
+    local ____instant_2Danimation_2Dloader = require("core.animation-manager.src.instant-animation-loader")
+    ____exports.InstantAnimationLoader = ____instant_2Danimation_2Dloader.InstantAnimationLoader
 end
 return ____exports
  end,

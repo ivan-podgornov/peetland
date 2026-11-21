@@ -1,4 +1,4 @@
-import type { IGeometry, Vector2, Vector3 } from './types';
+import type { IGeometry, Sector2d, Vector2, Vector3 } from './types';
 
 export class Geometry implements IGeometry {
   /** Полный оборот в градусах */
@@ -69,5 +69,21 @@ export class Geometry implements IGeometry {
     const { FULL_TURN } = Geometry;
 
     return ((angle % FULL_TURN) + FULL_TURN) % FULL_TURN;
+  }
+
+  isPointInSector2d(sector: Sector2d, point: Vector2): boolean {
+    if (sector.fovDeg >= 360) {
+      return true;
+    }
+
+    const isVertex = point.x === sector.origin.x && point.y === sector.origin.y;
+
+    if (isVertex) {
+      return true;
+    }
+
+    const angleToPoint = this.getAngleTo(sector.origin, point);
+
+    return this.isWithinAngle(angleToPoint, sector.angle, sector.fovDeg / 2);
   }
 }

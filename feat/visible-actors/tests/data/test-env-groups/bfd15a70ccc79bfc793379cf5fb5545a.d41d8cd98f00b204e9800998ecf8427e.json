@@ -1,0 +1,1 @@
+{"id":"bfd15a70ccc79bfc793379cf5fb5545a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/perception/__tests__/vision-system/exclusions.spec.ts#VisionSystem #getVisibleActors — кто не виден Не возвращает самого смотрящего","name":"Не возвращает самого смотрящего","status":"passed","testResultsByEnv":{"default":"81e67e4a4fd28ad4d15aa673b719f6f1"}}

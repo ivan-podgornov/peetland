@@ -3968,19 +3968,7 @@ function Geometry.prototype.normalizeAngle(self, angle)
     local FULL_TURN = ____exports_Geometry_0.FULL_TURN
     return (angle % FULL_TURN + FULL_TURN) % FULL_TURN
 end
-Geometry.FULL_TURN = 360
-return ____exports
- end,
-["toolkit.geometry.src.sector"] = function(...) 
-local ____lualib = require("lualib_bundle")
-local __TS__New = ____lualib.__TS__New
-local ____exports = {}
-local ____geometry = require("toolkit.geometry.src.geometry")
-local Geometry = ____geometry.Geometry
---- Общие вычисления углов. Класс без состояния, поэтому один экземпляр на модуль
-local geometry = __TS__New(Geometry)
---- Проверяет, что точка находится в круговом секторе, включая его границы. Радиус не проверяется
-function ____exports.isPointInSector2d(sector, point)
+function Geometry.prototype.isPointInSector2d(self, sector, point)
     if sector.fovDeg >= 360 then
         return true
     end
@@ -3988,9 +3976,10 @@ function ____exports.isPointInSector2d(sector, point)
     if isVertex then
         return true
     end
-    local angleToPoint = geometry:getAngleTo(sector.origin, point)
-    return geometry:isWithinAngle(angleToPoint, sector.angle, sector.fovDeg / 2)
+    local angleToPoint = self:getAngleTo(sector.origin, point)
+    return self:isWithinAngle(angleToPoint, sector.angle, sector.fovDeg / 2)
 end
+Geometry.FULL_TURN = 360
 return ____exports
  end,
 ["toolkit.geometry.src.index"] = function(...) 
@@ -3999,10 +3988,6 @@ local ____exports = {}
 do
     local ____geometry = require("toolkit.geometry.src.geometry")
     ____exports.Geometry = ____geometry.Geometry
-end
-do
-    local ____sector = require("toolkit.geometry.src.sector")
-    ____exports.isPointInSector2d = ____sector.isPointInSector2d
 end
 return ____exports
  end,

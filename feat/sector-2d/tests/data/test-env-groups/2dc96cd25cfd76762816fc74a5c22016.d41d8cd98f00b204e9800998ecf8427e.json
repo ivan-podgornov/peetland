@@ -1,1 +1,0 @@
-{"id":"2dc96cd25cfd76762816fc74a5c22016.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-point-in-sector-2d.spec.ts#isPointInSector2d Приводит отрицательный угол сектора к диапазону [0, 360)","name":"Приводит отрицательный угол сектора к диапазону [0, 360)","status":"passed","testResultsByEnv":{"default":"31864ad97a3680dca561a1679943c713"}}

@@ -1,1 +1,0 @@
-{"id":"32798c77d05d6c0c4246440e8691ed32.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/is-point-in-sector-2d.spec.ts#isPointInSector2d Возвращает false, если точка за крайними углами сектора","name":"Возвращает false, если точка за крайними углами сектора","status":"passed","testResultsByEnv":{"default":"3200496f53a5d3eaf5fb973bb04c7af5"}}

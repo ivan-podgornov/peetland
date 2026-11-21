@@ -2,7 +2,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IGeometry } from '@peetland/geometry';
 import type { IReadonlyTime } from '@peetland/timings';
 
-import type { IActorFactory } from './actor';
+import type { IActor, IActorFactory } from './actor';
 import type { IObjectFactory } from './object';
 
 /** События игры, например, тик мира */
@@ -24,4 +24,10 @@ export interface IGame {
    * сигналу это и убирает
    */
   readonly signal: IAbortSignal;
+
+  /**
+   * Возвращает акторов, которых видит target в радиусе radius: в секторе его зрения и без
+   * препятствий на прямой между ними. Сам target и деспавненные акторы не возвращаются
+   */
+  getVisibleActors(target: IActor, radius: number): IActor[];
 }

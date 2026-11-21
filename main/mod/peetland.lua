@@ -3985,12 +3985,56 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
+["core.game.src.actor.actor-registry"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local Set = ____lualib.Set
+local __TS__New = ____lualib.__TS__New
+local Map = ____lualib.Map
+local __TS__Spread = ____lualib.__TS__Spread
+local ____exports = {}
+____exports.ActorRegistry = __TS__Class()
+local ActorRegistry = ____exports.ActorRegistry
+ActorRegistry.name = "ActorRegistry"
+function ActorRegistry.prototype.____constructor(self)
+    self.actors = __TS__New(Set)
+    self.removeListeners = __TS__New(Map)
+end
+function ActorRegistry.prototype.register(self, actor)
+    if actor.signal.aborted or self.actors:has(actor) then
+        return
+    end
+    local function removeListener()
+        return self:remove(actor)
+    end
+    self.actors:add(actor)
+    self.removeListeners:set(actor, removeListener)
+    actor.signal:addEventListener("abort", removeListener)
+end
+function ActorRegistry.prototype.remove(self, actor)
+    local removeListener = self.removeListeners:get(actor)
+    if not removeListener then
+        return
+    end
+    actor.signal:removeEventListener("abort", removeListener)
+    self.removeListeners:delete(actor)
+    self.actors:delete(actor)
+end
+function ActorRegistry.prototype.getAll(self)
+    return {__TS__Spread(self.actors)}
+end
+return ____exports
+ end,
 ["core.game.src.actor.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
 do
     local ____animation = require("core.game.src.actor.animation")
     ____exports.ANIMATIONS = ____animation.ANIMATIONS
+end
+do
+    local ____actor_2Dregistry = require("core.game.src.actor.actor-registry")
+    ____exports.ActorRegistry = ____actor_2Dregistry.ActorRegistry
 end
 return ____exports
  end,
@@ -5807,7 +5851,11 @@ function GtaActorFactory.prototype.____constructor(self, deps)
     self.deps = deps
 end
 function GtaActorFactory.prototype.create(self, options)
-    return __TS__New(GtaActor, options, self.deps)
+    local ____self_deps_0 = self.deps
+    local actorRegistry = ____self_deps_0.actorRegistry
+    local actor = __TS__New(GtaActor, options, self.deps)
+    actorRegistry:register(actor)
+    return actor
 end
 return ____exports
  end,
@@ -5974,6 +6022,8 @@ local AnimationManager = ____animation_2Dmanager.AnimationManager
 local ____events = require("toolkit.events.src.index")
 local AbortController = ____events.AbortController
 local EventTarget = ____events.EventTarget
+local ____game = require("core.game.src.index")
+local ActorRegistry = ____game.ActorRegistry
 local ____geometry = require("toolkit.geometry.src.index")
 local Geometry = ____geometry.Geometry
 local ____moonloader = require("moonloader.src.index")
@@ -6027,9 +6077,11 @@ function GtaGame.prototype.____constructor(self, deps)
     self.time = __TS__New(GtaTime, {ticks = self.ticks})
     self.geometry = __TS__New(Geometry)
     self.objectFactory = __TS__New(GtaObjectFactory)
+    local actorRegistry = __TS__New(ActorRegistry)
     self.actorFactory = __TS__New(
         GtaActorFactory,
         {
+            actorRegistry = actorRegistry,
             animations = __TS__New(
                 AnimationManager,
                 {animations = GTA_ANIMATIONS},

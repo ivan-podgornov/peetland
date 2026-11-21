@@ -1,7 +1,7 @@
 # @peetland/geometry
 
 Набор базовых геометрических операций над точками на плоскости и в пространстве: расстояние между
-точками, попадание в радиус, пошаговое перемещение к цели и углы поворота.
+точками, попадание в радиус, пошаговое перемещение к цели, углы поворота и круговые секторы.
 
 ```ts
 import { Geometry } from '@peetland/geometry';
@@ -141,6 +141,37 @@ geometry.isWithinAngle(340, 5, 15); // false — 25°
 ```ts
 const target = geometry.getAngleTo(actor.getPosition(), trash.getPosition());
 const isFacing = geometry.isWithinAngle(actor.getAngle(), target, 15);
+```
+
+## Сектор на плоскости
+
+Круговой сектор описывается типом `Sector2d`: вершина `origin`, направление центра `angle` и
+угловой размер `fovDeg`. Углы в той же системе, что и у остальной геометрии: градусы, 0° — север,
+против часовой стрелки. Вхождение точки проверяет функция `isPointInSector2d`:
+
+```ts
+import { isPointInSector2d, type Sector2d } from '@peetland/geometry';
+
+const sector: Sector2d = {
+  origin: { x: 0, y: 0 },
+  angle: 0, // центр сектора — на севере
+  fovDeg: 90, // сектор раскрыт на 90°: от 315° до 45°
+};
+
+isPointInSector2d(sector, { x: 0, y: 10 }); // true — точка на севере
+isPointInSector2d(sector, { x: 10, y: 0 }); // false — точка на востоке
+```
+
+Границы сектора считаются попавшими в него: точка ровно на крайнем угле — внутри. Точка в вершине
+сектора тоже внутри. Сектор с `fovDeg` 360 и больше — это всё вокруг, в него попадает любая точка.
+
+Радиус сектор не проверяет: точка попадает в него на любом расстоянии. Чтобы ограничить сектор
+расстоянием, его комбинируют с `isWithinRadius2d`:
+
+```ts
+const geometry = new Geometry();
+const inSight =
+  isPointInSector2d(sector, point) && geometry.isWithinRadius2d(point, sector.origin, 50);
 ```
 
 ## Точка строкой

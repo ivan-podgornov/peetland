@@ -1,1 +1,0 @@
-{"id":"cfee78247552b30c46ed8a3290a7e5d0.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/game/__tests__/actor-registry/despawn.spec.ts#ActorRegistry При деспавне зарегистрированного актора Убирает только деспавненного актора","name":"Убирает только деспавненного актора","status":"passed","testResultsByEnv":{"default":"898eef32b73cfd8491644830c9b46ab8"}}

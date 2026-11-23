@@ -42,34 +42,6 @@ describe('ActorNpcRegistry', () => {
     });
   });
 
-  describe('#hasNpc', () => {
-    it('Говорит, есть ли у актора личность в реестре', () => {
-      const registry = new ActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps());
-      const actor = createActor();
-      registry.register(actor, npc);
-
-      expect(registry.hasNpc(actor)).toBe(true);
-      expect(registry.hasNpc(createActor())).toBe(false);
-    });
-
-    it('Когда NPC деспавнится, личности у актора больше нет', () => {
-      const registry = new ActorNpcRegistry();
-      const actor = createActor();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry: registry,
-          actorFactory: createMockedActorFactory(actor),
-        })
-      );
-
-      npc.despawn();
-
-      expect(registry.hasNpc(actor)).toBe(false);
-    });
-  });
-
   describe('#register', () => {
     it('Когда NPC деспавнится, убирает связь', () => {
       const registry = new ActorNpcRegistry();

@@ -4,8 +4,8 @@ import type { Mocked } from 'vitest';
 import type { IActorNpcRegistry } from '../src';
 
 /**
- * Создаёт мок реестра связей «актор ↔ NPC». Регистрации никуда не пишутся, переводы бросают
- * ошибки, а hasNpc говорит, что личности нет
+ * Создаёт мок реестра связей «актор ↔ NPC». Регистрации никуда не пишутся, а переводы бросают
+ * ошибки
  */
 export function createMockedActorNpcRegistry(): Mocked<IActorNpcRegistry> {
   return {
@@ -16,6 +16,5 @@ export function createMockedActorNpcRegistry(): Mocked<IActorNpcRegistry> {
     getNpc: vi.fn(() => {
       throw new Error('У актора нет NPC в реестре');
     }),
-    hasNpc: vi.fn(() => false),
   };
 }

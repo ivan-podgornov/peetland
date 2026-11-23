@@ -23,7 +23,7 @@ export class ActorNpcRegistry implements IActorNpcRegistry {
   getActor(npc: INpc): IActor {
     const actor = this.npcToActor.get(npc);
 
-    if (actor === undefined) {
+    if (!actor) {
       throw new Error('NPC не в реестре');
     }
 
@@ -33,14 +33,10 @@ export class ActorNpcRegistry implements IActorNpcRegistry {
   getNpc(actor: IActor): INpc {
     const npc = this.actorToNpc.get(actor);
 
-    if (npc === undefined) {
+    if (!npc) {
       throw new Error('У актора нет NPC в реестре');
     }
 
     return npc;
-  }
-
-  hasNpc(actor: IActor): boolean {
-    return this.actorToNpc.has(actor);
   }
 }

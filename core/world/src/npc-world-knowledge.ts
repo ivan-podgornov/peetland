@@ -33,7 +33,6 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
 
     return game
       .getVisibleActors(actor, radius)
-      .filter((visibleActor) => actorNpcRegistry.hasNpc(visibleActor))
       .map((visibleActor) => actorNpcRegistry.getNpc(visibleActor));
   }
 }

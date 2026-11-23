@@ -63,9 +63,6 @@ export interface IActorNpcRegistry {
    * ошибка вызывающего кода
    */
   getNpc(actor: IActor): INpc;
-
-  /** Говорит, есть ли у актора личность в реестре */
-  hasNpc(actor: IActor): boolean;
 }
 
 /**

@@ -52,25 +52,6 @@ describe('NpcWorldKnowledge', () => {
       expect(game.getVisibleActors).toHaveBeenCalledExactlyOnceWith(actor, 10);
     });
 
-    it('Актор без личности в выборку не попадает', () => {
-      const actorNpcRegistry = new ActorNpcRegistry();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actorFactory: createMockedActorFactory(createActor()),
-        })
-      );
-      const game = createGame({ getVisibleActors: vi.fn(() => [createActor()]) });
-      const knowledge = new NpcWorldKnowledge({
-        time: new ManualTime(),
-        game,
-        actorNpcRegistry,
-      });
-
-      expect(knowledge.getVisibleNpcs(npc, 10)).toStrictEqual([]);
-    });
-
     it('Бросает ошибку, когда target не в реестре', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const npc = new Npc(

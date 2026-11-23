@@ -8255,8 +8255,9 @@ function Npc.prototype.____constructor(self, data, deps)
     self.addictions = addictionsFactory:create(data.addictions, time)
     self.urgencyWatcher = urgencyWatcherFactory:create()
     self.lifetime = __TS__New(AbortController)
+    self.signal = self.lifetime.signal
     self.actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
-    actorNpcRegistry:register(self.actor, self, self.lifetime.signal)
+    actorNpcRegistry:register(self.actor, self)
     self.context = {
         actor = self.actor,
         inventory = self.inventory,
@@ -8413,10 +8414,10 @@ function ActorNpcRegistry.prototype.____constructor(self)
     self.npcToActor = __TS__New(Map)
     self.actorToNpc = __TS__New(Map)
 end
-function ActorNpcRegistry.prototype.register(self, actor, npc, signal)
+function ActorNpcRegistry.prototype.register(self, actor, npc)
     self.npcToActor:set(npc, actor)
     self.actorToNpc:set(actor, npc)
-    signal:addEventListener(
+    npc.signal:addEventListener(
         "abort",
         function()
             self.npcToActor:delete(npc)

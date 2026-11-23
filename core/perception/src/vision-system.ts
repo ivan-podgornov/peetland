@@ -15,7 +15,12 @@ export type VisionSystemDeps = {
 };
 
 /** Система зрения: сообщает, каких акторов видит данный актор */
-export class VisionSystem {
+export interface IVisionSystem {
+  /** Возвращает акторов, которых видит target в радиусе radius */
+  getVisibleActors(target: IActor, radius: number): IActor[];
+}
+
+export class VisionSystem implements IVisionSystem {
   private readonly deps: VisionSystemDeps;
 
   constructor(deps: VisionSystemDeps) {

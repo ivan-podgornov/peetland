@@ -1,13 +1,44 @@
+import type { IAbortSignal } from '@peetland/events';
+import type { IActor } from '@peetland/game';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '../dev';
+import { createNpcData, createNpcDeps } from '../dev';
 import { Npc } from '../src';
+import type { IActorNpcRegistry } from '../src';
+
+/** Реестр, который помнит последнюю связь актора с NPC и убирает её, когда сигнал прерван */
+function createRememberingRegistry(): IActorNpcRegistry<Npc> {
+  let npc: Npc | undefined;
+  let actor: IActor | undefined;
+
+  return {
+    register(registeredActor, registeredNpc, signal: IAbortSignal): void {
+      npc = registeredNpc;
+      actor = registeredActor;
+
+      signal.addEventListener(
+        'abort',
+        () => {
+          npc = undefined;
+          actor = undefined;
+        },
+        { once: true }
+      );
+    },
+    getActor(registeredNpc) {
+      return registeredNpc === npc ? actor : undefined;
+    },
+    getNpc(registeredActor) {
+      return registeredActor === actor ? npc : undefined;
+    },
+  };
+}
 
 describe('Npc', () => {
   describe('#constructor', () => {
     it('Связывает своего актора с собой в реестре связей', () => {
-      const actorNpcRegistry = createMockedActorNpcRegistry();
+      const actorNpcRegistry = createRememberingRegistry();
       const actor = createActor();
 
       const npc = new Npc(
@@ -18,21 +49,23 @@ describe('Npc', () => {
         })
       );
 
-      expect(actorNpcRegistry.register).toHaveBeenCalledExactlyOnceWith(
-        actor,
-        npc,
-        expect.anything()
-      );
+      expect(actorNpcRegistry.getActor(npc)).toBe(actor);
     });
 
-    it('Передаёт реестру сигнал, который обрывается при деспавне NPC', () => {
-      const actorNpcRegistry = createMockedActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps({ actorNpcRegistry }));
+    it('После деспавна NPC его актора из реестра уже не получить', () => {
+      const actorNpcRegistry = createRememberingRegistry();
+      const actor = createActor();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({
+          actorNpcRegistry,
+          actorFactory: createMockedActorFactory(actor),
+        })
+      );
 
-      const [, , signal] = actorNpcRegistry.register.mock.calls[0]!;
       npc.despawn();
 
-      expect(signal.aborted).toBe(true);
+      expect(actorNpcRegistry.getActor(npc)).toBeUndefined();
     });
   });
 });

@@ -8,7 +8,7 @@ import { ActorNpcRegistry } from '../src';
 
 describe('ActorNpcRegistry', () => {
   describe('#getActor', () => {
-    it('Возвращает актора, чьим телом является NPC', () => {
+    it('Возвращает актора, который является телом NPC', () => {
       const registry = new ActorNpcRegistry();
       const npc = new Npc(createNpcData(), createNpcDeps());
       const actor = createActor();

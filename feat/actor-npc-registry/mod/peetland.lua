@@ -8223,6 +8223,7 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____events = require("toolkit.events.src.index")
 local AbortController = ____events.AbortController
@@ -8255,7 +8256,6 @@ function Npc.prototype.____constructor(self, data, deps)
     self.addictions = addictionsFactory:create(data.addictions, time)
     self.urgencyWatcher = urgencyWatcherFactory:create()
     self.lifetime = __TS__New(AbortController)
-    self.signal = self.lifetime.signal
     self.actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
     actorNpcRegistry:register(self.actor, self)
     self.context = {
@@ -8308,6 +8308,14 @@ function Npc.prototype.despawn(self)
     self.htn:stop(self.context)
     self.actor:despawn()
 end
+__TS__SetDescriptor(
+    Npc.prototype,
+    "signal",
+    {get = function(self)
+        return self.lifetime.signal
+    end},
+    true
+)
 return ____exports
  end,
 ["core.npc.src.factory"] = function(...) 
@@ -8406,7 +8414,7 @@ local __TS__Class = ____lualib.__TS__Class
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Реестр связей «актор ↔ NPC»: две мапы, перевод в обе стороны за O(1)
+--- Реестр связей «актор ↔ NPC»: тело ↔ личность
 ____exports.ActorNpcRegistry = __TS__Class()
 local ActorNpcRegistry = ____exports.ActorNpcRegistry
 ActorNpcRegistry.name = "ActorNpcRegistry"

@@ -6133,6 +6133,12 @@ function GtaGame.prototype.____constructor(self, deps)
         }
     )
 end
+function GtaGame.prototype.getVisibleActors(self)
+    error(
+        __TS__New(Error, "getVisibleActors is not implemented yet for this game"),
+        0
+    )
+end
 __TS__SetDescriptor(
     GtaGame.prototype,
     "signal",

@@ -21,7 +21,12 @@ export interface INpcFactory {
  */
 export type NpcFactoryDeps = Pick<
   NpcDeps,
-  'actorFactory' | 'ticks' | 'rootTaskFactory' | 'gameSignal' | 'worldKnowledge'
+  | 'actorFactory'
+  | 'actorNpcRegistry'
+  | 'ticks'
+  | 'rootTaskFactory'
+  | 'gameSignal'
+  | 'worldKnowledge'
 > &
   Partial<
     Pick<
@@ -41,6 +46,7 @@ export class NpcFactory implements INpcFactory {
   constructor(deps: NpcFactoryDeps) {
     const {
       actorFactory,
+      actorNpcRegistry,
       ticks,
       rootTaskFactory,
       gameSignal,
@@ -55,6 +61,7 @@ export class NpcFactory implements INpcFactory {
 
     this.deps = {
       actorFactory,
+      actorNpcRegistry,
       ticks,
       htnFactory,
       inventoryFactory,

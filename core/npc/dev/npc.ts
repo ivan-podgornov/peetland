@@ -17,6 +17,7 @@ import { Npc, NpcKind } from '../src';
 import type { INpcFactory, NpcData } from '../src';
 import type { NpcDeps } from '../src/npc';
 
+import { createMockedActorNpcRegistry } from './actor-npc-registry';
 import { createMockedNpcWorldKnowledge } from './world-knowledge';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
@@ -43,6 +44,7 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
 export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   return {
     actorFactory: createMockedActorFactory(),
+    actorNpcRegistry: createMockedActorNpcRegistry(),
     htnFactory: createMockedHTNFactory(),
     inventoryFactory: createMockedInventoryFactory(),
     psycheFactory: createMockedPsycheFactory(),

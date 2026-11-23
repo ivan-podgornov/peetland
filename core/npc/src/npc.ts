@@ -19,9 +19,23 @@ import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 import type { INpcWorldKnowledge } from './world-knowledge';
 
+/** Реестр связей «актор ↔ NPC»: тело ↔ личность */
+export interface IActorNpcRegistry {
+  /** Связывает актора с NPC и убирает связь, когда сигнал прерван */
+  register(actor: IActor, npc: Npc, signal: IAbortSignal): void;
+
+  /** Возвращает актора, который является телом NPC */
+  getActor(npc: Npc): IActor | undefined;
+
+  /** Возвращает NPC, чьим телом является актор */
+  getNpc(actor: IActor): Npc | undefined;
+}
+
 export type NpcDeps = {
   /** Фабрика, которой NPC создаёт своего актора */
   actorFactory: IActorFactory;
+  /** Реестр, в котором NPC связывает своего актора с собой */
+  actorNpcRegistry: IActorNpcRegistry;
   /** Фабрика, которой NPC создаёт своего HTN-агента. Агент сам планирует и перепланирует задачи */
   htnFactory: IHTNFactory<NpcState, NpcContext>;
   /** Фабрика, которой NPC создаёт свой инвентарь */
@@ -70,6 +84,7 @@ export class Npc {
   constructor(data: NpcData, deps: NpcDeps) {
     const {
       actorFactory,
+      actorNpcRegistry,
       ticks,
       htnFactory,
       inventoryFactory,
@@ -97,6 +112,7 @@ export class Npc {
       position: data.spawnPosition,
       angle: data.spawnAngle,
     });
+    actorNpcRegistry.register(this.actor, this, this.lifetime.signal);
     this.context = {
       actor: this.actor,
       inventory: this.inventory,

@@ -1,1 +1,0 @@
-{"id":"bcfb530b86e18dbf5646c4d8eced62e4.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/registry.spec.ts#Npc #constructor Передаёт реестру сигнал, который обрывается при деспавне NPC","name":"Передаёт реестру сигнал, который обрывается при деспавне NPC","status":"passed","testResultsByEnv":{"default":"e10373385a3650ede59b9d11869ca2dd"}}

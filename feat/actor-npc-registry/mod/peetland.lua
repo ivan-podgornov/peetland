@@ -8214,6 +8214,11 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
+["core.npc.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
 ["core.npc.src.npc"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class

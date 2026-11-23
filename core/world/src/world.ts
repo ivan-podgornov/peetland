@@ -71,8 +71,12 @@ export class World {
       timer = new Timer(),
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry: game.geometry }),
-      worldKnowledge = new NpcWorldKnowledge({ time: game.time }),
       actorNpcRegistry = new ActorNpcRegistry(),
+      worldKnowledge = new NpcWorldKnowledge({
+        time: game.time,
+        game,
+        actorNpcRegistry,
+      }),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
     const {

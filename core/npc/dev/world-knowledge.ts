@@ -11,5 +11,8 @@ import type { INpcWorldKnowledge, NpcWorldState } from '../src';
 export function createMockedNpcWorldKnowledge(
   state: NpcWorldState = { time: new ManualTime() }
 ): Mocked<INpcWorldKnowledge> {
-  return { getState: vi.fn(() => state) };
+  return {
+    getState: vi.fn(() => state),
+    getVisibleNpcs: vi.fn(() => []),
+  };
 }

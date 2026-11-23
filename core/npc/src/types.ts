@@ -9,8 +9,7 @@ import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 import type { NpcContext } from './context';
 import type { NpcKind } from './kind';
 import type { IRootTaskFactory } from './root-task-factory';
-import type { NpcState } from './state';
-import type { INpcWorldKnowledge } from './world-knowledge';
+import type { NpcState, NpcWorldState } from './state';
 
 /** NPC — личность, которая живёт в теле-акторе */
 export interface INpc {
@@ -58,6 +57,18 @@ export interface IActorNpcRegistry {
 
   /** Возвращает NPC, чьим телом является актор */
   getNpc(actor: IActor): INpc | undefined;
+}
+
+/**
+ * То, что NPC знает о мире. NPC объявляет, какое знание ему нужно, а реализует его мир, поэтому NPC
+ * не зависит от мира
+ */
+export interface INpcWorldKnowledge {
+  /** Возвращает то, что NPC знает о мире */
+  getState(): NpcWorldState;
+
+  /** Возвращает NPC, которых видит target в радиусе radius */
+  getVisibleNpcs(target: INpc, radius: number): INpc[];
 }
 
 /** Зависимости NPC */

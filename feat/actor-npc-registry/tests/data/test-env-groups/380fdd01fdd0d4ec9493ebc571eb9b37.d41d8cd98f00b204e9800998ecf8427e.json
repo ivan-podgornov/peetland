@@ -1,1 +1,0 @@
-{"id":"380fdd01fdd0d4ec9493ebc571eb9b37.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/game/__tests__/actor-registry/get-all.spec.ts#ActorRegistry #getAll Возвращает копию: изменение результата не влияет на реестр","name":"Возвращает копию: изменение результата не влияет на реестр","status":"passed","testResultsByEnv":{"default":"b009bf4bba9878a8b06a76c0014736ba"}}

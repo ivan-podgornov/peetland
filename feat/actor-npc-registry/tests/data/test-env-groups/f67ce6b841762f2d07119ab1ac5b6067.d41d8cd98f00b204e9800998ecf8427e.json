@@ -1,1 +1,0 @@
-{"id":"f67ce6b841762f2d07119ab1ac5b6067.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/perception/__tests__/vision-system/fov.spec.ts#VisionSystem #getVisibleActors — угол зрения Не возвращает акторов вне области видимости","name":"Не возвращает акторов вне области видимости","status":"passed","testResultsByEnv":{"default":"6f0075d9c4c6157c09b2edff978758d9"}}

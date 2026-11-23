@@ -8437,7 +8437,7 @@ function ActorNpcRegistry.prototype.register(self, actor, npc)
 end
 function ActorNpcRegistry.prototype.getActor(self, npc)
     local actor = self.npcToActor:get(npc)
-    if actor == nil then
+    if not actor then
         error(
             __TS__New(Error, "NPC не в реестре"),
             0
@@ -8447,16 +8447,13 @@ function ActorNpcRegistry.prototype.getActor(self, npc)
 end
 function ActorNpcRegistry.prototype.getNpc(self, actor)
     local npc = self.actorToNpc:get(actor)
-    if npc == nil then
+    if not npc then
         error(
             __TS__New(Error, "У актора нет NPC в реестре"),
             0
         )
     end
     return npc
-end
-function ActorNpcRegistry.prototype.hasNpc(self, actor)
-    return self.actorToNpc:has(actor)
 end
 return ____exports
  end,
@@ -8608,7 +8605,6 @@ return ____exports
 ["core.world.src.npc-world-knowledge"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
 --- Знание NPC о мире, которое мир собирает из своих источников
@@ -8629,10 +8625,7 @@ function NpcWorldKnowledge.prototype.getVisibleNpcs(self, target, radius)
     local game = ____self_deps_1.game
     local actor = actorNpcRegistry:getActor(target)
     return __TS__ArrayMap(
-        __TS__ArrayFilter(
-            game:getVisibleActors(actor, radius),
-            function(____, visibleActor) return actorNpcRegistry:hasNpc(visibleActor) end
-        ),
+        game:getVisibleActors(actor, radius),
         function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
     )
 end

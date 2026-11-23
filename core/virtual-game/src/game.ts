@@ -4,6 +4,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import { ActorRegistry } from '@peetland/game';
 import type {
   GameEvents,
+  IActor,
   IActorFactory,
   IActorRegistry,
   IGame,
@@ -11,6 +12,8 @@ import type {
 } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
+import { AlwaysClearLos, VisionSystemFactory } from '@peetland/perception';
+import type { ILosProvider, IVisionSystem, IVisionSystemFactory } from '@peetland/perception';
 import { ManualTime, ManualTimer } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 import { VIRTUAL_ANIMATIONS, VirtualActorFactory } from '@peetland/virtual-actor';
@@ -31,6 +34,10 @@ export type VirtualGameDeps = {
   actorFactory?: IActorFactory;
   /** Реестр акторов игры. По умолчанию — ActorRegistry */
   actorRegistry?: IActorRegistry;
+  /** Провайдер прямой видимости для системы зрения. По умолчанию — AlwaysClearLos: виртуальный мир прозрачен */
+  los?: ILosProvider;
+  /** Фабрика системы зрения. По умолчанию — VisionSystemFactory из @peetland/perception */
+  visionSystemFactory?: IVisionSystemFactory;
 };
 
 /** Игра, которая хранит весь мир в памяти. Время игры двигается вручную */
@@ -44,6 +51,7 @@ export class VirtualGame implements IGame {
   private readonly timer: ManualTimer;
   private readonly tickEvents: EventTarget<GameEvents>;
   private readonly terminateController: AbortController;
+  private readonly vision: IVisionSystem;
 
   constructor(deps: VirtualGameDeps = {}) {
     this.terminateController = new AbortController();
@@ -73,6 +81,11 @@ export class VirtualGame implements IGame {
         geometry: this.geometry,
         timer: this.timer,
       });
+    this.vision = (deps.visionSystemFactory ?? new VisionSystemFactory()).create({
+      registry: actorRegistry,
+      los: deps.los ?? new AlwaysClearLos(),
+      geometry: this.geometry,
+    });
   }
 
   /** Прерывает сигнал игры: кто что создал в игре, тот по этому сигналу это и убирает */
@@ -90,5 +103,9 @@ export class VirtualGame implements IGame {
    */
   advanceTime(ms: number): void {
     this.timer.advance(ms);
+  }
+
+  getVisibleActors(target: IActor, radius: number): IActor[] {
+    return this.vision.getVisibleActors(target, radius);
   }
 }

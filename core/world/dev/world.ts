@@ -27,6 +27,7 @@ export function createGame(game: Partial<IGame> = {}): IGame {
     },
     ticks: createControlledObservable().observable,
     signal: new AbortController().signal,
+    getVisibleActors: vi.fn(() => []),
     ...game,
   };
 }

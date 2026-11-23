@@ -2,7 +2,7 @@ import { AnimationManager } from '@peetland/animation-manager';
 import { AbortController, EventTarget } from '@peetland/events';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import { ActorRegistry } from '@peetland/game';
-import type { GameEvents, IActorFactory, IGame } from '@peetland/game';
+import type { GameEvents, IActor, IActorFactory, IGame } from '@peetland/game';
 import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
 import type { ILogger } from '@peetland/logger';
@@ -82,5 +82,10 @@ export class GtaGame implements IGame {
 
   get signal(): IAbortSignal {
     return this.terminateController.signal;
+  }
+
+  getVisibleActors(): IActor[] {
+    // Ждёт обёртку натива прямой видимости в @peetland/moonloader
+    throw new Error('getVisibleActors is not implemented yet for this game');
   }
 }

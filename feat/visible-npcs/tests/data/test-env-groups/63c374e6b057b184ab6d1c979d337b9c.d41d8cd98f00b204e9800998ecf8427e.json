@@ -1,1 +1,0 @@
-{"id":"63c374e6b057b184ab6d1c979d337b9c.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/remove-item-task.spec.ts#RemoveItemTask #canExecute Если предмета в состоянии хватает, возвращает true","name":"Если предмета в состоянии хватает, возвращает true","status":"passed","testResultsByEnv":{"default":"f53f11a0bb88b7eb723b2242a2e0e57f"}}

@@ -6255,7 +6255,8 @@ function GtaGame.prototype.____constructor(self, deps)
     self.geometry = __TS__New(Geometry)
     self.objectFactory = __TS__New(GtaObjectFactory)
     local actorRegistry = __TS__New(ActorRegistry)
-    self.vision = __TS__New(VisionSystemFactory):create({
+    local visionSystemFactory = deps.visionSystemFactory or __TS__New(VisionSystemFactory)
+    self.vision = visionSystemFactory:create({
         registry = actorRegistry,
         los = deps.los or __TS__New(GtaLosProvider),
         geometry = self.geometry
@@ -6311,10 +6312,6 @@ end
 do
     local ____logger = require("gta-sa.src.logger")
     ____exports.GtaLogger = ____logger.GtaLogger
-end
-do
-    local ____los = require("gta-sa.src.los")
-    ____exports.GtaLosProvider = ____los.GtaLosProvider
 end
 do
     local ____export = require("gta-sa.src.object.index")

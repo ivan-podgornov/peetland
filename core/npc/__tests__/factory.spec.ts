@@ -16,7 +16,12 @@ import { createMockedPsycheFactory } from '@peetland/psyche/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
+import {
+  createMockedActorNpcRegistry,
+  createMockedNpcWorldKnowledge,
+  createNpcData,
+  createNpcDeps,
+} from '../dev';
 import { Npc, NpcFactory } from '../src';
 import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 
@@ -24,6 +29,7 @@ import type { NpcContext, NpcFactoryDeps, NpcState } from '../src';
 function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFactoryDeps {
   return {
     actorFactory: createMockedActorFactory(),
+    actorNpcRegistry: createMockedActorNpcRegistry(),
     ticks: createControlledObservable().observable,
     rootTaskFactory: {
       create: vi.fn(() => ({

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@peetland/addictions-tasks": "0.0.0",
+    "@peetland/events": "0.0.0",
     "@peetland/game": "0.0.0",
     "@peetland/geometry": "0.0.0",
     "@peetland/homeless": "0.0.0",
@@ -24,7 +25,6 @@
   },
   "devDependencies": {
     "@peetland/addictions": "0.0.0",
-    "@peetland/events": "0.0.0",
     "@peetland/htn": "0.0.0",
     "@peetland/inventory": "0.0.0",
     "@peetland/npc-tasks": "0.0.0",

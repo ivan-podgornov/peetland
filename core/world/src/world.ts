@@ -1,6 +1,12 @@
 import type { IGame } from '@peetland/game';
 import { NpcFactory } from '@peetland/npc';
-import type { INpcFactory, INpcWorldKnowledge, IRootTaskFactory, NpcData } from '@peetland/npc';
+import type {
+  IActorNpcRegistry,
+  INpcFactory,
+  INpcWorldKnowledge,
+  IRootTaskFactory,
+  NpcData,
+} from '@peetland/npc';
 import { PlacesFactory } from '@peetland/places';
 import type { IPlacesFactory, PlaceData } from '@peetland/places';
 import { PsycheFactory } from '@peetland/psyche';
@@ -11,6 +17,7 @@ import type { IRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
 import type { ITimer } from '@peetland/timings';
 
+import { ActorNpcRegistry } from './actor-npc-registry';
 import { NpcWorldKnowledge } from './npc-world-knowledge';
 import { RootTaskFactory } from './root-task-factory';
 
@@ -40,6 +47,8 @@ export type WorldDeps = {
   worldKnowledge: INpcWorldKnowledge;
   /** Фабрика, которой мир создаёт NPC */
   npcFactory: INpcFactory;
+  /** Реестр, в котором NPC связывают своих акторов с собой */
+  actorNpcRegistry: IActorNpcRegistry;
 };
 
 export class World {
@@ -63,6 +72,7 @@ export class World {
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry: game.geometry }),
       worldKnowledge = new NpcWorldKnowledge({ time: game.time }),
+      actorNpcRegistry = new ActorNpcRegistry(),
     } = this.deps;
     const worldPlaces = placesFactory.create({ places: await places.getAll() });
     const {
@@ -74,6 +84,7 @@ export class World {
       }),
       npcFactory = new NpcFactory({
         actorFactory: game.actorFactory,
+        actorNpcRegistry,
         ticks: game.ticks,
         psycheFactory,
         rootTaskFactory,

@@ -11,8 +11,7 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import type { NpcKind } from './kind';
 import type { NpcState } from './state';
-import type { INpc, NpcDeps } from './types';
-import type { INpcWorldKnowledge } from './world-knowledge';
+import type { INpc, INpcWorldKnowledge, NpcDeps } from './types';
 
 /** NPC склеивает свои данные, актора и HTN-агента */
 export class Npc implements INpc {

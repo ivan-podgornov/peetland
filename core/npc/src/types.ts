@@ -9,8 +9,7 @@ import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 import type { NpcContext } from './context';
 import type { NpcKind } from './kind';
 import type { IRootTaskFactory } from './root-task-factory';
-import type { NpcState } from './state';
-import type { INpcWorldKnowledge } from './world-knowledge';
+import type { NpcState, NpcWorldState } from './state';
 
 /** NPC — личность, которая живёт в теле-акторе */
 export interface INpc {
@@ -53,11 +52,29 @@ export interface IActorNpcRegistry {
   /** Связывает актора с NPC и убирает связь, когда сигнал жизни NPC прерван */
   register(actor: IActor, npc: INpc): void;
 
-  /** Возвращает актора, который является телом NPC */
-  getActor(npc: INpc): IActor | undefined;
+  /**
+   * Возвращает актора, который является телом NPC. Бросает ошибку, если NPC не в реестре: это
+   * ошибка вызывающего кода
+   */
+  getActor(npc: INpc): IActor;
 
-  /** Возвращает NPC, чьим телом является актор */
-  getNpc(actor: IActor): INpc | undefined;
+  /**
+   * Возвращает NPC, чьим телом является актор. Бросает ошибку, если у актора нет NPC: это
+   * ошибка вызывающего кода
+   */
+  getNpc(actor: IActor): INpc;
+}
+
+/**
+ * То, что NPC знает о мире. NPC объявляет, какое знание ему нужно, а реализует его мир, поэтому NPC
+ * не зависит от мира
+ */
+export interface INpcWorldKnowledge {
+  /** Возвращает то, что NPC знает о мире */
+  getState(): NpcWorldState;
+
+  /** Возвращает NPC, которых видит target в радиусе radius */
+  getVisibleNpcs(target: INpc, radius: number): INpc[];
 }
 
 /** Зависимости NPC */

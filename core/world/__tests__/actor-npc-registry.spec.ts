@@ -16,11 +16,11 @@ describe('ActorNpcRegistry', () => {
       expect(registry.getActor(npc)).toBe(actor);
     });
 
-    it('Для NPC вне реестра возвращает undefined', () => {
+    it('Бросает ошибку, когда NPC не в реестре', () => {
       const registry = new ActorNpcRegistry();
       const npc = new Npc(createNpcData(), createNpcDeps());
 
-      expect(registry.getActor(npc)).toBeUndefined();
+      expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
     });
   });
 
@@ -34,11 +34,11 @@ describe('ActorNpcRegistry', () => {
       expect(registry.getNpc(actor)).toBe(npc);
     });
 
-    it('Для актора вне реестра возвращает undefined', () => {
+    it('Бросает ошибку, когда у актора нет NPC в реестре', () => {
       const registry = new ActorNpcRegistry();
       const actor = createActor();
 
-      expect(registry.getNpc(actor)).toBeUndefined();
+      expect(() => registry.getNpc(actor)).toThrow('У актора нет NPC в реестре');
     });
   });
 
@@ -56,8 +56,8 @@ describe('ActorNpcRegistry', () => {
 
       npc.despawn();
 
-      expect(registry.getActor(npc)).toBeUndefined();
-      expect(registry.getNpc(actor)).toBeUndefined();
+      expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
+      expect(() => registry.getNpc(actor)).toThrow('У актора нет NPC в реестре');
     });
   });
 });

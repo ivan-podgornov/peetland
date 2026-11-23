@@ -25,9 +25,6 @@ export interface IGame {
    */
   readonly signal: IAbortSignal;
 
-  /**
-   * Возвращает акторов, которых видит target в радиусе radius: в секторе его зрения и без
-   * препятствий на прямой между ними. Сам target и деспавненные акторы не возвращаются
-   */
+  /** Возвращает акторов, которых видит target в радиусе radius */
   getVisibleActors(target: IActor, radius: number): IActor[];
 }

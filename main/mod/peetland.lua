@@ -8214,10 +8214,16 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
+["core.npc.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
 ["core.npc.src.npc"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____events = require("toolkit.events.src.index")
 local AbortController = ____events.AbortController
@@ -8228,6 +8234,7 @@ Npc.name = "Npc"
 function Npc.prototype.____constructor(self, data, deps)
     local ____deps_0 = deps
     local actorFactory = ____deps_0.actorFactory
+    local actorNpcRegistry = ____deps_0.actorNpcRegistry
     local ticks = ____deps_0.ticks
     local htnFactory = ____deps_0.htnFactory
     local inventoryFactory = ____deps_0.inventoryFactory
@@ -8250,6 +8257,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.urgencyWatcher = urgencyWatcherFactory:create()
     self.lifetime = __TS__New(AbortController)
     self.actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
+    actorNpcRegistry:register(self.actor, self)
     self.context = {
         actor = self.actor,
         inventory = self.inventory,
@@ -8300,6 +8308,14 @@ function Npc.prototype.despawn(self)
     self.htn:stop(self.context)
     self.actor:despawn()
 end
+__TS__SetDescriptor(
+    Npc.prototype,
+    "signal",
+    {get = function(self)
+        return self.lifetime.signal
+    end},
+    true
+)
 return ____exports
  end,
 ["core.npc.src.factory"] = function(...) 
@@ -8326,6 +8342,7 @@ NpcFactory.name = "NpcFactory"
 function NpcFactory.prototype.____constructor(self, deps)
     local ____deps_0 = deps
     local actorFactory = ____deps_0.actorFactory
+    local actorNpcRegistry = ____deps_0.actorNpcRegistry
     local ticks = ____deps_0.ticks
     local rootTaskFactory = ____deps_0.rootTaskFactory
     local gameSignal = ____deps_0.gameSignal
@@ -8356,6 +8373,7 @@ function NpcFactory.prototype.____constructor(self, deps)
     end
     self.deps = {
         actorFactory = actorFactory,
+        actorNpcRegistry = actorNpcRegistry,
         ticks = ticks,
         htnFactory = htnFactory,
         inventoryFactory = inventoryFactory,
@@ -8387,6 +8405,40 @@ end
 do
     local ____npc = require("core.npc.src.npc")
     ____exports.Npc = ____npc.Npc
+end
+return ____exports
+ end,
+["core.world.src.actor-npc-registry"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local Map = ____lualib.Map
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+--- Реестр связей «актор ↔ NPC»: тело ↔ личность
+____exports.ActorNpcRegistry = __TS__Class()
+local ActorNpcRegistry = ____exports.ActorNpcRegistry
+ActorNpcRegistry.name = "ActorNpcRegistry"
+function ActorNpcRegistry.prototype.____constructor(self)
+    self.npcToActor = __TS__New(Map)
+    self.actorToNpc = __TS__New(Map)
+end
+function ActorNpcRegistry.prototype.register(self, actor, npc)
+    self.npcToActor:set(npc, actor)
+    self.actorToNpc:set(actor, npc)
+    npc.signal:addEventListener(
+        "abort",
+        function()
+            self.npcToActor:delete(npc)
+            self.actorToNpc:delete(actor)
+        end,
+        {once = true}
+    )
+end
+function ActorNpcRegistry.prototype.getActor(self, npc)
+    return self.npcToActor:get(npc)
+end
+function ActorNpcRegistry.prototype.getNpc(self, actor)
+    return self.actorToNpc:get(actor)
 end
 return ____exports
  end,
@@ -10474,6 +10526,8 @@ local ____random = require("toolkit.random.src.index")
 local Random = ____random.Random
 local ____timings = require("toolkit.timings.src.index")
 local Timer = ____timings.Timer
+local ____actor_2Dnpc_2Dregistry = require("core.world.src.actor-npc-registry")
+local ActorNpcRegistry = ____actor_2Dnpc_2Dregistry.ActorNpcRegistry
 local ____npc_2Dworld_2Dknowledge = require("core.world.src.npc-world-knowledge")
 local NpcWorldKnowledge = ____npc_2Dworld_2Dknowledge.NpcWorldKnowledge
 local ____root_2Dtask_2Dfactory = require("core.world.src.root-task-factory")
@@ -10515,6 +10569,10 @@ function World.prototype.bigBang(self)
         if worldKnowledge == nil then
             worldKnowledge = __TS__New(NpcWorldKnowledge, {time = game.time})
         end
+        local actorNpcRegistry = ____self_deps_1.actorNpcRegistry
+        if actorNpcRegistry == nil then
+            actorNpcRegistry = __TS__New(ActorNpcRegistry)
+        end
         local worldPlaces = placesFactory:create({places = __TS__Await(places:getAll())})
         local ____self_deps_2 = self.deps
         local rootTaskFactory = ____self_deps_2.rootTaskFactory
@@ -10525,6 +10583,7 @@ function World.prototype.bigBang(self)
         if npcFactory == nil then
             npcFactory = __TS__New(NpcFactory, {
                 actorFactory = game.actorFactory,
+                actorNpcRegistry = actorNpcRegistry,
                 ticks = game.ticks,
                 psycheFactory = psycheFactory,
                 rootTaskFactory = rootTaskFactory,
@@ -10542,6 +10601,10 @@ return ____exports
 ["core.world.src.index"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
+do
+    local ____actor_2Dnpc_2Dregistry = require("core.world.src.actor-npc-registry")
+    ____exports.ActorNpcRegistry = ____actor_2Dnpc_2Dregistry.ActorNpcRegistry
+end
 do
     local ____world = require("core.world.src.world")
     ____exports.World = ____world.World

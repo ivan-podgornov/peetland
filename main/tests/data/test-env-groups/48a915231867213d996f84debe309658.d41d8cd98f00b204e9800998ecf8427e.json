@@ -1,0 +1,1 @@
+{"id":"48a915231867213d996f84debe309658.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/actor-npc-registry.spec.ts#ActorNpcRegistry #getActor Для NPC вне реестра возвращает undefined","name":"Для NPC вне реестра возвращает undefined","status":"passed","testResultsByEnv":{"default":"86591a1439d34d5cf3c2a9959562785e"}}

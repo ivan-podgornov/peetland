@@ -14,6 +14,12 @@ import type { INpcWorldKnowledge } from './world-knowledge';
 
 /** NPC — личность, которая живёт в теле-акторе */
 export interface INpc {
+  /**
+   * Сигнал жизни NPC. Пока NPC жив, сигнал в состоянии pending. despawn переводит его в состояние
+   * aborted, и после этого NPC больше не пользуются
+   */
+  readonly signal: IAbortSignal;
+
   /** Уникальный идентификатор NPC */
   readonly id: string;
 
@@ -44,8 +50,8 @@ export interface INpc {
 
 /** Реестр связей «актор ↔ NPC»: тело ↔ личность */
 export interface IActorNpcRegistry {
-  /** Связывает актора с NPC и убирает связь, когда сигнал прерван */
-  register(actor: IActor, npc: INpc, signal: IAbortSignal): void;
+  /** Связывает актора с NPC и убирает связь, когда сигнал жизни NPC прерван */
+  register(actor: IActor, npc: INpc): void;
 
   /** Возвращает актора, который является телом NPC */
   getActor(npc: INpc): IActor | undefined;

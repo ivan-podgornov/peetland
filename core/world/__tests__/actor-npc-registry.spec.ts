@@ -1,4 +1,3 @@
-import { AbortController } from '@peetland/events';
 import { Npc } from '@peetland/npc';
 import { createNpcData, createNpcDeps } from '@peetland/npc/dev';
 import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
@@ -12,7 +11,7 @@ describe('ActorNpcRegistry', () => {
       const registry = new ActorNpcRegistry();
       const npc = new Npc(createNpcData(), createNpcDeps());
       const actor = createActor();
-      registry.register(actor, npc, new AbortController().signal);
+      registry.register(actor, npc);
 
       expect(registry.getActor(npc)).toBe(actor);
     });
@@ -30,7 +29,7 @@ describe('ActorNpcRegistry', () => {
       const registry = new ActorNpcRegistry();
       const npc = new Npc(createNpcData(), createNpcDeps());
       const actor = createActor();
-      registry.register(actor, npc, new AbortController().signal);
+      registry.register(actor, npc);
 
       expect(registry.getNpc(actor)).toBe(npc);
     });
@@ -44,19 +43,6 @@ describe('ActorNpcRegistry', () => {
   });
 
   describe('#register', () => {
-    it('Когда сигнал прерван, убирает связь', () => {
-      const registry = new ActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps());
-      const actor = createActor();
-      const lifetime = new AbortController();
-      registry.register(actor, npc, lifetime.signal);
-
-      lifetime.abort();
-
-      expect(registry.getActor(npc)).toBeUndefined();
-      expect(registry.getNpc(actor)).toBeUndefined();
-    });
-
     it('Когда NPC деспавнится, убирает связь', () => {
       const registry = new ActorNpcRegistry();
       const actor = createActor();

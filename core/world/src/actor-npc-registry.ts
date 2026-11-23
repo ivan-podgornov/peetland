@@ -1,4 +1,3 @@
-import type { IAbortSignal } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { IActorNpcRegistry, INpc } from '@peetland/npc';
 
@@ -7,11 +6,11 @@ export class ActorNpcRegistry implements IActorNpcRegistry {
   private readonly npcToActor = new Map<INpc, IActor>();
   private readonly actorToNpc = new Map<IActor, INpc>();
 
-  register(actor: IActor, npc: INpc, signal: IAbortSignal): void {
+  register(actor: IActor, npc: INpc): void {
     this.npcToActor.set(npc, actor);
     this.actorToNpc.set(actor, npc);
 
-    signal.addEventListener(
+    npc.signal.addEventListener(
       'abort',
       () => {
         this.npcToActor.delete(npc);

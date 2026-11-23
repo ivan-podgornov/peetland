@@ -1,5 +1,6 @@
 import type { IAddictions } from '@peetland/addictions';
 import { AbortController } from '@peetland/events';
+import type { IAbortSignal } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { IHTN } from '@peetland/htn';
 import type { Inventory } from '@peetland/inventory';
@@ -21,6 +22,7 @@ export class Npc implements INpc {
   readonly psyche: IPsyche;
   readonly needs: INeeds;
   readonly addictions: IAddictions;
+  readonly signal: IAbortSignal;
 
   private readonly actor: IActor;
   private readonly context: NpcContext;
@@ -62,12 +64,13 @@ export class Npc implements INpc {
     this.addictions = addictionsFactory.create(data.addictions, time);
     this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
+    this.signal = this.lifetime.signal;
     this.actor = actorFactory.create({
       modelId: data.modelId,
       position: data.spawnPosition,
       angle: data.spawnAngle,
     });
-    actorNpcRegistry.register(this.actor, this, this.lifetime.signal);
+    actorNpcRegistry.register(this.actor, this);
     this.context = {
       actor: this.actor,
       inventory: this.inventory,

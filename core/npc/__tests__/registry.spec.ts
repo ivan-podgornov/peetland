@@ -18,11 +18,7 @@ describe('Npc', () => {
         })
       );
 
-      expect(actorNpcRegistry.register).toHaveBeenCalledExactlyOnceWith(
-        actor,
-        npc,
-        expect.anything()
-      );
+      expect(actorNpcRegistry.register).toHaveBeenCalledExactlyOnceWith(actor, npc);
     });
   });
 });

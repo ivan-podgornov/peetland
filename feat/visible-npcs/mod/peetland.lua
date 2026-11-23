@@ -8408,6 +8408,12 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
 local ____exports = {}
 --- Реестр связей «актор ↔ NPC»: тело ↔ личность
 ____exports.ActorNpcRegistry = __TS__Class()
@@ -8430,10 +8436,27 @@ function ActorNpcRegistry.prototype.register(self, actor, npc)
     )
 end
 function ActorNpcRegistry.prototype.getActor(self, npc)
-    return self.npcToActor:get(npc)
+    local actor = self.npcToActor:get(npc)
+    if actor == nil then
+        error(
+            __TS__New(Error, "NPC не в реестре"),
+            0
+        )
+    end
+    return actor
 end
 function ActorNpcRegistry.prototype.getNpc(self, actor)
-    return self.actorToNpc:get(actor)
+    local npc = self.actorToNpc:get(actor)
+    if npc == nil then
+        error(
+            __TS__New(Error, "У актора нет NPC в реестре"),
+            0
+        )
+    end
+    return npc
+end
+function ActorNpcRegistry.prototype.hasNpc(self, actor)
+    return self.actorToNpc:has(actor)
 end
 return ____exports
  end,
@@ -8585,8 +8608,8 @@ return ____exports
 ["core.world.src.npc-world-knowledge"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
-local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
 --- Знание NPC о мире, которое мир собирает из своих источников
 ____exports.NpcWorldKnowledge = __TS__Class()
@@ -8605,15 +8628,12 @@ function NpcWorldKnowledge.prototype.getVisibleNpcs(self, target, radius)
     local actorNpcRegistry = ____self_deps_1.actorNpcRegistry
     local game = ____self_deps_1.game
     local actor = actorNpcRegistry:getActor(target)
-    if actor == nil then
-        return {}
-    end
-    return __TS__ArrayFilter(
-        __TS__ArrayMap(
+    return __TS__ArrayMap(
+        __TS__ArrayFilter(
             game:getVisibleActors(actor, radius),
-            function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
+            function(____, visibleActor) return actorNpcRegistry:hasNpc(visibleActor) end
         ),
-        function(____, npc) return npc ~= nil end
+        function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
     )
 end
 return ____exports

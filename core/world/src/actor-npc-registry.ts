@@ -1,7 +1,7 @@
 import type { IActor } from '@peetland/game';
 import type { IActorNpcRegistry, INpc } from '@peetland/npc';
 
-/** Реестр связей «актор ↔ NPC»: две мапы, перевод в обе стороны за O(1) */
+/** Реестр связей «актор ↔ NPC»: тело ↔ личность */
 export class ActorNpcRegistry implements IActorNpcRegistry {
   private readonly npcToActor = new Map<INpc, IActor>();
   private readonly actorToNpc = new Map<IActor, INpc>();

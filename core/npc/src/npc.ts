@@ -22,7 +22,6 @@ export class Npc implements INpc {
   readonly psyche: IPsyche;
   readonly needs: INeeds;
   readonly addictions: IAddictions;
-  readonly signal: IAbortSignal;
 
   private readonly actor: IActor;
   private readonly context: NpcContext;
@@ -64,7 +63,6 @@ export class Npc implements INpc {
     this.addictions = addictionsFactory.create(data.addictions, time);
     this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
-    this.signal = this.lifetime.signal;
     this.actor = actorFactory.create({
       modelId: data.modelId,
       position: data.spawnPosition,
@@ -91,6 +89,10 @@ export class Npc implements INpc {
       once: true,
       signal: this.lifetime.signal,
     });
+  }
+
+  get signal(): IAbortSignal {
+    return this.lifetime.signal;
   }
 
   /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */

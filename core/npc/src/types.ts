@@ -52,11 +52,20 @@ export interface IActorNpcRegistry {
   /** Связывает актора с NPC и убирает связь, когда сигнал жизни NPC прерван */
   register(actor: IActor, npc: INpc): void;
 
-  /** Возвращает актора, который является телом NPC */
-  getActor(npc: INpc): IActor | undefined;
+  /**
+   * Возвращает актора, который является телом NPC. Бросает ошибку, если NPC не в реестре: это
+   * ошибка вызывающего кода
+   */
+  getActor(npc: INpc): IActor;
 
-  /** Возвращает NPC, чьим телом является актор */
-  getNpc(actor: IActor): INpc | undefined;
+  /**
+   * Возвращает NPC, чьим телом является актор. Бросает ошибку, если у актора нет NPC: это
+   * ошибка вызывающего кода
+   */
+  getNpc(actor: IActor): INpc;
+
+  /** Говорит, есть ли у актора личность в реестре */
+  hasNpc(actor: IActor): boolean;
 }
 
 /**

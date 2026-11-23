@@ -20,11 +20,27 @@ export class ActorNpcRegistry implements IActorNpcRegistry {
     );
   }
 
-  getActor(npc: INpc): IActor | undefined {
-    return this.npcToActor.get(npc);
+  getActor(npc: INpc): IActor {
+    const actor = this.npcToActor.get(npc);
+
+    if (actor === undefined) {
+      throw new Error('NPC не в реестре');
+    }
+
+    return actor;
   }
 
-  getNpc(actor: IActor): INpc | undefined {
-    return this.actorToNpc.get(actor);
+  getNpc(actor: IActor): INpc {
+    const npc = this.actorToNpc.get(actor);
+
+    if (npc === undefined) {
+      throw new Error('У актора нет NPC в реестре');
+    }
+
+    return npc;
+  }
+
+  hasNpc(actor: IActor): boolean {
+    return this.actorToNpc.has(actor);
   }
 }

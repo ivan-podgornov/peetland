@@ -16,11 +16,11 @@ describe('ActorNpcRegistry', () => {
       expect(registry.getActor(npc)).toBe(actor);
     });
 
-    it('Для NPC вне реестра возвращает undefined', () => {
+    it('Бросает ошибку, когда NPC не в реестре', () => {
       const registry = new ActorNpcRegistry();
       const npc = new Npc(createNpcData(), createNpcDeps());
 
-      expect(registry.getActor(npc)).toBeUndefined();
+      expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
     });
   });
 
@@ -34,11 +34,39 @@ describe('ActorNpcRegistry', () => {
       expect(registry.getNpc(actor)).toBe(npc);
     });
 
-    it('Для актора вне реестра возвращает undefined', () => {
+    it('Бросает ошибку, когда у актора нет NPC в реестре', () => {
       const registry = new ActorNpcRegistry();
       const actor = createActor();
 
-      expect(registry.getNpc(actor)).toBeUndefined();
+      expect(() => registry.getNpc(actor)).toThrow('У актора нет NPC в реестре');
+    });
+  });
+
+  describe('#hasNpc', () => {
+    it('Говорит, есть ли у актора личность в реестре', () => {
+      const registry = new ActorNpcRegistry();
+      const npc = new Npc(createNpcData(), createNpcDeps());
+      const actor = createActor();
+      registry.register(actor, npc);
+
+      expect(registry.hasNpc(actor)).toBe(true);
+      expect(registry.hasNpc(createActor())).toBe(false);
+    });
+
+    it('Когда NPC деспавнится, личности у актора больше нет', () => {
+      const registry = new ActorNpcRegistry();
+      const actor = createActor();
+      const npc = new Npc(
+        createNpcData(),
+        createNpcDeps({
+          actorNpcRegistry: registry,
+          actorFactory: createMockedActorFactory(actor),
+        })
+      );
+
+      npc.despawn();
+
+      expect(registry.hasNpc(actor)).toBe(false);
     });
   });
 
@@ -56,8 +84,8 @@ describe('ActorNpcRegistry', () => {
 
       npc.despawn();
 
-      expect(registry.getActor(npc)).toBeUndefined();
-      expect(registry.getNpc(actor)).toBeUndefined();
+      expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
+      expect(() => registry.getNpc(actor)).toThrow('У актора нет NPC в реестре');
     });
   });
 });

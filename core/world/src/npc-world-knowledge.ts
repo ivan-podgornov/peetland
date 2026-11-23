@@ -31,13 +31,9 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
     const { actorNpcRegistry, game } = this.deps;
     const actor = actorNpcRegistry.getActor(target);
 
-    if (actor === undefined) {
-      return [];
-    }
-
     return game
       .getVisibleActors(actor, radius)
-      .map((visibleActor) => actorNpcRegistry.getNpc(visibleActor))
-      .filter((npc) => npc !== undefined);
+      .filter((visibleActor) => actorNpcRegistry.hasNpc(visibleActor))
+      .map((visibleActor) => actorNpcRegistry.getNpc(visibleActor));
   }
 }

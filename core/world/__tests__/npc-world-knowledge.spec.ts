@@ -48,7 +48,7 @@ describe('NpcWorldKnowledge', () => {
         actorNpcRegistry,
       });
 
-      expect(knowledge.getVisibleNpcs(npc, 10)).toEqual([visibleNpc]);
+      expect(knowledge.getVisibleNpcs(npc, 10)).toStrictEqual([visibleNpc]);
       expect(game.getVisibleActors).toHaveBeenCalledExactlyOnceWith(actor, 10);
     });
 
@@ -68,15 +68,15 @@ describe('NpcWorldKnowledge', () => {
         actorNpcRegistry,
       });
 
-      expect(knowledge.getVisibleNpcs(npc, 10)).toEqual([]);
+      expect(knowledge.getVisibleNpcs(npc, 10)).toStrictEqual([]);
     });
 
-    it('Когда у target нет актора в реестре, возвращает пустой массив', () => {
-      const actorNpcRegistry = createMockedActorNpcRegistry();
+    it('Бросает ошибку, когда target не в реестре', () => {
+      const actorNpcRegistry = new ActorNpcRegistry();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          actorNpcRegistry,
+          actorNpcRegistry: createMockedActorNpcRegistry(),
           actorFactory: createMockedActorFactory(createActor()),
         })
       );
@@ -87,7 +87,7 @@ describe('NpcWorldKnowledge', () => {
         actorNpcRegistry,
       });
 
-      expect(knowledge.getVisibleNpcs(npc, 10)).toEqual([]);
+      expect(() => knowledge.getVisibleNpcs(npc, 10)).toThrow('NPC не в реестре');
       expect(game.getVisibleActors).not.toHaveBeenCalled();
     });
   });

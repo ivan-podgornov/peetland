@@ -5,7 +5,6 @@ import type {
   INpcFactory,
   INpcWorldKnowledge,
   IRootTaskFactory,
-  Npc,
   NpcData,
 } from '@peetland/npc';
 import { PlacesFactory } from '@peetland/places';
@@ -49,7 +48,7 @@ export type WorldDeps = {
   /** Фабрика, которой мир создаёт NPC */
   npcFactory: INpcFactory;
   /** Реестр, в котором NPC связывают своих акторов с собой */
-  actorNpcRegistry: IActorNpcRegistry<Npc>;
+  actorNpcRegistry: IActorNpcRegistry;
 };
 
 export class World {

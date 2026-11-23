@@ -1,13 +1,13 @@
 import type { IAbortSignal } from '@peetland/events';
 import type { IActor } from '@peetland/game';
-import type { IActorNpcRegistry, Npc } from '@peetland/npc';
+import type { IActorNpcRegistry, INpc } from '@peetland/npc';
 
 /** Реестр связей «актор ↔ NPC»: две мапы, перевод в обе стороны за O(1) */
-export class ActorNpcRegistry implements IActorNpcRegistry<Npc> {
-  private readonly npcToActor = new Map<Npc, IActor>();
-  private readonly actorToNpc = new Map<IActor, Npc>();
+export class ActorNpcRegistry implements IActorNpcRegistry {
+  private readonly npcToActor = new Map<INpc, IActor>();
+  private readonly actorToNpc = new Map<IActor, INpc>();
 
-  register(actor: IActor, npc: Npc, signal: IAbortSignal): void {
+  register(actor: IActor, npc: INpc, signal: IAbortSignal): void {
     this.npcToActor.set(npc, actor);
     this.actorToNpc.set(actor, npc);
 
@@ -21,11 +21,11 @@ export class ActorNpcRegistry implements IActorNpcRegistry<Npc> {
     );
   }
 
-  getActor(npc: Npc): IActor | undefined {
+  getActor(npc: INpc): IActor | undefined {
     return this.npcToActor.get(npc);
   }
 
-  getNpc(actor: IActor): Npc | undefined {
+  getNpc(actor: IActor): INpc | undefined {
     return this.actorToNpc.get(actor);
   }
 }

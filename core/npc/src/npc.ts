@@ -10,14 +10,11 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import type { NpcKind } from './kind';
 import type { NpcState } from './state';
-import type { INpcDeps } from './types';
+import type { INpc, NpcDeps } from './types';
 import type { INpcWorldKnowledge } from './world-knowledge';
 
-/** Зависимости NPC */
-export type NpcDeps = INpcDeps<Npc>;
-
 /** NPC склеивает свои данные, актора и HTN-агента */
-export class Npc {
+export class Npc implements INpc {
   readonly id: string;
   readonly kind: NpcKind;
   readonly inventory: Inventory;

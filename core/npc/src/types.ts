@@ -1,35 +1,66 @@
-import type { IAddictionsFactory } from '@peetland/addictions';
+import type { IAddictions, IAddictionsFactory } from '@peetland/addictions';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor, IActorFactory } from '@peetland/game';
 import type { IHTNFactory } from '@peetland/htn';
-import type { IInventoryFactory } from '@peetland/inventory';
-import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
-import type { IPsycheFactory } from '@peetland/psyche';
+import type { Inventory, IInventoryFactory } from '@peetland/inventory';
+import type { INeeds, INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
+import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
+import type { NpcKind } from './kind';
 import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState } from './state';
 import type { INpcWorldKnowledge } from './world-knowledge';
 
-/** Реестр связей «актор ↔ NPC»: тело ↔ личность */
-export interface IActorNpcRegistry<TNpc> {
-  /** Связывает актора с NPC и убирает связь, когда сигнал прерван */
-  register(actor: IActor, npc: TNpc, signal: IAbortSignal): void;
+/** NPC — личность, которая живёт в теле-акторе */
+export interface INpc {
+  /** Уникальный идентификатор NPC */
+  readonly id: string;
 
-  /** Возвращает актора, который является телом NPC */
-  getActor(npc: TNpc): IActor | undefined;
+  /** Тип NPC, по которому подбирается корневая задача */
+  readonly kind: NpcKind;
 
-  /** Возвращает NPC, чьим телом является актор */
-  getNpc(actor: IActor): TNpc | undefined;
+  /** Инвентарь NPC */
+  readonly inventory: Inventory;
+
+  /** Психика NPC */
+  readonly psyche: IPsyche;
+
+  /** Потребности NPC */
+  readonly needs: INeeds;
+
+  /** Зависимости NPC */
+  readonly addictions: IAddictions;
+
+  /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */
+  getState(): NpcState;
+
+  /**
+   * Завершает жизнь NPC: перестаёт следить за тиками, останавливает HTN-агента и деспавнит
+   * актора. После деспавна NPC больше не пользуются
+   */
+  despawn(): void;
 }
 
-/** Зависимости NPC. Личность — дженерик, чтобы файл типов не зависел от npc.ts */
-export interface INpcDeps<TNpc> {
+/** Реестр связей «актор ↔ NPC»: тело ↔ личность */
+export interface IActorNpcRegistry {
+  /** Связывает актора с NPC и убирает связь, когда сигнал прерван */
+  register(actor: IActor, npc: INpc, signal: IAbortSignal): void;
+
+  /** Возвращает актора, который является телом NPC */
+  getActor(npc: INpc): IActor | undefined;
+
+  /** Возвращает NPC, чьим телом является актор */
+  getNpc(actor: IActor): INpc | undefined;
+}
+
+/** Зависимости NPC */
+export interface NpcDeps {
   /** Фабрика, которой NPC создаёт своего актора */
   actorFactory: IActorFactory;
   /** Реестр, в котором NPC связывает своего актора с собой */
-  actorNpcRegistry: IActorNpcRegistry<TNpc>;
-  /** Фабрика, которой NPC создаёт своего HTN-агента. Агент сам планирует и перепланирует задачи */
+  actorNpcRegistry: IActorNpcRegistry;
+  /** Фабрика, которой NPC создаёт свой HTN-агент. Агент сам планирует и перепланирует задачи */
   htnFactory: IHTNFactory<NpcState, NpcContext>;
   /** Фабрика, которой NPC создаёт свой инвентарь */
   inventoryFactory: IInventoryFactory;

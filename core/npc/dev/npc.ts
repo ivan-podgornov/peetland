@@ -15,7 +15,7 @@ import type { Mocked } from 'vitest';
 
 import { Npc, NpcKind } from '../src';
 import type { INpcFactory, NpcData } from '../src';
-import type { NpcDeps } from '../src/npc';
+import type { NpcDeps } from '../src/types';
 
 import { createMockedActorNpcRegistry } from './actor-npc-registry';
 import { createMockedNpcWorldKnowledge } from './world-knowledge';

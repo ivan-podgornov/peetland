@@ -7,8 +7,8 @@ import { PsycheFactory } from '@peetland/psyche';
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import { Npc } from './npc';
-import type { NpcDeps } from './npc';
 import type { NpcState } from './state';
+import type { NpcDeps } from './types';
 
 export interface INpcFactory {
   /** Создаёт NPC по данным */

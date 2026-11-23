@@ -8,7 +8,7 @@ import type { IGeometry } from '@peetland/geometry';
 import type { ILogger } from '@peetland/logger';
 import { addEventHandler, thisScript } from '@peetland/moonloader';
 import { VisionSystemFactory } from '@peetland/perception';
-import type { ILosProvider, IVisionSystem } from '@peetland/perception';
+import type { ILosProvider, IVisionSystem, IVisionSystemFactory } from '@peetland/perception';
 import { Timer } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
@@ -29,6 +29,8 @@ export type GtaGameDeps = {
   logger?: ILogger;
   /** Провайдер прямой видимости. По умолчанию — GtaLosProvider */
   los?: ILosProvider;
+  /** Фабрика системы зрения. По умолчанию — VisionSystemFactory */
+  visionSystemFactory?: IVisionSystemFactory;
 };
 
 /**
@@ -73,7 +75,8 @@ export class GtaGame implements IGame {
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     const actorRegistry = new ActorRegistry();
-    this.vision = new VisionSystemFactory().create({
+    const visionSystemFactory = deps.visionSystemFactory ?? new VisionSystemFactory();
+    this.vision = visionSystemFactory.create({
       registry: actorRegistry,
       los: deps.los ?? new GtaLosProvider(),
       geometry: this.geometry,

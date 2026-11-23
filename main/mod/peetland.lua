@@ -8209,11 +8209,6 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["core.npc.src.world-knowledge"] = function(...) 
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-local ____exports = {}
-return ____exports
- end,
 ["core.npc.src.types"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -8413,6 +8408,12 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local Map = ____lualib.Map
 local __TS__New = ____lualib.__TS__New
+local Error = ____lualib.Error
+local RangeError = ____lualib.RangeError
+local ReferenceError = ____lualib.ReferenceError
+local SyntaxError = ____lualib.SyntaxError
+local TypeError = ____lualib.TypeError
+local URIError = ____lualib.URIError
 local ____exports = {}
 --- Реестр связей «актор ↔ NPC»: тело ↔ личность
 ____exports.ActorNpcRegistry = __TS__Class()
@@ -8435,10 +8436,24 @@ function ActorNpcRegistry.prototype.register(self, actor, npc)
     )
 end
 function ActorNpcRegistry.prototype.getActor(self, npc)
-    return self.npcToActor:get(npc)
+    local actor = self.npcToActor:get(npc)
+    if not actor then
+        error(
+            __TS__New(Error, "NPC не в реестре"),
+            0
+        )
+    end
+    return actor
 end
 function ActorNpcRegistry.prototype.getNpc(self, actor)
-    return self.actorToNpc:get(actor)
+    local npc = self.actorToNpc:get(actor)
+    if not npc then
+        error(
+            __TS__New(Error, "У актора нет NPC в реестре"),
+            0
+        )
+    end
+    return npc
 end
 return ____exports
  end,
@@ -8590,6 +8605,7 @@ return ____exports
 ["core.world.src.npc-world-knowledge"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
+local __TS__ArrayMap = ____lualib.__TS__ArrayMap
 local ____exports = {}
 --- Знание NPC о мире, которое мир собирает из своих источников
 ____exports.NpcWorldKnowledge = __TS__Class()
@@ -8602,6 +8618,16 @@ function NpcWorldKnowledge.prototype.getState(self)
     local ____self_deps_0 = self.deps
     local time = ____self_deps_0.time
     return {time = time}
+end
+function NpcWorldKnowledge.prototype.getVisibleNpcs(self, target, radius)
+    local ____self_deps_1 = self.deps
+    local actorNpcRegistry = ____self_deps_1.actorNpcRegistry
+    local game = ____self_deps_1.game
+    local actor = actorNpcRegistry:getActor(target)
+    return __TS__ArrayMap(
+        game:getVisibleActors(actor, radius),
+        function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
+    )
 end
 return ____exports
  end,
@@ -10565,13 +10591,13 @@ function World.prototype.bigBang(self)
         if placesFactory == nil then
             placesFactory = __TS__New(PlacesFactory, {geometry = game.geometry})
         end
-        local worldKnowledge = ____self_deps_1.worldKnowledge
-        if worldKnowledge == nil then
-            worldKnowledge = __TS__New(NpcWorldKnowledge, {time = game.time})
-        end
         local actorNpcRegistry = ____self_deps_1.actorNpcRegistry
         if actorNpcRegistry == nil then
             actorNpcRegistry = __TS__New(ActorNpcRegistry)
+        end
+        local worldKnowledge = ____self_deps_1.worldKnowledge
+        if worldKnowledge == nil then
+            worldKnowledge = __TS__New(NpcWorldKnowledge, {time = game.time, game = game, actorNpcRegistry = actorNpcRegistry})
         end
         local worldPlaces = placesFactory:create({places = __TS__Await(places:getAll())})
         local ____self_deps_2 = self.deps

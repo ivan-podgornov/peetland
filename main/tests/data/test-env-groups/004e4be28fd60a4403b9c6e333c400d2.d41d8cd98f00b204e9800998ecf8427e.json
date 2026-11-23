@@ -1,0 +1,1 @@
+{"id":"004e4be28fd60a4403b9c6e333c400d2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/npc-world-knowledge.spec.ts#NpcWorldKnowledge #getVisibleNpcs Возвращает NPC, которых видит target в радиусе radius","name":"Возвращает NPC, которых видит target в радиусе radius","status":"passed","testResultsByEnv":{"default":"9eb795468af09d3c930c53a2a997a084"}}

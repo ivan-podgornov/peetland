@@ -1,1 +1,0 @@
-{"id":"b7a5354cee7b0aae85f5b88e896a046d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-game/__tests__/game/visible-actors.spec.ts#VirtualGame #getVisibleActors — кого видно Не возвращает акторов дальше радиуса","name":"Не возвращает акторов дальше радиуса","status":"passed","testResultsByEnv":{"default":"877b8a263da693652db899aa807cecc6"}}

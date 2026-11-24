@@ -1,0 +1,1 @@
+{"id":"c42b305a35d85cba6a94e647c70697f5.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/actor-npc-registry.spec.ts#ActorNpcRegistry #getNpc Бросает ошибку, когда у актора нет NPC в реестре","name":"Бросает ошибку, когда у актора нет NPC в реестре","status":"passed","testResultsByEnv":{"default":"2706c8ab457ff3a4a2950882fd372b2b"}}

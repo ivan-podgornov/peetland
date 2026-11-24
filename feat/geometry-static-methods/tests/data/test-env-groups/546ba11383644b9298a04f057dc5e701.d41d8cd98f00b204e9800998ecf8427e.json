@@ -1,0 +1,1 @@
+{"id":"546ba11383644b9298a04f057dc5e701.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc-tasks/__tests__/eat-task/preconditions.spec.ts#EatTask Метод eat-food Предусловия Если еда есть в инвентаре, план составляется","name":"Если еда есть в инвентаре, план составляется","status":"passed","testResultsByEnv":{"default":"0ca2db530837622af99d87e2c8e0b570"}}

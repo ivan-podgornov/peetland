@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "packageManager": "npm@12.2.3",
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || >=26.0.0",
+    "npm": "~12.2.3"
+  },
   "workspaces": [
     "toolkit/*",
     "core/*",
@@ -14,6 +19,7 @@
     "check:code": "eslint",
     "check:code:all": "npm run check:code \".\"",
     "check:deps": "depcruise toolkit core mod",
+    "check:lock": "npm install --package-lock-only --ignore-scripts && git diff --exit-code package-lock.json",
     "fix:code": "eslint --fix",
     "fix:code:all": "npm run fix:code \".\"",
     "check:formatting": "prettier --check",

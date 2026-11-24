@@ -6,8 +6,13 @@ runs:
     - name: Install node
       uses: actions/setup-node@v7
       with:
-        node-version: 22
+        node-version: 24
         cache: npm
+    - name: Enable corepack
+      shell: bash
+      env:
+        COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      run: corepack enable npm
     - name: Install dependencies
       shell: bash
       run: npm ci

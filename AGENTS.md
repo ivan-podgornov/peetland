@@ -31,6 +31,10 @@ Peetland — учебный мод для GTA San Andreas, в котором NPC
 
 ## Команды
 
+- В новой среде перед установкой зависимостей сверь `npm -v` с `packageManager` в корневом
+  `package.json`: версию npm задаёт репозиторий, а не среда. Если не совпало, запускай npm через
+  `npx -y npm@<версия из packageManager>` или поставь её глобально — иначе `npm install`
+  перепишет `package-lock.json` по-своему (см. [CI и сборки](./docs/process/ci.md#версия-npm)).
 - `npm install` — поставить зависимости.
 - `npm test` — тесты.
 - `npm run check:types`, `npm run check:code:all`, `npm run check:deps`,

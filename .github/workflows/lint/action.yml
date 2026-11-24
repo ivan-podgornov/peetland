@@ -12,6 +12,9 @@ runs:
     - name: Check dependencies
       shell: bash
       run: npm run check:deps
+    - name: Check lock
+      shell: bash
+      run: npm run check:lock
     - name: Lint formatting
       shell: bash
       run: npm run check:formatting:all

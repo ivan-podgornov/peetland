@@ -1,4 +1,4 @@
-import { vector3 } from '@peetland/geometry/dev';
+import { Geometry } from '@peetland/geometry';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -21,7 +21,7 @@ describe('NpcFactory', () => {
       const actorFactory = createMockedActorFactory();
       const data = createNpcData({
         modelId: 78,
-        spawnPosition: vector3(1, 2, 3),
+        spawnPosition: Geometry.vector3(1, 2, 3),
         spawnAngle: 90,
       });
       const factory = new NpcFactory(createRequiredDeps({ actorFactory }));

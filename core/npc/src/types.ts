@@ -3,6 +3,7 @@ import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { IHTN } from '@peetland/htn';
 import type { Inventory } from '@peetland/inventory';
+import type { IMemory } from '@peetland/memory';
 import type { INeeds, IUrgencyWatcher } from '@peetland/needs';
 import type { IPsyche } from '@peetland/psyche';
 
@@ -80,6 +81,8 @@ export interface NpcDeps {
   needs: INeeds;
   /** Зависимости NPC */
   addictions: IAddictions;
+  /** Память NPC */
+  memory: IMemory;
   /** Наблюдатель, который следит, когда потребности становятся срочными */
   urgencyWatcher: IUrgencyWatcher;
   /** Сообщает о каждом тике мира */

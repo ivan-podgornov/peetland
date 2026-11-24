@@ -100,6 +100,7 @@ flowchart TD
     npc --> inventory
     npc --> needs
     npc --> addictions
+    npc --> memory
     npc --> game
     virtualactor[virtual-actor] --> actorcommand[actor-command]
     virtualactor --> animationmanager[animation-manager]

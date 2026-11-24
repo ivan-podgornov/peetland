@@ -3,6 +3,7 @@ import { AddictionsBuilder } from '@peetland/addictions/dev';
 import type { Vector3 } from '@peetland/geometry';
 import { Inventory } from '@peetland/inventory';
 import type { InventoryCounts } from '@peetland/inventory';
+import { Memory } from '@peetland/memory';
 import type { INeeds } from '@peetland/needs';
 import { NeedsBuilder } from '@peetland/needs/dev';
 import type { IPsyche } from '@peetland/psyche';
@@ -25,8 +26,8 @@ type AddictionsBuild = (builder: AddictionsBuilder) => IAddictions;
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC —
  * бомж, стоит в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder
- * по умолчанию, потребности удовлетворены полностью, зависимостей нет, а в мире полночь первого
- * дня. Каждый вызов
+ * по умолчанию, потребности удовлетворены полностью, зависимостей нет, память пуста, а в мире
+ * полночь первого дня. Каждый вызов
  * build возвращает новое состояние
  *
  * @example
@@ -142,6 +143,7 @@ export class NpcStateBuilder {
         psyche: this.psyche(new PsycheBuilder()),
         needs: this.needs(new NeedsBuilder().withTime(this.time)),
         addictions: this.addictions(new AddictionsBuilder().withTime(this.time)),
+        memory: new Memory(),
       },
       world: {
         time,

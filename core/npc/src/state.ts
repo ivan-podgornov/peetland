@@ -1,6 +1,7 @@
 import type { IReadonlyAddictions } from '@peetland/addictions';
 import type { Vector3 } from '@peetland/geometry';
 import type { IReadonlyInventory } from '@peetland/inventory';
+import type { IReadonlyMemory } from '@peetland/memory';
 import type { IReadonlyNeeds } from '@peetland/needs';
 import type { IReadonlyPsyche } from '@peetland/psyche';
 import type { IReadonlyTime } from '@peetland/timings';
@@ -14,7 +15,7 @@ export type NpcActorState = Readonly<{
   angle: number;
 }>;
 
-/** Сам NPC: тип, слепок актора, инвентарь, психика, потребности и зависимости только на чтение */
+/** Сам NPC: тип, слепок актора, инвентарь, психика, потребности, зависимости и память только на чтение */
 export type NpcSelfState = Readonly<{
   /** Тип NPC. Задачи, которые доступны не всем типам, проверяют его в предусловиях */
   kind: NpcKind;
@@ -25,6 +26,8 @@ export type NpcSelfState = Readonly<{
   needs: IReadonlyNeeds;
   /** Зависимости. Их значения читаются на момент времени из того же состояния (см. NpcWorldState) */
   addictions: IReadonlyAddictions;
+  /** Память NPC: факты о том, что с ним было. Запоминают через контекст (см. NpcContext) */
+  memory: IReadonlyMemory;
 }>;
 
 /** Что NPC знает о мире */
@@ -40,8 +43,8 @@ export type NpcWorldState = Readonly<{
  * Состояние NPC, с которым HTN-агент планирует и исполняет задачи: сам NPC и то, что он знает о
  * мире. В нём лежат данные и сущности, доступные только на чтение. Эффекты задач не меняют
  * состояние: сущность, которую нужно поменять, задача клонирует и кладёт копию в новое состояние.
- * Команды живым актору, инвентарю, психике, потребностям и зависимостям задачи отдают через контекст (см. NpcContext и ADR
- * «Состояние NPC из живых сущностей»)
+ * Команды живым актору, инвентарю, психике, потребностям, зависимостям и памяти задачи отдают
+ * через контекст (см. NpcContext и ADR «Состояние NPC из живых сущностей»)
  */
 export type NpcState = Readonly<{
   self: NpcSelfState;

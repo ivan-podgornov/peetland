@@ -12,19 +12,19 @@ import type { NpcKind } from './kind';
 import type { NpcState } from './state';
 import type { INpc, INpcWorldKnowledge, NpcDeps } from './types';
 
-/** NPC склеивает актора, свои сущности и HTN-агента */
+/** NPC — личность, которая живёт в теле-акторе */
 export class Npc implements INpc {
   readonly id: string;
   readonly kind: NpcKind;
-  readonly inventory: Inventory;
-  readonly psyche: IPsyche;
-  readonly needs: INeeds;
-  readonly addictions: IAddictions;
 
+  private readonly addictions: IAddictions;
   private readonly actor: IActor;
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
+  private readonly inventory: Inventory;
   private readonly lifetime: AbortController;
+  private readonly needs: INeeds;
+  private readonly psyche: IPsyche;
   private readonly urgencyWatcher: IUrgencyWatcher;
   private readonly worldKnowledge: INpcWorldKnowledge;
 

@@ -1,6 +1,7 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
+import { Inventory, Item } from '@peetland/inventory';
+import { createMockedPsyche } from '@peetland/psyche/dev';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -62,12 +63,14 @@ describe('Npc', () => {
     it('Вызывает htn.update с контекстом, в котором инвентарь NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const inventory = new Inventory();
       const data = createNpcData();
-      const npc = new Npc(
+      new Npc(
         data.id,
         data.kind,
         createNpcDeps({
           htn,
+          inventory,
           ticks: ticks.observable,
         })
       );
@@ -76,19 +79,21 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ inventory: npc.inventory })
+        expect.objectContaining({ inventory })
       );
     });
 
     it('Вызывает htn.update с контекстом, в котором психика NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const psyche = createMockedPsyche();
       const data = createNpcData();
-      const npc = new Npc(
+      new Npc(
         data.id,
         data.kind,
         createNpcDeps({
           htn,
+          psyche,
           ticks: ticks.observable,
         })
       );
@@ -97,7 +102,7 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ psyche: npc.psyche })
+        expect.objectContaining({ psyche })
       );
     });
 
@@ -138,7 +143,7 @@ describe('Npc', () => {
 
       ticks.subscriber.next(undefined);
 
-      expect(npc.inventory.get(Item.Booze)).toBe(1);
+      expect(npc.getState().self.inventory.get(Item.Booze)).toBe(1);
     });
   });
 });

@@ -21,12 +21,14 @@ describe('Npc', () => {
     it('Вызывает htn.update с контекстом, в котором потребности NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const needs = new Needs(createNeedsState(), createNeedsDeps());
       const data = createNpcData();
-      const npc = new Npc(
+      new Npc(
         data.id,
         data.kind,
         createNpcDeps({
           htn,
+          needs,
           ticks: ticks.observable,
         })
       );
@@ -35,7 +37,7 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ needs: npc.needs })
+        expect.objectContaining({ needs })
       );
     });
   });

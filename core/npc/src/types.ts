@@ -24,18 +24,6 @@ export interface INpc {
   /** Тип NPC, по которому подбирается корневая задача */
   readonly kind: NpcKind;
 
-  /** Инвентарь NPC */
-  readonly inventory: Inventory;
-
-  /** Психика NPC */
-  readonly psyche: IPsyche;
-
-  /** Потребности NPC */
-  readonly needs: INeeds;
-
-  /** Зависимости NPC */
-  readonly addictions: IAddictions;
-
   /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */
   getState(): NpcState;
 

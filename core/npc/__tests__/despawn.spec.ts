@@ -1,5 +1,6 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN } from '@peetland/htn/dev';
+import { Inventory } from '@peetland/inventory';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
@@ -39,12 +40,20 @@ describe('Npc', () => {
 
     it('Передаёт HTN-агенту при остановке контекст с инвентарём NPC', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const inventory = new Inventory();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ htn }));
+      const npc = new Npc(
+        data.id,
+        data.kind,
+        createNpcDeps({
+          htn,
+          inventory,
+        })
+      );
 
       npc.despawn();
 
-      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ inventory: npc.inventory }));
+      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ inventory }));
     });
 
     it('Деспавнит актора', () => {

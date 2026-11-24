@@ -100,7 +100,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.inventory).toBe(inventory);
+      expect(npc.getState().self.inventory).toBe(inventory);
     });
 
     it('Вызывает psycheFactory.create с начальным состоянием психики из данных', () => {
@@ -125,7 +125,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.psyche).toBe(psyche);
+      expect(npc.getState().self.psyche).toBe(psyche);
     });
 
     it('Вызывает needsFactory.create с начальными потребностями из данных и временем мира', () => {
@@ -156,7 +156,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.needs).toBe(needs);
+      expect(npc.getState().self.needs).toBe(needs);
     });
 
     it('Вызывает addictionsFactory.create с начальными зависимостями из данных и временем мира', () => {
@@ -194,7 +194,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.addictions).toBe(addictions);
+      expect(npc.getState().self.addictions).toBe(addictions);
     });
 
     it('Создаёт наблюдателя срочности фабрикой urgencyWatcherFactory из зависимостей', () => {
@@ -244,7 +244,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.inventory).toBeInstanceOf(Inventory);
+      expect(npc.getState().self.inventory).toBeInstanceOf(Inventory);
     });
 
     it('Если psycheFactory не передана, NPC получает экземпляр Psyche', () => {
@@ -252,7 +252,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.psyche).toBeInstanceOf(Psyche);
+      expect(npc.getState().self.psyche).toBeInstanceOf(Psyche);
     });
 
     it('Если needsFactory не передана, NPC получает экземпляр Needs', () => {
@@ -260,7 +260,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.needs).toBeInstanceOf(Needs);
+      expect(npc.getState().self.needs).toBeInstanceOf(Needs);
     });
 
     it('Если addictionsFactory не передана, NPC получает экземпляр Addictions', () => {
@@ -268,7 +268,7 @@ describe('NpcFactory', () => {
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.addictions).toBeInstanceOf(Addictions);
+      expect(npc.getState().self.addictions).toBeInstanceOf(Addictions);
     });
 
     it('Если urgencyWatcherFactory не передана, при срочной потребности NPC мягко останавливает план', () => {

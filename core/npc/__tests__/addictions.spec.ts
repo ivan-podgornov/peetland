@@ -21,12 +21,14 @@ describe('Npc', () => {
     it('Вызывает htn.update с контекстом, в котором зависимости NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const addictions = new Addictions(createAddictionsState(), createAddictionsDeps());
       const data = createNpcData();
-      const npc = new Npc(
+      new Npc(
         data.id,
         data.kind,
         createNpcDeps({
           htn,
+          addictions,
           ticks: ticks.observable,
         })
       );
@@ -35,7 +37,7 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ addictions: npc.addictions })
+        expect.objectContaining({ addictions })
       );
     });
   });

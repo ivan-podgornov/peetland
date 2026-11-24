@@ -1,6 +1,6 @@
 import { Npc } from '@peetland/npc';
 import { createNpcData, createNpcDeps } from '@peetland/npc/dev';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { ActorNpcRegistry } from '../src';
@@ -9,7 +9,8 @@ describe('ActorNpcRegistry', () => {
   describe('#getActor', () => {
     it('Возвращает актора, который является телом NPC', () => {
       const registry = new ActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps());
+      const data = createNpcData();
+      const npc = new Npc(data.id, data.kind, createNpcDeps());
       const actor = createActor();
       registry.register(actor, npc);
 
@@ -18,7 +19,8 @@ describe('ActorNpcRegistry', () => {
 
     it('Бросает ошибку, когда NPC не в реестре', () => {
       const registry = new ActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps());
+      const data = createNpcData();
+      const npc = new Npc(data.id, data.kind, createNpcDeps());
 
       expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
     });
@@ -27,7 +29,8 @@ describe('ActorNpcRegistry', () => {
   describe('#getNpc', () => {
     it('Возвращает NPC, чьим телом является актор', () => {
       const registry = new ActorNpcRegistry();
-      const npc = new Npc(createNpcData(), createNpcDeps());
+      const data = createNpcData();
+      const npc = new Npc(data.id, data.kind, createNpcDeps());
       const actor = createActor();
       registry.register(actor, npc);
 
@@ -46,11 +49,13 @@ describe('ActorNpcRegistry', () => {
     it('Когда NPC деспавнится, убирает связь', () => {
       const registry = new ActorNpcRegistry();
       const actor = createActor();
+      const data = createNpcData();
       const npc = new Npc(
-        createNpcData(),
+        data.id,
+        data.kind,
         createNpcDeps({
           actorNpcRegistry: registry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
 

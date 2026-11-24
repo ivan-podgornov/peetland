@@ -1,7 +1,7 @@
 import { Npc } from '@peetland/npc';
 import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createGame } from '../dev';
@@ -26,19 +26,23 @@ describe('NpcWorldKnowledge', () => {
     it('Возвращает NPC, которых видит target в радиусе radius', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const actor = createActor();
+      const data = createNpcData();
       const npc = new Npc(
-        createNpcData(),
+        data.id,
+        data.kind,
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
       const visibleActor = createActor();
+      const visibleData = createNpcData();
       const visibleNpc = new Npc(
-        createNpcData(),
+        visibleData.id,
+        visibleData.kind,
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(visibleActor),
+          actor: visibleActor,
         })
       );
       const game = createGame({ getVisibleActors: vi.fn(() => [visibleActor]) });
@@ -54,11 +58,13 @@ describe('NpcWorldKnowledge', () => {
 
     it('Бросает ошибку, когда target не в реестре', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
+      const data = createNpcData();
       const npc = new Npc(
-        createNpcData(),
+        data.id,
+        data.kind,
         createNpcDeps({
           actorNpcRegistry: createMockedActorNpcRegistry(),
-          actorFactory: createMockedActorFactory(createActor()),
+          actor: createActor(),
         })
       );
       const game = createGame();

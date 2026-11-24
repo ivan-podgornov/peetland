@@ -1,20 +1,29 @@
-import { createAddictionsData, createMockedAddictionsFactory } from '@peetland/addictions/dev';
+import { Addictions } from '@peetland/addictions';
+import {
+  createAddictionsData,
+  createAddictionsDeps,
+  createAddictionsState,
+} from '@peetland/addictions/dev';
 import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedHTNFactory } from '@peetland/htn/dev';
-import { createMockedInventoryFactory } from '@peetland/inventory/dev';
+import { createMockedHTN } from '@peetland/htn/dev';
+import { Inventory } from '@peetland/inventory';
+import { Needs } from '@peetland/needs';
 import {
-  createMockedNeedsFactory,
-  createMockedUrgencyWatcherFactory,
+  createMockedUrgencyWatcher,
   createNeedValues,
+  createNeedsDeps,
+  createNeedsState,
 } from '@peetland/needs/dev';
-import { createMockedPsycheFactory, createPsycheState } from '@peetland/psyche/dev';
-import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { Psyche } from '@peetland/psyche';
+import { createPsycheDeps, createPsycheState } from '@peetland/psyche/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
 import { Npc, NpcKind } from '../src';
 import type { INpcFactory, NpcData } from '../src';
+import type { NpcContext, NpcState } from '../src';
 import type { NpcDeps } from '../src/types';
 
 import { createMockedActorNpcRegistry } from './actor-npc-registry';
@@ -40,23 +49,17 @@ export function createNpcData(data: Partial<NpcData> = {}): NpcData {
   };
 }
 
-/** Создаёт зависимости NPC. Зависимости, которые не переданы, заполняются незначимыми моками */
+/** Создаёт зависимости NPC. Зависимости, которые не переданы, заполняются незначимыми значениями */
 export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   return {
-    actorFactory: createMockedActorFactory(),
+    actor: createActor(),
     actorNpcRegistry: createMockedActorNpcRegistry(),
-    htnFactory: createMockedHTNFactory(),
-    inventoryFactory: createMockedInventoryFactory(),
-    psycheFactory: createMockedPsycheFactory(),
-    needsFactory: createMockedNeedsFactory(),
-    addictionsFactory: createMockedAddictionsFactory(),
-    urgencyWatcherFactory: createMockedUrgencyWatcherFactory(),
-    rootTaskFactory: {
-      create: vi.fn(() => ({
-        name: 'root',
-        methods: [],
-      })),
-    },
+    htn: createMockedHTN<NpcState, NpcContext>(),
+    inventory: new Inventory(),
+    psyche: new Psyche(createPsycheState(), createPsycheDeps()),
+    needs: new Needs(createNeedsState(), createNeedsDeps()),
+    addictions: new Addictions(createAddictionsState(), createAddictionsDeps()),
+    urgencyWatcher: createMockedUrgencyWatcher(),
     ticks: createControlledObservable().observable,
     worldKnowledge: createMockedNpcWorldKnowledge(),
     gameSignal: new AbortController().signal,
@@ -64,7 +67,9 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
   };
 }
 
-/** Создаёт фабрику NPC, которая создаёт NPC по данным с незначимыми зависимостями */
+/** Создаёт фабрику NPC, которая создаёт NPC по данным с незначительными зависимостями */
 export function createMockedNpcFactory(): Mocked<INpcFactory> {
-  return { create: vi.fn((data: NpcData) => new Npc(data, createNpcDeps())) };
+  return {
+    create: vi.fn((data: NpcData) => new Npc(data.id, data.kind, createNpcDeps())),
+  };
 }

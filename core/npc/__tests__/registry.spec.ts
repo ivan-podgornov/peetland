@@ -1,4 +1,4 @@
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '../dev';
@@ -9,12 +9,14 @@ describe('Npc', () => {
     it('Связывает своего актора с собой в реестре связей', () => {
       const actorNpcRegistry = createMockedActorNpcRegistry();
       const actor = createActor();
+      const data = createNpcData();
 
       const npc = new Npc(
-        createNpcData(),
+        data.id,
+        data.kind,
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
 

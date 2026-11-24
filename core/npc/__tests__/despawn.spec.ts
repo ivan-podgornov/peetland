@@ -13,7 +13,7 @@ describe('Npc', () => {
     it('Останавливает HTN-агента', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ htn }));
+      const npc = new Npc(data, createNpcDeps({ htn }));
 
       npc.despawn();
 
@@ -25,8 +25,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actor,
           htn,
@@ -43,8 +42,7 @@ describe('Npc', () => {
       const inventory = new Inventory();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           inventory,
@@ -59,7 +57,7 @@ describe('Npc', () => {
     it('Деспавнит актора', () => {
       const actor = createActor();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ actor }));
+      const npc = new Npc(data, createNpcDeps({ actor }));
 
       npc.despawn();
 
@@ -71,8 +69,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,

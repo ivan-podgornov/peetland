@@ -2,6 +2,15 @@ import { vi } from 'vitest';
 
 import type { IGeometry, Vector3 } from '../src';
 
+/** Создаёт точку в трёхмерном пространстве. Координаты, которые не переданы, нулевые */
+export function vector3(x = 0, y = 0, z = 0): Vector3 {
+  return {
+    x,
+    y,
+    z,
+  };
+}
+
 /** Создаёт мок геометрии: проверки попадания возвращают true, а методы можно переопределить */
 export function createMockedGeometry(overrides: Partial<IGeometry> = {}): IGeometry {
   return {

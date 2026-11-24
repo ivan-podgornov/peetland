@@ -14,8 +14,7 @@ describe('Npc', () => {
       const actor = createActor();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actor,
           gameSignal: game.signal,
@@ -32,8 +31,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           gameSignal: game.signal,
@@ -50,8 +48,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           gameSignal: game.signal,
@@ -73,8 +70,7 @@ describe('Npc', () => {
       const data = createNpcData();
 
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actor,
           gameSignal: game.signal,
@@ -91,8 +87,7 @@ describe('Npc', () => {
       const data = createNpcData();
 
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           gameSignal: game.signal,

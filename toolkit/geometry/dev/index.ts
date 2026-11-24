@@ -1,1 +1,1 @@
-export { createMockedGeometry } from './geometry';
+export { createMockedGeometry, vector3 } from './geometry';

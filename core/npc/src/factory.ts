@@ -107,7 +107,7 @@ export class NpcFactory implements INpcFactory {
     const { time } = worldKnowledge.getState();
     const rootTask = rootTaskFactory.create(data.kind);
 
-    return new Npc(data.id, data.kind, {
+    return new Npc(data, {
       actor: actorFactory.create({
         modelId: data.modelId,
         position: data.spawnPosition,

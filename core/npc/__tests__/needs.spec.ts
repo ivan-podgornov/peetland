@@ -13,7 +13,7 @@ describe('Npc', () => {
     it('getState возвращает потребности NPC', () => {
       const needs = new Needs(createNeedsState(), createNeedsDeps());
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ needs }));
+      const npc = new Npc(data, createNpcDeps({ needs }));
 
       expect(npc.getState().self.needs).toBe(needs);
     });
@@ -24,8 +24,7 @@ describe('Npc', () => {
       const needs = new Needs(createNeedsState(), createNeedsDeps());
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           needs,

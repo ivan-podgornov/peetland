@@ -70,6 +70,6 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
 /** Создаёт фабрику NPC, которая создаёт NPC по данным с незначительными зависимостями */
 export function createMockedNpcFactory(): Mocked<INpcFactory> {
   return {
-    create: vi.fn((data: NpcData) => new Npc(data.id, data.kind, createNpcDeps())),
+    create: vi.fn((data: NpcData) => new Npc(data, createNpcDeps())),
   };
 }

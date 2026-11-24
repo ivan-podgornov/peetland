@@ -13,7 +13,7 @@ describe('Npc', () => {
     it('getState возвращает зависимости NPC', () => {
       const addictions = new Addictions(createAddictionsState(), createAddictionsDeps());
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ addictions }));
+      const npc = new Npc(data, createNpcDeps({ addictions }));
 
       expect(npc.getState().self.addictions).toBe(addictions);
     });
@@ -24,8 +24,7 @@ describe('Npc', () => {
       const addictions = new Addictions(createAddictionsState(), createAddictionsDeps());
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           addictions,

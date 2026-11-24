@@ -28,8 +28,7 @@ describe('NpcWorldKnowledge', () => {
       const actor = createActor();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actorNpcRegistry,
           actor,
@@ -38,8 +37,7 @@ describe('NpcWorldKnowledge', () => {
       const visibleActor = createActor();
       const visibleData = createNpcData();
       const visibleNpc = new Npc(
-        visibleData.id,
-        visibleData.kind,
+        visibleData,
         createNpcDeps({
           actorNpcRegistry,
           actor: visibleActor,
@@ -60,8 +58,7 @@ describe('NpcWorldKnowledge', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actorNpcRegistry: createMockedActorNpcRegistry(),
           actor: createActor(),

@@ -8,6 +8,7 @@ import type { INeeds, IUrgencyWatcher } from '@peetland/needs';
 import type { IPsyche } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
+import type { NpcData } from './data';
 import type { NpcKind } from './kind';
 import type { NpcState } from './state';
 import type { INpc, INpcWorldKnowledge, NpcDeps } from './types';
@@ -29,14 +30,12 @@ export class Npc implements INpc {
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
-   * Получает готовые актора, инвентарь, психику, потребности, зависимости и HTN-агента, связывает
-   * их в контекст и каждый тик передаёт агенту актуальное состояние и контекст с ними. Когда игра
-   * завершается, деспавнится, а если она уже завершилась, деспавнится сразу
-   * @param id - уникальный идентификатор NPC
-   * @param kind - тип NPC
+   * Каждый тик передаёт HTN-агенту актуальное состояние и контекст. Когда игра завершается,
+   * деспавнится, а если она уже завершилась, деспавнится сразу
+   * @param data - данные NPC
    * @param deps - готовые сущности и сервисы, с которыми NPC живёт
    */
-  constructor(id: string, kind: NpcKind, deps: NpcDeps) {
+  constructor(data: NpcData, deps: NpcDeps) {
     const {
       actor,
       actorNpcRegistry,
@@ -51,8 +50,8 @@ export class Npc implements INpc {
       gameSignal,
     } = deps;
 
-    this.id = id;
-    this.kind = kind;
+    this.id = data.id;
+    this.kind = data.kind;
     this.actor = actor;
     this.inventory = inventory;
     this.psyche = psyche;

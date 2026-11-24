@@ -11,7 +11,7 @@ describe('Npc', () => {
   describe('#getState', () => {
     it('Возвращает тип NPC из данных', () => {
       const data = createNpcData({ kind: NpcKind.Homeless });
-      const npc = new Npc(data.id, data.kind, createNpcDeps());
+      const npc = new Npc(data, createNpcDeps());
 
       expect(npc.getState().self.kind).toBe(NpcKind.Homeless);
     });
@@ -19,7 +19,7 @@ describe('Npc', () => {
     it('Возвращает инвентарь NPC', () => {
       const inventory = new Inventory();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ inventory }));
+      const npc = new Npc(data, createNpcDeps({ inventory }));
 
       expect(npc.getState().self.inventory).toBe(inventory);
     });
@@ -33,7 +33,7 @@ describe('Npc', () => {
         },
       });
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ actor }));
+      const npc = new Npc(data, createNpcDeps({ actor }));
 
       expect(npc.getState().self.actor.position).toStrictEqual(actor.getPosition());
     });
@@ -41,7 +41,7 @@ describe('Npc', () => {
     it('Возвращает угол актора', () => {
       const actor = createActor({ angle: 90 });
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ actor }));
+      const npc = new Npc(data, createNpcDeps({ actor }));
 
       expect(npc.getState().self.actor.angle).toBe(actor.getAngle());
     });
@@ -55,7 +55,7 @@ describe('Npc', () => {
         },
       });
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ actor }));
+      const npc = new Npc(data, createNpcDeps({ actor }));
       const state = npc.getState();
 
       actor.setPosition({
@@ -74,7 +74,7 @@ describe('Npc', () => {
     it('Возвращает психику NPC', () => {
       const psyche = createMockedPsyche();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ psyche }));
+      const npc = new Npc(data, createNpcDeps({ psyche }));
 
       expect(npc.getState().self.psyche).toBe(psyche);
     });
@@ -83,7 +83,7 @@ describe('Npc', () => {
       const world = { time: new ManualTime() };
       const worldKnowledge = createMockedNpcWorldKnowledge(world);
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps({ worldKnowledge }));
+      const npc = new Npc(data, createNpcDeps({ worldKnowledge }));
 
       expect(npc.getState().world).toBe(world);
     });

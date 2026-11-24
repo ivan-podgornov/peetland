@@ -10,7 +10,7 @@ describe('ActorNpcRegistry', () => {
     it('Возвращает актора, который является телом NPC', () => {
       const registry = new ActorNpcRegistry();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps());
+      const npc = new Npc(data, createNpcDeps());
       const actor = createActor();
       registry.register(actor, npc);
 
@@ -20,7 +20,7 @@ describe('ActorNpcRegistry', () => {
     it('Бросает ошибку, когда NPC не в реестре', () => {
       const registry = new ActorNpcRegistry();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps());
+      const npc = new Npc(data, createNpcDeps());
 
       expect(() => registry.getActor(npc)).toThrow('NPC не в реестре');
     });
@@ -30,7 +30,7 @@ describe('ActorNpcRegistry', () => {
     it('Возвращает NPC, чьим телом является актор', () => {
       const registry = new ActorNpcRegistry();
       const data = createNpcData();
-      const npc = new Npc(data.id, data.kind, createNpcDeps());
+      const npc = new Npc(data, createNpcDeps());
       const actor = createActor();
       registry.register(actor, npc);
 
@@ -51,8 +51,7 @@ describe('ActorNpcRegistry', () => {
       const actor = createActor();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actorNpcRegistry: registry,
           actor,

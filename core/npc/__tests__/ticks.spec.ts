@@ -14,7 +14,7 @@ describe('Npc', () => {
     it('Не обновляет HTN-агента, пока не наступил тик', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
-      new Npc(data.id, data.kind, createNpcDeps({ htn }));
+      new Npc(data, createNpcDeps({ htn }));
 
       expect(htn.update).not.toHaveBeenCalled();
     });
@@ -24,8 +24,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -43,8 +42,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actor,
           htn,
@@ -66,8 +64,7 @@ describe('Npc', () => {
       const inventory = new Inventory();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           inventory,
@@ -89,8 +86,7 @@ describe('Npc', () => {
       const psyche = createMockedPsyche();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           psyche,
@@ -111,8 +107,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -133,8 +128,7 @@ describe('Npc', () => {
       });
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,

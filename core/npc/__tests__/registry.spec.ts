@@ -12,8 +12,7 @@ describe('Npc', () => {
       const data = createNpcData();
 
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           actorNpcRegistry,
           actor,

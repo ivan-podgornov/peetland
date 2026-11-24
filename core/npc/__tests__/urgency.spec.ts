@@ -14,8 +14,7 @@ describe('Npc', () => {
       const watcher = createMockedUrgencyWatcher();
       const data = createNpcData();
       const npc = new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           ticks: ticks.observable,
           urgencyWatcher: watcher,
@@ -33,8 +32,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -52,8 +50,7 @@ describe('Npc', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const data = createNpcData();
       new Npc(
-        data.id,
-        data.kind,
+        data,
         createNpcDeps({
           htn,
           ticks: ticks.observable,

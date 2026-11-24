@@ -79,6 +79,24 @@ interface WorldGlobal {
 
   /** Проверяет существование огня */
   isScriptFireExtinguished(this: void, fire: FireHandle): boolean;
+
+  /** Проверяет, свободна ли прямая между двумя точками мира */
+  isLineOfSightClear(
+    this: void,
+    x1: number,
+    y1: number,
+    z1: number,
+    x2: number,
+    y2: number,
+    z2: number,
+    checkBuildings: boolean,
+    checkCars: boolean,
+    checkOther: boolean,
+    checkPeds: boolean,
+    checkObjects: boolean,
+    seeThroughStuff: boolean,
+    ignoreSomeObjectsForCamera: boolean
+  ): boolean;
 }
 
 declare const _G: WorldGlobal;
@@ -105,4 +123,5 @@ export const {
   startScriptFire,
   removeScriptFire,
   isScriptFireExtinguished,
+  isLineOfSightClear,
 } = _G;

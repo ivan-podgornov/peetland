@@ -7,6 +7,8 @@ import { Geometry } from '@peetland/geometry';
 import type { IGeometry } from '@peetland/geometry';
 import type { ILogger } from '@peetland/logger';
 import { addEventHandler, thisScript } from '@peetland/moonloader';
+import { VisionSystemFactory } from '@peetland/perception';
+import type { ILosProvider, IVisionSystem, IVisionSystemFactory } from '@peetland/perception';
 import { Timer } from '@peetland/timings';
 import type { IReadonlyTime } from '@peetland/timings';
 
@@ -14,6 +16,7 @@ import { GTA_ANIMATIONS, GtaActorFactory, GtaAnimationLoader } from './actor';
 import { GtaClock } from './clock';
 
 import { GtaLogger } from './logger';
+import { GtaLosProvider } from './los';
 import { GtaObjectFactory } from './object';
 import type { IGtaObjectFactory } from './object';
 import { GtaTime } from './time';
@@ -24,6 +27,10 @@ const TICK_PERIOD = 250;
 export type GtaGameDeps = {
   /** Куда игра и её акторы пишут лог. По умолчанию — GtaLogger */
   logger?: ILogger;
+  /** Провайдер прямой видимости. По умолчанию — GtaLosProvider */
+  los?: ILosProvider;
+  /** Фабрика системы зрения. По умолчанию — VisionSystemFactory */
+  visionSystemFactory?: IVisionSystemFactory;
 };
 
 /**
@@ -38,6 +45,7 @@ export class GtaGame implements IGame {
   readonly ticks: Observable<unknown>;
 
   private readonly terminateController: AbortController;
+  private readonly vision: IVisionSystem;
 
   constructor(deps: GtaGameDeps = {}) {
     const logger = deps.logger ?? new GtaLogger();
@@ -67,6 +75,12 @@ export class GtaGame implements IGame {
     this.geometry = new Geometry();
     this.objectFactory = new GtaObjectFactory();
     const actorRegistry = new ActorRegistry();
+    const visionSystemFactory = deps.visionSystemFactory ?? new VisionSystemFactory();
+    this.vision = visionSystemFactory.create({
+      registry: actorRegistry,
+      los: deps.los ?? new GtaLosProvider(),
+      geometry: this.geometry,
+    });
     this.actorFactory = new GtaActorFactory({
       actorRegistry,
       animations: new AnimationManager(
@@ -84,8 +98,7 @@ export class GtaGame implements IGame {
     return this.terminateController.signal;
   }
 
-  getVisibleActors(): IActor[] {
-    // Ждёт обёртку натива прямой видимости в @peetland/moonloader
-    throw new Error('getVisibleActors is not implemented yet for this game');
+  getVisibleActors(target: IActor, radius: number): IActor[] {
+    return this.vision.getVisibleActors(target, radius);
   }
 }

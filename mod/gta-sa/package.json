@@ -12,6 +12,7 @@
     "@peetland/geometry": "0.0.0",
     "@peetland/logger": "0.0.0",
     "@peetland/moonloader": "0.0.0",
+    "@peetland/perception": "0.0.0",
     "@peetland/timings": "0.0.0"
   }
 }

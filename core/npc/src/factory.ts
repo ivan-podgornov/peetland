@@ -123,7 +123,7 @@ export class NpcFactory implements INpcFactory {
       actorNpcRegistry,
       htn: htnFactory.create(rootTask),
       inventory: inventoryFactory.create(data.inventory),
-      memory: memoryFactory.create(time),
+      memory: memoryFactory.create(),
       psyche: psycheFactory.create(data.psyche),
       needs: needsFactory.create(data.needs, time),
       addictions: addictionsFactory.create(data.addictions, time),

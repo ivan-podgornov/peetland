@@ -1,22 +1,25 @@
 import type { TimeState } from '@peetland/timings';
 
-/** Карта «тип записи → детали»: каждой записи памяти соответствуют свои детали, как типы событий у эмиттера */
-export type MemoryDetailsMap = { [type: string]: unknown };
-
-/** Что NPC запоминает */
+/** Что NPC запоминает: карта «тип факта → детали» */
 export type MemoryMap = {
   /** Место занято: в деталях — какое место NPC помнит занятым */
   placeTaken: {
     placeId: string;
   };
+  /** Мусорка исследована: в деталях — какая мусорка была исследована */
+  binSearched: {
+    placeId: string;
+  };
 };
 
-/** Запись памяти: тип, детали и момент игрового времени, когда её запомнили */
-export type MemoryRecord<Map extends MemoryDetailsMap, K extends keyof Map = keyof Map> = Readonly<{
-  /** Тип записи */
-  type: K;
-  /** Детали своего типа (см. MemoryMap) */
-  details: Map[K];
-  /** Момент игрового времени, когда запись запомнили */
-  rememberedAt: TimeState;
-}>;
+/** Факт памяти: тип, детали своего типа и момент игрового времени, когда его запомнили */
+export type Fact = {
+  [K in keyof MemoryMap]: Readonly<{
+    /** Тип факта */
+    type: K;
+    /** Детали своего типа (см. MemoryMap) */
+    details: MemoryMap[K];
+    /** Момент игрового времени, когда факт запомнили */
+    rememberedAt: TimeState;
+  }>;
+}[keyof MemoryMap];

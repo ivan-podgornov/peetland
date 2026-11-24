@@ -76,7 +76,7 @@ describe('Npc', () => {
     });
 
     it('Возвращает память NPC', () => {
-      const memory = new Memory({ time: new ManualTime() });
+      const memory = new Memory();
       const npc = new Npc(createNpcData(), createNpcDeps({ memory }));
 
       expect(npc.getState().self.memory).toBe(memory);

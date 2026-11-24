@@ -26,7 +26,7 @@ export type NpcSelfState = Readonly<{
   needs: IReadonlyNeeds;
   /** Зависимости. Их значения читаются на момент времени из того же состояния (см. NpcWorldState) */
   addictions: IReadonlyAddictions;
-  /** Память NPC: записи о том, что с ним было. Запоминают через контекст (см. NpcContext) */
+  /** Память NPC: факты о том, что с ним было. Запоминают через контекст (см. NpcContext) */
   memory: IReadonlyMemory;
 }>;
 

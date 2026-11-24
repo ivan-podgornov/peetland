@@ -1,55 +1,47 @@
-import type { IReadonlyTime } from '@peetland/timings';
-
-import type { MemoryDetailsMap, MemoryMap, MemoryRecord } from './types';
+import type { Fact, MemoryMap } from './types';
 
 /**
- * Память только на чтение. Так память лежит в состоянии NPC: планирование вспоминает записи, а
- * запоминают через контекст (см. NpcContext)
+ * Память только на чтение. Так память лежит в состоянии NPC: планирование вспоминает факты, а
+ * эффекты задач пишут в копию из clone() (см. NpcContext)
  */
-export interface IReadonlyMemory<Map extends MemoryDetailsMap = MemoryMap> {
+export interface IReadonlyMemory {
   /**
-   * Возвращает записи запрошенного типа в порядке запоминания
-   * @param type - тип записей
+   * Возвращает факты запрошенного типа в порядке запоминания
+   * @param type - тип фактов
    */
-  recall<K extends keyof Map>(type: K): ReadonlyArray<MemoryRecord<Map, K>>;
+  recall<K extends keyof MemoryMap>(type: K): ReadonlyArray<Extract<Fact, { type: K }>>;
+
+  /** Возвращает копию памяти, в которую можно писать. Копия исходную память не меняет */
+  clone(): IMemory;
 }
 
 /** Память NPC, в которую можно запоминать */
-export interface IMemory<Map extends MemoryDetailsMap = MemoryMap> extends IReadonlyMemory<Map> {
+export interface IMemory extends IReadonlyMemory {
   /**
-   * Запоминает запись с моментом игрового времени, когда её запомнили
-   * @param type - тип записи
-   * @param details - детали записи своего типа
+   * Запоминает факт: тип, детали и момент игрового времени, когда его запомнили. Момент передаёт
+   * вызывающий, обычно задача берёт его из своего состояния (см. NpcState)
+   * @param fact - факт
    */
-  remember<K extends keyof Map>(type: K, details: Map[K]): void;
+  remember(fact: Fact): void;
 }
 
-export type MemoryDeps = {
-  /** Время мира, из которого память берёт момент запоминания записей */
-  time: IReadonlyTime;
-};
+/** Память NPC: факты о том, что с ним было */
+export class Memory implements IMemory {
+  private facts: Fact[] = [];
 
-/** Память NPC: записи о том, что с ним было */
-export class Memory<Map extends MemoryDetailsMap = MemoryMap> implements IMemory<Map> {
-  private readonly deps: MemoryDeps;
-  private readonly records: MemoryRecord<Map, keyof Map>[];
-
-  constructor(deps: MemoryDeps) {
-    this.deps = deps;
-    this.records = [];
+  recall<K extends keyof MemoryMap>(type: K): ReadonlyArray<Extract<Fact, { type: K }>> {
+    return this.facts.filter((fact): fact is Extract<Fact, { type: K }> => fact.type === type);
   }
 
-  recall<K extends keyof Map>(type: K): ReadonlyArray<MemoryRecord<Map, K>> {
-    return this.records.filter((record): record is MemoryRecord<Map, K> => record.type === type);
+  clone(): IMemory {
+    const clone = new Memory();
+
+    clone.facts = [...this.facts];
+
+    return clone;
   }
 
-  remember<K extends keyof Map>(type: K, details: Map[K]): void {
-    const { time } = this.deps;
-
-    this.records.push({
-      type,
-      details,
-      rememberedAt: time.getState(),
-    });
+  remember(fact: Fact): void {
+    this.facts.push(fact);
   }
 }

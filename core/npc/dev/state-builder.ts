@@ -143,7 +143,7 @@ export class NpcStateBuilder {
         psyche: this.psyche(new PsycheBuilder()),
         needs: this.needs(new NeedsBuilder().withTime(this.time)),
         addictions: this.addictions(new AddictionsBuilder().withTime(this.time)),
-        memory: new Memory({ time }),
+        memory: new Memory(),
       },
       world: {
         time,

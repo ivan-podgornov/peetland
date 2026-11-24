@@ -5,7 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./dev": "./dev/index.ts"
   },
   "dependencies": {
     "@peetland/timings": "0.0.0"

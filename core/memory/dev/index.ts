@@ -1,0 +1,1 @@
+export { createMockedMemoryFactory } from './factory';

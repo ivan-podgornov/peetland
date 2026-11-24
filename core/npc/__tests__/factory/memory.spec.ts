@@ -1,43 +1,30 @@
 import { Memory } from '@peetland/memory';
-import type { IMemoryFactory } from '@peetland/memory';
-import { ManualTime } from '@peetland/timings';
-import { describe, expect, it, vi } from 'vitest';
+import { createMockedMemoryFactory } from '@peetland/memory/dev';
+import { describe, expect, it } from 'vitest';
 
-import { createMockedNpcWorldKnowledge, createNpcData } from '../../dev';
+import { createNpcData } from '../../dev';
 import { NpcFactory } from '../../src';
 
 import { createRequiredDeps } from './helpers';
 
 describe('NpcFactory', () => {
   describe('#create', () => {
-    it('Вызывает memoryFactory.create с временем мира', () => {
-      const memory = new Memory({ time: new ManualTime() });
-      const memoryFactory: IMemoryFactory = { create: vi.fn(() => memory) };
-      const time = new ManualTime({
-        day: 3,
-        hours: 8,
-        minutes: 0,
-      });
-      const factory = new NpcFactory(
-        createRequiredDeps({
-          memoryFactory,
-          worldKnowledge: createMockedNpcWorldKnowledge({ time }),
-        })
-      );
+    it('Вызывает memoryFactory.create', () => {
+      const memoryFactory = createMockedMemoryFactory();
+      const factory = new NpcFactory(createRequiredDeps({ memoryFactory }));
 
       factory.create(createNpcData());
 
-      expect(memoryFactory.create).toHaveBeenCalledExactlyOnceWith(time);
+      expect(memoryFactory.create).toHaveBeenCalledExactlyOnceWith();
     });
 
     it('Передаёт NPC память, которую вернула memoryFactory', () => {
-      const memory = new Memory({ time: new ManualTime() });
-      const memoryFactory: IMemoryFactory = { create: vi.fn(() => memory) };
+      const memoryFactory = createMockedMemoryFactory();
       const factory = new NpcFactory(createRequiredDeps({ memoryFactory }));
 
       const npc = factory.create(createNpcData());
 
-      expect(npc.getState().self.memory).toBe(memory);
+      expect(npc.getState().self.memory).toBe(memoryFactory.create());
     });
 
     it('Если memoryFactory не передана, NPC получает экземпляр Memory', () => {

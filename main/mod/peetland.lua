@@ -8356,11 +8356,6 @@ return ____exports
 local ____exports = {}
 return ____exports
  end,
-["core.npc.src.root-task-factory"] = function(...) 
---[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
-local ____exports = {}
-return ____exports
- end,
 ["core.npc.src.types"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -8374,45 +8369,42 @@ local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____events = require("toolkit.events.src.index")
 local AbortController = ____events.AbortController
---- NPC склеивает свои данные, актора и HTN-агента
+--- NPC — личность, которая живёт в теле-акторе
 ____exports.Npc = __TS__Class()
 local Npc = ____exports.Npc
 Npc.name = "Npc"
 function Npc.prototype.____constructor(self, data, deps)
     local ____deps_0 = deps
-    local actorFactory = ____deps_0.actorFactory
+    local actor = ____deps_0.actor
     local actorNpcRegistry = ____deps_0.actorNpcRegistry
+    local htn = ____deps_0.htn
+    local inventory = ____deps_0.inventory
+    local psyche = ____deps_0.psyche
+    local needs = ____deps_0.needs
+    local addictions = ____deps_0.addictions
+    local urgencyWatcher = ____deps_0.urgencyWatcher
     local ticks = ____deps_0.ticks
-    local htnFactory = ____deps_0.htnFactory
-    local inventoryFactory = ____deps_0.inventoryFactory
-    local psycheFactory = ____deps_0.psycheFactory
-    local needsFactory = ____deps_0.needsFactory
-    local addictionsFactory = ____deps_0.addictionsFactory
-    local urgencyWatcherFactory = ____deps_0.urgencyWatcherFactory
-    local rootTaskFactory = ____deps_0.rootTaskFactory
-    local gameSignal = ____deps_0.gameSignal
     local worldKnowledge = ____deps_0.worldKnowledge
-    local ____temp_1 = worldKnowledge:getState()
-    local time = ____temp_1.time
+    local gameSignal = ____deps_0.gameSignal
     self.id = data.id
     self.kind = data.kind
+    self.actor = actor
+    self.inventory = inventory
+    self.psyche = psyche
+    self.needs = needs
+    self.addictions = addictions
+    self.urgencyWatcher = urgencyWatcher
     self.worldKnowledge = worldKnowledge
-    self.inventory = inventoryFactory:create(data.inventory)
-    self.psyche = psycheFactory:create(data.psyche)
-    self.needs = needsFactory:create(data.needs, time)
-    self.addictions = addictionsFactory:create(data.addictions, time)
-    self.urgencyWatcher = urgencyWatcherFactory:create()
     self.lifetime = __TS__New(AbortController)
-    self.actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
-    actorNpcRegistry:register(self.actor, self)
+    actorNpcRegistry:register(actor, self)
     self.context = {
-        actor = self.actor,
-        inventory = self.inventory,
-        psyche = self.psyche,
-        needs = self.needs,
-        addictions = self.addictions
+        actor = actor,
+        inventory = inventory,
+        psyche = psyche,
+        needs = needs,
+        addictions = addictions
     }
-    self.htn = htnFactory:create(rootTaskFactory:create(data.kind))
+    self.htn = htn
     ticks:subscribe(
         function() return self:tick() end,
         {signal = self.lifetime.signal}
@@ -8465,6 +8457,11 @@ __TS__SetDescriptor(
 )
 return ____exports
  end,
+["core.npc.src.root-task-factory"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
 ["core.npc.src.factory"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -8491,9 +8488,6 @@ function NpcFactory.prototype.____constructor(self, deps)
     local actorFactory = ____deps_0.actorFactory
     local actorNpcRegistry = ____deps_0.actorNpcRegistry
     local ticks = ____deps_0.ticks
-    local rootTaskFactory = ____deps_0.rootTaskFactory
-    local gameSignal = ____deps_0.gameSignal
-    local worldKnowledge = ____deps_0.worldKnowledge
     local htnFactory = ____deps_0.htnFactory
     if htnFactory == nil then
         htnFactory = __TS__New(HTNFactory)
@@ -8518,6 +8512,9 @@ function NpcFactory.prototype.____constructor(self, deps)
     if urgencyWatcherFactory == nil then
         urgencyWatcherFactory = __TS__New(UrgencyWatcherFactory)
     end
+    local rootTaskFactory = ____deps_0.rootTaskFactory
+    local gameSignal = ____deps_0.gameSignal
+    local worldKnowledge = ____deps_0.worldKnowledge
     self.deps = {
         actorFactory = actorFactory,
         actorNpcRegistry = actorNpcRegistry,
@@ -8534,7 +8531,39 @@ function NpcFactory.prototype.____constructor(self, deps)
     }
 end
 function NpcFactory.prototype.create(self, data)
-    return __TS__New(Npc, data, self.deps)
+    local ____self_deps_1 = self.deps
+    local actorFactory = ____self_deps_1.actorFactory
+    local actorNpcRegistry = ____self_deps_1.actorNpcRegistry
+    local ticks = ____self_deps_1.ticks
+    local htnFactory = ____self_deps_1.htnFactory
+    local inventoryFactory = ____self_deps_1.inventoryFactory
+    local psycheFactory = ____self_deps_1.psycheFactory
+    local needsFactory = ____self_deps_1.needsFactory
+    local addictionsFactory = ____self_deps_1.addictionsFactory
+    local urgencyWatcherFactory = ____self_deps_1.urgencyWatcherFactory
+    local rootTaskFactory = ____self_deps_1.rootTaskFactory
+    local gameSignal = ____self_deps_1.gameSignal
+    local worldKnowledge = ____self_deps_1.worldKnowledge
+    local ____temp_2 = worldKnowledge:getState()
+    local time = ____temp_2.time
+    local rootTask = rootTaskFactory:create(data.kind)
+    return __TS__New(
+        Npc,
+        data,
+        {
+            actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle}),
+            actorNpcRegistry = actorNpcRegistry,
+            htn = htnFactory:create(rootTask),
+            inventory = inventoryFactory:create(data.inventory),
+            psyche = psycheFactory:create(data.psyche),
+            needs = needsFactory:create(data.needs, time),
+            addictions = addictionsFactory:create(data.addictions, time),
+            urgencyWatcher = urgencyWatcherFactory:create(),
+            ticks = ticks,
+            worldKnowledge = worldKnowledge,
+            gameSignal = gameSignal
+        }
+    )
 end
 return ____exports
  end,

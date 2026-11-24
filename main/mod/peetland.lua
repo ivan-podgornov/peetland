@@ -7063,6 +7063,72 @@ do
 end
 return ____exports
  end,
+["core.memory.src.types"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.memory.src.memory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+--- Память NPC: факты о том, что с ним было
+____exports.Memory = __TS__Class()
+local Memory = ____exports.Memory
+Memory.name = "Memory"
+function Memory.prototype.____constructor(self)
+    self.facts = {}
+end
+function Memory.prototype.recall(self, ____type)
+    return __TS__ArrayFilter(
+        self.facts,
+        function(____, fact) return fact.type == ____type end
+    )
+end
+function Memory.prototype.clone(self)
+    local clone = __TS__New(____exports.Memory)
+    clone.facts = {unpack(self.facts)}
+    return clone
+end
+function Memory.prototype.remember(self, fact)
+    local ____self_facts_0 = self.facts
+    ____self_facts_0[#____self_facts_0 + 1] = fact
+end
+return ____exports
+ end,
+["core.memory.src.factory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____memory = require("core.memory.src.memory")
+local Memory = ____memory.Memory
+--- Фабрика памяти NPC
+____exports.MemoryFactory = __TS__Class()
+local MemoryFactory = ____exports.MemoryFactory
+MemoryFactory.name = "MemoryFactory"
+function MemoryFactory.prototype.____constructor(self)
+end
+function MemoryFactory.prototype.create(self)
+    return __TS__New(Memory)
+end
+return ____exports
+ end,
+["core.memory.src.index"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____memory = require("core.memory.src.memory")
+    ____exports.Memory = ____memory.Memory
+end
+do
+    local ____factory = require("core.memory.src.factory")
+    ____exports.MemoryFactory = ____factory.MemoryFactory
+end
+return ____exports
+ end,
 ["core.needs.src.activity"] = function(...) 
 --[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
 local ____exports = {}
@@ -8382,6 +8448,7 @@ function Npc.prototype.____constructor(self, data, deps)
     local psyche = ____deps_0.psyche
     local needs = ____deps_0.needs
     local addictions = ____deps_0.addictions
+    local memory = ____deps_0.memory
     local urgencyWatcher = ____deps_0.urgencyWatcher
     local ticks = ____deps_0.ticks
     local worldKnowledge = ____deps_0.worldKnowledge
@@ -8393,6 +8460,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.psyche = psyche
     self.needs = needs
     self.addictions = addictions
+    self.memory = memory
     self.urgencyWatcher = urgencyWatcher
     self.worldKnowledge = worldKnowledge
     self.lifetime = __TS__New(AbortController)
@@ -8402,7 +8470,8 @@ function Npc.prototype.____constructor(self, data, deps)
         inventory = inventory,
         psyche = psyche,
         needs = needs,
-        addictions = addictions
+        addictions = addictions,
+        memory = memory
     }
     self.htn = htn
     ticks:subscribe(
@@ -8430,7 +8499,8 @@ function Npc.prototype.getState(self)
             inventory = self.inventory,
             psyche = self.psyche,
             needs = self.needs,
-            addictions = self.addictions
+            addictions = self.addictions,
+            memory = self.memory
         },
         world = self.worldKnowledge:getState()
     }
@@ -8473,6 +8543,8 @@ local ____htn = require("toolkit.htn.src.index")
 local HTNFactory = ____htn.HTNFactory
 local ____inventory = require("core.inventory.src.index")
 local InventoryFactory = ____inventory.InventoryFactory
+local ____memory = require("core.memory.src.index")
+local MemoryFactory = ____memory.MemoryFactory
 local ____needs = require("core.needs.src.index")
 local NeedsFactory = ____needs.NeedsFactory
 local UrgencyWatcherFactory = ____needs.UrgencyWatcherFactory
@@ -8495,6 +8567,10 @@ function NpcFactory.prototype.____constructor(self, deps)
     local inventoryFactory = ____deps_0.inventoryFactory
     if inventoryFactory == nil then
         inventoryFactory = __TS__New(InventoryFactory)
+    end
+    local memoryFactory = ____deps_0.memoryFactory
+    if memoryFactory == nil then
+        memoryFactory = __TS__New(MemoryFactory)
     end
     local psycheFactory = ____deps_0.psycheFactory
     if psycheFactory == nil then
@@ -8521,6 +8597,7 @@ function NpcFactory.prototype.____constructor(self, deps)
         ticks = ticks,
         htnFactory = htnFactory,
         inventoryFactory = inventoryFactory,
+        memoryFactory = memoryFactory,
         psycheFactory = psycheFactory,
         needsFactory = needsFactory,
         addictionsFactory = addictionsFactory,
@@ -8537,6 +8614,7 @@ function NpcFactory.prototype.create(self, data)
     local ticks = ____self_deps_1.ticks
     local htnFactory = ____self_deps_1.htnFactory
     local inventoryFactory = ____self_deps_1.inventoryFactory
+    local memoryFactory = ____self_deps_1.memoryFactory
     local psycheFactory = ____self_deps_1.psycheFactory
     local needsFactory = ____self_deps_1.needsFactory
     local addictionsFactory = ____self_deps_1.addictionsFactory
@@ -8555,6 +8633,7 @@ function NpcFactory.prototype.create(self, data)
             actorNpcRegistry = actorNpcRegistry,
             htn = htnFactory:create(rootTask),
             inventory = inventoryFactory:create(data.inventory),
+            memory = memoryFactory:create(),
             psyche = psycheFactory:create(data.psyche),
             needs = needsFactory:create(data.needs, time),
             addictions = addictionsFactory:create(data.addictions, time),

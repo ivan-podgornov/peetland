@@ -1,1 +1,0 @@
-{"id":"1a429a3405c45ed1fa9269ce8fcb04b6.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/ticks.spec.ts#Npc Каждый тик Не обновляет HTN-агента, пока не наступил тик","name":"Не обновляет HTN-агента, пока не наступил тик","status":"passed","testResultsByEnv":{"default":"a6485c663354b712267f0f0229bffb2f"}}

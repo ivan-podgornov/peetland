@@ -1,1 +1,0 @@
-{"id":"d78fabcc1b8ae68ec87c8b19f081e852.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/npc/__tests__/factory/needs.spec.ts#NpcFactory #create Если needsFactory не передана, NPC получает экземпляр Needs","name":"Если needsFactory не передана, NPC получает экземпляр Needs","status":"passed","testResultsByEnv":{"default":"7de244fd4af255b00982e15c696965c9"}}

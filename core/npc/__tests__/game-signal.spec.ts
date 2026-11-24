@@ -1,6 +1,6 @@
 import { AbortController } from '@peetland/events';
-import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createMockedHTN } from '@peetland/htn/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
@@ -15,7 +15,7 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          actorFactory: createMockedActorFactory(actor),
+          actor,
           gameSignal: game.signal,
         })
       );
@@ -31,7 +31,7 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           gameSignal: game.signal,
         })
       );
@@ -47,7 +47,7 @@ describe('Npc', () => {
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           gameSignal: game.signal,
         })
       );
@@ -68,7 +68,7 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          actorFactory: createMockedActorFactory(actor),
+          actor,
           gameSignal: game.signal,
         })
       );
@@ -84,7 +84,7 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           gameSignal: game.signal,
         })
       );

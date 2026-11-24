@@ -1,6 +1,6 @@
 import { Npc } from '@peetland/npc';
 import { createNpcData, createNpcDeps } from '@peetland/npc/dev';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { ActorNpcRegistry } from '../src';
@@ -50,7 +50,7 @@ describe('ActorNpcRegistry', () => {
         createNpcData(),
         createNpcDeps({
           actorNpcRegistry: registry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
 

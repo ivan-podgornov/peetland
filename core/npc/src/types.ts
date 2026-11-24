@@ -1,14 +1,13 @@
-import type { IAddictions, IAddictionsFactory } from '@peetland/addictions';
+import type { IAddictions } from '@peetland/addictions';
 import type { IAbortSignal, Observable } from '@peetland/events';
-import type { IActor, IActorFactory } from '@peetland/game';
-import type { IHTNFactory } from '@peetland/htn';
-import type { Inventory, IInventoryFactory } from '@peetland/inventory';
-import type { INeeds, INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
-import type { IPsyche, IPsycheFactory } from '@peetland/psyche';
+import type { IActor } from '@peetland/game';
+import type { IHTN } from '@peetland/htn';
+import type { Inventory } from '@peetland/inventory';
+import type { INeeds, IUrgencyWatcher } from '@peetland/needs';
+import type { IPsyche } from '@peetland/psyche';
 
 import type { NpcContext } from './context';
 import type { NpcKind } from './kind';
-import type { IRootTaskFactory } from './root-task-factory';
 import type { NpcState, NpcWorldState } from './state';
 
 /** NPC — личность, которая живёт в теле-акторе */
@@ -24,18 +23,6 @@ export interface INpc {
 
   /** Тип NPC, по которому подбирается корневая задача */
   readonly kind: NpcKind;
-
-  /** Инвентарь NPC */
-  readonly inventory: Inventory;
-
-  /** Психика NPC */
-  readonly psyche: IPsyche;
-
-  /** Потребности NPC */
-  readonly needs: INeeds;
-
-  /** Зависимости NPC */
-  readonly addictions: IAddictions;
 
   /** Возвращает состояние NPC: слепок самого NPC и то, что он знает о мире (см. NpcState) */
   getState(): NpcState;
@@ -77,26 +64,24 @@ export interface INpcWorldKnowledge {
   getVisibleNpcs(target: INpc, radius: number): INpc[];
 }
 
-/** Зависимости NPC */
+/** Зависимости NPC: готовые сущности, с которыми он живёт, и сервисы мира */
 export interface NpcDeps {
-  /** Фабрика, которой NPC создаёт своего актора */
-  actorFactory: IActorFactory;
+  /** Актор — тело NPC */
+  actor: IActor;
   /** Реестр, в котором NPC связывает своего актора с собой */
   actorNpcRegistry: IActorNpcRegistry;
-  /** Фабрика, которой NPC создаёт свой HTN-агент. Агент сам планирует и перепланирует задачи */
-  htnFactory: IHTNFactory<NpcState, NpcContext>;
-  /** Фабрика, которой NPC создаёт свой инвентарь */
-  inventoryFactory: IInventoryFactory;
-  /** Фабрика, которой NPC создаёт свою психику */
-  psycheFactory: IPsycheFactory;
-  /** Фабрика, которой NPC создаёт свои потребности */
-  needsFactory: INeedsFactory;
-  /** Фабрика, которой NPC создаёт свои зависимости */
-  addictionsFactory: IAddictionsFactory;
-  /** Фабрика, которой NPC создаёт наблюдателя, который следит, когда потребности становятся срочными */
-  urgencyWatcherFactory: IUrgencyWatcherFactory;
-  /** Фабрика, которой NPC создаёт корневую задачу своего HTN-агента по своему типу */
-  rootTaskFactory: IRootTaskFactory;
+  /** HTN-агент, который планирует и исполняет задачи NPC */
+  htn: IHTN<NpcState, NpcContext>;
+  /** Инвентарь NPC */
+  inventory: Inventory;
+  /** Психика NPC */
+  psyche: IPsyche;
+  /** Потребности NPC */
+  needs: INeeds;
+  /** Зависимости NPC */
+  addictions: IAddictions;
+  /** Наблюдатель, который следит, когда потребности становятся срочными */
+  urgencyWatcher: IUrgencyWatcher;
   /** Сообщает о каждом тике мира */
   ticks: Observable<unknown>;
   /** То, что NPC знает о мире */

@@ -1,4 +1,4 @@
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '../dev';
@@ -14,7 +14,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
 

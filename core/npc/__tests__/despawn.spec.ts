@@ -1,6 +1,7 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createMockedHTN } from '@peetland/htn/dev';
+import { Inventory } from '@peetland/inventory';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
@@ -11,10 +12,7 @@ describe('Npc', () => {
   describe('#despawn', () => {
     it('Останавливает HTN-агента', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn) })
-      );
+      const npc = new Npc(createNpcData(), createNpcDeps({ htn }));
 
       npc.despawn();
 
@@ -27,8 +25,8 @@ describe('Npc', () => {
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          actorFactory: createMockedActorFactory(actor),
-          htnFactory: createMockedHTNFactory(htn),
+          actor,
+          htn,
         })
       );
 
@@ -39,22 +37,23 @@ describe('Npc', () => {
 
     it('Передаёт HTN-агенту при остановке контекст с инвентарём NPC', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
+      const inventory = new Inventory();
       const npc = new Npc(
         createNpcData(),
-        createNpcDeps({ htnFactory: createMockedHTNFactory(htn) })
+        createNpcDeps({
+          htn,
+          inventory,
+        })
       );
 
       npc.despawn();
 
-      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ inventory: npc.inventory }));
+      expect(htn.stop).toHaveBeenCalledWith(expect.objectContaining({ inventory }));
     });
 
     it('Деспавнит актора', () => {
       const actor = createActor();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({ actorFactory: createMockedActorFactory(actor) })
-      );
+      const npc = new Npc(createNpcData(), createNpcDeps({ actor }));
 
       npc.despawn();
 
@@ -67,7 +66,7 @@ describe('Npc', () => {
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
         })
       );

@@ -13,69 +13,62 @@ import type { NpcKind } from './kind';
 import type { NpcState } from './state';
 import type { INpc, INpcWorldKnowledge, NpcDeps } from './types';
 
-/** NPC склеивает свои данные, актора и HTN-агента */
+/** NPC — личность, которая живёт в теле-акторе */
 export class Npc implements INpc {
   readonly id: string;
   readonly kind: NpcKind;
-  readonly inventory: Inventory;
-  readonly psyche: IPsyche;
-  readonly needs: INeeds;
-  readonly addictions: IAddictions;
 
+  private readonly addictions: IAddictions;
   private readonly actor: IActor;
   private readonly context: NpcContext;
   private readonly htn: IHTN<NpcState, NpcContext>;
+  private readonly inventory: Inventory;
   private readonly lifetime: AbortController;
+  private readonly needs: INeeds;
+  private readonly psyche: IPsyche;
   private readonly urgencyWatcher: IUrgencyWatcher;
   private readonly worldKnowledge: INpcWorldKnowledge;
 
   /**
-   * Создаёт актора, инвентарь, психику, потребности, зависимости и HTN-агента по данным NPC и каждый
-   * тик передаёт агенту актуальное состояние и контекст с ними. Потребности начинают падать, а тяга
-   * зависимостей расти со времени, которое NPC знает о мире в момент создания. Когда игра завершается, деспавнится, а если она уже
-   * завершилась, деспавнится сразу
+   * Каждый тик передаёт HTN-агенту актуальное состояние и контекст. Когда игра завершается,
+   * деспавнится, а если она уже завершилась, деспавнится сразу
    * @param data - данные NPC
+   * @param deps - готовые сущности и сервисы, с которыми NPC живёт
    */
   constructor(data: NpcData, deps: NpcDeps) {
     const {
-      actorFactory,
+      actor,
       actorNpcRegistry,
+      htn,
+      inventory,
+      psyche,
+      needs,
+      addictions,
+      urgencyWatcher,
       ticks,
-      htnFactory,
-      inventoryFactory,
-      psycheFactory,
-      needsFactory,
-      addictionsFactory,
-      urgencyWatcherFactory,
-      rootTaskFactory,
-      gameSignal,
       worldKnowledge,
+      gameSignal,
     } = deps;
-    const { time } = worldKnowledge.getState();
 
     this.id = data.id;
     this.kind = data.kind;
+    this.actor = actor;
+    this.inventory = inventory;
+    this.psyche = psyche;
+    this.needs = needs;
+    this.addictions = addictions;
+    this.urgencyWatcher = urgencyWatcher;
     this.worldKnowledge = worldKnowledge;
-    this.inventory = inventoryFactory.create(data.inventory);
-    this.psyche = psycheFactory.create(data.psyche);
-    this.needs = needsFactory.create(data.needs, time);
-    this.addictions = addictionsFactory.create(data.addictions, time);
-    this.urgencyWatcher = urgencyWatcherFactory.create();
     this.lifetime = new AbortController();
-    this.actor = actorFactory.create({
-      modelId: data.modelId,
-      position: data.spawnPosition,
-      angle: data.spawnAngle,
-    });
-    actorNpcRegistry.register(this.actor, this);
+    actorNpcRegistry.register(actor, this);
     this.context = {
-      actor: this.actor,
-      inventory: this.inventory,
-      psyche: this.psyche,
-      needs: this.needs,
-      addictions: this.addictions,
+      actor,
+      inventory,
+      psyche,
+      needs,
+      addictions,
     };
-    this.htn = htnFactory.create(rootTaskFactory.create(data.kind));
+    this.htn = htn;
 
     ticks.subscribe(() => this.tick(), { signal: this.lifetime.signal });
 

@@ -1,6 +1,6 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { createMockedUrgencyWatcher, createMockedUrgencyWatcherFactory } from '@peetland/needs/dev';
+import { createMockedHTN } from '@peetland/htn/dev';
+import { createMockedUrgencyWatcher } from '@peetland/needs/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
@@ -9,14 +9,6 @@ import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
   describe('Срочные потребности', () => {
-    it('Создаёт наблюдателя срочности фабрикой urgencyWatcherFactory', () => {
-      const urgencyWatcherFactory = createMockedUrgencyWatcherFactory();
-
-      new Npc(createNpcData(), createNpcDeps({ urgencyWatcherFactory }));
-
-      expect(urgencyWatcherFactory.create).toHaveBeenCalledOnce();
-    });
-
     it('На каждый тик проверяет потребности и время из состояния NPC', () => {
       const ticks = createControlledObservable();
       const watcher = createMockedUrgencyWatcher();
@@ -24,7 +16,7 @@ describe('Npc', () => {
         createNpcData(),
         createNpcDeps({
           ticks: ticks.observable,
-          urgencyWatcherFactory: createMockedUrgencyWatcherFactory(watcher),
+          urgencyWatcher: watcher,
         })
       );
 
@@ -40,11 +32,9 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
-          urgencyWatcherFactory: createMockedUrgencyWatcherFactory(
-            createMockedUrgencyWatcher(true)
-          ),
+          urgencyWatcher: createMockedUrgencyWatcher(true),
         })
       );
 
@@ -59,11 +49,9 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
-          urgencyWatcherFactory: createMockedUrgencyWatcherFactory(
-            createMockedUrgencyWatcher(false)
-          ),
+          urgencyWatcher: createMockedUrgencyWatcher(false),
         })
       );
 

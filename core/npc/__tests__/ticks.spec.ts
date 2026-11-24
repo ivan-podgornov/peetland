@@ -1,7 +1,8 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { Item } from '@peetland/inventory';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createMockedHTN } from '@peetland/htn/dev';
+import { Inventory, Item } from '@peetland/inventory';
+import { createMockedPsyche } from '@peetland/psyche/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createNpcData, createNpcDeps } from '../dev';
@@ -10,13 +11,20 @@ import type { NpcContext, NpcState } from '../src';
 
 describe('Npc', () => {
   describe('Каждый тик', () => {
+    it('Не обновляет HTN-агента, пока не наступил тик', () => {
+      const htn = createMockedHTN<NpcState, NpcContext>();
+      new Npc(createNpcData(), createNpcDeps({ htn }));
+
+      expect(htn.update).not.toHaveBeenCalled();
+    });
+
     it('Вызывает htn.update с состоянием NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
         })
       );
@@ -33,8 +41,8 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          actorFactory: createMockedActorFactory(actor),
-          htnFactory: createMockedHTNFactory(htn),
+          actor,
+          htn,
           ticks: ticks.observable,
         })
       );
@@ -50,10 +58,12 @@ describe('Npc', () => {
     it('Вызывает htn.update с контекстом, в котором инвентарь NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const npc = new Npc(
+      const inventory = new Inventory();
+      new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
+          inventory,
           ticks: ticks.observable,
         })
       );
@@ -62,17 +72,19 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ inventory: npc.inventory })
+        expect.objectContaining({ inventory })
       );
     });
 
     it('Вызывает htn.update с контекстом, в котором психика NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const npc = new Npc(
+      const psyche = createMockedPsyche();
+      new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
+          psyche,
           ticks: ticks.observable,
         })
       );
@@ -81,7 +93,7 @@ describe('Npc', () => {
 
       expect(htn.update).toHaveBeenCalledWith(
         expect.anything(),
-        expect.objectContaining({ psyche: npc.psyche })
+        expect.objectContaining({ psyche })
       );
     });
 
@@ -91,7 +103,7 @@ describe('Npc', () => {
       new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
         })
       );
@@ -111,14 +123,14 @@ describe('Npc', () => {
       const npc = new Npc(
         createNpcData(),
         createNpcDeps({
-          htnFactory: createMockedHTNFactory(htn),
+          htn,
           ticks: ticks.observable,
         })
       );
 
       ticks.subscriber.next(undefined);
 
-      expect(npc.inventory.get(Item.Booze)).toBe(1);
+      expect(npc.getState().self.inventory.get(Item.Booze)).toBe(1);
     });
   });
 });

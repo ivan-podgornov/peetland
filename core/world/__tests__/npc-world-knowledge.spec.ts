@@ -1,7 +1,7 @@
 import { Npc } from '@peetland/npc';
 import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
-import { createActor, createMockedActorFactory } from '@peetland/virtual-actor/dev';
+import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createGame } from '../dev';
@@ -30,7 +30,7 @@ describe('NpcWorldKnowledge', () => {
         createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(actor),
+          actor,
         })
       );
       const visibleActor = createActor();
@@ -38,7 +38,7 @@ describe('NpcWorldKnowledge', () => {
         createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
-          actorFactory: createMockedActorFactory(visibleActor),
+          actor: visibleActor,
         })
       );
       const game = createGame({ getVisibleActors: vi.fn(() => [visibleActor]) });
@@ -58,7 +58,7 @@ describe('NpcWorldKnowledge', () => {
         createNpcData(),
         createNpcDeps({
           actorNpcRegistry: createMockedActorNpcRegistry(),
-          actorFactory: createMockedActorFactory(createActor()),
+          actor: createActor(),
         })
       );
       const game = createGame();

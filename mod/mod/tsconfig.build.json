@@ -14,6 +14,7 @@
       "@peetland/game": ["../../core/game/src/index.ts"],
       "@peetland/homeless": ["../../core/homeless/src/index.ts"],
       "@peetland/inventory": ["../../core/inventory/src/index.ts"],
+      "@peetland/memory": ["../../core/memory/src/index.ts"],
       "@peetland/needs": ["../../core/needs/src/index.ts"],
       "@peetland/needs-tasks": ["../../core/needs-tasks/src/index.ts"],
       "@peetland/npc": ["../../core/npc/src/index.ts"],

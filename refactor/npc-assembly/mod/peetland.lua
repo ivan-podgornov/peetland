@@ -8369,7 +8369,7 @@ local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
 local ____exports = {}
 local ____events = require("toolkit.events.src.index")
 local AbortController = ____events.AbortController
---- NPC склеивает актора, свои сущности и HTN-агента
+--- NPC — личность, которая живёт в теле-акторе
 ____exports.Npc = __TS__Class()
 local Npc = ____exports.Npc
 Npc.name = "Npc"

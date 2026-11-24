@@ -5040,6 +5040,7 @@ ____exports.addExplosion = _G.addExplosion
 ____exports.startScriptFire = _G.startScriptFire
 ____exports.removeScriptFire = _G.removeScriptFire
 ____exports.isScriptFireExtinguished = _G.isScriptFireExtinguished
+____exports.isLineOfSightClear = _G.isLineOfSightClear
 return ____exports
  end,
 ["moonloader.src.zones"] = function(...) 
@@ -5920,6 +5921,108 @@ do
 end
 return ____exports
  end,
+["core.perception.src.los-provider"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+return ____exports
+ end,
+["core.perception.src.always-clear-los"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+--- Провайдер прямой видимости прозрачного мира: прямая всегда свободна
+____exports.AlwaysClearLos = __TS__Class()
+local AlwaysClearLos = ____exports.AlwaysClearLos
+AlwaysClearLos.name = "AlwaysClearLos"
+function AlwaysClearLos.prototype.____constructor(self)
+end
+function AlwaysClearLos.prototype.isLineOfSightClear(self)
+    return true
+end
+return ____exports
+ end,
+["core.perception.src.vision-system"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
+local ____exports = {}
+--- Человеческий угол зрения в градусах
+____exports.HUMAN_FOV_DEG = 100
+____exports.VisionSystem = __TS__Class()
+local VisionSystem = ____exports.VisionSystem
+VisionSystem.name = "VisionSystem"
+function VisionSystem.prototype.____constructor(self, deps)
+    self.deps = deps
+end
+function VisionSystem.prototype.getVisibleActors(self, target, radius)
+    local ____self_deps_0 = self.deps
+    local registry = ____self_deps_0.registry
+    local position = target:getPosition()
+    return __TS__ArrayFilter(
+        registry:getAll(),
+        function(____, actor) return self:isVisible(target, actor, position, radius) end
+    )
+end
+function VisionSystem.prototype.isVisible(self, target, actor, targetPosition, radius)
+    if actor == target or actor.signal.aborted then
+        return false
+    end
+    local ____self_deps_1 = self.deps
+    local geometry = ____self_deps_1.geometry
+    local los = ____self_deps_1.los
+    local actorPosition = actor:getPosition()
+    if not geometry:isWithinRadius2d(actorPosition, targetPosition, radius) then
+        return false
+    end
+    if not geometry:isPointInSector2d(
+        {
+            origin = targetPosition,
+            angle = target:getAngle(),
+            fovDeg = ____exports.HUMAN_FOV_DEG
+        },
+        actorPosition
+    ) then
+        return false
+    end
+    return los:isLineOfSightClear(targetPosition, actorPosition)
+end
+return ____exports
+ end,
+["core.perception.src.vision-system-factory"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__New = ____lualib.__TS__New
+local ____exports = {}
+local ____vision_2Dsystem = require("core.perception.src.vision-system")
+local VisionSystem = ____vision_2Dsystem.VisionSystem
+____exports.VisionSystemFactory = __TS__Class()
+local VisionSystemFactory = ____exports.VisionSystemFactory
+VisionSystemFactory.name = "VisionSystemFactory"
+function VisionSystemFactory.prototype.____constructor(self)
+end
+function VisionSystemFactory.prototype.create(self, deps)
+    return __TS__New(VisionSystem, deps)
+end
+return ____exports
+ end,
+["core.perception.src.index"] = function(...) 
+--[[ Generated with https://github.com/TypeScriptToLua/TypeScriptToLua ]]
+local ____exports = {}
+do
+    local ____always_2Dclear_2Dlos = require("core.perception.src.always-clear-los")
+    ____exports.AlwaysClearLos = ____always_2Dclear_2Dlos.AlwaysClearLos
+end
+do
+    local ____vision_2Dsystem_2Dfactory = require("core.perception.src.vision-system-factory")
+    ____exports.VisionSystemFactory = ____vision_2Dsystem_2Dfactory.VisionSystemFactory
+end
+do
+    local ____vision_2Dsystem = require("core.perception.src.vision-system")
+    ____exports.HUMAN_FOV_DEG = ____vision_2Dsystem.HUMAN_FOV_DEG
+    ____exports.VisionSystem = ____vision_2Dsystem.VisionSystem
+end
+return ____exports
+ end,
 ["gta-sa.src.clock"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -5975,6 +6078,37 @@ function GtaLogger.prototype.warn(self, message)
 end
 function GtaLogger.prototype.error(self, message)
     ____print("[error] " .. message)
+end
+return ____exports
+ end,
+["gta-sa.src.los"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local ____exports = {}
+local ____moonloader = require("moonloader.src.index")
+local isLineOfSightClear = ____moonloader.isLineOfSightClear
+--- Провайдер прямой видимости GTA SA: проверяет прямую нативом MoonLoader
+____exports.GtaLosProvider = __TS__Class()
+local GtaLosProvider = ____exports.GtaLosProvider
+GtaLosProvider.name = "GtaLosProvider"
+function GtaLosProvider.prototype.____constructor(self)
+end
+function GtaLosProvider.prototype.isLineOfSightClear(self, from, to)
+    return isLineOfSightClear(
+        from.x,
+        from.y,
+        from.z,
+        to.x,
+        to.y,
+        to.z,
+        true,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+    )
 end
 return ____exports
  end,
@@ -6068,6 +6202,8 @@ local Geometry = ____geometry.Geometry
 local ____moonloader = require("moonloader.src.index")
 local addEventHandler = ____moonloader.addEventHandler
 local thisScript = ____moonloader.thisScript
+local ____perception = require("core.perception.src.index")
+local VisionSystemFactory = ____perception.VisionSystemFactory
 local ____timings = require("toolkit.timings.src.index")
 local Timer = ____timings.Timer
 local ____actor = require("gta-sa.src.actor.index")
@@ -6078,6 +6214,8 @@ local ____clock = require("gta-sa.src.clock")
 local GtaClock = ____clock.GtaClock
 local ____logger = require("gta-sa.src.logger")
 local GtaLogger = ____logger.GtaLogger
+local ____los = require("gta-sa.src.los")
+local GtaLosProvider = ____los.GtaLosProvider
 local ____object = require("gta-sa.src.object.index")
 local GtaObjectFactory = ____object.GtaObjectFactory
 local ____time = require("gta-sa.src.time")
@@ -6117,6 +6255,12 @@ function GtaGame.prototype.____constructor(self, deps)
     self.geometry = __TS__New(Geometry)
     self.objectFactory = __TS__New(GtaObjectFactory)
     local actorRegistry = __TS__New(ActorRegistry)
+    local visionSystemFactory = deps.visionSystemFactory or __TS__New(VisionSystemFactory)
+    self.vision = visionSystemFactory:create({
+        registry = actorRegistry,
+        los = deps.los or __TS__New(GtaLosProvider),
+        geometry = self.geometry
+    })
     self.actorFactory = __TS__New(
         GtaActorFactory,
         {
@@ -6133,11 +6277,8 @@ function GtaGame.prototype.____constructor(self, deps)
         }
     )
 end
-function GtaGame.prototype.getVisibleActors(self)
-    error(
-        __TS__New(Error, "getVisibleActors is not implemented yet for this game"),
-        0
-    )
+function GtaGame.prototype.getVisibleActors(self, target, radius)
+    return self.vision:getVisibleActors(target, radius)
 end
 __TS__SetDescriptor(
     GtaGame.prototype,

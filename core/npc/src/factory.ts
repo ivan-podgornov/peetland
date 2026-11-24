@@ -6,6 +6,8 @@ import type { IHTNFactory } from '@peetland/htn';
 import { HTNFactory } from '@peetland/htn';
 import type { IInventoryFactory } from '@peetland/inventory';
 import { InventoryFactory } from '@peetland/inventory';
+import type { IMemoryFactory } from '@peetland/memory';
+import { MemoryFactory } from '@peetland/memory';
 import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
 import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
 import type { IPsycheFactory } from '@peetland/psyche';
@@ -38,6 +40,8 @@ export interface NpcFactoryDeps {
   htnFactory?: IHTNFactory<NpcState, NpcContext>;
   /** Фабрика, которая создаёт инвентари */
   inventoryFactory?: IInventoryFactory;
+  /** Фабрика, которая создаёт память NPC */
+  memoryFactory?: IMemoryFactory;
   /** Фабрика, которая создаёт психики */
   psycheFactory?: IPsycheFactory;
   /** Фабрика, которая создаёт потребности */
@@ -64,6 +68,7 @@ export class NpcFactory implements INpcFactory {
       ticks,
       htnFactory = new HTNFactory<NpcState, NpcContext>(),
       inventoryFactory = new InventoryFactory(),
+      memoryFactory = new MemoryFactory(),
       psycheFactory = new PsycheFactory(),
       needsFactory = new NeedsFactory(),
       addictionsFactory = new AddictionsFactory(),
@@ -79,6 +84,7 @@ export class NpcFactory implements INpcFactory {
       ticks,
       htnFactory,
       inventoryFactory,
+      memoryFactory,
       psycheFactory,
       needsFactory,
       addictionsFactory,
@@ -96,6 +102,7 @@ export class NpcFactory implements INpcFactory {
       ticks,
       htnFactory,
       inventoryFactory,
+      memoryFactory,
       psycheFactory,
       needsFactory,
       addictionsFactory,
@@ -116,6 +123,7 @@ export class NpcFactory implements INpcFactory {
       actorNpcRegistry,
       htn: htnFactory.create(rootTask),
       inventory: inventoryFactory.create(data.inventory),
+      memory: memoryFactory.create(time),
       psyche: psycheFactory.create(data.psyche),
       needs: needsFactory.create(data.needs, time),
       addictions: addictionsFactory.create(data.addictions, time),

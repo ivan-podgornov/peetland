@@ -4,6 +4,7 @@ import type { IAbortSignal } from '@peetland/events';
 import type { IActor } from '@peetland/game';
 import type { IHTN } from '@peetland/htn';
 import type { Inventory } from '@peetland/inventory';
+import type { IMemory } from '@peetland/memory';
 import type { INeeds, IUrgencyWatcher } from '@peetland/needs';
 import type { IPsyche } from '@peetland/psyche';
 
@@ -24,6 +25,7 @@ export class Npc implements INpc {
   private readonly htn: IHTN<NpcState, NpcContext>;
   private readonly inventory: Inventory;
   private readonly lifetime: AbortController;
+  private readonly memory: IMemory;
   private readonly needs: INeeds;
   private readonly psyche: IPsyche;
   private readonly urgencyWatcher: IUrgencyWatcher;
@@ -44,6 +46,7 @@ export class Npc implements INpc {
       psyche,
       needs,
       addictions,
+      memory,
       urgencyWatcher,
       ticks,
       worldKnowledge,
@@ -57,6 +60,7 @@ export class Npc implements INpc {
     this.psyche = psyche;
     this.needs = needs;
     this.addictions = addictions;
+    this.memory = memory;
     this.urgencyWatcher = urgencyWatcher;
     this.worldKnowledge = worldKnowledge;
     this.lifetime = new AbortController();
@@ -67,6 +71,7 @@ export class Npc implements INpc {
       psyche,
       needs,
       addictions,
+      memory,
     };
     this.htn = htn;
 
@@ -100,6 +105,7 @@ export class Npc implements INpc {
         psyche: this.psyche,
         needs: this.needs,
         addictions: this.addictions,
+        memory: this.memory,
       },
       world: this.worldKnowledge.getState(),
     };

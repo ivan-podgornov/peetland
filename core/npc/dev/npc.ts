@@ -8,6 +8,7 @@ import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN } from '@peetland/htn/dev';
 import { Inventory } from '@peetland/inventory';
+import { Memory } from '@peetland/memory';
 import { Needs } from '@peetland/needs';
 import {
   createMockedUrgencyWatcher,
@@ -17,6 +18,7 @@ import {
 } from '@peetland/needs/dev';
 import { Psyche } from '@peetland/psyche';
 import { createPsycheDeps, createPsycheState } from '@peetland/psyche/dev';
+import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
@@ -59,6 +61,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     psyche: new Psyche(createPsycheState(), createPsycheDeps()),
     needs: new Needs(createNeedsState(), createNeedsDeps()),
     addictions: new Addictions(createAddictionsState(), createAddictionsDeps()),
+    memory: new Memory({ time: new ManualTime() }),
     urgencyWatcher: createMockedUrgencyWatcher(),
     ticks: createControlledObservable().observable,
     worldKnowledge: createMockedNpcWorldKnowledge(),

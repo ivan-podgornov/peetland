@@ -1,4 +1,5 @@
 import { Inventory } from '@peetland/inventory';
+import { Memory } from '@peetland/memory';
 import { createMockedPsyche } from '@peetland/psyche/dev';
 import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
@@ -72,6 +73,13 @@ describe('Npc', () => {
       const npc = new Npc(createNpcData(), createNpcDeps({ psyche }));
 
       expect(npc.getState().self.psyche).toBe(psyche);
+    });
+
+    it('Возвращает память NPC', () => {
+      const memory = new Memory({ time: new ManualTime() });
+      const npc = new Npc(createNpcData(), createNpcDeps({ memory }));
+
+      expect(npc.getState().self.memory).toBe(memory);
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {

@@ -8,11 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { VirtualGame } from '../../src';
 
 function point(x: number, y: number): Vector3 {
-  return {
-    x,
-    y,
-    z: 0,
-  };
+  return Geometry.vector3(x, y, 0);
 }
 
 describe('VirtualGame', () => {

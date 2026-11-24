@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -10,23 +11,12 @@ describe('VirtualActor', () => {
       it('Завершается', () => {
         const timer = new ManualTimer();
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
           timer,
         });
         const complete = vi.fn();
         actor
-          .goToCoords(
-            {
-              x: 2,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(2, 0, 0), 1)
           .execute()
           .subscribe({ complete });
 
@@ -38,22 +28,11 @@ describe('VirtualActor', () => {
       it('Больше не двигает актора', () => {
         const timer = new ManualTimer();
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
           timer,
         });
         actor
-          .goToCoords(
-            {
-              x: 2,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(2, 0, 0), 1)
           .execute()
           .subscribe();
 
@@ -65,23 +44,12 @@ describe('VirtualActor', () => {
 
       it('Если актор уже в радиусе, при подписке завершается', () => {
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
         });
         const complete = vi.fn();
 
         actor
-          .goToCoords(
-            {
-              x: 1,
-              y: 0,
-              z: 0,
-            },
-            2
-          )
+          .goToCoords(Geometry.vector3(1, 0, 0), 2)
           .execute()
           .subscribe({ complete });
 
@@ -90,23 +58,12 @@ describe('VirtualActor', () => {
 
       it('Не учитывает высоту при проверке радиуса', () => {
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
         });
         const complete = vi.fn();
 
         actor
-          .goToCoords(
-            {
-              x: 1,
-              y: 0,
-              z: 50,
-            },
-            2
-          )
+          .goToCoords(Geometry.vector3(1, 0, 50), 2)
           .execute()
           .subscribe({ complete });
 

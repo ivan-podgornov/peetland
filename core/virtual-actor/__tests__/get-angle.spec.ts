@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { describe, expect, it } from 'vitest';
 
 import { createActor } from '../dev';
@@ -31,11 +32,7 @@ describe('VirtualActor', () => {
     it('Если актор переместился, угол не меняется', () => {
       const actor = createActor({ angle: 90 });
 
-      actor.setPosition({
-        x: 10,
-        y: 20,
-        z: 0,
-      });
+      actor.setPosition(Geometry.vector3(10, 20, 0));
 
       expect(actor.getAngle()).toBe(90);
     });

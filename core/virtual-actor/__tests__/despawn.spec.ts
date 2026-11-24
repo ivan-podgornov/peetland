@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -45,14 +46,7 @@ describe('VirtualActor', () => {
       actor.despawn();
 
       actor
-        .goToCoords(
-          {
-            x: 10,
-            y: 0,
-            z: 0,
-          },
-          1
-        )
+        .goToCoords(Geometry.vector3(10, 0, 0), 1)
         .execute()
         .subscribe({ error });
 
@@ -64,14 +58,7 @@ describe('VirtualActor', () => {
         const actor = createActor();
         const error = vi.fn();
         actor
-          .goToCoords(
-            {
-              x: 10,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(10, 0, 0), 1)
           .execute()
           .subscribe({ error });
 
@@ -84,14 +71,7 @@ describe('VirtualActor', () => {
         const timer = new ManualTimer();
         const actor = createActor({ timer });
         actor
-          .goToCoords(
-            {
-              x: 10,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(10, 0, 0), 1)
           .execute()
           .subscribe();
 
@@ -120,22 +100,11 @@ describe('VirtualActor', () => {
 
     it('Не влияет на завершённое движение', () => {
       const actor = createActor({
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
       });
       const error = vi.fn();
       actor
-        .goToCoords(
-          {
-            x: 1,
-            y: 0,
-            z: 0,
-          },
-          2
-        )
+        .goToCoords(Geometry.vector3(1, 0, 0), 2)
         .execute()
         .subscribe({ error });
 

@@ -1,4 +1,5 @@
 import { ActorRegistry } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
 import { describe, expect, it } from 'vitest';
 
 import { VirtualGame } from '../../src';
@@ -11,11 +12,7 @@ describe('VirtualGame', () => {
 
       const actor = game.actorFactory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
 

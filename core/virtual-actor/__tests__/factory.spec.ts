@@ -18,11 +18,7 @@ describe('VirtualActorFactory', () => {
 
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 1,
-          y: 2,
-          z: 3,
-        },
+        position: Geometry.vector3(1, 2, 3),
         angle: 0,
       });
 
@@ -43,11 +39,7 @@ describe('VirtualActorFactory', () => {
 
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 180,
       });
 
@@ -64,22 +56,11 @@ describe('VirtualActorFactory', () => {
       });
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
       actor
-        .goToCoords(
-          {
-            x: 10,
-            y: 0,
-            z: 0,
-          },
-          1
-        )
+        .goToCoords(Geometry.vector3(10, 0, 0), 1)
         .execute()
         .subscribe();
 
@@ -101,11 +82,7 @@ describe('VirtualActorFactory', () => {
       });
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
       const complete = vi.fn();
@@ -126,11 +103,7 @@ describe('VirtualActorFactory', () => {
       });
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
 
@@ -147,11 +120,7 @@ describe('VirtualActorFactory', () => {
       });
       const actor = factory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
 

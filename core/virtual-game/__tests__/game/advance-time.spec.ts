@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { describe, expect, it, vi } from 'vitest';
 
 import { VirtualGame } from '../../src';
@@ -18,22 +19,11 @@ describe('VirtualGame', () => {
       const game = new VirtualGame();
       const actor = game.actorFactory.create({
         modelId: 230,
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
         angle: 0,
       });
       actor
-        .goToCoords(
-          {
-            x: 10,
-            y: 0,
-            z: 0,
-          },
-          1
-        )
+        .goToCoords(Geometry.vector3(10, 0, 0), 1)
         .execute()
         .subscribe();
 

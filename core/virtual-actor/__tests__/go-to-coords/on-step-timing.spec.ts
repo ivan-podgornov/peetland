@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
@@ -9,22 +10,11 @@ describe('VirtualActor', () => {
       it('Раз в секунду сдвигает актора к точке со скоростью пешехода 5 км/ч', () => {
         const timer = new ManualTimer();
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
           timer,
         });
         actor
-          .goToCoords(
-            {
-              x: 10,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(10, 0, 0), 1)
           .execute()
           .subscribe();
 
@@ -37,22 +27,11 @@ describe('VirtualActor', () => {
       it('Не сдвигает актора, пока не прошла секунда', () => {
         const timer = new ManualTimer();
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
           timer,
         });
         actor
-          .goToCoords(
-            {
-              x: 10,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(10, 0, 0), 1)
           .execute()
           .subscribe();
 
@@ -68,23 +47,12 @@ describe('VirtualActor', () => {
       it('Отсчитывает секунду от подписки', () => {
         const timer = new ManualTimer();
         const actor = createActor({
-          position: {
-            x: 0,
-            y: 0,
-            z: 0,
-          },
+          position: Geometry.vector3(0, 0, 0),
           timer,
         });
         timer.advance(500);
         actor
-          .goToCoords(
-            {
-              x: 10,
-              y: 0,
-              z: 0,
-            },
-            1
-          )
+          .goToCoords(Geometry.vector3(10, 0, 0), 1)
           .execute()
           .subscribe();
 

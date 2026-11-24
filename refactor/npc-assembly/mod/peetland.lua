@@ -8373,7 +8373,7 @@ local AbortController = ____events.AbortController
 ____exports.Npc = __TS__Class()
 local Npc = ____exports.Npc
 Npc.name = "Npc"
-function Npc.prototype.____constructor(self, id, kind, deps)
+function Npc.prototype.____constructor(self, data, deps)
     local ____deps_0 = deps
     local actor = ____deps_0.actor
     local actorNpcRegistry = ____deps_0.actorNpcRegistry
@@ -8386,8 +8386,8 @@ function Npc.prototype.____constructor(self, id, kind, deps)
     local ticks = ____deps_0.ticks
     local worldKnowledge = ____deps_0.worldKnowledge
     local gameSignal = ____deps_0.gameSignal
-    self.id = id
-    self.kind = kind
+    self.id = data.id
+    self.kind = data.kind
     self.actor = actor
     self.inventory = inventory
     self.psyche = psyche
@@ -8549,8 +8549,7 @@ function NpcFactory.prototype.create(self, data)
     local rootTask = rootTaskFactory:create(data.kind)
     return __TS__New(
         Npc,
-        data.id,
-        data.kind,
+        data,
         {
             actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle}),
             actorNpcRegistry = actorNpcRegistry,

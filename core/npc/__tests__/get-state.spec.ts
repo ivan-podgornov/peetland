@@ -18,8 +18,7 @@ describe('Npc', () => {
 
     it('Возвращает инвентарь NPC', () => {
       const inventory = new Inventory();
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ inventory }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ inventory }));
 
       expect(npc.getState().self.inventory).toBe(inventory);
     });
@@ -32,16 +31,14 @@ describe('Npc', () => {
           z: 3,
         },
       });
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ actor }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ actor }));
 
       expect(npc.getState().self.actor.position).toStrictEqual(actor.getPosition());
     });
 
     it('Возвращает угол актора', () => {
       const actor = createActor({ angle: 90 });
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ actor }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ actor }));
 
       expect(npc.getState().self.actor.angle).toBe(actor.getAngle());
     });
@@ -54,8 +51,7 @@ describe('Npc', () => {
           z: 0,
         },
       });
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ actor }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ actor }));
       const state = npc.getState();
 
       actor.setPosition({
@@ -73,8 +69,7 @@ describe('Npc', () => {
 
     it('Возвращает психику NPC', () => {
       const psyche = createMockedPsyche();
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ psyche }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ psyche }));
 
       expect(npc.getState().self.psyche).toBe(psyche);
     });
@@ -82,8 +77,7 @@ describe('Npc', () => {
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
       const world = { time: new ManualTime() };
       const worldKnowledge = createMockedNpcWorldKnowledge(world);
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ worldKnowledge }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
       expect(npc.getState().world).toBe(world);
     });

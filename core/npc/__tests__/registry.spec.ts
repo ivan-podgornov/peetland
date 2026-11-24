@@ -9,10 +9,9 @@ describe('Npc', () => {
     it('Связывает своего актора с собой в реестре связей', () => {
       const actorNpcRegistry = createMockedActorNpcRegistry();
       const actor = createActor();
-      const data = createNpcData();
 
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
           actor,

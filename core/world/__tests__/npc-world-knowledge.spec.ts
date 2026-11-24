@@ -26,18 +26,16 @@ describe('NpcWorldKnowledge', () => {
     it('Возвращает NPC, которых видит target в радиусе radius', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const actor = createActor();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
           actor,
         })
       );
       const visibleActor = createActor();
-      const visibleData = createNpcData();
       const visibleNpc = new Npc(
-        visibleData,
+        createNpcData(),
         createNpcDeps({
           actorNpcRegistry,
           actor: visibleActor,
@@ -56,9 +54,8 @@ describe('NpcWorldKnowledge', () => {
 
     it('Бросает ошибку, когда target не в реестре', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actorNpcRegistry: createMockedActorNpcRegistry(),
           actor: createActor(),

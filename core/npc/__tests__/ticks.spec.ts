@@ -13,8 +13,7 @@ describe('Npc', () => {
   describe('Каждый тик', () => {
     it('Не обновляет HTN-агента, пока не наступил тик', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
-      new Npc(data, createNpcDeps({ htn }));
+      new Npc(createNpcData(), createNpcDeps({ htn }));
 
       expect(htn.update).not.toHaveBeenCalled();
     });
@@ -22,9 +21,8 @@ describe('Npc', () => {
     it('Вызывает htn.update с состоянием NPC', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -40,9 +38,8 @@ describe('Npc', () => {
       const ticks = createControlledObservable();
       const actor = createActor();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actor,
           htn,
@@ -62,9 +59,8 @@ describe('Npc', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const inventory = new Inventory();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           inventory,
@@ -84,9 +80,8 @@ describe('Npc', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const psyche = createMockedPsyche();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           psyche,
@@ -105,9 +100,8 @@ describe('Npc', () => {
     it('Вызывает htn.update на каждый тик', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -126,9 +120,8 @@ describe('Npc', () => {
       vi.mocked(htn.update).mockImplementation((_state: NpcState, context: NpcContext) => {
         context.inventory.add(Item.Booze, 1);
       });
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,

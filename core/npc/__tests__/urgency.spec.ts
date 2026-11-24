@@ -12,9 +12,8 @@ describe('Npc', () => {
     it('На каждый тик проверяет потребности и время из состояния NPC', () => {
       const ticks = createControlledObservable();
       const watcher = createMockedUrgencyWatcher();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           ticks: ticks.observable,
           urgencyWatcher: watcher,
@@ -30,9 +29,8 @@ describe('Npc', () => {
     it('Если потребность стала срочной, мягко останавливает план до того, как продвинуть агента', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,
@@ -48,9 +46,8 @@ describe('Npc', () => {
     it('Если ни одна потребность не стала срочной, не останавливает план', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,

@@ -12,9 +12,8 @@ describe('Npc', () => {
     it('Деспавнит актора', () => {
       const game = new AbortController();
       const actor = createActor();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actor,
           gameSignal: game.signal,
@@ -29,9 +28,8 @@ describe('Npc', () => {
     it('Останавливает HTN-агента', () => {
       const game = new AbortController();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           gameSignal: game.signal,
@@ -46,9 +44,8 @@ describe('Npc', () => {
     it('Если NPC уже деспавнен, не останавливает HTN-агента повторно', () => {
       const game = new AbortController();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           gameSignal: game.signal,
@@ -67,10 +64,9 @@ describe('Npc', () => {
       const game = new AbortController();
       const actor = createActor();
       game.abort();
-      const data = createNpcData();
 
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actor,
           gameSignal: game.signal,
@@ -84,10 +80,9 @@ describe('Npc', () => {
       const game = new AbortController();
       const htn = createMockedHTN<NpcState, NpcContext>();
       game.abort();
-      const data = createNpcData();
 
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           gameSignal: game.signal,

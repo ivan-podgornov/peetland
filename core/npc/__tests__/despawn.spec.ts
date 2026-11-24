@@ -12,8 +12,7 @@ describe('Npc', () => {
   describe('#despawn', () => {
     it('Останавливает HTN-агента', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ htn }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ htn }));
 
       npc.despawn();
 
@@ -23,9 +22,8 @@ describe('Npc', () => {
     it('Передаёт HTN-агенту при остановке контекст с актором NPC', () => {
       const actor = createActor();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           actor,
           htn,
@@ -40,9 +38,8 @@ describe('Npc', () => {
     it('Передаёт HTN-агенту при остановке контекст с инвентарём NPC', () => {
       const htn = createMockedHTN<NpcState, NpcContext>();
       const inventory = new Inventory();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           inventory,
@@ -56,8 +53,7 @@ describe('Npc', () => {
 
     it('Деспавнит актора', () => {
       const actor = createActor();
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ actor }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ actor }));
 
       npc.despawn();
 
@@ -67,9 +63,8 @@ describe('Npc', () => {
     it('После деспавна тики не вызывают htn.update', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
-      const data = createNpcData();
       const npc = new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           ticks: ticks.observable,

@@ -12,8 +12,7 @@ describe('Npc', () => {
   describe('Потребности', () => {
     it('getState возвращает потребности NPC', () => {
       const needs = new Needs(createNeedsState(), createNeedsDeps());
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ needs }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ needs }));
 
       expect(npc.getState().self.needs).toBe(needs);
     });
@@ -22,9 +21,8 @@ describe('Npc', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const needs = new Needs(createNeedsState(), createNeedsDeps());
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           needs,

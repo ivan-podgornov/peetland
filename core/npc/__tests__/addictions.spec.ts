@@ -12,8 +12,7 @@ describe('Npc', () => {
   describe('Зависимости', () => {
     it('getState возвращает зависимости NPC', () => {
       const addictions = new Addictions(createAddictionsState(), createAddictionsDeps());
-      const data = createNpcData();
-      const npc = new Npc(data, createNpcDeps({ addictions }));
+      const npc = new Npc(createNpcData(), createNpcDeps({ addictions }));
 
       expect(npc.getState().self.addictions).toBe(addictions);
     });
@@ -22,9 +21,8 @@ describe('Npc', () => {
       const ticks = createControlledObservable();
       const htn = createMockedHTN<NpcState, NpcContext>();
       const addictions = new Addictions(createAddictionsState(), createAddictionsDeps());
-      const data = createNpcData();
       new Npc(
-        data,
+        createNpcData(),
         createNpcDeps({
           htn,
           addictions,

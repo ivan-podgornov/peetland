@@ -1,4 +1,5 @@
 import type { IActor, IActorRegistry } from '@peetland/game';
+import { Geometry } from '@peetland/geometry';
 import type { IGeometry, Vector3 } from '@peetland/geometry';
 
 import type { ILosProvider } from './los-provider';
@@ -54,11 +55,7 @@ export class VisionSystem implements IVisionSystem {
 
     if (
       !geometry.isPointInSector2d(
-        {
-          origin: targetPosition,
-          angle: target.getAngle(),
-          fovDeg: HUMAN_FOV_DEG,
-        },
+        Geometry.sector2d(targetPosition, target.getAngle(), HUMAN_FOV_DEG),
         actorPosition
       )
     ) {

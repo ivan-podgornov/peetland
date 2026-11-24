@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { ManualTimer } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -76,14 +77,7 @@ describe('VirtualActor', () => {
       const actor = createActor();
       const error = vi.fn();
       actor
-        .goToCoords(
-          {
-            x: 10,
-            y: 0,
-            z: 0,
-          },
-          1
-        )
+        .goToCoords(Geometry.vector3(10, 0, 0), 1)
         .execute()
         .subscribe({ error });
 

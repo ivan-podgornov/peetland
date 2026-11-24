@@ -6,11 +6,7 @@ import type { Vector3 } from '../src';
 describe('Geometry', () => {
   describe('#formatPoint', () => {
     it('Возвращает координаты через запятую в порядке x, y, z', () => {
-      const point: Vector3 = {
-        x: 1,
-        y: 2,
-        z: 3,
-      };
+      const point: Vector3 = Geometry.vector3(1, 2, 3);
       const geometry = new Geometry();
 
       const formatted = geometry.formatPoint(point);
@@ -19,11 +15,7 @@ describe('Geometry', () => {
     });
 
     it('Округляет координаты до двух знаков после запятой', () => {
-      const point: Vector3 = {
-        x: 1320.2234,
-        y: 210.516,
-        z: 19.5,
-      };
+      const point: Vector3 = Geometry.vector3(1320.2234, 210.516, 19.5);
       const geometry = new Geometry();
 
       const formatted = geometry.formatPoint(point);
@@ -32,11 +24,7 @@ describe('Geometry', () => {
     });
 
     it('Если координаты отрицательные, сохраняет знак', () => {
-      const point: Vector3 = {
-        x: -1.5,
-        y: -2,
-        z: -0.25,
-      };
+      const point: Vector3 = Geometry.vector3(-1.5, -2, -0.25);
       const geometry = new Geometry();
 
       const formatted = geometry.formatPoint(point);

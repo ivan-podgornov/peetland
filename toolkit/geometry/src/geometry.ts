@@ -4,6 +4,32 @@ export class Geometry implements IGeometry {
   /** Полный оборот в градусах */
   private static readonly FULL_TURN = 360;
 
+  /** Создаёт точку на плоскости */
+  static vector2(x: number, y: number): Vector2 {
+    return {
+      x,
+      y,
+    };
+  }
+
+  /** Создаёт точку в пространстве */
+  static vector3(x: number, y: number, z: number): Vector3 {
+    return {
+      x,
+      y,
+      z,
+    };
+  }
+
+  /** Создаёт круговой сектор на плоскости */
+  static sector2d(origin: Vector2, angle: number, fovDeg: number): Sector2d {
+    return {
+      origin,
+      angle,
+      fovDeg,
+    };
+  }
+
   getDistance2d(pointA: Vector2, pointB: Vector2): number {
     const x = Math.pow(pointB.x - pointA.x, 2);
     const y = Math.pow(pointB.y - pointA.y, 2);

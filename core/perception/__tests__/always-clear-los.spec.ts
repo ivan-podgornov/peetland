@@ -1,3 +1,4 @@
+import { Geometry } from '@peetland/geometry';
 import { describe, expect, it } from 'vitest';
 
 import { AlwaysClearLos } from '../src';
@@ -9,16 +10,8 @@ describe('AlwaysClearLos', () => {
       const los: ILosProvider = new AlwaysClearLos();
 
       const isClear = los.isLineOfSightClear(
-        {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
-        {
-          x: 10,
-          y: 20,
-          z: 5,
-        }
+        Geometry.vector3(0, 0, 0),
+        Geometry.vector3(10, 20, 5)
       );
 
       expect(isClear).toBe(true);

@@ -6,11 +6,7 @@ import type { Vector3 } from '../src';
 describe('Geometry', () => {
   describe('#getDistance3d', () => {
     it('Возвращает 0, если точки совпадают', () => {
-      const point: Vector3 = {
-        x: 5,
-        y: -3,
-        z: 2,
-      };
+      const point: Vector3 = Geometry.vector3(5, -3, 2);
       const geometry = new Geometry();
 
       const distance = geometry.getDistance3d(point, point);
@@ -19,16 +15,8 @@ describe('Geometry', () => {
     });
 
     it('Возвращает расстояние по прямой между точками', () => {
-      const a: Vector3 = {
-        x: 0,
-        y: 0,
-        z: 0,
-      };
-      const b: Vector3 = {
-        x: 2,
-        y: 3,
-        z: 6,
-      };
+      const a: Vector3 = Geometry.vector3(0, 0, 0);
+      const b: Vector3 = Geometry.vector3(2, 3, 6);
       const geometry = new Geometry();
 
       const distance = geometry.getDistance3d(a, b);
@@ -37,16 +25,8 @@ describe('Geometry', () => {
     });
 
     it('Возвращает одинаковый результат независимо от порядка точек', () => {
-      const a: Vector3 = {
-        x: 1,
-        y: 2,
-        z: 3,
-      };
-      const b: Vector3 = {
-        x: 7,
-        y: 10,
-        z: -4,
-      };
+      const a: Vector3 = Geometry.vector3(1, 2, 3);
+      const b: Vector3 = Geometry.vector3(7, 10, -4);
       const geometry = new Geometry();
 
       const distanceFromAtoB = geometry.getDistance3d(a, b);
@@ -56,16 +36,8 @@ describe('Geometry', () => {
     });
 
     it('Если координаты отрицательные, возвращает положительное расстояние', () => {
-      const a: Vector3 = {
-        x: -2,
-        y: -3,
-        z: -6,
-      };
-      const b: Vector3 = {
-        x: 0,
-        y: 0,
-        z: 0,
-      };
+      const a: Vector3 = Geometry.vector3(-2, -3, -6);
+      const b: Vector3 = Geometry.vector3(0, 0, 0);
       const geometry = new Geometry();
 
       const distance = geometry.getDistance3d(a, b);
@@ -74,16 +46,8 @@ describe('Geometry', () => {
     });
 
     it('Если точки различаются только по высоте, возвращает разницу высот', () => {
-      const a: Vector3 = {
-        x: 1,
-        y: 1,
-        z: 0,
-      };
-      const b: Vector3 = {
-        x: 1,
-        y: 1,
-        z: 5,
-      };
+      const a: Vector3 = Geometry.vector3(1, 1, 0);
+      const b: Vector3 = Geometry.vector3(1, 1, 5);
       const geometry = new Geometry();
 
       const distance = geometry.getDistance3d(a, b);

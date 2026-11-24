@@ -3918,6 +3918,15 @@ local Geometry = ____exports.Geometry
 Geometry.name = "Geometry"
 function Geometry.prototype.____constructor(self)
 end
+function Geometry.vector2(self, x, y)
+    return {x = x, y = y}
+end
+function Geometry.vector3(self, x, y, z)
+    return {x = x, y = y, z = z}
+end
+function Geometry.sector2d(self, origin, angle, fovDeg)
+    return {origin = origin, angle = angle, fovDeg = fovDeg}
+end
 function Geometry.prototype.getDistance2d(self, pointA, pointB)
     local x = (pointB.x - pointA.x) ^ 2
     local y = (pointB.y - pointA.y) ^ 2
@@ -5946,6 +5955,8 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArrayFilter = ____lualib.__TS__ArrayFilter
 local ____exports = {}
+local ____geometry = require("toolkit.geometry.src.index")
+local Geometry = ____geometry.Geometry
 --- Человеческий угол зрения в градусах
 ____exports.HUMAN_FOV_DEG = 100
 ____exports.VisionSystem = __TS__Class()
@@ -5975,11 +5986,11 @@ function VisionSystem.prototype.isVisible(self, target, actor, targetPosition, r
         return false
     end
     if not geometry:isPointInSector2d(
-        {
-            origin = targetPosition,
-            angle = target:getAngle(),
-            fovDeg = ____exports.HUMAN_FOV_DEG
-        },
+        Geometry:sector2d(
+            targetPosition,
+            target:getAngle(),
+            ____exports.HUMAN_FOV_DEG
+        ),
         actorPosition
     ) then
         return false

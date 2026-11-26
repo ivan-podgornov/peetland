@@ -1,4 +1,4 @@
-import type { IActor, IGame } from '@peetland/game';
+import type { IGame } from '@peetland/game';
 import type {
   IActorNpcRegistry,
   INpc,
@@ -18,11 +18,11 @@ export type NpcWorldKnowledgeDeps = {
 
 /** Знание NPC о мире, которое мир собирает из своих источников для конкретного NPC */
 export class NpcWorldKnowledge implements INpcWorldKnowledge {
-  private readonly actor: IActor;
+  private readonly npc: INpc;
   private readonly deps: NpcWorldKnowledgeDeps;
 
-  constructor(actor: IActor, deps: NpcWorldKnowledgeDeps) {
-    this.actor = actor;
+  constructor(npc: INpc, deps: NpcWorldKnowledgeDeps) {
+    this.npc = npc;
     this.deps = deps;
   }
 
@@ -36,14 +36,15 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
   /** Возвращает NPC, которых видит NPC в радиусе radius */
   getVisibleNpcs(radius: number): INpc[] {
     const { actorNpcRegistry, game } = this.deps;
+    const actor = actorNpcRegistry.getActor(this.npc);
 
     return game
-      .getVisibleActors(this.actor, radius)
+      .getVisibleActors(actor, radius)
       .map((visibleActor) => actorNpcRegistry.getNpc(visibleActor));
   }
 }
 
-/** Создаёт знание о мире для каждого NPC: знание замыкает тело NPC, для которого создано */
+/** Создаёт знание о мире для каждого NPC: знание замыкает того NPC, для которого создано */
 export class NpcWorldKnowledgeFactory implements INpcWorldKnowledgeFactory {
   private readonly deps: NpcWorldKnowledgeDeps;
 
@@ -51,8 +52,8 @@ export class NpcWorldKnowledgeFactory implements INpcWorldKnowledgeFactory {
     this.deps = deps;
   }
 
-  /** Создаёт знание о мире для тела NPC */
-  create(actor: IActor): INpcWorldKnowledge {
-    return new NpcWorldKnowledge(actor, this.deps);
+  /** Создаёт знание о мире для npc */
+  create(npc: INpc): INpcWorldKnowledge {
+    return new NpcWorldKnowledge(npc, this.deps);
   }
 }

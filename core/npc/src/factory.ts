@@ -134,7 +134,7 @@ export class NpcFactory implements INpcFactory {
       addictions: addictionsFactory.create(data.addictions, time),
       urgencyWatcher: urgencyWatcherFactory.create(),
       ticks,
-      worldKnowledge: worldKnowledgeFactory.create(actor),
+      worldKnowledgeFactory,
       gameSignal,
     });
   }

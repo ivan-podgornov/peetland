@@ -1,5 +1,5 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedNpcWorldKnowledge, createNpcData } from '@peetland/npc/dev';
+import { createMockedNpcWorldKnowledgeFactory, createNpcData } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +22,7 @@ describe('World', () => {
             npcs: [createNpcData()],
           }),
           {
-            worldKnowledge: createMockedNpcWorldKnowledge(npcWorld),
+            worldKnowledge: createMockedNpcWorldKnowledgeFactory(npcWorld),
             rootTaskFactory: createMockedRootTaskFactory({
               name: 'root',
               methods: [

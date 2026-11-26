@@ -3,7 +3,7 @@ import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
-import { createMockedActorNpcRegistry, createMockedNpcWorldKnowledge } from '../../dev';
+import { createMockedActorNpcRegistry, createMockedNpcWorldKnowledgeFactory } from '../../dev';
 import type { NpcFactoryDeps } from '../../src';
 
 /** Создаёт зависимости фабрики NPC, без которых она не собирается. Остальное — по умолчанию */
@@ -18,7 +18,7 @@ export function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFacto
         methods: [],
       })),
     },
-    worldKnowledge: createMockedNpcWorldKnowledge(),
+    worldKnowledge: createMockedNpcWorldKnowledgeFactory(),
     gameSignal: new AbortController().signal,
     ...deps,
   };

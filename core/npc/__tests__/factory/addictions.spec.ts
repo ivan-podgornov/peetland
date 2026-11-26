@@ -8,7 +8,7 @@ import {
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNpcWorldKnowledge, createNpcData } from '../../dev';
+import { createMockedNpcWorldKnowledgeFactory, createNpcData } from '../../dev';
 import { NpcFactory } from '../../src';
 
 import { createRequiredDeps } from './helpers';
@@ -33,7 +33,7 @@ describe('NpcFactory', () => {
       const factory = new NpcFactory(
         createRequiredDeps({
           addictionsFactory,
-          worldKnowledge: createMockedNpcWorldKnowledge({
+          worldKnowledge: createMockedNpcWorldKnowledgeFactory({
             time,
             getVisibleNpcs: () => [],
           }),

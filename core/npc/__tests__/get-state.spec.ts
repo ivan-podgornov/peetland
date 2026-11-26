@@ -5,9 +5,9 @@ import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledgeFactory, createNpcData, createNpcDeps } from '../dev';
 import { Npc, NpcKind } from '../src';
-import type { NpcWorldState } from '../src';
+import type { INpcWorldKnowledge } from '../src';
 
 describe('Npc', () => {
   describe('#getState', () => {
@@ -84,23 +84,21 @@ describe('Npc', () => {
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
-      const world: NpcWorldState = {
+      const world: INpcWorldKnowledge = {
         time: new ManualTime(),
         getVisibleNpcs: () => [],
       };
-      const worldKnowledge = createMockedNpcWorldKnowledge(world);
+      const worldKnowledge = createMockedNpcWorldKnowledgeFactory(world);
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
       expect(npc.getState().world).toBe(world);
     });
 
-    it('Передаёт себя в знание о мире, когда собирает состояние', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledge();
+    it('Передаёт себя в фабрику знания о мире, когда создаётся', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledgeFactory();
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      npc.getState();
-
-      expect(worldKnowledge.getState).toHaveBeenCalledExactlyOnceWith(npc);
+      expect(worldKnowledge.create).toHaveBeenCalledExactlyOnceWith(npc);
     });
   });
 });

@@ -61,7 +61,7 @@ export class Npc implements INpc {
     this.addictions = addictions;
     this.memory = memory;
     this.urgencyWatcher = urgencyWatcher;
-    this.worldKnowledge = worldKnowledge;
+    this.worldKnowledge = worldKnowledge.create(this);
     this.lifetime = new AbortController();
     actorNpcRegistry.register(actor, this);
     this.context = {
@@ -106,7 +106,7 @@ export class Npc implements INpc {
         addictions: this.addictions,
         memory: this.memory,
       },
-      world: this.worldKnowledge.getState(this),
+      world: this.worldKnowledge,
     };
   }
 

@@ -9,8 +9,8 @@ export type {
   NpcActorState,
   NpcSelfState,
   NpcState,
-  NpcWorldState,
   IActorNpcRegistry,
   INpc,
   INpcWorldKnowledge,
+  INpcWorldKnowledgeFactory,
 } from './types';

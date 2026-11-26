@@ -17,7 +17,7 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import { Npc } from './npc';
 import type { IRootTaskFactory } from './root-task-factory';
-import type { IActorNpcRegistry, INpcWorldKnowledge, NpcState } from './types';
+import type { IActorNpcRegistry, INpcWorldKnowledgeFactory, NpcState } from './types';
 
 export interface INpcFactory {
   /** Создаёт NPC по данным */
@@ -53,8 +53,8 @@ export interface NpcFactoryDeps {
   rootTaskFactory: IRootTaskFactory;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
-  /** То, что NPC знает о мире */
-  worldKnowledge: INpcWorldKnowledge;
+  /** Фабрика, которая создаёт знание о мире для NPC */
+  worldKnowledge: INpcWorldKnowledgeFactory;
 }
 
 export class NpcFactory implements INpcFactory {
@@ -110,7 +110,7 @@ export class NpcFactory implements INpcFactory {
       gameSignal,
       worldKnowledge,
     } = this.deps;
-    const time = worldKnowledge.getTime();
+    const time = worldKnowledge.time;
     const rootTask = rootTaskFactory.create(data.kind);
 
     return new Npc(data, {

@@ -3,7 +3,7 @@ import { NpcFactory } from '@peetland/npc';
 import type {
   IActorNpcRegistry,
   INpcFactory,
-  INpcWorldKnowledge,
+  INpcWorldKnowledgeFactory,
   IRootTaskFactory,
   NpcData,
 } from '@peetland/npc';
@@ -18,7 +18,7 @@ import { Timer } from '@peetland/timings';
 import type { ITimer } from '@peetland/timings';
 
 import { ActorNpcRegistry } from './actor-npc-registry';
-import { NpcWorldKnowledge } from './npc-world-knowledge';
+import { NpcWorldKnowledgeFactory } from './npc-world-knowledge';
 import { RootTaskFactory } from './root-task-factory';
 
 export type WorldOptions = {
@@ -43,8 +43,8 @@ export type WorldDeps = {
   placesFactory: IPlacesFactory;
   /** Фабрика, которой NPC создают корневые задачи по своему типу */
   rootTaskFactory: IRootTaskFactory;
-  /** То, что NPC знают о мире. Одно на всех, потому что все NPC знают о мире одно и то же */
-  worldKnowledge: INpcWorldKnowledge;
+  /** Фабрика, которая создаёт знание о мире для каждого NPC */
+  worldKnowledge: INpcWorldKnowledgeFactory;
   /** Фабрика, которой мир создаёт NPC */
   npcFactory: INpcFactory;
   /** Реестр, в котором NPC связывают своих акторов с собой */
@@ -72,7 +72,7 @@ export class World {
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry: game.geometry }),
       actorNpcRegistry = new ActorNpcRegistry(),
-      worldKnowledge = new NpcWorldKnowledge({
+      worldKnowledge = new NpcWorldKnowledgeFactory({
         time: game.time,
         game,
         actorNpcRegistry,

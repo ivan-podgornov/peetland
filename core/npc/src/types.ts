@@ -68,26 +68,12 @@ export type NpcSelfState = Readonly<{
   actor: NpcActorState;
   inventory: IReadonlyInventory;
   psyche: IReadonlyPsyche;
-  /** Потребности. Их значения читаются на момент времени из того же состояния (см. NpcWorldState) */
+  /** Потребности. Их значения читаются на момент времени из того же состояния (см. INpcWorldKnowledge) */
   needs: IReadonlyNeeds;
-  /** Зависимости. Их значения читаются на момент времени из того же состояния (см. NpcWorldState) */
+  /** Зависимости. Их значения читаются на момент времени из того же состояния (см. INpcWorldKnowledge) */
   addictions: IReadonlyAddictions;
   /** Память NPC: факты о том, что с ним было. Запоминают через контекст (см. NpcContext) */
   memory: IReadonlyMemory;
-}>;
-
-/** Что NPC знает о мире */
-export type NpcWorldState = Readonly<{
-  /**
-   * Время суток. Время идёт, поэтому геттеры могут вернуть разное даже за одно планирование. Если
-   * эффекту задачи нужно поменять время, задача кладёт в новое состояние копию из clone()
-   */
-  time: IReadonlyTime;
-  /**
-   * Возвращает NPC, которых видит тот NPC, для которого собрано состояние, в радиусе radius. Кто
-   * именно смотрит, знание решает при сборке состояния, поэтому задаче достаточно передать радиус
-   */
-  getVisibleNpcs(radius: number): INpc[];
 }>;
 
 /**
@@ -99,25 +85,35 @@ export type NpcWorldState = Readonly<{
  */
 export type NpcState = Readonly<{
   self: NpcSelfState;
-  world: NpcWorldState;
+  world: INpcWorldKnowledge;
 }>;
 
 /**
  * То, что NPC знает о мире. NPC объявляет, какое знание ему нужно, а реализует его мир, поэтому NPC
- * не зависит от мира
+ * не зависит от мира. Знание создаётся для конкретного NPC, поэтому задача вызывает
+ * state.world.getVisibleNpcs(radius) без указания NPC
  */
 export interface INpcWorldKnowledge {
-  /** Возвращает время суток, которое знают NPC */
-  getTime(): IReadonlyTime;
-
   /**
-   * Возвращает то, что NPC знает о мире. Состояние собирается для target: кто видит мир, решает
-   * знание, поэтому задача вызывает state.world.getVisibleNpcs(radius) без указания NPC
+   * Время суток. Время идёт, поэтому геттеры могут вернуть разное даже за одно планирование. Если
+   * эффекту задачи нужно поменять время, задача кладёт в новое состояние копию из clone()
    */
-  getState(target: INpc): NpcWorldState;
+  readonly time: IReadonlyTime;
 
-  /** Возвращает NPC, которых видит target в радиусе radius */
-  getVisibleNpcs(target: INpc, radius: number): INpc[];
+  /** Возвращает NPC, которых видит NPC, для которого создано знание, в радиусе radius */
+  getVisibleNpcs(radius: number): INpc[];
+}
+
+/**
+ * Создаёт знание о мире для конкретного NPC. Мир передаёт фабрику, а не готовое знание: знание
+ * замыкает NPC, которого ещё нет, когда мир собирает зависимости
+ */
+export interface INpcWorldKnowledgeFactory {
+  /** Время суток, которое знают NPC */
+  readonly time: IReadonlyTime;
+
+  /** Создаёт знание о мире для npc */
+  create(npc: INpc): INpcWorldKnowledge;
 }
 
 /** Зависимости NPC: готовые сущности, с которыми он живёт, и сервисы мира */
@@ -142,8 +138,8 @@ export interface NpcDeps {
   urgencyWatcher: IUrgencyWatcher;
   /** Сообщает о каждом тике мира */
   ticks: Observable<unknown>;
-  /** То, что NPC знает о мире */
-  worldKnowledge: INpcWorldKnowledge;
+  /** Фабрика, которая создаёт знание о мире для NPC */
+  worldKnowledge: INpcWorldKnowledgeFactory;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
 }

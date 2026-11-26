@@ -8457,7 +8457,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.addictions = addictions
     self.memory = memory
     self.urgencyWatcher = urgencyWatcher
-    self.worldKnowledge = worldKnowledge
+    self.worldKnowledge = worldKnowledge:create(self)
     self.lifetime = __TS__New(AbortController)
     actorNpcRegistry:register(actor, self)
     self.context = {
@@ -8497,7 +8497,7 @@ function Npc.prototype.getState(self)
             addictions = self.addictions,
             memory = self.memory
         },
-        world = self.worldKnowledge:getState(self)
+        world = self.worldKnowledge
     }
 end
 function Npc.prototype.tick(self)
@@ -8617,7 +8617,7 @@ function NpcFactory.prototype.create(self, data)
     local rootTaskFactory = ____self_deps_1.rootTaskFactory
     local gameSignal = ____self_deps_1.gameSignal
     local worldKnowledge = ____self_deps_1.worldKnowledge
-    local time = worldKnowledge:getTime()
+    local time = worldKnowledge.time
     local rootTask = rootTaskFactory:create(data.kind)
     return __TS__New(
         Npc,
@@ -8860,37 +8860,57 @@ return ____exports
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__ArrayMap = ____lualib.__TS__ArrayMap
+local __TS__SetDescriptor = ____lualib.__TS__SetDescriptor
+local __TS__New = ____lualib.__TS__New
 local ____exports = {}
---- Знание NPC о мире, которое мир собирает из своих источников
+--- Знание NPC о мире, которое мир собирает из своих источников для конкретного NPC
 ____exports.NpcWorldKnowledge = __TS__Class()
 local NpcWorldKnowledge = ____exports.NpcWorldKnowledge
 NpcWorldKnowledge.name = "NpcWorldKnowledge"
-function NpcWorldKnowledge.prototype.____constructor(self, deps)
+function NpcWorldKnowledge.prototype.____constructor(self, npc, deps)
+    self.npc = npc
     self.deps = deps
 end
-function NpcWorldKnowledge.prototype.getTime(self)
+function NpcWorldKnowledge.prototype.getVisibleNpcs(self, radius)
     local ____self_deps_0 = self.deps
-    local time = ____self_deps_0.time
-    return time
-end
-function NpcWorldKnowledge.prototype.getState(self, target)
-    local ____self_deps_1 = self.deps
-    local time = ____self_deps_1.time
-    return {
-        time = time,
-        getVisibleNpcs = function(____, radius) return self:getVisibleNpcs(target, radius) end
-    }
-end
-function NpcWorldKnowledge.prototype.getVisibleNpcs(self, target, radius)
-    local ____self_deps_2 = self.deps
-    local actorNpcRegistry = ____self_deps_2.actorNpcRegistry
-    local game = ____self_deps_2.game
-    local actor = actorNpcRegistry:getActor(target)
+    local actorNpcRegistry = ____self_deps_0.actorNpcRegistry
+    local game = ____self_deps_0.game
+    local actor = actorNpcRegistry:getActor(self.npc)
     return __TS__ArrayMap(
         game:getVisibleActors(actor, radius),
         function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
     )
 end
+__TS__SetDescriptor(
+    NpcWorldKnowledge.prototype,
+    "time",
+    {get = function(self)
+        local ____self_deps_1 = self.deps
+        local time = ____self_deps_1.time
+        return time
+    end},
+    true
+)
+--- Создаёт знание о мире для каждого NPC: знание замыкает того NPC, для которого создано
+____exports.NpcWorldKnowledgeFactory = __TS__Class()
+local NpcWorldKnowledgeFactory = ____exports.NpcWorldKnowledgeFactory
+NpcWorldKnowledgeFactory.name = "NpcWorldKnowledgeFactory"
+function NpcWorldKnowledgeFactory.prototype.____constructor(self, deps)
+    self.deps = deps
+end
+function NpcWorldKnowledgeFactory.prototype.create(self, npc)
+    return __TS__New(____exports.NpcWorldKnowledge, npc, self.deps)
+end
+__TS__SetDescriptor(
+    NpcWorldKnowledgeFactory.prototype,
+    "time",
+    {get = function(self)
+        local ____self_deps_2 = self.deps
+        local time = ____self_deps_2.time
+        return time
+    end},
+    true
+)
 return ____exports
  end,
 ["core.addictions-tasks.src.types"] = function(...) 
@@ -10817,7 +10837,7 @@ local Timer = ____timings.Timer
 local ____actor_2Dnpc_2Dregistry = require("core.world.src.actor-npc-registry")
 local ActorNpcRegistry = ____actor_2Dnpc_2Dregistry.ActorNpcRegistry
 local ____npc_2Dworld_2Dknowledge = require("core.world.src.npc-world-knowledge")
-local NpcWorldKnowledge = ____npc_2Dworld_2Dknowledge.NpcWorldKnowledge
+local NpcWorldKnowledgeFactory = ____npc_2Dworld_2Dknowledge.NpcWorldKnowledgeFactory
 local ____root_2Dtask_2Dfactory = require("core.world.src.root-task-factory")
 local RootTaskFactory = ____root_2Dtask_2Dfactory.RootTaskFactory
 ____exports.World = __TS__Class()
@@ -10859,7 +10879,7 @@ function World.prototype.bigBang(self)
         end
         local worldKnowledge = ____self_deps_1.worldKnowledge
         if worldKnowledge == nil then
-            worldKnowledge = __TS__New(NpcWorldKnowledge, {time = game.time, game = game, actorNpcRegistry = actorNpcRegistry})
+            worldKnowledge = __TS__New(NpcWorldKnowledgeFactory, {time = game.time, game = game, actorNpcRegistry = actorNpcRegistry})
         end
         local worldPlaces = placesFactory:create({places = __TS__Await(places:getAll())})
         local ____self_deps_2 = self.deps

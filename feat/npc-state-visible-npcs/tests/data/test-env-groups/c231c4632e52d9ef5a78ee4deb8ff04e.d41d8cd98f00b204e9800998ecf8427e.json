@@ -1,1 +1,0 @@
-{"id":"c231c4632e52d9ef5a78ee4deb8ff04e.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/npc-world-knowledge.spec.ts#NpcWorldKnowledge #getVisibleNpcs Бросает ошибку, когда видимый актор без личности","name":"Бросает ошибку, когда видимый актор без личности","status":"passed","testResultsByEnv":{"default":"d5fe250b2d9c4ae465a447eab2ec79bd"}}

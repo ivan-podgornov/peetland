@@ -8446,7 +8446,7 @@ function Npc.prototype.____constructor(self, data, deps)
     local memory = ____deps_0.memory
     local urgencyWatcher = ____deps_0.urgencyWatcher
     local ticks = ____deps_0.ticks
-    local worldKnowledge = ____deps_0.worldKnowledge
+    local worldKnowledgeFactory = ____deps_0.worldKnowledgeFactory
     local gameSignal = ____deps_0.gameSignal
     self.id = data.id
     self.kind = data.kind
@@ -8457,7 +8457,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.addictions = addictions
     self.memory = memory
     self.urgencyWatcher = urgencyWatcher
-    self.worldKnowledge = worldKnowledge
+    self.worldKnowledge = worldKnowledgeFactory:create(self)
     self.lifetime = __TS__New(AbortController)
     actorNpcRegistry:register(actor, self)
     self.context = {
@@ -8636,7 +8636,7 @@ function NpcFactory.prototype.create(self, data)
             addictions = addictionsFactory:create(data.addictions, time),
             urgencyWatcher = urgencyWatcherFactory:create(),
             ticks = ticks,
-            worldKnowledge = worldKnowledgeFactory:create(actor),
+            worldKnowledgeFactory = worldKnowledgeFactory,
             gameSignal = gameSignal
         }
     )
@@ -8870,16 +8870,17 @@ local ____exports = {}
 ____exports.NpcWorldKnowledge = __TS__Class()
 local NpcWorldKnowledge = ____exports.NpcWorldKnowledge
 NpcWorldKnowledge.name = "NpcWorldKnowledge"
-function NpcWorldKnowledge.prototype.____constructor(self, actor, deps)
-    self.actor = actor
+function NpcWorldKnowledge.prototype.____constructor(self, npc, deps)
+    self.npc = npc
     self.deps = deps
 end
 function NpcWorldKnowledge.prototype.getVisibleNpcs(self, radius)
     local ____self_deps_0 = self.deps
     local actorNpcRegistry = ____self_deps_0.actorNpcRegistry
     local game = ____self_deps_0.game
+    local actor = actorNpcRegistry:getActor(self.npc)
     return __TS__ArrayMap(
-        game:getVisibleActors(self.actor, radius),
+        game:getVisibleActors(actor, radius),
         function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
     )
 end
@@ -8893,15 +8894,15 @@ __TS__SetDescriptor(
     end},
     true
 )
---- Создаёт знание о мире для каждого NPC: знание замыкает тело NPC, для которого создано
+--- Создаёт знание о мире для каждого NPC: знание замыкает того NPC, для которого создано
 ____exports.NpcWorldKnowledgeFactory = __TS__Class()
 local NpcWorldKnowledgeFactory = ____exports.NpcWorldKnowledgeFactory
 NpcWorldKnowledgeFactory.name = "NpcWorldKnowledgeFactory"
 function NpcWorldKnowledgeFactory.prototype.____constructor(self, deps)
     self.deps = deps
 end
-function NpcWorldKnowledgeFactory.prototype.create(self, actor)
-    return __TS__New(____exports.NpcWorldKnowledge, actor, self.deps)
+function NpcWorldKnowledgeFactory.prototype.create(self, npc)
+    return __TS__New(____exports.NpcWorldKnowledge, npc, self.deps)
 end
 return ____exports
  end,

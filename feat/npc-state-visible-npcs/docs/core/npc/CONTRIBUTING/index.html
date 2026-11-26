@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/npc | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/npc/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/npc | Peetland"><meta data-rh="true" name="description" content="NPC: склеивает актора, инвентарь, психику, потребности, зависимости и HTN-агента, который каждый"><meta data-rh="true" property="og:description" content="NPC: склеивает актора, инвентарь, психику, потребности, зависимости и HTN-агента, который каждый"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/npc/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/npc/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/npc/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/npc","item":"https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/npc/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/npc-state-visible-npcs/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/runtime~main.1c241afa.js" defer="defer"></script>
+<script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/runtime~main.ba751965.js" defer="defer"></script>
 <script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/main.b2084958.js" defer="defer"></script>
 </head>
 <body>
@@ -46,9 +46,10 @@
 тяга не прерывает план, а ждёт следующего планирования.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="сборка">Сборка<a href="#сборка" class="hash-link" aria-label="Прямая ссылка на Сборка" title="Прямая ссылка на Сборка" translate="no">​</a></h2>
 <p><code>NpcFactory</code> — точка сборки пакета. Она создаёт актора, инвентарь, психику, потребности,
-зависимости, наблюдателя срочности, знание о мире и HTN-агента с корневой задачей из данных NPC и
-передаёт их <code>Npc</code> готовыми. Снаружи фабрике нужны только акторы, тики, время суток, сигнал
-завершения игры, фабрика знания о мире и фабрика корневых задач, остальное она собирает сама.</p>
+зависимости, наблюдателя срочности и HTN-агента с корневой задачей из данных NPC и передаёт их
+<code>Npc</code> готовыми. Знание о мире <code>Npc</code> создаёт сам через фабрику, которую получает в зависимостях.
+Снаружи фабрике нужны только акторы, тики, время суток, сигнал завершения игры, фабрика знания о
+мире и фабрика корневых задач, остальное она собирает сама.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="корневая-задача">Корневая задача<a href="#корневая-задача" class="hash-link" aria-label="Прямая ссылка на Корневая задача" title="Прямая ссылка на Корневая задача" translate="no">​</a></h2>
 <p>NPC не зависит от задач. Корневую задачу HTN-агента получает фабрика NPC от фабрики
 <code>IRootTaskFactory</code>, которую объявляет сам и получает в зависимостях. Какую реализацию передать,

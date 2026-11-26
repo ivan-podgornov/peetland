@@ -22,7 +22,7 @@ describe('World', () => {
             npcs: [createNpcData()],
           }),
           {
-            worldKnowledge: createMockedNpcWorldKnowledgeFactory(npcWorld),
+            worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory(npcWorld),
             rootTaskFactory: createMockedRootTaskFactory({
               name: 'root',
               methods: [

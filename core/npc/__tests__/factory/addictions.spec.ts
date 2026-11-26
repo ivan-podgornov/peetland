@@ -33,10 +33,8 @@ describe('NpcFactory', () => {
       const factory = new NpcFactory(
         createRequiredDeps({
           addictionsFactory,
-          worldKnowledge: createMockedNpcWorldKnowledgeFactory({
-            time,
-            getVisibleNpcs: () => [],
-          }),
+          time,
+          worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory(),
         })
       );
 

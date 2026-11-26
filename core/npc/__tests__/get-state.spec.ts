@@ -5,7 +5,7 @@ import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNpcWorldKnowledgeFactory, createNpcData, createNpcDeps } from '../dev';
+import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc, NpcKind } from '../src';
 import type { INpcWorldKnowledge } from '../src';
 
@@ -88,17 +88,17 @@ describe('Npc', () => {
         time: new ManualTime(),
         getVisibleNpcs: () => [],
       };
-      const worldKnowledge = createMockedNpcWorldKnowledgeFactory(world);
+      const worldKnowledge = createMockedNpcWorldKnowledge(world);
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      expect(npc.getState().world).toBe(world);
+      expect(npc.getState().world).toBe(worldKnowledge);
     });
 
-    it('Передаёт себя в фабрику знания о мире, когда создаётся', () => {
-      const worldKnowledge = createMockedNpcWorldKnowledgeFactory();
+    it('Передаёт в состояние то знание о мире, которое получил', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge();
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
-      expect(worldKnowledge.create).toHaveBeenCalledExactlyOnceWith(npc);
+      expect(npc.getState().world).toBe(worldKnowledge);
     });
   });
 });

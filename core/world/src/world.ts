@@ -15,7 +15,7 @@ import { Random } from '@peetland/random';
 import type { IRandom } from '@peetland/random';
 import type { IRepository } from '@peetland/repository';
 import { Timer } from '@peetland/timings';
-import type { ITimer } from '@peetland/timings';
+import type { IReadonlyTime, ITimer } from '@peetland/timings';
 
 import { ActorNpcRegistry } from './actor-npc-registry';
 import { NpcWorldKnowledgeFactory } from './npc-world-knowledge';
@@ -43,8 +43,10 @@ export type WorldDeps = {
   placesFactory: IPlacesFactory;
   /** Фабрика, которой NPC создают корневые задачи по своему типу */
   rootTaskFactory: IRootTaskFactory;
+  /** Время суток, которое знают NPC */
+  time: IReadonlyTime;
   /** Фабрика, которая создаёт знание о мире для каждого NPC */
-  worldKnowledge: INpcWorldKnowledgeFactory;
+  worldKnowledgeFactory: INpcWorldKnowledgeFactory;
   /** Фабрика, которой мир создаёт NPC */
   npcFactory: INpcFactory;
   /** Реестр, в котором NPC связывают своих акторов с собой */
@@ -69,11 +71,12 @@ export class World {
     const {
       random = new Random(),
       timer = new Timer(),
+      time = game.time,
       psycheFactory = new PsycheFactory(),
       placesFactory = new PlacesFactory({ geometry: game.geometry }),
       actorNpcRegistry = new ActorNpcRegistry(),
-      worldKnowledge = new NpcWorldKnowledgeFactory({
-        time: game.time,
+      worldKnowledgeFactory = new NpcWorldKnowledgeFactory({
+        time,
         game,
         actorNpcRegistry,
       }),
@@ -92,8 +95,9 @@ export class World {
         ticks: game.ticks,
         psycheFactory,
         rootTaskFactory,
+        time,
+        worldKnowledgeFactory,
         gameSignal: game.signal,
-        worldKnowledge,
       }),
     } = this.deps;
 

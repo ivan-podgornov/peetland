@@ -12,6 +12,7 @@ import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
 import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
 import type { IPsycheFactory } from '@peetland/psyche';
 import { PsycheFactory } from '@peetland/psyche';
+import type { IReadonlyTime } from '@peetland/timings';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
@@ -53,8 +54,10 @@ export interface NpcFactoryDeps {
   rootTaskFactory: IRootTaskFactory;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
+  /** Время суток, которое знают NPC */
+  time: IReadonlyTime;
   /** Фабрика, которая создаёт знание о мире для NPC */
-  worldKnowledge: INpcWorldKnowledgeFactory;
+  worldKnowledgeFactory: INpcWorldKnowledgeFactory;
 }
 
 export class NpcFactory implements INpcFactory {
@@ -74,7 +77,8 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory = new UrgencyWatcherFactory(),
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      time,
+      worldKnowledgeFactory,
     } = deps;
 
     this.deps = {
@@ -90,7 +94,8 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      time,
+      worldKnowledgeFactory,
     };
   }
 
@@ -108,17 +113,18 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      time,
+      worldKnowledgeFactory,
     } = this.deps;
-    const time = worldKnowledge.time;
     const rootTask = rootTaskFactory.create(data.kind);
+    const actor = actorFactory.create({
+      modelId: data.modelId,
+      position: data.spawnPosition,
+      angle: data.spawnAngle,
+    });
 
     return new Npc(data, {
-      actor: actorFactory.create({
-        modelId: data.modelId,
-        position: data.spawnPosition,
-        angle: data.spawnAngle,
-      }),
+      actor,
       actorNpcRegistry,
       htn: htnFactory.create(rootTask),
       inventory: inventoryFactory.create(data.inventory),
@@ -128,7 +134,7 @@ export class NpcFactory implements INpcFactory {
       addictions: addictionsFactory.create(data.addictions, time),
       urgencyWatcher: urgencyWatcherFactory.create(),
       ticks,
-      worldKnowledge,
+      worldKnowledge: worldKnowledgeFactory.create(actor),
       gameSignal,
     });
   }

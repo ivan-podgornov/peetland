@@ -1,5 +1,5 @@
 import { Npc } from '@peetland/npc';
-import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '@peetland/npc/dev';
+import { createNpcData, createNpcDeps } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
 import { describe, expect, it, vi } from 'vitest';
@@ -12,18 +12,10 @@ describe('NpcWorldKnowledge', () => {
   describe('#time', () => {
     it('Возвращает время суток', () => {
       const time = new ManualTime();
-      const actorNpcRegistry = new ActorNpcRegistry();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actor: createActor(),
-        })
-      );
-      const knowledge = new NpcWorldKnowledge(npc, {
+      const knowledge = new NpcWorldKnowledge(createActor(), {
         time,
         game: createGame(),
-        actorNpcRegistry,
+        actorNpcRegistry: new ActorNpcRegistry(),
       });
 
       expect(knowledge.time).toBe(time);
@@ -34,13 +26,6 @@ describe('NpcWorldKnowledge', () => {
     it('Возвращает NPC, которых видит NPC в радиусе radius', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const actor = createActor();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actor,
-        })
-      );
       const visibleActor = createActor();
       const visibleNpc = new Npc(
         createNpcData(),
@@ -50,7 +35,7 @@ describe('NpcWorldKnowledge', () => {
         })
       );
       const game = createGame({ getVisibleActors: vi.fn(() => [visibleActor]) });
-      const knowledge = new NpcWorldKnowledge(npc, {
+      const knowledge = new NpcWorldKnowledge(actor, {
         time: new ManualTime(),
         game,
         actorNpcRegistry,
@@ -60,53 +45,26 @@ describe('NpcWorldKnowledge', () => {
       expect(game.getVisibleActors).toHaveBeenCalledExactlyOnceWith(actor, 10);
     });
 
-    it('Бросает ошибку, когда NPC не в реестре', () => {
+    it('Бросает ошибку, когда видимый актор без личности', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry: createMockedActorNpcRegistry(),
-          actor: createActor(),
-        })
-      );
-      const game = createGame();
-      const knowledge = new NpcWorldKnowledge(npc, {
+      const visibleActor = createActor();
+      const game = createGame({ getVisibleActors: vi.fn(() => [visibleActor]) });
+      const knowledge = new NpcWorldKnowledge(createActor(), {
         time: new ManualTime(),
         game,
         actorNpcRegistry,
       });
 
-      expect(() => knowledge.getVisibleNpcs(10)).toThrow('NPC не в реестре');
-      expect(game.getVisibleActors).not.toHaveBeenCalled();
+      expect(() => knowledge.getVisibleNpcs(10)).toThrow('У актора нет NPC в реестре');
     });
   });
 });
 
 describe('NpcWorldKnowledgeFactory', () => {
-  describe('#time', () => {
-    it('Возвращает время суток', () => {
-      const time = new ManualTime();
-      const factory = new NpcWorldKnowledgeFactory({
-        time,
-        game: createGame(),
-        actorNpcRegistry: new ActorNpcRegistry(),
-      });
-
-      expect(factory.time).toBe(time);
-    });
-  });
-
   describe('#create', () => {
-    it('Создаёт знание, которое видит мир глазами переданного NPC', () => {
+    it('Создаёт знание, которое видит мир глазами переданного актора', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const actor = createActor();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actor,
-        })
-      );
       const visibleActor = createActor();
       const visibleNpc = new Npc(
         createNpcData(),
@@ -122,7 +80,7 @@ describe('NpcWorldKnowledgeFactory', () => {
         actorNpcRegistry,
       });
 
-      const knowledge = factory.create(npc);
+      const knowledge = factory.create(actor);
 
       expect(knowledge.getVisibleNpcs(10)).toStrictEqual([visibleNpc]);
       expect(game.getVisibleActors).toHaveBeenCalledExactlyOnceWith(actor, 10);

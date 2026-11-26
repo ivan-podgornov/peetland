@@ -106,14 +106,11 @@ export interface INpcWorldKnowledge {
 
 /**
  * Создаёт знание о мире для конкретного NPC. Мир передаёт фабрику, а не готовое знание: знание
- * замыкает NPC, которого ещё нет, когда мир собирает зависимости
+ * замыкает тело NPC, которого ещё нет, когда мир собирает зависимости
  */
 export interface INpcWorldKnowledgeFactory {
-  /** Время суток, которое знают NPC */
-  readonly time: IReadonlyTime;
-
-  /** Создаёт знание о мире для npc */
-  create(npc: INpc): INpcWorldKnowledge;
+  /** Создаёт знание о мире для тела NPC */
+  create(actor: IActor): INpcWorldKnowledge;
 }
 
 /** Зависимости NPC: готовые сущности, с которыми он живёт, и сервисы мира */
@@ -138,8 +135,8 @@ export interface NpcDeps {
   urgencyWatcher: IUrgencyWatcher;
   /** Сообщает о каждом тике мира */
   ticks: Observable<unknown>;
-  /** Фабрика, которая создаёт знание о мире для NPC */
-  worldKnowledge: INpcWorldKnowledgeFactory;
+  /** То, что NPC знает о мире */
+  worldKnowledge: INpcWorldKnowledge;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
 }

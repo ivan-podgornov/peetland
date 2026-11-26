@@ -17,8 +17,7 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import { Npc } from './npc';
 import type { IRootTaskFactory } from './root-task-factory';
-import type { NpcState } from './state';
-import type { IActorNpcRegistry, INpcWorldKnowledge } from './types';
+import type { IActorNpcRegistry, INpcWorldKnowledge, NpcState } from './types';
 
 export interface INpcFactory {
   /** Создаёт NPC по данным */
@@ -111,7 +110,7 @@ export class NpcFactory implements INpcFactory {
       gameSignal,
       worldKnowledge,
     } = this.deps;
-    const { time } = worldKnowledge.getState();
+    const time = worldKnowledge.getTime();
     const rootTask = rootTaskFactory.create(data.kind);
 
     return new Npc(data, {

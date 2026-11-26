@@ -12,7 +12,10 @@ describe('World', () => {
       it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
         const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
-        const npcWorld = { time: new ManualTime() };
+        const npcWorld = {
+          time: new ManualTime(),
+          getVisibleNpcs: () => [],
+        };
         const world = new World(
           createWorldOptions({
             game: createGame({ ticks: ticks.observable }),
@@ -68,7 +71,9 @@ describe('World', () => {
 
         ticks.subscriber.next(undefined);
 
-        expect(preconditions).toHaveBeenCalledWith(expect.objectContaining({ world: { time } }));
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({ world: expect.objectContaining({ time }) })
+        );
       });
     });
   });

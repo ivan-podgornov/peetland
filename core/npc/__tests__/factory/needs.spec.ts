@@ -26,7 +26,10 @@ describe('NpcFactory', () => {
       const factory = new NpcFactory(
         createRequiredDeps({
           needsFactory,
-          worldKnowledge: createMockedNpcWorldKnowledge({ time }),
+          worldKnowledge: createMockedNpcWorldKnowledge({
+            time,
+            getVisibleNpcs: () => [],
+          }),
         })
       );
 

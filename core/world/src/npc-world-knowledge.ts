@@ -19,11 +19,21 @@ export class NpcWorldKnowledge implements INpcWorldKnowledge {
     this.deps = deps;
   }
 
-  /** Возвращает мир с временем суток */
-  getState(): NpcWorldState {
+  /** Возвращает время суток, которое знают NPC */
+  getTime(): IReadonlyTime {
     const { time } = this.deps;
 
-    return { time };
+    return time;
+  }
+
+  /** Возвращает мир с временем суток и видимыми NPC для target */
+  getState(target: INpc): NpcWorldState {
+    const { time } = this.deps;
+
+    return {
+      time,
+      getVisibleNpcs: (radius) => this.getVisibleNpcs(target, radius),
+    };
   }
 
   /** Возвращает NPC, которых видит target в радиусе radius */

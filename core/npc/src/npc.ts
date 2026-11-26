@@ -11,8 +11,7 @@ import type { IPsyche } from '@peetland/psyche';
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import type { NpcKind } from './kind';
-import type { NpcState } from './state';
-import type { INpc, INpcWorldKnowledge, NpcDeps } from './types';
+import type { INpc, INpcWorldKnowledge, NpcDeps, NpcState } from './types';
 
 /** NPC — личность, которая живёт в теле-акторе */
 export class Npc implements INpc {
@@ -107,7 +106,7 @@ export class Npc implements INpc {
         addictions: this.addictions,
         memory: this.memory,
       },
-      world: this.worldKnowledge.getState(),
+      world: this.worldKnowledge.getState(this),
     };
   }
 

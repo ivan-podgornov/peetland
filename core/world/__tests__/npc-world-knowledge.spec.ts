@@ -1,4 +1,5 @@
 import { Npc } from '@peetland/npc';
+import type { IActorNpcRegistry, INpc } from '@peetland/npc';
 import { createMockedActorNpcRegistry, createNpcData, createNpcDeps } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
 import { createActor } from '@peetland/virtual-actor/dev';
@@ -8,17 +9,56 @@ import { createGame } from '../dev';
 import { ActorNpcRegistry } from '../src/actor-npc-registry';
 import { NpcWorldKnowledge } from '../src/npc-world-knowledge';
 
+/** Создаёт NPC, который живёт в переданном реестре связей */
+function createRegisteredNpc(actorNpcRegistry: IActorNpcRegistry, actor = createActor()): INpc {
+  return new Npc(
+    createNpcData(),
+    createNpcDeps({
+      actorNpcRegistry,
+      actor,
+    })
+  );
+}
+
 describe('NpcWorldKnowledge', () => {
   describe('#getState', () => {
     it('Возвращает время суток', () => {
+      const actorNpcRegistry = new ActorNpcRegistry();
       const time = new ManualTime();
       const knowledge = new NpcWorldKnowledge({
         time,
         game: createGame(),
-        actorNpcRegistry: new ActorNpcRegistry(),
+        actorNpcRegistry,
+      });
+      const npc = createRegisteredNpc(actorNpcRegistry);
+
+      expect(knowledge.getState(npc).time).toBe(time);
+    });
+
+    it('Собирает видимость глазами того NPC, для которого собрано состояние', () => {
+      const actorNpcRegistry = new ActorNpcRegistry();
+      const actor = createActor();
+      const npc = createRegisteredNpc(actorNpcRegistry, actor);
+      const otherActor = createActor();
+      const otherNpc = createRegisteredNpc(actorNpcRegistry, otherActor);
+      const visibleActor = createActor();
+      const visibleNpc = createRegisteredNpc(actorNpcRegistry, visibleActor);
+      const game = createGame({
+        getVisibleActors: vi.fn((target) => (target === actor ? [visibleActor] : [])),
+      });
+      const knowledge = new NpcWorldKnowledge({
+        time: new ManualTime(),
+        game,
+        actorNpcRegistry,
       });
 
-      expect(knowledge.getState().time).toBe(time);
+      const npcState = knowledge.getState(npc);
+      const otherNpcState = knowledge.getState(otherNpc);
+
+      expect(npcState.getVisibleNpcs(10)).toStrictEqual([visibleNpc]);
+      expect(otherNpcState.getVisibleNpcs(10)).toStrictEqual([]);
+      expect(game.getVisibleActors).toHaveBeenCalledWith(actor, 10);
+      expect(game.getVisibleActors).toHaveBeenCalledWith(otherActor, 10);
     });
   });
 
@@ -26,21 +66,9 @@ describe('NpcWorldKnowledge', () => {
     it('Возвращает NPC, которых видит target в радиусе radius', () => {
       const actorNpcRegistry = new ActorNpcRegistry();
       const actor = createActor();
-      const npc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actor,
-        })
-      );
+      const npc = createRegisteredNpc(actorNpcRegistry, actor);
       const visibleActor = createActor();
-      const visibleNpc = new Npc(
-        createNpcData(),
-        createNpcDeps({
-          actorNpcRegistry,
-          actor: visibleActor,
-        })
-      );
+      const visibleNpc = createRegisteredNpc(actorNpcRegistry, visibleActor);
       const game = createGame({ getVisibleActors: vi.fn(() => [visibleActor]) });
       const knowledge = new NpcWorldKnowledge({
         time: new ManualTime(),

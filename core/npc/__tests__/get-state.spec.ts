@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createMockedNpcWorldKnowledge, createNpcData, createNpcDeps } from '../dev';
 import { Npc, NpcKind } from '../src';
+import type { NpcWorldState } from '../src';
 
 describe('Npc', () => {
   describe('#getState', () => {
@@ -83,11 +84,23 @@ describe('Npc', () => {
     });
 
     it('Возвращает состояние мира, которое вернуло знание о мире', () => {
-      const world = { time: new ManualTime() };
+      const world: NpcWorldState = {
+        time: new ManualTime(),
+        getVisibleNpcs: () => [],
+      };
       const worldKnowledge = createMockedNpcWorldKnowledge(world);
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
 
       expect(npc.getState().world).toBe(world);
+    });
+
+    it('Передаёт себя в знание о мире, когда собирает состояние', () => {
+      const worldKnowledge = createMockedNpcWorldKnowledge();
+      const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledge }));
+
+      npc.getState();
+
+      expect(worldKnowledge.getState).toHaveBeenCalledExactlyOnceWith(npc);
     });
   });
 });

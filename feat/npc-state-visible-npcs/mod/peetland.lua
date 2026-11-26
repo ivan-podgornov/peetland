@@ -8457,7 +8457,7 @@ function Npc.prototype.____constructor(self, data, deps)
     self.addictions = addictions
     self.memory = memory
     self.urgencyWatcher = urgencyWatcher
-    self.worldKnowledge = worldKnowledge:create(self)
+    self.worldKnowledge = worldKnowledge
     self.lifetime = __TS__New(AbortController)
     actorNpcRegistry:register(actor, self)
     self.context = {
@@ -8585,7 +8585,8 @@ function NpcFactory.prototype.____constructor(self, deps)
     end
     local rootTaskFactory = ____deps_0.rootTaskFactory
     local gameSignal = ____deps_0.gameSignal
-    local worldKnowledge = ____deps_0.worldKnowledge
+    local time = ____deps_0.time
+    local worldKnowledgeFactory = ____deps_0.worldKnowledgeFactory
     self.deps = {
         actorFactory = actorFactory,
         actorNpcRegistry = actorNpcRegistry,
@@ -8599,7 +8600,8 @@ function NpcFactory.prototype.____constructor(self, deps)
         urgencyWatcherFactory = urgencyWatcherFactory,
         rootTaskFactory = rootTaskFactory,
         gameSignal = gameSignal,
-        worldKnowledge = worldKnowledge
+        time = time,
+        worldKnowledgeFactory = worldKnowledgeFactory
     }
 end
 function NpcFactory.prototype.create(self, data)
@@ -8616,14 +8618,15 @@ function NpcFactory.prototype.create(self, data)
     local urgencyWatcherFactory = ____self_deps_1.urgencyWatcherFactory
     local rootTaskFactory = ____self_deps_1.rootTaskFactory
     local gameSignal = ____self_deps_1.gameSignal
-    local worldKnowledge = ____self_deps_1.worldKnowledge
-    local time = worldKnowledge.time
+    local time = ____self_deps_1.time
+    local worldKnowledgeFactory = ____self_deps_1.worldKnowledgeFactory
     local rootTask = rootTaskFactory:create(data.kind)
+    local actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
     return __TS__New(
         Npc,
         data,
         {
-            actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle}),
+            actor = actor,
             actorNpcRegistry = actorNpcRegistry,
             htn = htnFactory:create(rootTask),
             inventory = inventoryFactory:create(data.inventory),
@@ -8633,7 +8636,7 @@ function NpcFactory.prototype.create(self, data)
             addictions = addictionsFactory:create(data.addictions, time),
             urgencyWatcher = urgencyWatcherFactory:create(),
             ticks = ticks,
-            worldKnowledge = worldKnowledge,
+            worldKnowledge = worldKnowledgeFactory:create(actor),
             gameSignal = gameSignal
         }
     )
@@ -8867,17 +8870,16 @@ local ____exports = {}
 ____exports.NpcWorldKnowledge = __TS__Class()
 local NpcWorldKnowledge = ____exports.NpcWorldKnowledge
 NpcWorldKnowledge.name = "NpcWorldKnowledge"
-function NpcWorldKnowledge.prototype.____constructor(self, npc, deps)
-    self.npc = npc
+function NpcWorldKnowledge.prototype.____constructor(self, actor, deps)
+    self.actor = actor
     self.deps = deps
 end
 function NpcWorldKnowledge.prototype.getVisibleNpcs(self, radius)
     local ____self_deps_0 = self.deps
     local actorNpcRegistry = ____self_deps_0.actorNpcRegistry
     local game = ____self_deps_0.game
-    local actor = actorNpcRegistry:getActor(self.npc)
     return __TS__ArrayMap(
-        game:getVisibleActors(actor, radius),
+        game:getVisibleActors(self.actor, radius),
         function(____, visibleActor) return actorNpcRegistry:getNpc(visibleActor) end
     )
 end
@@ -8891,26 +8893,16 @@ __TS__SetDescriptor(
     end},
     true
 )
---- Создаёт знание о мире для каждого NPC: знание замыкает того NPC, для которого создано
+--- Создаёт знание о мире для каждого NPC: знание замыкает тело NPC, для которого создано
 ____exports.NpcWorldKnowledgeFactory = __TS__Class()
 local NpcWorldKnowledgeFactory = ____exports.NpcWorldKnowledgeFactory
 NpcWorldKnowledgeFactory.name = "NpcWorldKnowledgeFactory"
 function NpcWorldKnowledgeFactory.prototype.____constructor(self, deps)
     self.deps = deps
 end
-function NpcWorldKnowledgeFactory.prototype.create(self, npc)
-    return __TS__New(____exports.NpcWorldKnowledge, npc, self.deps)
+function NpcWorldKnowledgeFactory.prototype.create(self, actor)
+    return __TS__New(____exports.NpcWorldKnowledge, actor, self.deps)
 end
-__TS__SetDescriptor(
-    NpcWorldKnowledgeFactory.prototype,
-    "time",
-    {get = function(self)
-        local ____self_deps_2 = self.deps
-        local time = ____self_deps_2.time
-        return time
-    end},
-    true
-)
 return ____exports
  end,
 ["core.addictions-tasks.src.types"] = function(...) 
@@ -10865,6 +10857,10 @@ function World.prototype.bigBang(self)
         if timer == nil then
             timer = __TS__New(Timer)
         end
+        local time = ____self_deps_1.time
+        if time == nil then
+            time = game.time
+        end
         local psycheFactory = ____self_deps_1.psycheFactory
         if psycheFactory == nil then
             psycheFactory = __TS__New(PsycheFactory)
@@ -10877,9 +10873,9 @@ function World.prototype.bigBang(self)
         if actorNpcRegistry == nil then
             actorNpcRegistry = __TS__New(ActorNpcRegistry)
         end
-        local worldKnowledge = ____self_deps_1.worldKnowledge
-        if worldKnowledge == nil then
-            worldKnowledge = __TS__New(NpcWorldKnowledgeFactory, {time = game.time, game = game, actorNpcRegistry = actorNpcRegistry})
+        local worldKnowledgeFactory = ____self_deps_1.worldKnowledgeFactory
+        if worldKnowledgeFactory == nil then
+            worldKnowledgeFactory = __TS__New(NpcWorldKnowledgeFactory, {time = time, game = game, actorNpcRegistry = actorNpcRegistry})
         end
         local worldPlaces = placesFactory:create({places = __TS__Await(places:getAll())})
         local ____self_deps_2 = self.deps
@@ -10895,8 +10891,9 @@ function World.prototype.bigBang(self)
                 ticks = game.ticks,
                 psycheFactory = psycheFactory,
                 rootTaskFactory = rootTaskFactory,
-                gameSignal = game.signal,
-                worldKnowledge = worldKnowledge
+                time = time,
+                worldKnowledgeFactory = worldKnowledgeFactory,
+                gameSignal = game.signal
             })
         end
         for ____, data in ipairs(__TS__Await(npcs:getAll())) do

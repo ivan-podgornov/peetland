@@ -8585,7 +8585,6 @@ function NpcFactory.prototype.____constructor(self, deps)
     end
     local rootTaskFactory = ____deps_0.rootTaskFactory
     local gameSignal = ____deps_0.gameSignal
-    local time = ____deps_0.time
     local worldKnowledgeFactory = ____deps_0.worldKnowledgeFactory
     self.deps = {
         actorFactory = actorFactory,
@@ -8600,7 +8599,6 @@ function NpcFactory.prototype.____constructor(self, deps)
         urgencyWatcherFactory = urgencyWatcherFactory,
         rootTaskFactory = rootTaskFactory,
         gameSignal = gameSignal,
-        time = time,
         worldKnowledgeFactory = worldKnowledgeFactory
     }
 end
@@ -8618,8 +8616,8 @@ function NpcFactory.prototype.create(self, data)
     local urgencyWatcherFactory = ____self_deps_1.urgencyWatcherFactory
     local rootTaskFactory = ____self_deps_1.rootTaskFactory
     local gameSignal = ____self_deps_1.gameSignal
-    local time = ____self_deps_1.time
     local worldKnowledgeFactory = ____self_deps_1.worldKnowledgeFactory
+    local time = worldKnowledgeFactory.time
     local rootTask = rootTaskFactory:create(data.kind)
     local actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
     return __TS__New(
@@ -8904,6 +8902,16 @@ end
 function NpcWorldKnowledgeFactory.prototype.create(self, npc)
     return __TS__New(____exports.NpcWorldKnowledge, npc, self.deps)
 end
+__TS__SetDescriptor(
+    NpcWorldKnowledgeFactory.prototype,
+    "time",
+    {get = function(self)
+        local ____self_deps_2 = self.deps
+        local time = ____self_deps_2.time
+        return time
+    end},
+    true
+)
 return ____exports
  end,
 ["core.addictions-tasks.src.types"] = function(...) 
@@ -10858,10 +10866,6 @@ function World.prototype.bigBang(self)
         if timer == nil then
             timer = __TS__New(Timer)
         end
-        local time = ____self_deps_1.time
-        if time == nil then
-            time = game.time
-        end
         local psycheFactory = ____self_deps_1.psycheFactory
         if psycheFactory == nil then
             psycheFactory = __TS__New(PsycheFactory)
@@ -10876,7 +10880,7 @@ function World.prototype.bigBang(self)
         end
         local worldKnowledgeFactory = ____self_deps_1.worldKnowledgeFactory
         if worldKnowledgeFactory == nil then
-            worldKnowledgeFactory = __TS__New(NpcWorldKnowledgeFactory, {time = time, game = game, actorNpcRegistry = actorNpcRegistry})
+            worldKnowledgeFactory = __TS__New(NpcWorldKnowledgeFactory, {time = game.time, game = game, actorNpcRegistry = actorNpcRegistry})
         end
         local worldPlaces = placesFactory:create({places = __TS__Await(places:getAll())})
         local ____self_deps_2 = self.deps
@@ -10892,7 +10896,6 @@ function World.prototype.bigBang(self)
                 ticks = game.ticks,
                 psycheFactory = psycheFactory,
                 rootTaskFactory = rootTaskFactory,
-                time = time,
                 worldKnowledgeFactory = worldKnowledgeFactory,
                 gameSignal = game.signal
             })

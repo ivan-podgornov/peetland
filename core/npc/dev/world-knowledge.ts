@@ -19,13 +19,14 @@ export function createMockedNpcWorldKnowledge(
 }
 
 /**
- * Создаёт фабрику знания о мире, которая всегда создаёт знание с переданным состоянием. Если
- * состояние передано не полностью, недостающее заполняет createMockedNpcWorldKnowledge
+ * Создаёт фабрику знания о мире, которая всегда создаёт переданное знание. Если знание не
+ * передано, фабрика создаёт знание по умолчанию: полночь и пустой список видимых NPC
  */
 export function createMockedNpcWorldKnowledgeFactory(
-  state: Partial<INpcWorldKnowledge> = {}
+  state: INpcWorldKnowledge = createMockedNpcWorldKnowledge()
 ): Mocked<INpcWorldKnowledgeFactory> {
   return {
-    create: vi.fn(() => createMockedNpcWorldKnowledge(state)),
+    time: state.time,
+    create: vi.fn(() => state),
   };
 }

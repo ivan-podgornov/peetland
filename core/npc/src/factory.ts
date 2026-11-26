@@ -12,7 +12,6 @@ import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
 import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
 import type { IPsycheFactory } from '@peetland/psyche';
 import { PsycheFactory } from '@peetland/psyche';
-import type { IReadonlyTime } from '@peetland/timings';
 
 import type { NpcContext } from './context';
 import type { NpcData } from './data';
@@ -54,8 +53,6 @@ export interface NpcFactoryDeps {
   rootTaskFactory: IRootTaskFactory;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
-  /** Время суток, которое знают NPC */
-  time: IReadonlyTime;
   /** Фабрика, которая создаёт знание о мире для NPC */
   worldKnowledgeFactory: INpcWorldKnowledgeFactory;
 }
@@ -77,7 +74,6 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory = new UrgencyWatcherFactory(),
       rootTaskFactory,
       gameSignal,
-      time,
       worldKnowledgeFactory,
     } = deps;
 
@@ -94,7 +90,6 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      time,
       worldKnowledgeFactory,
     };
   }
@@ -113,9 +108,9 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      time,
       worldKnowledgeFactory,
     } = this.deps;
+    const time = worldKnowledgeFactory.time;
     const rootTask = rootTaskFactory.create(data.kind);
     const actor = actorFactory.create({
       modelId: data.modelId,

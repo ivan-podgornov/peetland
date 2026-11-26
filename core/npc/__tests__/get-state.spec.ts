@@ -84,14 +84,14 @@ describe('Npc', () => {
     });
 
     it('Возвращает состояние мира, которое создала фабрика знания', () => {
-      const world: INpcWorldKnowledge = {
+      const worldKnowledge: INpcWorldKnowledge = {
         time: new ManualTime(),
         getVisibleNpcs: () => [],
       };
-      const worldKnowledgeFactory = createMockedNpcWorldKnowledgeFactory(world);
+      const worldKnowledgeFactory = createMockedNpcWorldKnowledgeFactory(worldKnowledge);
       const npc = new Npc(createNpcData(), createNpcDeps({ worldKnowledgeFactory }));
 
-      expect(npc.getState().world).toBe(worldKnowledgeFactory.create.mock.results[0]?.value);
+      expect(npc.getState().world).toBe(worldKnowledge);
     });
 
     it('Передаёт себя в фабрику знания о мире, когда создаётся', () => {

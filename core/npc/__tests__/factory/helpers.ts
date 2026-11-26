@@ -1,6 +1,5 @@
 import { AbortController } from '@peetland/events';
 import { createControlledObservable } from '@peetland/events/dev';
-import { ManualTime } from '@peetland/timings';
 import { createMockedActorFactory } from '@peetland/virtual-actor/dev';
 import { vi } from 'vitest';
 
@@ -19,7 +18,6 @@ export function createRequiredDeps(deps: Partial<NpcFactoryDeps> = {}): NpcFacto
         methods: [],
       })),
     },
-    time: new ManualTime(),
     worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory(),
     gameSignal: new AbortController().signal,
     ...deps,

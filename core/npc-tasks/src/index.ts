@@ -8,6 +8,7 @@ export type {
 } from './types';
 export type { AddItemTaskOptions } from './add-item-task';
 export type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
+export type { EnsurePlaceFreeTaskOptions } from './ensure-place-free-task';
 export type { NeedsPerformTaskOptions } from './needs-perform-task';
 export type { PlayAnimationTaskOptions } from './play-animation-task';
 export type { PsycheReactTaskOptions } from './psyche-react-task';

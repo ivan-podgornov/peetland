@@ -13,6 +13,7 @@ import { AddItemTask } from '../src/add-item-task';
 import { AddictionsConsumeTask } from '../src/addictions-consume-task';
 import { DrinkTask } from '../src/drink-task';
 import { EatTask } from '../src/eat-task';
+import { EnsurePlaceFreeTask } from '../src/ensure-place-free-task';
 import { GoToCoordsTask } from '../src/go-to-coords-task';
 import { NeedsPerformTask } from '../src/needs-perform-task';
 import { PlayAnimationTask } from '../src/play-animation-task';
@@ -99,6 +100,23 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(RememberFactTask);
+    });
+  });
+
+  describe('#ensurePlaceFree', () => {
+    it('Возвращает EnsurePlaceFreeTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.ensurePlaceFree({
+        placeId: 'begging-spot-1',
+        position: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+      });
+
+      expect(task).toBeInstanceOf(EnsurePlaceFreeTask);
     });
   });
 

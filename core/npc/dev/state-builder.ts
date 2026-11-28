@@ -12,6 +12,7 @@ import { ManualTime } from '@peetland/timings';
 import type { TimeState } from '@peetland/timings';
 
 import { NpcKind } from '../src';
+import type { INpc } from '../src';
 import type { NpcState } from '../src';
 
 /** Собирает психику из переданного билдера психики */
@@ -23,11 +24,14 @@ type NeedsBuild = (builder: NeedsBuilder) => INeeds;
 /** Собирает зависимости из переданного билдера зависимостей */
 type AddictionsBuild = (builder: AddictionsBuilder) => IAddictions;
 
+/** Собирает видимых NPC: функция получает радиус запроса и возвращает NPC, которых видно в нём */
+type VisibleNpcsBuild = (radius: number) => INpc[];
+
 /**
  * Собирает состояние NPC по шагам. То, что не задано, заполняется незначимыми значениями: NPC —
  * бомж, стоит в начале координат, смотрит под углом 0, инвентарь пуст, психика как у PsycheBuilder
- * по умолчанию, потребности удовлетворены полностью, зависимостей нет, память пуста, а в мире
- * полночь первого дня. Каждый вызов
+ * по умолчанию, потребности удовлетворены полностью, зависимостей нет, память пуста, NPC никого не
+ * видит, а в мире полночь первого дня. Каждый вызов
  * build возвращает новое состояние
  *
  * @example
@@ -49,6 +53,7 @@ export class NpcStateBuilder {
   private psyche: PsycheBuild = (builder) => builder.build();
   private needs: NeedsBuild = (builder) => builder.build();
   private addictions: AddictionsBuild = (builder) => builder.build();
+  private visibleNpcs: VisibleNpcsBuild = () => [];
   private time: TimeState = {
     day: 1,
     hours: 0,
@@ -122,6 +127,16 @@ export class NpcStateBuilder {
     return this;
   }
 
+  /**
+   * Задаёт видимых NPC: функция получает радиус запроса и возвращает NPC, которых NPC из состояния
+   * видит в этом радиусе. Чтобы проверить, с каким радиусом задача спрашивает видимых NPC, можно
+   * передать vi.fn
+   */
+  withVisibleNpcs(visibleNpcs: VisibleNpcsBuild): this {
+    this.visibleNpcs = visibleNpcs;
+    return this;
+  }
+
   /** Задаёт время суток в мире: в состояние ляжет ManualTime с этим временем */
   withTime(time: TimeState): this {
     this.time = time;
@@ -147,7 +162,7 @@ export class NpcStateBuilder {
       },
       world: {
         time,
-        getVisibleNpcs: () => [],
+        getVisibleNpcs: this.visibleNpcs,
       },
     };
   }

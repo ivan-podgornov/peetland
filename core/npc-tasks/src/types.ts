@@ -5,6 +5,7 @@ import type { NpcContext, NpcState } from '@peetland/npc';
 
 import type { AddItemTaskOptions } from './add-item-task';
 import type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
+import type { EnsurePlaceFreeTaskOptions } from './ensure-place-free-task';
 import type { NeedsPerformTaskOptions } from './needs-perform-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import type { PsycheReactTaskOptions } from './psyche-react-task';
@@ -28,6 +29,8 @@ export interface INpcTaskFactory {
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
   /** Запомнить факт в память NPC (см. RememberFactTask) */
   rememberFact(options: RememberFactTaskOptions): NpcPrimitiveTask;
+  /** Убедиться, что место свободно (см. EnsurePlaceFreeTask) */
+  ensurePlaceFree(options: EnsurePlaceFreeTaskOptions): NpcPrimitiveTask;
   /** Сообщить психике о поступке (см. PsycheReactTask) */
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask;
   /** Сообщить потребностям о занятии (см. NeedsPerformTask) */

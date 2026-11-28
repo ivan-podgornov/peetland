@@ -9202,6 +9202,51 @@ function PsycheReactTask.prototype.stop(self)
 end
 return ____exports
  end,
+["core.npc-tasks.src.remember-fact-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ObjectAssign = ____lualib.__TS__ObjectAssign
+local ____exports = {}
+--- Запомнить факт: записывает факт в память NPC, например что место занято или мусорка исследована.
+-- Момент запоминания — текущее время из состояния. Задача мгновенная: завершается прямо в start
+____exports.RememberFactTask = __TS__Class()
+local RememberFactTask = ____exports.RememberFactTask
+RememberFactTask.name = "RememberFactTask"
+function RememberFactTask.prototype.____constructor(self, options)
+    self.name = "remember-fact"
+    self.options = options
+end
+function RememberFactTask.prototype.canExecute(self)
+    return true
+end
+function RememberFactTask.prototype.applyEffects(self, state)
+    local memory = state.self.memory:clone()
+    memory:remember(__TS__ObjectAssign(
+        {},
+        self.options,
+        {rememberedAt = state.world.time:getState()}
+    ))
+    return __TS__ObjectAssign(
+        {},
+        state,
+        {self = __TS__ObjectAssign({}, state.self, {memory = memory})}
+    )
+end
+function RememberFactTask.prototype.start(self, state, context)
+    context.memory:remember(__TS__ObjectAssign(
+        {},
+        self.options,
+        {rememberedAt = state.world.time:getState()}
+    ))
+    return "success"
+end
+function RememberFactTask.prototype.update(self)
+    return "failed"
+end
+function RememberFactTask.prototype.stop(self)
+end
+return ____exports
+ end,
 ["core.npc-tasks.src.remove-item-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -9508,6 +9553,8 @@ local ____psyche_2Dreact_2Dtask = require("core.npc-tasks.src.psyche-react-task"
 local PsycheReactTask = ____psyche_2Dreact_2Dtask.PsycheReactTask
 local ____purchase_2Dtask = require("core.npc-tasks.src.purchase-task")
 local PurchaseTask = ____purchase_2Dtask.PurchaseTask
+local ____remember_2Dfact_2Dtask = require("core.npc-tasks.src.remember-fact-task")
+local RememberFactTask = ____remember_2Dfact_2Dtask.RememberFactTask
 local ____remove_2Ditem_2Dtask = require("core.npc-tasks.src.remove-item-task")
 local RemoveItemTask = ____remove_2Ditem_2Dtask.RemoveItemTask
 local ____try_2Dluck_2Dtask = require("core.npc-tasks.src.try-luck-task")
@@ -9532,6 +9579,9 @@ function NpcTaskFactory.prototype.addItem(self, options)
 end
 function NpcTaskFactory.prototype.removeItem(self, options)
     return __TS__New(RemoveItemTask, options)
+end
+function NpcTaskFactory.prototype.rememberFact(self, options)
+    return __TS__New(RememberFactTask, options)
 end
 function NpcTaskFactory.prototype.psycheReact(self, options)
     return __TS__New(PsycheReactTask, options)

@@ -18,6 +18,7 @@ import { NeedsPerformTask } from '../src/needs-perform-task';
 import { PlayAnimationTask } from '../src/play-animation-task';
 import { PsycheReactTask } from '../src/psyche-react-task';
 import { PurchaseTask } from '../src/purchase-task';
+import { RememberFactTask } from '../src/remember-fact-task';
 import { RemoveItemTask } from '../src/remove-item-task';
 import { TryLuckTask } from '../src/try-luck-task';
 
@@ -85,6 +86,19 @@ describe('NpcTaskFactory', () => {
       });
 
       expect(task).toBeInstanceOf(RemoveItemTask);
+    });
+  });
+
+  describe('#rememberFact', () => {
+    it('Возвращает RememberFactTask', () => {
+      const factory = new NpcTaskFactory(createNpcTaskFactoryDeps());
+
+      const task = factory.rememberFact({
+        type: 'placeTaken',
+        details: { placeId: 'begging-spot-1' },
+      });
+
+      expect(task).toBeInstanceOf(RememberFactTask);
     });
   });
 

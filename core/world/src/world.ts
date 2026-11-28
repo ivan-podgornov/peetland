@@ -1,4 +1,8 @@
+import type { IAddictionsFactory } from '@peetland/addictions';
+import { AddictionsFactory } from '@peetland/addictions';
 import type { IGame } from '@peetland/game';
+import type { INeedsFactory } from '@peetland/needs';
+import { NeedsFactory } from '@peetland/needs';
 import { NpcFactory } from '@peetland/npc';
 import type {
   IActorNpcRegistry,
@@ -39,6 +43,10 @@ export type WorldDeps = {
   timer: ITimer;
   /** Фабрика, которой NPC создают свои психики */
   psycheFactory: IPsycheFactory;
+  /** Фабрика, которой мир создаёт потребности NPC. Фабрика сама знает время, с которого они падают */
+  needsFactory: INeedsFactory;
+  /** Фабрика, которой мир создаёт зависимости NPC. Фабрика сама знает время, с которого растёт тяга */
+  addictionsFactory: IAddictionsFactory;
   /** Фабрика, которой мир создаёт запросы к загруженным местам */
   placesFactory: IPlacesFactory;
   /** Фабрика, которой NPC создают корневые задачи по своему типу */
@@ -70,6 +78,8 @@ export class World {
       random = new Random(),
       timer = new Timer(),
       psycheFactory = new PsycheFactory(),
+      needsFactory = new NeedsFactory({ time: game.time }),
+      addictionsFactory = new AddictionsFactory({ time: game.time }),
       placesFactory = new PlacesFactory({ geometry: game.geometry }),
       actorNpcRegistry = new ActorNpcRegistry(),
       worldKnowledgeFactory = new NpcWorldKnowledgeFactory({
@@ -91,6 +101,8 @@ export class World {
         actorNpcRegistry,
         ticks: game.ticks,
         psycheFactory,
+        needsFactory,
+        addictionsFactory,
         rootTaskFactory,
         worldKnowledgeFactory,
         gameSignal: game.signal,

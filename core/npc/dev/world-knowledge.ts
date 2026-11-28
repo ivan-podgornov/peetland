@@ -26,7 +26,6 @@ export function createMockedNpcWorldKnowledgeFactory(
   state: INpcWorldKnowledge = createMockedNpcWorldKnowledge()
 ): Mocked<INpcWorldKnowledgeFactory> {
   return {
-    time: state.time,
     create: vi.fn(() => state),
   };
 }

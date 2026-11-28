@@ -1,5 +1,4 @@
 import type { IAddictionsFactory } from '@peetland/addictions';
-import { AddictionsFactory } from '@peetland/addictions';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory } from '@peetland/game';
 import type { IHTNFactory } from '@peetland/htn';
@@ -9,7 +8,7 @@ import { InventoryFactory } from '@peetland/inventory';
 import type { IMemoryFactory } from '@peetland/memory';
 import { MemoryFactory } from '@peetland/memory';
 import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
-import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
+import { UrgencyWatcherFactory } from '@peetland/needs';
 import type { IPsycheFactory } from '@peetland/psyche';
 import { PsycheFactory } from '@peetland/psyche';
 
@@ -25,8 +24,8 @@ export interface INpcFactory {
 }
 
 /**
- * Зависимости фабрики NPC. Снаружи нужны игра, её сигнал завершения, знание о мире и корневые задачи, а фабрики сущностей она
- * создаёт сама, если их не передали
+ * Зависимости фабрики NPC. Снаружи нужны игра, её сигнал завершения, знание о мире, корневые задачи,
+ * потребности и зависимости, а остальные фабрики сущностей она создаёт сама, если их не передали
  */
 export interface NpcFactoryDeps {
   /** Фабрика, которая создаёт актора — тело NPC */
@@ -43,10 +42,10 @@ export interface NpcFactoryDeps {
   memoryFactory?: IMemoryFactory;
   /** Фабрика, которая создаёт психики */
   psycheFactory?: IPsycheFactory;
-  /** Фабрика, которая создаёт потребности */
-  needsFactory?: INeedsFactory;
-  /** Фабрика, которая создаёт зависимости */
-  addictionsFactory?: IAddictionsFactory;
+  /** Фабрика, которая создаёт потребности. Фабрика сама знает время, с которого потребности падают */
+  needsFactory: INeedsFactory;
+  /** Фабрика, которая создаёт зависимости. Фабрика сама знает время, с которого растёт тяга */
+  addictionsFactory: IAddictionsFactory;
   /** Фабрика, которая создаёт наблюдателей, следящих, когда потребности становятся срочными */
   urgencyWatcherFactory?: IUrgencyWatcherFactory;
   /** Фабрика, которая создаёт корневую задачу HTN-агента по типу NPC */
@@ -69,8 +68,8 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory = new InventoryFactory(),
       memoryFactory = new MemoryFactory(),
       psycheFactory = new PsycheFactory(),
-      needsFactory = new NeedsFactory(),
-      addictionsFactory = new AddictionsFactory(),
+      needsFactory,
+      addictionsFactory,
       urgencyWatcherFactory = new UrgencyWatcherFactory(),
       rootTaskFactory,
       gameSignal,
@@ -110,7 +109,6 @@ export class NpcFactory implements INpcFactory {
       gameSignal,
       worldKnowledgeFactory,
     } = this.deps;
-    const time = worldKnowledgeFactory.time;
     const rootTask = rootTaskFactory.create(data.kind);
     const actor = actorFactory.create({
       modelId: data.modelId,
@@ -125,8 +123,8 @@ export class NpcFactory implements INpcFactory {
       inventory: inventoryFactory.create(data.inventory),
       memory: memoryFactory.create(),
       psyche: psycheFactory.create(data.psyche),
-      needs: needsFactory.create(data.needs, time),
-      addictions: addictionsFactory.create(data.addictions, time),
+      needs: needsFactory.create(data.needs),
+      addictions: addictionsFactory.create(data.addictions),
       urgencyWatcher: urgencyWatcherFactory.create(),
       ticks,
       worldKnowledgeFactory,

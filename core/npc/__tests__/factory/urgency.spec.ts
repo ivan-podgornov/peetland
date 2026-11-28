@@ -1,7 +1,8 @@
 import { createControlledObservable } from '@peetland/events/dev';
 import { createMockedHTN, createMockedHTNFactory } from '@peetland/htn/dev';
-import { Need } from '@peetland/needs';
+import { Need, NeedsFactory } from '@peetland/needs';
 import { createMockedUrgencyWatcherFactory, createNeedValues } from '@peetland/needs/dev';
+import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
 import { createNpcData } from '../../dev';
@@ -28,6 +29,7 @@ describe('NpcFactory', () => {
         createRequiredDeps({
           ticks: ticks.observable,
           htnFactory: createMockedHTNFactory(htn),
+          needsFactory: new NeedsFactory({ time: new ManualTime() }),
         })
       );
       factory.create(

@@ -5,37 +5,23 @@ import {
   createNeedsDeps,
   createNeedsState,
 } from '@peetland/needs/dev';
-import { ManualTime } from '@peetland/timings';
 import { describe, expect, it } from 'vitest';
 
-import { createMockedNpcWorldKnowledgeFactory, createNpcData } from '../../dev';
+import { createNpcData } from '../../dev';
 import { NpcFactory } from '../../src';
 
 import { createRequiredDeps } from './helpers';
 
 describe('NpcFactory', () => {
   describe('#create', () => {
-    it('Вызывает needsFactory.create с начальными потребностями из данных и временем мира', () => {
+    it('Вызывает needsFactory.create с начальными потребностями из данных', () => {
       const needsFactory = createMockedNeedsFactory();
-      const time = new ManualTime({
-        day: 3,
-        hours: 8,
-        minutes: 0,
-      });
       const data = createNpcData({ needs: createNeedValues({ [Need.Satiety]: 70 }) });
-      const factory = new NpcFactory(
-        createRequiredDeps({
-          needsFactory,
-          worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory({
-            time,
-            getVisibleNpcs: () => [],
-          }),
-        })
-      );
+      const factory = new NpcFactory(createRequiredDeps({ needsFactory }));
 
       factory.create(data);
 
-      expect(needsFactory.create).toHaveBeenCalledExactlyOnceWith(data.needs, time);
+      expect(needsFactory.create).toHaveBeenCalledExactlyOnceWith(data.needs);
     });
 
     it('Передаёт NPC потребности, которые вернула needsFactory', () => {
@@ -47,14 +33,6 @@ describe('NpcFactory', () => {
       const npc = factory.create(createNpcData());
 
       expect(npc.getState().self.needs).toBe(needs);
-    });
-
-    it('Если needsFactory не передана, NPC получает экземпляр Needs', () => {
-      const factory = new NpcFactory(createRequiredDeps());
-
-      const npc = factory.create(createNpcData());
-
-      expect(npc.getState().self.needs).toBeInstanceOf(Needs);
     });
   });
 });

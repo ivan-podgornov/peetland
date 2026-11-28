@@ -39,6 +39,6 @@ export class NeedsBuilder {
 
   /** Возвращает собранные потребности */
   build(): INeeds {
-    return new NeedsFactory().create(this.values, new ManualTime(this.time));
+    return new NeedsFactory({ time: new ManualTime(this.time) }).create(this.values);
   }
 }

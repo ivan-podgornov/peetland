@@ -52,13 +52,6 @@ export class NpcWorldKnowledgeFactory implements INpcWorldKnowledgeFactory {
     this.deps = deps;
   }
 
-  /** Возвращает время суток, которое знают NPC */
-  get time(): IReadonlyTime {
-    const { time } = this.deps;
-
-    return time;
-  }
-
   /** Создаёт знание о мире для npc */
   create(npc: INpc): INpcWorldKnowledge {
     return new NpcWorldKnowledge(npc, this.deps);

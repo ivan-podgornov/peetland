@@ -109,9 +109,6 @@ export interface INpcWorldKnowledge {
  * замыкает NPC, которого ещё нет, когда мир собирает зависимости
  */
 export interface INpcWorldKnowledgeFactory {
-  /** Время суток, которое знают NPC */
-  readonly time: IReadonlyTime;
-
   /** Создаёт знание о мире для npc */
   create(npc: INpc): INpcWorldKnowledge;
 }

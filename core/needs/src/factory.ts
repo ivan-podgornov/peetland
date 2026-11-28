@@ -10,14 +10,17 @@ import type { INeedsValidator } from './validator';
 
 export interface INeedsFactory {
   /**
-   * Создаёт потребности с начальными значениями, которые падают с момента time (см. Needs)
+   * Создаёт потребности с начальными значениями, которые падают с момента, который знает фабрика
+   * (см. time в зависимостях фабрики)
    * @param values - начальное значение каждой потребности
-   * @param time - время, с которого потребности начинают падать
    */
-  create(values: NeedValues, time: IReadonlyTime): INeeds;
+  create(values: NeedValues): INeeds;
 }
 
-export type NeedsFactoryDeps = Partial<
+export type NeedsFactoryDeps = {
+  /** Время, с которого потребности начинают падать */
+  time: IReadonlyTime;
+} & Partial<
   NeedsDeps & {
     validator: INeedsValidator;
   }
@@ -25,16 +28,18 @@ export type NeedsFactoryDeps = Partial<
 
 export class NeedsFactory implements INeedsFactory {
   private readonly deps: NeedsDeps;
+  private readonly time: IReadonlyTime;
 
-  constructor(deps: NeedsFactoryDeps = {}) {
-    const { validator = new NeedsValidator() } = deps;
+  constructor(deps: NeedsFactoryDeps) {
+    const { time, validator = new NeedsValidator() } = deps;
     const { needFactory = new NeedFactory({ validator }) } = deps;
 
+    this.time = time;
     this.deps = { needFactory };
   }
 
-  create(values: NeedValues, time: IReadonlyTime): INeeds {
-    const since = time.getState();
+  create(values: NeedValues): INeeds {
+    const since = this.time.getState();
     const state = Object.fromEntries(
       Object.values(Need).map((need) => [
         need,

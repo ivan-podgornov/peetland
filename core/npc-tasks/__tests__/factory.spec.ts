@@ -1,4 +1,5 @@
 import { ConsumptionType } from '@peetland/addictions';
+import { Geometry } from '@peetland/geometry';
 import { ParallelTask } from '@peetland/htn';
 import { Item } from '@peetland/inventory';
 import { ActivityType } from '@peetland/needs';
@@ -109,11 +110,7 @@ describe('NpcTaskFactory', () => {
 
       const task = factory.ensurePlaceFree({
         placeId: 'begging-spot-1',
-        position: {
-          x: 0,
-          y: 0,
-          z: 0,
-        },
+        position: Geometry.vector3(0, 0, 0),
       });
 
       expect(task).toBeInstanceOf(EnsurePlaceFreeTask);

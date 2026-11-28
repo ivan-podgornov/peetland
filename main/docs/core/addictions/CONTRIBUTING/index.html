@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/addictions | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/addictions | Peetland"><meta data-rh="true" name="description" content="Зависимости NPC: удовлетворённость, которая падает со временем тем быстрее, чем сильнее зависимость,"><meta data-rh="true" property="og:description" content="Зависимости NPC: удовлетворённость, которая падает со временем тем быстрее, чем сильнее зависимость,"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/addictions","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/addictions/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.245df72e.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.d293d612.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.0a8c335f.js" defer="defer"></script>
 </head>
 <body>
@@ -72,8 +72,9 @@
 <code>getState</code> и <code>clone()</code>. Такими зависимости лежат в состоянии NPC. <code>clone()</code> возвращает копию за
 <code>IAddictions</code>, в которую можно писать: так эффекты задач меняют зависимости, не трогая живые.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="создание-и-сохранение">Создание и сохранение<a href="#создание-и-сохранение" class="hash-link" aria-label="Прямая ссылка на Создание и сохранение" title="Прямая ссылка на Создание и сохранение" translate="no">​</a></h2>
-<p><code>AddictionsFactory.create(data, time)</code> создаёт зависимости с начальными удовлетворённостью и силой
-каждой (<code>AddictionsData</code>), которые падают с момента <code>time</code>. <code>getState()</code> возвращает
+<p><code>AddictionsFactory.create(data)</code> создаёт зависимости с начальными удовлетворённостью и силой
+каждой (<code>AddictionsData</code>), которые падают с момента, который фабрика знает о мире: фабрика получает
+время в зависимостях. <code>getState()</code> возвращает
 удовлетворённость, силу и момент каждой зависимости (<code>AddictionsState</code>), а конструктор <code>Addictions</code> собирает из такого же
 объекта такие же зависимости.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="проверка-удовлетворённости-и-силы">Проверка удовлетворённости и силы<a href="#проверка-удовлетворённости-и-силы" class="hash-link" aria-label="Прямая ссылка на Проверка удовлетворённости и силы" title="Прямая ссылка на Проверка удовлетворённости и силы" translate="no">​</a></h2>

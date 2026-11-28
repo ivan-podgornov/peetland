@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/npc | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/npc | Peetland"><meta data-rh="true" name="description" content="NPC: склеивает актора, инвентарь, психику, потребности, зависимости и HTN-агента, который каждый"><meta data-rh="true" property="og:description" content="NPC: склеивает актора, инвентарь, психику, потребности, зависимости и HTN-агента, который каждый"><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/npc","item":"https://ivan-podgornov.github.io/peetland/main/docs/core/npc/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/main/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/main/docs/assets/js/runtime~main.245df72e.js" defer="defer"></script>
+<script src="/peetland/main/docs/assets/js/runtime~main.d293d612.js" defer="defer"></script>
 <script src="/peetland/main/docs/assets/js/main.0a8c335f.js" defer="defer"></script>
 </head>
 <body>
@@ -16,9 +16,11 @@
 тик планирует и исполняет задачи. Собирает NPC из данных фабрика NPC.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="состояние-и-контекст">Состояние и контекст<a href="#состояние-и-контекст" class="hash-link" aria-label="Прямая ссылка на Состояние и контекст" title="Прямая ссылка на Состояние и контекст" translate="no">​</a></h2>
 <ul>
-<li class=""><strong>Состояние</strong> (<code>NpcState</code>) — тип NPC, слепок актора и сами инвентарь, психика, потребности,
-зависимости и время, доступные только на чтение (<code>IReadonlyInventory</code>, <code>IReadonlyPsyche</code>,
-<code>IReadonlyNeeds</code>, <code>IReadonlyAddictions</code>, <code>IReadonlyTime</code>). С ним HTN-агент планирует задачи. Эффекты задач состояние не меняют: сущность,
+<li class=""><strong>Состояние</strong> (<code>NpcState</code>) — тип NPC, слепок актора и сами инвентарь, психика, потребности и
+зависимости, доступные только на чтение (<code>IReadonlyInventory</code>, <code>IReadonlyPsyche</code>,
+<code>IReadonlyNeeds</code>, <code>IReadonlyAddictions</code>), а также знание о мире (<code>INpcWorldKnowledge</code>): время
+суток и видимые NPC (<code>state.world.time</code>, <code>state.world.getVisibleNpcs(radius)</code>). С ним HTN-агент
+планирует задачи. Эффекты задач состояние не меняют: сущность,
 которую нужно поменять, задача клонирует (<code>clone()</code>) и кладёт копию в новое состояние. Время
 идёт, и его геттеры могут вернуть разное даже за одно планирование, а копия времени стоит на
 месте, пока её не выставят.</li>
@@ -27,7 +29,7 @@
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="потребности">Потребности<a href="#потребности" class="hash-link" aria-label="Прямая ссылка на Потребности" title="Прямая ссылка на Потребности" translate="no">​</a></h2>
 <p>Начальные значения потребностей лежат в <code>NpcData.needs</code>. Фабрика NPC создаёт потребности
-фабрикой <code>INeedsFactory</code> со временем, которое NPC знает о мире в момент создания: с него потребности и начинают
+фабрикой <code>INeedsFactory</code>: фабрика сама знает время, с которого потребности начинают
 падать. Значения потребностей читаются на момент времени из того же состояния:
 <code>state.self.needs.get(need, state.world.time)</code> (см. <a class="" href="/peetland/main/docs/core/needs/CONTRIBUTING/">потребности</a>).</p>
 <p>Если NPC ушёл в долгое дело, срочная потребность не должна ждать конца плана. Поэтому фабрика NPC
@@ -38,15 +40,16 @@
 потребность срочная, повторной остановки нет.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="зависимости">Зависимости<a href="#зависимости" class="hash-link" aria-label="Прямая ссылка на Зависимости" title="Прямая ссылка на Зависимости" translate="no">​</a></h2>
 <p>Начальные значение и сила каждой зависимости лежат в <code>NpcData.addictions</code>. Фабрика NPC создаёт
-зависимости фабрикой <code>IAddictionsFactory</code> с тем же временем, что и потребности: с него и растёт
+зависимости фабрикой <code>IAddictionsFactory</code>: с того же момента, с которого падают потребности, и растёт
 тяга. Значения зависимостей тоже читаются на момент времени из того же состояния (см.
 <a class="" href="/peetland/main/docs/core/addictions/CONTRIBUTING/">зависимости</a>). Наблюдатель срочности за зависимостями не следит:
 тяга не прерывает план, а ждёт следующего планирования.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="сборка">Сборка<a href="#сборка" class="hash-link" aria-label="Прямая ссылка на Сборка" title="Прямая ссылка на Сборка" translate="no">​</a></h2>
 <p><code>NpcFactory</code> — точка сборки пакета. Она создаёт актора, инвентарь, психику, потребности,
 зависимости, наблюдателя срочности и HTN-агента с корневой задачей из данных NPC и передаёт их
-<code>Npc</code> готовыми. Снаружи фабрике нужны только акторы, тики, сигнал завершения игры, знание о мире
-и фабрика корневых задач, остальное она собирает сама.</p>
+<code>Npc</code> готовыми. Знание о мире <code>Npc</code> создаёт сам через фабрику, которую получает в зависимостях.
+Снаружи фабрике нужны только акторы, тики, сигнал завершения игры, фабрика знания о мире, фабрика
+корневых задач, потребности и зависимости, остальное она собирает сама.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="корневая-задача">Корневая задача<a href="#корневая-задача" class="hash-link" aria-label="Прямая ссылка на Корневая задача" title="Прямая ссылка на Корневая задача" translate="no">​</a></h2>
 <p>NPC не зависит от задач. Корневую задачу HTN-агента получает фабрика NPC от фабрики
 <code>IRootTaskFactory</code>, которую объявляет сам и получает в зависимостях. Какую реализацию передать,
@@ -61,7 +64,7 @@
 узнать, какие это NPC, — существует реестр связей «актор ↔ NPC». Интерфейсы <code>INpc</code> и
 <code>IActorNpcRegistry</code> объявляет <code>npc</code>, потому что они потребляются NPC: <code>INpc</code> — публичный интерфейс
 личности, через него с ней работает реестр. Переводы реестра бросают ошибку, когда сущности
-в реестре нет: это ошибка вызывающего кода, а проверить наличие личности можно через <code>hasNpc</code>.
+в реестре нет: это ошибка вызывающего кода.
 В конструкторе NPC связывает в реестре своего
 актора с собой. Сигнал жизни NPC — часть его публичного API: когда NPC деспавняется, сигнал
 прерывается, и реестр убирает связь.

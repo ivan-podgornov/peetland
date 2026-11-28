@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.2">
 <title data-rh="true">@peetland/needs | Peetland</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/needs/CONTRIBUTING/"><meta data-rh="true" property="og:locale" content="ru"><meta data-rh="true" name="docusaurus_locale" content="ru"><meta data-rh="true" name="docsearch:language" content="ru"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-core-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-core-current"><meta data-rh="true" property="og:title" content="@peetland/needs | Peetland"><meta data-rh="true" name="description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><meta data-rh="true" property="og:description" content="Потребности NPC: значения, которые сами падают со временем и меняются от занятий."><link data-rh="true" rel="canonical" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/needs/CONTRIBUTING/"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/needs/CONTRIBUTING/" hreflang="ru"><link data-rh="true" rel="alternate" href="https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/needs/CONTRIBUTING/" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"@peetland/needs","item":"https://ivan-podgornov.github.io/peetland/feat/npc-state-visible-npcs/docs/core/needs/CONTRIBUTING"}]}</script><link rel="stylesheet" href="/peetland/feat/npc-state-visible-npcs/docs/assets/css/styles.3f58d634.css">
-<script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/runtime~main.ba751965.js" defer="defer"></script>
+<script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/runtime~main.5b566f65.js" defer="defer"></script>
 <script src="/peetland/feat/npc-state-visible-npcs/docs/assets/js/main.b2084958.js" defer="defer"></script>
 </head>
 <body>
@@ -84,8 +84,8 @@
 потребности лежат в состоянии NPC. <code>clone()</code> возвращает копию за <code>INeeds</code>, в которую можно писать:
 так эффекты задач меняют потребности, не трогая живые.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="создание-и-сохранение">Создание и сохранение<a href="#создание-и-сохранение" class="hash-link" aria-label="Прямая ссылка на Создание и сохранение" title="Прямая ссылка на Создание и сохранение" translate="no">​</a></h2>
-<p><code>NeedsFactory.create(values, time)</code> создаёт потребности с начальными значениями, которые падают с
-момента <code>time</code>.</p>
+<p><code>NeedsFactory.create(values)</code> создаёт потребности с начальными значениями, которые падают с
+момента, который фабрика знает о мире: фабрика получает время в зависимостях.</p>
 <p><code>getState()</code> возвращает значение каждой потребности и момент, когда его выставили, а конструктор
 <code>Needs</code> собирает из такого же объекта такие же потребности.</p>
 <h2 class="anchor anchorTargetStickyNavbar_tleR" id="проверка-значений">Проверка значений<a href="#проверка-значений" class="hash-link" aria-label="Прямая ссылка на Проверка значений" title="Прямая ссылка на Проверка значений" translate="no">​</a></h2>

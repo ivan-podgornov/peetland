@@ -7006,10 +7006,8 @@ ____exports.AddictionsFactory = __TS__Class()
 local AddictionsFactory = ____exports.AddictionsFactory
 AddictionsFactory.name = "AddictionsFactory"
 function AddictionsFactory.prototype.____constructor(self, deps)
-    if deps == nil then
-        deps = {}
-    end
     local ____deps_0 = deps
+    local time = ____deps_0.time
     local validator = ____deps_0.validator
     if validator == nil then
         validator = __TS__New(AddictionsValidator)
@@ -7019,10 +7017,11 @@ function AddictionsFactory.prototype.____constructor(self, deps)
     if addictionFactory == nil then
         addictionFactory = __TS__New(AddictionFactory, {validator = validator})
     end
+    self.time = time
     self.deps = {addictionFactory = addictionFactory}
 end
-function AddictionsFactory.prototype.create(self, data, time)
-    local since = time:getState()
+function AddictionsFactory.prototype.create(self, data)
+    local since = self.time:getState()
     local state = __TS__ObjectFromEntries(__TS__ArrayMap(
         __TS__ObjectValues(Addiction),
         function(____, addiction) return {
@@ -7396,10 +7395,8 @@ ____exports.NeedsFactory = __TS__Class()
 local NeedsFactory = ____exports.NeedsFactory
 NeedsFactory.name = "NeedsFactory"
 function NeedsFactory.prototype.____constructor(self, deps)
-    if deps == nil then
-        deps = {}
-    end
     local ____deps_0 = deps
+    local time = ____deps_0.time
     local validator = ____deps_0.validator
     if validator == nil then
         validator = __TS__New(NeedsValidator)
@@ -7409,10 +7406,11 @@ function NeedsFactory.prototype.____constructor(self, deps)
     if needFactory == nil then
         needFactory = __TS__New(NeedFactory, {validator = validator})
     end
+    self.time = time
     self.deps = {needFactory = needFactory}
 end
-function NeedsFactory.prototype.create(self, values, time)
-    local since = time:getState()
+function NeedsFactory.prototype.create(self, values)
+    local since = self.time:getState()
     local state = __TS__ObjectFromEntries(__TS__ArrayMap(
         __TS__ObjectValues(Need),
         function(____, need) return {need, {value = values[need], since = since}} end
@@ -8532,8 +8530,6 @@ local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
 local __TS__New = ____lualib.__TS__New
 local ____exports = {}
-local ____addictions = require("core.addictions.src.index")
-local AddictionsFactory = ____addictions.AddictionsFactory
 local ____htn = require("toolkit.htn.src.index")
 local HTNFactory = ____htn.HTNFactory
 local ____inventory = require("core.inventory.src.index")
@@ -8541,7 +8537,6 @@ local InventoryFactory = ____inventory.InventoryFactory
 local ____memory = require("core.memory.src.index")
 local MemoryFactory = ____memory.MemoryFactory
 local ____needs = require("core.needs.src.index")
-local NeedsFactory = ____needs.NeedsFactory
 local UrgencyWatcherFactory = ____needs.UrgencyWatcherFactory
 local ____psyche = require("core.psyche.src.index")
 local PsycheFactory = ____psyche.PsycheFactory
@@ -8572,13 +8567,7 @@ function NpcFactory.prototype.____constructor(self, deps)
         psycheFactory = __TS__New(PsycheFactory)
     end
     local needsFactory = ____deps_0.needsFactory
-    if needsFactory == nil then
-        needsFactory = __TS__New(NeedsFactory)
-    end
     local addictionsFactory = ____deps_0.addictionsFactory
-    if addictionsFactory == nil then
-        addictionsFactory = __TS__New(AddictionsFactory)
-    end
     local urgencyWatcherFactory = ____deps_0.urgencyWatcherFactory
     if urgencyWatcherFactory == nil then
         urgencyWatcherFactory = __TS__New(UrgencyWatcherFactory)
@@ -8617,7 +8606,6 @@ function NpcFactory.prototype.create(self, data)
     local rootTaskFactory = ____self_deps_1.rootTaskFactory
     local gameSignal = ____self_deps_1.gameSignal
     local worldKnowledgeFactory = ____self_deps_1.worldKnowledgeFactory
-    local time = worldKnowledgeFactory.time
     local rootTask = rootTaskFactory:create(data.kind)
     local actor = actorFactory:create({modelId = data.modelId, position = data.spawnPosition, angle = data.spawnAngle})
     return __TS__New(
@@ -8630,8 +8618,8 @@ function NpcFactory.prototype.create(self, data)
             inventory = inventoryFactory:create(data.inventory),
             memory = memoryFactory:create(),
             psyche = psycheFactory:create(data.psyche),
-            needs = needsFactory:create(data.needs, time),
-            addictions = addictionsFactory:create(data.addictions, time),
+            needs = needsFactory:create(data.needs),
+            addictions = addictionsFactory:create(data.addictions),
             urgencyWatcher = urgencyWatcherFactory:create(),
             ticks = ticks,
             worldKnowledgeFactory = worldKnowledgeFactory,
@@ -8902,16 +8890,6 @@ end
 function NpcWorldKnowledgeFactory.prototype.create(self, npc)
     return __TS__New(____exports.NpcWorldKnowledge, npc, self.deps)
 end
-__TS__SetDescriptor(
-    NpcWorldKnowledgeFactory.prototype,
-    "time",
-    {get = function(self)
-        local ____self_deps_2 = self.deps
-        local time = ____self_deps_2.time
-        return time
-    end},
-    true
-)
 return ____exports
  end,
 ["core.addictions-tasks.src.types"] = function(...) 
@@ -10825,6 +10803,10 @@ local __TS__New = ____lualib.__TS__New
 local __TS__AsyncAwaiter = ____lualib.__TS__AsyncAwaiter
 local __TS__Await = ____lualib.__TS__Await
 local ____exports = {}
+local ____addictions = require("core.addictions.src.index")
+local AddictionsFactory = ____addictions.AddictionsFactory
+local ____needs = require("core.needs.src.index")
+local NeedsFactory = ____needs.NeedsFactory
 local ____npc = require("core.npc.src.index")
 local NpcFactory = ____npc.NpcFactory
 local ____places = require("core.places.src.index")
@@ -10870,6 +10852,14 @@ function World.prototype.bigBang(self)
         if psycheFactory == nil then
             psycheFactory = __TS__New(PsycheFactory)
         end
+        local needsFactory = ____self_deps_1.needsFactory
+        if needsFactory == nil then
+            needsFactory = __TS__New(NeedsFactory, {time = game.time})
+        end
+        local addictionsFactory = ____self_deps_1.addictionsFactory
+        if addictionsFactory == nil then
+            addictionsFactory = __TS__New(AddictionsFactory, {time = game.time})
+        end
         local placesFactory = ____self_deps_1.placesFactory
         if placesFactory == nil then
             placesFactory = __TS__New(PlacesFactory, {geometry = game.geometry})
@@ -10895,6 +10885,8 @@ function World.prototype.bigBang(self)
                 actorNpcRegistry = actorNpcRegistry,
                 ticks = game.ticks,
                 psycheFactory = psycheFactory,
+                needsFactory = needsFactory,
+                addictionsFactory = addictionsFactory,
                 rootTaskFactory = rootTaskFactory,
                 worldKnowledgeFactory = worldKnowledgeFactory,
                 gameSignal = game.signal

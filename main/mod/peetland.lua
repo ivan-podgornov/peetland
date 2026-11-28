@@ -9100,6 +9100,62 @@ function AddictionsConsumeTask.prototype.stop(self)
 end
 return ____exports
  end,
+["core.npc-tasks.src.ensure-place-free-task"] = function(...) 
+local ____lualib = require("lualib_bundle")
+local __TS__Class = ____lualib.__TS__Class
+local __TS__ArraySome = ____lualib.__TS__ArraySome
+local ____exports = {}
+--- Убедиться, что место свободно: перед занятием места NPC смотрит, нет ли у места видимого NPC в
+-- радиусе занятости. Место занято — задача запоминает факт `placeTaken` и завершается неудачей,
+-- чтобы HTN перепланировал. Проверка только визуальная: невидимого соседа NPC не «чувствует». Задача
+-- мгновенная: завершается прямо в start
+____exports.EnsurePlaceFreeTask = __TS__Class()
+local EnsurePlaceFreeTask = ____exports.EnsurePlaceFreeTask
+EnsurePlaceFreeTask.name = "EnsurePlaceFreeTask"
+function EnsurePlaceFreeTask.prototype.____constructor(self, options, deps)
+    self.name = "ensure-place-free"
+    self.options = options
+    self.deps = deps
+end
+function EnsurePlaceFreeTask.prototype.canExecute(self)
+    return true
+end
+function EnsurePlaceFreeTask.prototype.applyEffects(self, state)
+    return state
+end
+function EnsurePlaceFreeTask.prototype.start(self, state, context)
+    local ____self_deps_0 = self.deps
+    local geometry = ____self_deps_0.geometry
+    local ____self_options_1 = self.options
+    local placeId = ____self_options_1.placeId
+    local position = ____self_options_1.position
+    local distance = geometry:getDistance3d(state.self.actor.position, position)
+    local visibleNpcs = state.world:getVisibleNpcs(distance + ____exports.EnsurePlaceFreeTask.OCCUPANCY_RADIUS)
+    local taken = __TS__ArraySome(
+        visibleNpcs,
+        function(____, npc) return geometry:getDistance3d(
+            npc:getState().self.actor.position,
+            position
+        ) <= ____exports.EnsurePlaceFreeTask.OCCUPANCY_RADIUS end
+    )
+    if not taken then
+        return "success"
+    end
+    context.memory:remember({
+        type = "placeTaken",
+        details = {placeId = placeId},
+        rememberedAt = state.world.time:getState()
+    })
+    return "failed"
+end
+function EnsurePlaceFreeTask.prototype.update(self)
+    return "failed"
+end
+function EnsurePlaceFreeTask.prototype.stop(self)
+end
+EnsurePlaceFreeTask.OCCUPANCY_RADIUS = 2
+return ____exports
+ end,
 ["core.npc-tasks.src.needs-perform-task"] = function(...) 
 local ____lualib = require("lualib_bundle")
 local __TS__Class = ____lualib.__TS__Class
@@ -9543,6 +9599,8 @@ local ____drink_2Dtask = require("core.npc-tasks.src.drink-task")
 local DrinkTask = ____drink_2Dtask.DrinkTask
 local ____eat_2Dtask = require("core.npc-tasks.src.eat-task")
 local EatTask = ____eat_2Dtask.EatTask
+local ____ensure_2Dplace_2Dfree_2Dtask = require("core.npc-tasks.src.ensure-place-free-task")
+local EnsurePlaceFreeTask = ____ensure_2Dplace_2Dfree_2Dtask.EnsurePlaceFreeTask
 local ____go_2Dto_2Dcoords_2Dtask = require("core.npc-tasks.src.go-to-coords-task")
 local GoToCoordsTask = ____go_2Dto_2Dcoords_2Dtask.GoToCoordsTask
 local ____needs_2Dperform_2Dtask = require("core.npc-tasks.src.needs-perform-task")
@@ -9583,6 +9641,11 @@ end
 function NpcTaskFactory.prototype.rememberFact(self, options)
     return __TS__New(RememberFactTask, options)
 end
+function NpcTaskFactory.prototype.ensurePlaceFree(self, options)
+    local ____self_deps_0 = self.deps
+    local geometry = ____self_deps_0.geometry
+    return __TS__New(EnsurePlaceFreeTask, options, {geometry = geometry})
+end
 function NpcTaskFactory.prototype.psycheReact(self, options)
     return __TS__New(PsycheReactTask, options)
 end
@@ -9593,9 +9656,9 @@ function NpcTaskFactory.prototype.addictionsConsume(self, options)
     return __TS__New(AddictionsConsumeTask, options)
 end
 function NpcTaskFactory.prototype.tryLuck(self, options)
-    local ____self_deps_0 = self.deps
-    local random = ____self_deps_0.random
-    local timer = ____self_deps_0.timer
+    local ____self_deps_1 = self.deps
+    local random = ____self_deps_1.random
+    local timer = ____self_deps_1.timer
     return __TS__New(TryLuckTask, options, {random = random, timer = timer})
 end
 function NpcTaskFactory.prototype.parallel(self, options)

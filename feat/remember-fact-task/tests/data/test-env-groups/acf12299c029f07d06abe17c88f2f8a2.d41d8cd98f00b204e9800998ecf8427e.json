@@ -1,0 +1,1 @@
+{"id":"acf12299c029f07d06abe17c88f2f8a2.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isBooze Если предмет не пойло (bottles), возвращает false","name":"Если предмет не пойло (bottles), возвращает false","status":"passed","testResultsByEnv":{"default":"4c68e5f8107a5ae5d611072165c3f740"}}

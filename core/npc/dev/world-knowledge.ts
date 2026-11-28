@@ -2,17 +2,30 @@ import { ManualTime } from '@peetland/timings';
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { INpcWorldKnowledge, NpcWorldState } from '../src';
+import type { INpcWorldKnowledge, INpcWorldKnowledgeFactory } from '../src';
 
 /**
- * Создаёт знание о мире, которое всегда возвращает переданное состояние мира. Если состояние не
- * передано, в мире полночь
+ * Создаёт знание о мире с переданным состоянием. Если состояние передано не полностью, недостающее
+ * заполняется незначимыми значениями: в мире полночь, а видимых NPC нет
  */
 export function createMockedNpcWorldKnowledge(
-  state: NpcWorldState = { time: new ManualTime() }
-): Mocked<INpcWorldKnowledge> {
+  state: Partial<INpcWorldKnowledge> = {}
+): INpcWorldKnowledge {
   return {
-    getState: vi.fn(() => state),
-    getVisibleNpcs: vi.fn(() => []),
+    time: new ManualTime(),
+    getVisibleNpcs: () => [],
+    ...state,
+  };
+}
+
+/**
+ * Создаёт фабрику знания о мире, которая всегда создаёт переданное знание. Если знание не
+ * передано, фабрика создаёт знание по умолчанию: полночь и пустой список видимых NPC
+ */
+export function createMockedNpcWorldKnowledgeFactory(
+  state: INpcWorldKnowledge = createMockedNpcWorldKnowledge()
+): Mocked<INpcWorldKnowledgeFactory> {
+  return {
+    create: vi.fn(() => state),
   };
 }

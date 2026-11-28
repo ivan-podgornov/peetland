@@ -10,15 +10,17 @@ import type { IAddictionsValidator } from './validator';
 
 export interface IAddictionsFactory {
   /**
-   * Создаёт зависимости с начальными удовлетворённостью и силой, которые падают с момента time (см.
-   * Addictions)
+   * Создаёт зависимости с начальными удовлетворённостью и силой, которые падают с момента, который
+   * знает фабрика (см. time в зависимостях фабрики)
    * @param data - начальные удовлетворённость и сила каждой зависимости
-   * @param time - время, с которого растёт тяга
    */
-  create(data: AddictionsData, time: IReadonlyTime): IAddictions;
+  create(data: AddictionsData): IAddictions;
 }
 
-export type AddictionsFactoryDeps = Partial<
+export type AddictionsFactoryDeps = {
+  /** Время, с которого растёт тяга */
+  time: IReadonlyTime;
+} & Partial<
   AddictionsDeps & {
     validator: IAddictionsValidator;
   }
@@ -26,16 +28,18 @@ export type AddictionsFactoryDeps = Partial<
 
 export class AddictionsFactory implements IAddictionsFactory {
   private readonly deps: AddictionsDeps;
+  private readonly time: IReadonlyTime;
 
-  constructor(deps: AddictionsFactoryDeps = {}) {
-    const { validator = new AddictionsValidator() } = deps;
+  constructor(deps: AddictionsFactoryDeps) {
+    const { time, validator = new AddictionsValidator() } = deps;
     const { addictionFactory = new AddictionFactory({ validator }) } = deps;
 
+    this.time = time;
     this.deps = { addictionFactory };
   }
 
-  create(data: AddictionsData, time: IReadonlyTime): IAddictions {
-    const since = time.getState();
+  create(data: AddictionsData): IAddictions {
+    const since = this.time.getState();
     const state = Object.fromEntries(
       Object.values(Addiction).map((addiction) => [
         addiction,

@@ -1,5 +1,4 @@
 import type { IAddictionsFactory } from '@peetland/addictions';
-import { AddictionsFactory } from '@peetland/addictions';
 import type { IAbortSignal, Observable } from '@peetland/events';
 import type { IActorFactory } from '@peetland/game';
 import type { IHTNFactory } from '@peetland/htn';
@@ -9,7 +8,7 @@ import { InventoryFactory } from '@peetland/inventory';
 import type { IMemoryFactory } from '@peetland/memory';
 import { MemoryFactory } from '@peetland/memory';
 import type { INeedsFactory, IUrgencyWatcherFactory } from '@peetland/needs';
-import { NeedsFactory, UrgencyWatcherFactory } from '@peetland/needs';
+import { UrgencyWatcherFactory } from '@peetland/needs';
 import type { IPsycheFactory } from '@peetland/psyche';
 import { PsycheFactory } from '@peetland/psyche';
 
@@ -17,8 +16,7 @@ import type { NpcContext } from './context';
 import type { NpcData } from './data';
 import { Npc } from './npc';
 import type { IRootTaskFactory } from './root-task-factory';
-import type { NpcState } from './state';
-import type { IActorNpcRegistry, INpcWorldKnowledge } from './types';
+import type { IActorNpcRegistry, INpcWorldKnowledgeFactory, NpcState } from './types';
 
 export interface INpcFactory {
   /** Создаёт NPC по данным */
@@ -26,8 +24,8 @@ export interface INpcFactory {
 }
 
 /**
- * Зависимости фабрики NPC. Снаружи нужны игра, её сигнал завершения, знание о мире и корневые задачи, а фабрики сущностей она
- * создаёт сама, если их не передали
+ * Зависимости фабрики NPC. Снаружи нужны игра, её сигнал завершения, знание о мире, корневые задачи,
+ * потребности и зависимости, а остальные фабрики сущностей она создаёт сама, если их не передали
  */
 export interface NpcFactoryDeps {
   /** Фабрика, которая создаёт актора — тело NPC */
@@ -44,18 +42,18 @@ export interface NpcFactoryDeps {
   memoryFactory?: IMemoryFactory;
   /** Фабрика, которая создаёт психики */
   psycheFactory?: IPsycheFactory;
-  /** Фабрика, которая создаёт потребности */
-  needsFactory?: INeedsFactory;
-  /** Фабрика, которая создаёт зависимости */
-  addictionsFactory?: IAddictionsFactory;
+  /** Фабрика, которая создаёт потребности. Фабрика сама знает время, с которого потребности падают */
+  needsFactory: INeedsFactory;
+  /** Фабрика, которая создаёт зависимости. Фабрика сама знает время, с которого растёт тяга */
+  addictionsFactory: IAddictionsFactory;
   /** Фабрика, которая создаёт наблюдателей, следящих, когда потребности становятся срочными */
   urgencyWatcherFactory?: IUrgencyWatcherFactory;
   /** Фабрика, которая создаёт корневую задачу HTN-агента по типу NPC */
   rootTaskFactory: IRootTaskFactory;
   /** Переходит в состояние aborted, когда игра завершается. Тогда NPC деспавнится */
   gameSignal: IAbortSignal;
-  /** То, что NPC знает о мире */
-  worldKnowledge: INpcWorldKnowledge;
+  /** Фабрика, которая создаёт знание о мире для NPC */
+  worldKnowledgeFactory: INpcWorldKnowledgeFactory;
 }
 
 export class NpcFactory implements INpcFactory {
@@ -70,12 +68,12 @@ export class NpcFactory implements INpcFactory {
       inventoryFactory = new InventoryFactory(),
       memoryFactory = new MemoryFactory(),
       psycheFactory = new PsycheFactory(),
-      needsFactory = new NeedsFactory(),
-      addictionsFactory = new AddictionsFactory(),
+      needsFactory,
+      addictionsFactory,
       urgencyWatcherFactory = new UrgencyWatcherFactory(),
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      worldKnowledgeFactory,
     } = deps;
 
     this.deps = {
@@ -91,7 +89,7 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      worldKnowledgeFactory,
     };
   }
 
@@ -109,27 +107,27 @@ export class NpcFactory implements INpcFactory {
       urgencyWatcherFactory,
       rootTaskFactory,
       gameSignal,
-      worldKnowledge,
+      worldKnowledgeFactory,
     } = this.deps;
-    const { time } = worldKnowledge.getState();
     const rootTask = rootTaskFactory.create(data.kind);
+    const actor = actorFactory.create({
+      modelId: data.modelId,
+      position: data.spawnPosition,
+      angle: data.spawnAngle,
+    });
 
     return new Npc(data, {
-      actor: actorFactory.create({
-        modelId: data.modelId,
-        position: data.spawnPosition,
-        angle: data.spawnAngle,
-      }),
+      actor,
       actorNpcRegistry,
       htn: htnFactory.create(rootTask),
       inventory: inventoryFactory.create(data.inventory),
       memory: memoryFactory.create(),
       psyche: psycheFactory.create(data.psyche),
-      needs: needsFactory.create(data.needs, time),
-      addictions: addictionsFactory.create(data.addictions, time),
+      needs: needsFactory.create(data.needs),
+      addictions: addictionsFactory.create(data.addictions),
       urgencyWatcher: urgencyWatcherFactory.create(),
       ticks,
-      worldKnowledge,
+      worldKnowledgeFactory,
       gameSignal,
     });
   }

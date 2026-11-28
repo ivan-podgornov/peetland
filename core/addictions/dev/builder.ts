@@ -56,6 +56,6 @@ export class AddictionsBuilder {
 
   /** Возвращает собранные зависимости */
   build(): IAddictions {
-    return new AddictionsFactory().create(this.data, new ManualTime(this.time));
+    return new AddictionsFactory({ time: new ManualTime(this.time) }).create(this.data);
   }
 }

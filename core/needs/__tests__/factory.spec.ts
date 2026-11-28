@@ -12,22 +12,25 @@ import { Need, Needs, NeedsFactory } from '../src';
 describe('NeedsFactory', () => {
   describe('#create', () => {
     it('Возвращает экземпляр Needs', () => {
-      const factory = new NeedsFactory(createNeedsDeps());
+      const factory = new NeedsFactory({
+        time: new ManualTime(),
+        ...createNeedsDeps(),
+      });
 
-      expect(factory.create(createNeedValues(), new ManualTime())).toBeInstanceOf(Needs);
+      expect(factory.create(createNeedValues())).toBeInstanceOf(Needs);
     });
 
-    it('Выставляет начальные значения на момент переданного времени', () => {
-      const factory = new NeedsFactory(createNeedsDeps());
-
-      const needs = factory.create(
-        createNeedValues({ [Need.Satiety]: 80 }),
-        new ManualTime({
+    it('Выставляет начальные значения на момент времени фабрики', () => {
+      const factory = new NeedsFactory({
+        time: new ManualTime({
           day: 2,
           hours: 9,
           minutes: 15,
-        })
-      );
+        }),
+        ...createNeedsDeps(),
+      });
+
+      const needs = factory.create(createNeedValues({ [Need.Satiety]: 80 }));
 
       expect(needs.getState()).toStrictEqual({
         [Need.Satiety]: {
@@ -42,9 +45,9 @@ describe('NeedsFactory', () => {
     });
 
     it('Если валидатор не передан, проверяет значения NeedsValidator', () => {
-      const factory = new NeedsFactory();
+      const factory = new NeedsFactory({ time: new ManualTime() });
       function create() {
-        return factory.create(createNeedValues({ [Need.Satiety]: -1 }), new ManualTime());
+        return factory.create(createNeedValues({ [Need.Satiety]: -1 }));
       }
 
       expect(create).toThrow(RangeError);
@@ -53,7 +56,10 @@ describe('NeedsFactory', () => {
     it('Собирает потребности переданной фабрикой потребностей', () => {
       const needFactory = createMockedNeedFactory();
 
-      new NeedsFactory({ needFactory }).create(createNeedValues(), new ManualTime());
+      new NeedsFactory({
+        time: new ManualTime(),
+        needFactory,
+      }).create(createNeedValues());
 
       expect(needFactory.create).toHaveBeenCalledOnce();
     });
@@ -61,7 +67,10 @@ describe('NeedsFactory', () => {
     it('Проверяет значения переданным валидатором', () => {
       const validator = createMockedNeedsValidator();
 
-      new NeedsFactory({ validator }).create(createNeedValues(), new ManualTime());
+      new NeedsFactory({
+        time: new ManualTime(),
+        validator,
+      }).create(createNeedValues());
 
       expect(validator.validateValue).toHaveBeenCalled();
     });

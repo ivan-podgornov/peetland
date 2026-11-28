@@ -1,5 +1,5 @@
 import { createControlledObservable } from '@peetland/events/dev';
-import { createMockedNpcWorldKnowledge, createNpcData } from '@peetland/npc/dev';
+import { createMockedNpcWorldKnowledgeFactory, createNpcData } from '@peetland/npc/dev';
 import { ManualTime } from '@peetland/timings';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -12,14 +12,17 @@ describe('World', () => {
       it('NPC планирует с тем, что вернуло worldKnowledge', async () => {
         const ticks = createControlledObservable();
         const preconditions = vi.fn(() => false);
-        const npcWorld = { time: new ManualTime() };
+        const npcWorld = {
+          time: new ManualTime(),
+          getVisibleNpcs: () => [],
+        };
         const world = new World(
           createWorldOptions({
             game: createGame({ ticks: ticks.observable }),
             npcs: [createNpcData()],
           }),
           {
-            worldKnowledge: createMockedNpcWorldKnowledge(npcWorld),
+            worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory(npcWorld),
             rootTaskFactory: createMockedRootTaskFactory({
               name: 'root',
               methods: [
@@ -68,7 +71,9 @@ describe('World', () => {
 
         ticks.subscriber.next(undefined);
 
-        expect(preconditions).toHaveBeenCalledWith(expect.objectContaining({ world: { time } }));
+        expect(preconditions).toHaveBeenCalledWith(
+          expect.objectContaining({ world: expect.objectContaining({ time }) })
+        );
       });
     });
   });

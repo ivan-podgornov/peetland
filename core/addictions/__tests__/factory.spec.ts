@@ -12,13 +12,23 @@ import { Addiction, Addictions, AddictionsFactory } from '../src';
 describe('AddictionsFactory', () => {
   describe('#create', () => {
     it('Возвращает экземпляр Addictions', () => {
-      const factory = new AddictionsFactory(createAddictionsDeps());
+      const factory = new AddictionsFactory({
+        time: new ManualTime(),
+        ...createAddictionsDeps(),
+      });
 
-      expect(factory.create(createAddictionsData(), new ManualTime())).toBeInstanceOf(Addictions);
+      expect(factory.create(createAddictionsData())).toBeInstanceOf(Addictions);
     });
 
-    it('Выставляет начальные удовлетворённость и силу на момент переданного времени', () => {
-      const factory = new AddictionsFactory(createAddictionsDeps());
+    it('Выставляет начальные удовлетворённость и силу на момент времени фабрики', () => {
+      const factory = new AddictionsFactory({
+        time: new ManualTime({
+          day: 2,
+          hours: 9,
+          minutes: 15,
+        }),
+        ...createAddictionsDeps(),
+      });
       const since = {
         day: 2,
         hours: 9,
@@ -31,8 +41,7 @@ describe('AddictionsFactory', () => {
             satisfaction: 30,
             strength: 70,
           },
-        }),
-        new ManualTime(since)
+        })
       );
 
       expect(addictions.getState()).toStrictEqual({
@@ -45,7 +54,7 @@ describe('AddictionsFactory', () => {
     });
 
     it('Если валидатор не передан, проверяет удовлетворённость AddictionsValidator', () => {
-      const factory = new AddictionsFactory();
+      const factory = new AddictionsFactory({ time: new ManualTime() });
       function create() {
         return factory.create(
           createAddictionsData({
@@ -53,8 +62,7 @@ describe('AddictionsFactory', () => {
               satisfaction: -1,
               strength: 0,
             },
-          }),
-          new ManualTime()
+          })
         );
       }
 
@@ -62,7 +70,7 @@ describe('AddictionsFactory', () => {
     });
 
     it('Если валидатор не передан, проверяет силу AddictionsValidator', () => {
-      const factory = new AddictionsFactory();
+      const factory = new AddictionsFactory({ time: new ManualTime() });
       function create() {
         return factory.create(
           createAddictionsData({
@@ -70,8 +78,7 @@ describe('AddictionsFactory', () => {
               satisfaction: 100,
               strength: 101,
             },
-          }),
-          new ManualTime()
+          })
         );
       }
 
@@ -81,7 +88,10 @@ describe('AddictionsFactory', () => {
     it('Собирает зависимости переданной фабрикой зависимостей', () => {
       const addictionFactory = createMockedAddictionFactory();
 
-      new AddictionsFactory({ addictionFactory }).create(createAddictionsData(), new ManualTime());
+      new AddictionsFactory({
+        time: new ManualTime(),
+        addictionFactory,
+      }).create(createAddictionsData());
 
       expect(addictionFactory.create).toHaveBeenCalledTimes(Object.values(Addiction).length);
     });
@@ -89,7 +99,10 @@ describe('AddictionsFactory', () => {
     it('Проверяет удовлетворённость переданным валидатором', () => {
       const validator = createMockedAddictionsValidator();
 
-      new AddictionsFactory({ validator }).create(createAddictionsData(), new ManualTime());
+      new AddictionsFactory({
+        time: new ManualTime(),
+        validator,
+      }).create(createAddictionsData());
 
       expect(validator.validateSatisfaction).toHaveBeenCalled();
     });

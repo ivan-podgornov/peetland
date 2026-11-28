@@ -84,8 +84,9 @@ const satisfaction = state.self.addictions.get(Addiction.Alcoholism, state.world
 
 ## Создание и сохранение
 
-`AddictionsFactory.create(data, time)` создаёт зависимости с начальными удовлетворённостью и силой
-каждой (`AddictionsData`), которые падают с момента `time`. `getState()` возвращает
+`AddictionsFactory.create(data)` создаёт зависимости с начальными удовлетворённостью и силой
+каждой (`AddictionsData`), которые падают с момента, который фабрика знает о мире: фабрика получает
+время в зависимостях. `getState()` возвращает
 удовлетворённость, силу и момент каждой зависимости (`AddictionsState`), а конструктор `Addictions` собирает из такого же
 объекта такие же зависимости.
 

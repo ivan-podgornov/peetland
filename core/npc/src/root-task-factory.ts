@@ -2,7 +2,7 @@ import type { Task } from '@peetland/htn';
 
 import type { NpcContext } from './context';
 import type { NpcKind } from './kind';
-import type { NpcState } from './state';
+import type { NpcState } from './types';
 
 /**
  * Создаёт корневые задачи, которые планируют HTN-агенты NPC. NPC объявляет, какая фабрика ему

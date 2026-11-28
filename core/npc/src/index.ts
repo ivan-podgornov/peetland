@@ -4,6 +4,13 @@ export { NpcFactory } from './factory';
 export type { INpcFactory, NpcFactoryDeps } from './factory';
 export { NpcKind } from './kind';
 export { Npc } from './npc';
-export type { IActorNpcRegistry, INpc, INpcWorldKnowledge } from './types';
 export type { IActivityTaskFactory, IRootTaskFactory } from './root-task-factory';
-export type { NpcActorState, NpcSelfState, NpcState, NpcWorldState } from './state';
+export type {
+  NpcActorState,
+  NpcSelfState,
+  NpcState,
+  IActorNpcRegistry,
+  INpc,
+  INpcWorldKnowledge,
+  INpcWorldKnowledgeFactory,
+} from './types';

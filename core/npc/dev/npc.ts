@@ -28,7 +28,7 @@ import type { NpcContext, NpcState } from '../src';
 import type { NpcDeps } from '../src/types';
 
 import { createMockedActorNpcRegistry } from './actor-npc-registry';
-import { createMockedNpcWorldKnowledge } from './world-knowledge';
+import { createMockedNpcWorldKnowledgeFactory } from './world-knowledge';
 
 /** Создаёт данные NPC. Поля, которые не переданы, заполняются незначимыми значениями */
 export function createNpcData(data: Partial<NpcData> = {}): NpcData {
@@ -63,7 +63,7 @@ export function createNpcDeps(deps: Partial<NpcDeps> = {}): NpcDeps {
     memory: new Memory(),
     urgencyWatcher: createMockedUrgencyWatcher(),
     ticks: createControlledObservable().observable,
-    worldKnowledge: createMockedNpcWorldKnowledge(),
+    worldKnowledgeFactory: createMockedNpcWorldKnowledgeFactory(),
     gameSignal: new AbortController().signal,
     ...deps,
   };

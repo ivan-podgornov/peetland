@@ -7,18 +7,17 @@ import { RememberFactTask } from '../src/remember-fact-task';
 describe('RememberFactTask', () => {
   describe('#start', () => {
     it('Запоминает факт в память из контекста с моментом из времени мира', () => {
+      const time = {
+        day: 2,
+        hours: 14,
+        minutes: 30,
+      };
       const memory = new Memory();
       const context = {
         ...createNpcContext(),
         memory,
       };
-      const state = new NpcStateBuilder()
-        .withTime({
-          day: 2,
-          hours: 14,
-          minutes: 30,
-        })
-        .build();
+      const state = new NpcStateBuilder().withTime(time).build();
       const task = new RememberFactTask({
         type: 'placeTaken',
         details: { placeId: 'begging-spot-1' },
@@ -30,11 +29,7 @@ describe('RememberFactTask', () => {
         {
           type: 'placeTaken',
           details: { placeId: 'begging-spot-1' },
-          rememberedAt: {
-            day: 2,
-            hours: 14,
-            minutes: 30,
-          },
+          rememberedAt: time,
         },
       ]);
     });
@@ -53,13 +48,12 @@ describe('RememberFactTask', () => {
 
   describe('#applyEffects', () => {
     it('Запоминает факт копии памяти из состояния с моментом из времени мира', () => {
-      const state = new NpcStateBuilder()
-        .withTime({
-          day: 2,
-          hours: 14,
-          minutes: 30,
-        })
-        .build();
+      const time = {
+        day: 2,
+        hours: 14,
+        minutes: 30,
+      };
+      const state = new NpcStateBuilder().withTime(time).build();
       const task = new RememberFactTask({
         type: 'placeTaken',
         details: { placeId: 'begging-spot-1' },
@@ -71,11 +65,7 @@ describe('RememberFactTask', () => {
         {
           type: 'placeTaken',
           details: { placeId: 'begging-spot-1' },
-          rememberedAt: {
-            day: 2,
-            hours: 14,
-            minutes: 30,
-          },
+          rememberedAt: time,
         },
       ]);
     });

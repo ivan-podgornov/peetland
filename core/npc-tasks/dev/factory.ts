@@ -31,6 +31,7 @@ export function createNpcTaskFactory(factory: Partial<INpcTaskFactory> = {}): IN
     addItem: (options) => real.addItem(options),
     removeItem: (options) => real.removeItem(options),
     rememberFact: (options) => real.rememberFact(options),
+    ensurePlaceFree: (options) => real.ensurePlaceFree(options),
     psycheReact: (options) => real.psycheReact(options),
     needsPerform: (options) => real.needsPerform(options),
     addictionsConsume: (options) => real.addictionsConsume(options),

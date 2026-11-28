@@ -13,6 +13,8 @@ import { AddictionsConsumeTask } from './addictions-consume-task';
 import type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
 import { DrinkTask } from './drink-task';
 import { EatTask } from './eat-task';
+import { EnsurePlaceFreeTask } from './ensure-place-free-task';
+import type { EnsurePlaceFreeTaskOptions } from './ensure-place-free-task';
 import { GoToCoordsTask } from './go-to-coords-task';
 import { NeedsPerformTask } from './needs-perform-task';
 import type { NeedsPerformTaskOptions } from './needs-perform-task';
@@ -70,6 +72,12 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   rememberFact(options: RememberFactTaskOptions): NpcPrimitiveTask {
     return new RememberFactTask(options);
+  }
+
+  ensurePlaceFree(options: EnsurePlaceFreeTaskOptions): NpcPrimitiveTask {
+    const { geometry } = this.deps;
+
+    return new EnsurePlaceFreeTask(options, { geometry });
   }
 
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask {

@@ -1,1 +1,0 @@
-{"id":"5a83c65bd124ffc87fce89e4bb199d0a.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/virtual-actor/__tests__/get-position.spec.ts#VirtualActor #getPosition Изменение возвращённой позиции не сдвигает актора","name":"Изменение возвращённой позиции не сдвигает актора","status":"passed","testResultsByEnv":{"default":"a793517e7bc2676bb35beeff3b91eda1"}}

@@ -1,1 +1,0 @@
-{"id":"19cbdaeaa3a42e69ad81df8553facde1.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/world/__tests__/npc-world-knowledge.spec.ts#NpcWorldKnowledge #getVisibleNpcs Бросает ошибку, когда NPC не в реестре","name":"Бросает ошибку, когда NPC не в реестре","status":"passed","testResultsByEnv":{"default":"1777168568f9eb1de4a50b2311b34519"}}

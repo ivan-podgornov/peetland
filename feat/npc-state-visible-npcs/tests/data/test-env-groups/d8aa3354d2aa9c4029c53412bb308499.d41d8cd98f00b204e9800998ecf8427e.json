@@ -1,1 +1,0 @@
-{"id":"d8aa3354d2aa9c4029c53412bb308499.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:toolkit/geometry/__tests__/format-point.spec.ts#Geometry #formatPoint Если координаты отрицательные, сохраняет знак","name":"Если координаты отрицательные, сохраняет знак","status":"passed","testResultsByEnv":{"default":"6cc515b3899f41f7ddf7b3bb9e779e6d"}}

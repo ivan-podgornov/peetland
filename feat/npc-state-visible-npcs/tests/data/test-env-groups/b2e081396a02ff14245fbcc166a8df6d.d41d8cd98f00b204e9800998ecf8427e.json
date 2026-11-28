@@ -1,1 +1,0 @@
-{"id":"b2e081396a02ff14245fbcc166a8df6d.d41d8cd98f00b204e9800998ecf8427e","fullName":"peetland:core/inventory/__tests__/classifier.spec.ts#ItemClassifier #isFood Если у предмета есть тег еды (smile-pizza), возвращает true","name":"Если у предмета есть тег еды (smile-pizza), возвращает true","status":"passed","testResultsByEnv":{"default":"9f82e096e1c03282207106248ad67e9c"}}

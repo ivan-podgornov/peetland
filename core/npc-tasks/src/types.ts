@@ -8,6 +8,7 @@ import type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
 import type { NeedsPerformTaskOptions } from './needs-perform-task';
 import type { PlayAnimationTaskOptions } from './play-animation-task';
 import type { PsycheReactTaskOptions } from './psyche-react-task';
+import type { RememberFactTaskOptions } from './remember-fact-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
 import type { TryLuckTaskOptions } from './try-luck-task';
 
@@ -25,6 +26,8 @@ export interface INpcTaskFactory {
   addItem(options: AddItemTaskOptions): NpcPrimitiveTask;
   /** Отнять предмет из инвентаря (см. RemoveItemTask) */
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask;
+  /** Запомнить факт в память NPC (см. RememberFactTask) */
+  rememberFact(options: RememberFactTaskOptions): NpcPrimitiveTask;
   /** Сообщить психике о поступке (см. PsycheReactTask) */
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask;
   /** Сообщить потребностям о занятии (см. NeedsPerformTask) */

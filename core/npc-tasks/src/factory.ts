@@ -21,6 +21,8 @@ import type { PlayAnimationTaskOptions } from './play-animation-task';
 import { PsycheReactTask } from './psyche-react-task';
 import type { PsycheReactTaskOptions } from './psyche-react-task';
 import { PurchaseTask } from './purchase-task';
+import { RememberFactTask } from './remember-fact-task';
+import type { RememberFactTaskOptions } from './remember-fact-task';
 import { RemoveItemTask } from './remove-item-task';
 import type { RemoveItemTaskOptions } from './remove-item-task';
 import { TryLuckTask } from './try-luck-task';
@@ -64,6 +66,10 @@ export class NpcTaskFactory implements INpcTaskFactory {
 
   removeItem(options: RemoveItemTaskOptions): NpcPrimitiveTask {
     return new RemoveItemTask(options);
+  }
+
+  rememberFact(options: RememberFactTaskOptions): NpcPrimitiveTask {
+    return new RememberFactTask(options);
   }
 
   psycheReact(options: PsycheReactTaskOptions): NpcPrimitiveTask {

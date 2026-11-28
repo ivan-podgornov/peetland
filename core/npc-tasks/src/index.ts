@@ -11,5 +11,6 @@ export type { AddictionsConsumeTaskOptions } from './addictions-consume-task';
 export type { NeedsPerformTaskOptions } from './needs-perform-task';
 export type { PlayAnimationTaskOptions } from './play-animation-task';
 export type { PsycheReactTaskOptions } from './psyche-react-task';
+export type { RememberFactTaskOptions } from './remember-fact-task';
 export type { RemoveItemTaskOptions } from './remove-item-task';
 export type { TryLuckTaskOptions } from './try-luck-task';
